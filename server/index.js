@@ -92,7 +92,6 @@ io.sockets.on('connection', function (socket) {
 				name: message.name,
 				pos: pos,
 				rot: message.rot,
-				tRot: message.tRot,
 				aVeloc: message.aVeloc,
 				lVeloc: message.lVeloc,
 				lastMove: getTime(),
@@ -103,7 +102,6 @@ io.sockets.on('connection', function (socket) {
 				name: message.name,
 				pos: pos,
 				rot: [0, 0, 0],
-				tRot: [0, 0, 0],
 				aVeloc: [0, 0, 0],
 				lVeloc: [0, 0, 0],
 				interp: false // Not really necessary here, we're telling the client itself to move
@@ -116,7 +114,6 @@ io.sockets.on('connection', function (socket) {
 				name: message.name,
 				pos: pos,
 				rot: message.rot,
-				tRot: message.tRot,
 				aVeloc: message.aVeloc,
 				lVeloc: message.lVeloc
 			});
@@ -191,7 +188,6 @@ io.sockets.on('connection', function (socket) {
 				name: name,
 				pos: newPos,
 				rot: [0, 0, 0],
-				tRot: [0, 0, 0],
 				aVeloc: [0, 0, 0],
 				lVeloc: [0, 0, 0],
 				interp: false
@@ -226,7 +222,6 @@ io.sockets.on('connection', function (socket) {
 				// Update position
 				player.pos = message.pos;
 				player.rot = message.rot;
-				player.tRot = message.tRot;
 				player.aVeloc = message.aVeloc;
 				player.lVeloc = message.lVeloc;
 				player.lastMove = message.time;
@@ -236,7 +231,6 @@ io.sockets.on('connection', function (socket) {
 					name: name,
 					pos: message.pos,
 					rot: message.rot,
-					tRot: message.tRot,
 					aVeloc: message.aVeloc,
 					lVeloc: message.lVeloc,
 					interp: true
