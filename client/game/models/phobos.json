@@ -23,8 +23,6 @@
 "transparency"  : 1.0,
 "specularCoef"  : 0.0,
 "mapDiffuse"    : "../../textures/phobos.jpg",
-"mapSpecular"    : "../../textures/phobos.jpg",
-"mapBump"    : "../../textures/phobos.jpg",
 "vertexColors" : false
 }
 

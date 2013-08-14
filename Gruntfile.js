@@ -6,6 +6,7 @@ module.exports = function(grunt) {
 		'client/lib/three.js',
 		'client/lib/physi.js',
 		'client/lib/Stats.js',
+		'client/lib/TrackballControls.js',
 		'client/game/s.js',
 		'client/game/s.util.js',
 		'client/game/classes/s.EventEmitter.js',

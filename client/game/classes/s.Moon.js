@@ -12,7 +12,7 @@ s.Moon = new Class({
 		var materials = s.models.phobos.materials;
 
 		// Make the moon a bit red
-		materials[0].color.setHex(0x604030); 
+		materials[0].color.setHex(0x704030); 
 
 		// Setup physical properties
 		materials[0] = Physijs.createMaterial(
