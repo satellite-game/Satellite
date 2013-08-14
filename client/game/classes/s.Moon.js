@@ -22,6 +22,7 @@ s.Moon = new Class({
 		);
 
 		this.root = new Physijs.ConvexMesh(geometry, new THREE.MeshFaceMaterial(materials), 0);
+		// this.root.scale.set(2, 2, 2); // Can't set scale on convex meshes due to https://github.com/chandlerprall/Physijs/issues/60
 		this.root.position.copy(options.position);
 		this.root.rotation.copy(options.rotation);
 		// this.root.receiveShadow = true; // Causes shader error

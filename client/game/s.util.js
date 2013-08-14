@@ -1,5 +1,13 @@
 s.util = {};
 
+Math.toDegrees = function(radians) {
+	return radians * 180/Math.PI;
+};
+
+Math.toRadians = function(degrees) {
+	return degrees * Math.PI/180;
+};
+
 /**
 	Load models
 	

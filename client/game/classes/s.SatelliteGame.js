@@ -9,7 +9,7 @@ s.SatelliteGame = new Class({
 		this.scene.setGravity(new THREE.Vector3(0, 0, 0));
 
 		// Ambient light
-		this.ambientLight = new THREE.AmbientLight(0x666666);
+		this.ambientLight = new THREE.AmbientLight(0x222222);
 		this.scene.add(this.ambientLight);
 	
 		// Directional light
