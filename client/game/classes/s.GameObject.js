@@ -12,6 +12,12 @@ s.GameObject = new Class({
 	},
 	
 	init: function() {
+		// Store a reference to the instance on the object
+		// This is used after a collision is detected
+		// For instance, to remove HP from the item hit
+		if (this.root)
+			this.root.instance = this;
+
 		this.add();
 	},
 	
