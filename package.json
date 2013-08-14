@@ -1,0 +1,34 @@
+{
+  "name": "Satellite",
+  "version": "0.0.0",
+  "private": true,
+  "homepage": "https://lazd.github.com/Satellite",
+  "author": "Larry Davis <lazdnet@gmail.com>",
+  "license": "BSD",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lazd/Satellite.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lazd/Satellite/issues"
+  },
+  "devDependencies": {
+    "grunt-cli": "0.1.x",
+    "grunt": "0.4.x",
+    "grunt-contrib-clean": "0.5.x",
+    "grunt-contrib-concat": "0.3.x",
+    "grunt-contrib-copy": "0.4.x",
+    "grunt-contrib-watch": "0.3.x",
+    "grunt-contrib-uglify": "0.2.x",
+    "grunt-contrib-jshint": "0.4.x",
+    "grunt-contrib-stylus": "0.7.x"
+  },
+  "engines": {
+    "node": ">=0.8"
+  },
+  "keywords": [
+    "game",
+    "webgl",
+    "satellite"
+  ]
+}
