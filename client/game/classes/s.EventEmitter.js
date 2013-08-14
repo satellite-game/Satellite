@@ -2,9 +2,8 @@
  * Provides observer pattern for basic eventing
  *
  * @class	
- * @extends BaseClass
  */
-var EventEmitter = new Class(/** @lends EventEmitter# */{
+s.EventEmitter = new Class(/** @lends EventEmitter# */{
 	/** @constructs */
 	construct: function() {
 		this._events = {};

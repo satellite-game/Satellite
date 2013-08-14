@@ -1,14 +1,19 @@
 module.exports = function(grunt) {
 	// Order of concatonation/minification
 	var includeOrder = [
-		'client/lib/jquery.min.js',
-		'client/lib/Class.min.js',
+		'client/lib/jquery.js',
+		'client/lib/Class.js',
 		'client/lib/three.js',
 		'client/lib/physi.js',
 		'client/lib/Stats.js',
-		'client/lib/EventEmitter.js',
 		'client/game/s.js',
-		'client/game/classes/s.Game.js'
+		'client/game/s.util.js',
+		'client/game/classes/s.EventEmitter.js',
+		'client/game/classes/s.GameObject.js',
+		'client/game/classes/s.Ship.js',
+		'client/game/classes/s.Moon.js',
+		'client/game/classes/s.Game.js',
+		'client/game/classes/s.SatelliteGame.js'
 	];
 
 	grunt.initConfig({

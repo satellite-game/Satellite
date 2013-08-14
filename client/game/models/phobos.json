@@ -22,8 +22,9 @@
 "colorSpecular"  : [0.9000, 0.9000, 0.9000],
 "transparency"  : 1.0,
 "specularCoef"  : 0.0,
-"mapSpecular"    : "/game/textures/phobos.jpg",
-"mapBump"    : "/game/textures/phobos.jpg",
+"mapDiffuse"    : "../../textures/phobos.jpg",
+"mapSpecular"    : "../../textures/phobos.jpg",
+"mapBump"    : "../../textures/phobos.jpg",
 "vertexColors" : false
 }
 

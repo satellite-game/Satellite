@@ -1,76 +1,34 @@
 s.Game = new Class({
-	extend: EventEmitter,
+	extend: s.EventEmitter,
 	
 	construct: function(options) {
 		var self = this;
 		
-		this.options = jQuery.extend({}, this.defaults, options);
+		this.doRender = false;
+		this.lastRender = 0;
 		
-		this._doRender = false;
-		this._lastRender = 0;
+		// Store functions that should be called before render
+		this.hookedFuncs = [];
 		
-		// Store functions hooked to render
-		this._hookedFuncs = [];
-		
-		// Store laoded models
-		this.models = {};
-		
-		// Bind callback functions
-		this.bind(this.animate);
-		this.bind(this.fitWindow);
-		this.bind(this.handleFullscreenChange);
-		this.bind(this.handlePointerLockChange);
-		this.bind(this.handlePointerLockError);
+		// Bind render function permenantly
+		this.render = this.render.bind(this);
 		
 		// Configure Physijs
 		Physijs.scripts.worker = 'lib/physijs_worker.js';
-		Physijs.scripts.ammo = '../ammo.js';
+		Physijs.scripts.ammo = 'ammo.js';
 		
-		/******************
-		Create utility instances
-		******************/
-		// Projector
-		this.projector = new THREE.Projector();
-		
-		// Model loader
-		this.loader = new THREE.JSONLoader();
-		
-		// Gamepad interface
-		/*
-		this.gamepad = new Gamepad();
-		
-		this.gamepad.bind(Gamepad.Event.CONNECTED, function(device) {
-			console.log('Gamepad connected: '+device.id);
-		});
-
-		this.gamepad.bind(Gamepad.Event.DISCONNECTED, function(device) {
-			console.log('Gamepad disconnected: '+device.id);
-		});
-
-		this.gamepad.bind(Gamepad.Event.UNSUPPORTED, function(device) {
-			console.warn('Unsupported gamepad connected: '+device.id);
-		});
-		
-		if (!this.gamepad.init()) {
-			console.warn('Gamepads are not supported on this browser');
-		}
-		*/
-		
-		/******************
-		Create rendering instances
-		******************/
 		// Create renderer
 		this.renderer = new THREE.WebGLRenderer({
 			antialias: true // to get smoother output
 		});
 		
 		// Set sky color
-		this.renderer.setClearColorHex(0x87CCEB);
+		this.renderer.setClearColor(0x87CCEB);
 		
 		// Create a camera
 		this.camera = new THREE.PerspectiveCamera(35, 1, 1, 10000);
 		
-		// Configure shadow
+		// Configure shadows
 		this.renderer.shadowMapEnabled = true;
 		this.renderer.shadowMapSoft = true;
 		this.renderer.shadowMapCullFrontFaces = false;
@@ -79,12 +37,6 @@ s.Game = new Class({
 		this.scene = scene = new Physijs.Scene();
 		this.scene.add(this.camera);
 
-		// Add listeners
-		$(window).on('resize', this.fitWindow);
-		
-		/******************
-		Initialization
-		******************/
 		// Add the renderer's canvas to the DOM
 		this.el = this.renderer.domElement;
 		$(document.body).append(this.el);
@@ -95,26 +47,32 @@ s.Game = new Class({
 				self.toggleFullScreen();
 		});
 		
-		$(document).on('fullscreenchange mozfullscreenchange webkitfullscreenchange', this.handleFullscreenChange);
- 
-		$(document).on('pointerlockchange mozpointerlockchange webkitpointerlockchange', this.handlePointerLockChange);
-		$(document).on('pointerlockerror mozpointerlockerror webkitpointerlockerror', this.handlePointerLockError);
- 
+		// Handle window resizes
+		$(window).on('resize', this.fitWindow.bind(this));
 		this.fitWindow();
 		
+		// Handle fullscreen state changes		
+		$(document).on('fullscreenchange mozfullscreenchange webkitfullscreenchange', this.handleFullscreenChange.bind(this));
 		this.handleFullscreenChange();
+
+		// Handle pointer lock changes
+		$(document).on('pointerlockchange mozpointerlockchange webkitpointerlockchange', this.handlePointerLockChange.bind(this));
+		$(document).on('pointerlockerror mozpointerlockerror webkitpointerlockerror', this.handlePointerLockError.bind(this));
 		
+		// Monitor rendering stats
 		this.render_stats = new Stats();
-		this.render_stats.domElement.style.position = 'absolute';
-		this.render_stats.domElement.style.top = '0px';
-		this.render_stats.domElement.style.zIndex = 100;
-		document.body.appendChild(this.render_stats.domElement);
+		$(this.render_stats.domElement).css({
+			position: 'absolute',
+			top: 0,
+			zIndex: 100
+		}).appendTo(document.body);
 
 		this.physics_stats = physics_stats = new Stats();
-		this.physics_stats.domElement.style.position = 'absolute';
-		this.physics_stats.domElement.style.top = '50px';
-		this.physics_stats.domElement.style.zIndex = 100;
-		document.body.appendChild(this.physics_stats.domElement);
+		$(this.physics_stats.domElement).css({
+			position: 'absolute',
+			top: '50px',
+			zIndex: 100
+		}).appendTo(document.body);
 		
 		// Physics engine statistics
 		this.scene.addEventListener(
@@ -125,7 +83,7 @@ s.Game = new Class({
 		);
 		
 		// Physics engine ready state
-		// TODO: This doesn't really do much, find a better way to figure out if the engine has started. 2+ ticks?
+		// TODO: This event seems to fire before the engine is actually doing anything
 		this.physicsStarted = false;
 		this.scene.addEventListener(
 			'ready', 
@@ -135,13 +93,44 @@ s.Game = new Class({
 			}
 		);
 		
-		this.loadModels();
+		// Start loading models
+		// TODO: Load different conditionally based on game type
+		s.util.loadModels({
+			models: [
+				'phobos',
+				'human_ship_heavy',
+				'human_ship_light'
+			],
+			complete: function(models) {
+				self.modelsLoaded = true;
+
+				// Store loaded models
+				s.models = models;
+
+				// Attempt to start the game
+				self.tryInitialize(this);
+			}
+		});
 	},
 	
+	// Start the game
+	// This method should be overridden
+	initialize: function() {
+		console.log('Game ready.');
+
+		this.start();
+	},
+
+	// Attempt to start the game (if models and physics have begun)
+	tryInitialize: function() {
+		if (this.modelsLoaded && this.physicsStarted && !this.initialized) {
+			this.initialize();
+		}
+	},
+
 	isFullScreen: function() {
 		return (screen.width === window.outerWidth && screen.height === window.outerHeight);
 	},
-	
 
 	handleFullscreenChange: function(evt) {
 		if (this.isFullScreen()) {
@@ -196,16 +185,15 @@ s.Game = new Class({
 		this.pointerLocked = false;
 	},
 
-
+	// Size the renderer to fit the window
 	fitWindow: function() {
-		// Size the rendere to match the window size
 		this.setSize(window.innerWidth, window.innerHeight);
 	},
 	
-	// Display
+	// Set the size of the renderer
 	setSize: function(width, height) {
-		this.options.width = width;
-		this.options.height = height;
+		this.width = width;
+		this.height = height;
 		this.renderer.setSize(width, height);
 		if (this.camera) {
 			this.camera.aspect = width/height;
@@ -213,166 +201,50 @@ s.Game = new Class({
 		}
 	},
 	
-	// Loop
+	// Add a callback to the rendering loop
 	hook: function(callback) {
-		this._hookedFuncs.push(callback);
+		this.hookedFuncs.push(callback);
 	},
 	
+	// Remove a callback from the rendering loop
 	unhook: function(callback) {
-		var index = this._hookedFuncs.indexOf(callback);
+		var index = this.hookedFuncs.indexOf(callback);
 		if (~index)
-			this._hookedFuncs.splice(index, 1);
+			this.hookedFuncs.splice(index, 1);
 	},
 	
-	// Rendering
-	stop: function() {
-		this._doRender = false;
-	},
-	
+	// Start rendering
 	start: function() {
-		this._doRender = true;
-		requestAnimationFrame(this.animate);
-	},
-	
-	animate: function(time) {
-		if (this._doRender) {
-			requestAnimationFrame(this.animate);
-			this.render(time);
-		}
+		this.doRender = true;
+		requestAnimationFrame(this.render);
 	},
 
-	render: function(time) {
-		var now = time/1000;
-		
-		this.scene.simulate();
-	
-		if (!this._lastRender)
-			this._lastRender = now - 1/60;
-		
-		var delta = now - this._lastRender;
-		
-		this._lastRender = now;
-		
-		this._hookedFuncs.forEach(function(func) {
-			func(delta, now);
-		});
-		
-		// Re-render the scene
-		this.renderer.render(this.scene, this.camera);
-		
-		this.render_stats.update();
+	// Stop rendering
+	stop: function() {
+		this.doRender = false;
 	},
 	
-	// Utilities
-	createRay: function(pointA, pointB) {
-		var rayStart = pointA;
-		var rayDirection = new THREE.Vector3();
-		rayDirection.subVectors(pointB, pointA).normalize();
+	// Perform render
+	render: function(now) {
+		if (this.doRender) {
+			// Simulate physics
+			this.scene.simulate();
 		
-		return new THREE.Raycaster(rayStart, rayDirection);
-	},
-	
-	getNDCX: function(x) {
-		return (x / this.options.width) * 2 - 1;
-	},
-	
-	getNDCY: function(y) {
-		return -(y / this.options.height) * 2 + 1;
-	},
-	
-	get2DCoords: function(objVector, removeYOffset) {
-		var vector3D = objVector.clone();
-		
-		// Objects are positioned with a Y offset of height/2, remove this 
-		if (removeYOffset)
-			vector3D.y = 0;
-			
-		var vector2D = this.projector.projectVector(vector3D, this.camera);
-		
-		vector2D.y = -(vector2D.y*this.options.height - this.options.height)/2;
-		vector2D.x = (vector2D.x*this.options.width + this.options.width)/2;
-		
-		return vector2D;
-	},
-	
-	get3DCoords: function(x, y) {
-		// Convert to normalized device coordinates
-		var xVal = this.getNDCX(x);
-		var yVal = this.getNDCY(y);
-		
-		var startVector = new THREE.Vector3();
-		var endVector = new THREE.Vector3();
-		var dirVector = new THREE.Vector3();
-		var goalVector = new THREE.Vector3();
-		var t;
-		
-		// Create vectors above and below ground plane at our NDCs
-		startVector.set(xVal, yVal, -1.0);
-		endVector.set(xVal, yVal, 1.0);
-		
-		// Convert back to 3D world coordinates
-		startVector = this.projector.unprojectVector(startVector, this.camera);
-		endVector = this.projector.unprojectVector(endVector, this.camera);
-		
-		// Get direction from startVector to endVector
-		dirVector.subVectors(endVector, startVector);
-		dirVector.normalize();
-		
-		// Find intersection where y = 0
-		t = startVector.y / -(dirVector.y);
+			// Calculate the time since the last frame was rendered
+			var delta = now - this.lastRender;
+			this.lastRender = now;
 
-		// Find goal point
-		goalVector.set(
-			startVector.x + t * dirVector.x,
-			startVector.y + t * dirVector.y,
-			startVector.z + t * dirVector.z
-		);
-		
-		return goalVector;
-	},
-	
-	tryInitialize: function() {
-		if (this.modelsLoaded && this.physicsStarted && !this.initialized) {
-			console.log('Physics engine started!');
-			if (typeof this.initialize === 'function')
-				this.initialize();
-		}
-	},
-	
-	loadModels: function() {
-		var toLoad = this.options.models.length;
-		if (!toLoad) {
-			this.tryInitialize();
-			return;
-		}
-		
-		// Hold models
-		var models = this.models;
-		
-		var self = this;
-		var loaded = function(name, geometry, materials) {
-			// Store model and materials
-			models[name] = {
-				geometry: geometry,
-				materials: materials
-			};
+			// Run each hooked function before rendering
+			this.hookedFuncs.forEach(function(func) {
+				func(now, delta);
+			});
 			
-			// Track progress
-			toLoad--;
-			if (toLoad === 0) {
-				console.log('Models loaded!');
-				self.trigger('models:loaded');
-				self.modelsLoaded = true;
-			}
-			else {
-				var pct = (self.options.models.length-toLoad)/self.options.models.length*100;
-				console.log('Loading: '+pct.toFixed(0)+'%');
-				self.trigger('models:loading', pct);
-			}
-		};
-		
-		this.options.models.forEach(function(name, index) {
-			self.loader.load('duneBuggy/models/'+name+'.js', loaded.bind(self, name));
-		});
+			// Re-render the scene
+			this.renderer.render(this.scene, this.camera);
+			this.render_stats.update();
+
+			// Request the next frame to be rendered
+			requestAnimationFrame(this.render);
+		}
 	}
 });
