@@ -1,7 +1,7 @@
 s.GameObject = new Class({
 	toString: 'GameObject',
 	extend: s.EventEmitter,
-	
+
 	construct: function(options) {
 		// Bind execution scope of update, if necessary
 		if (this.update)

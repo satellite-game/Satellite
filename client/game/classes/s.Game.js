@@ -26,7 +26,7 @@ s.Game = new Class({
 		this.renderer.setClearColor(0x87CCEB);
 		
 		// Create a camera
-		this.camera = new THREE.PerspectiveCamera(35, 1, 1, 10000);
+		this.camera = new THREE.PerspectiveCamera(35, 1, 1, 100000);
 		
 		// Configure shadows
 		this.renderer.shadowMapEnabled = true;
@@ -35,7 +35,9 @@ s.Game = new Class({
 
 		// Create the scene
 		this.scene = scene = new Physijs.Scene();
-		this.scene.add(this.camera);
+
+		// If we want to attach the camera to an object, doing this first causes a Physijs error
+		// this.scene.add(this.camera);
 
 		// Add the renderer's canvas to the DOM
 		this.el = this.renderer.domElement;
@@ -96,11 +98,7 @@ s.Game = new Class({
 		// Start loading models
 		// TODO: Load different conditionally based on game type
 		s.util.loadModels({
-			models: [
-				'phobos',
-				'human_ship_heavy',
-				'human_ship_light'
-			],
+			models: this.models,
 			complete: function(models) {
 				self.modelsLoaded = true;
 

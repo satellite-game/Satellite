@@ -20,11 +20,11 @@ s.Ship = new Class({
 		_super.call(this);
 
 		// Just make it rotate, for show
-		this.root.setAngularVelocity(new THREE.Vector3(-Math.PI/8, 0, 0));
+		// this.root.setAngularVelocity(new THREE.Vector3(-Math.PI/8, 0, 0));
 
 		setTimeout(function() {
 			var rotation_matrix = new THREE.Matrix4().extractRotation(this.root.matrix);
-			var force_vector = new THREE.Vector3(-50000, 0, 0).applyMatrix4(rotation_matrix);
+			var force_vector = new THREE.Vector3(0, 0, -50000).applyMatrix4(rotation_matrix);
 			this.root.applyCentralImpulse(force_vector);
 			// this.root.applyCentralImpulse(new THREE.Vector3(0, 0, -25000));
 		}.bind(this), 500);

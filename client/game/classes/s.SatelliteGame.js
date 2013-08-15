@@ -1,6 +1,13 @@
 s.SatelliteGame = new Class({
 	toString: 'SatelliteGame',
 	extend: s.Game,
+	
+	// Models that should be loaded
+	models: [
+		'phobos_large_hifi',
+		'human_ship_heavy',
+		'human_ship_light'
+	],
 
 	initialize: function(_super) {
 		_super.call(this);
@@ -10,18 +17,14 @@ s.SatelliteGame = new Class({
 
 		// Ambient light
 		// this.ambientLight = new THREE.AmbientLight(0x222222);
-		this.ambientLight = new THREE.AmbientLight(0xAAAAAA);
+		this.ambientLight = new THREE.AmbientLight(0x555555);
 		this.scene.add(this.ambientLight);
 	
 		// Directional light
 		this.light = new THREE.DirectionalLight(0xFFFFFF, 2);
-		this.light.position.set(2200, 2200, -4000);
+		this.light.position.set(-100000, 0, 0);
 		this.scene.add(this.light);
 		
-		// Setup camera
-		this.camera.position.set(0,0,1000);
-		this.camera.lookAt(new THREE.Vector3(0,0,0));
-
 		// Add moon
 		this.moon = new s.Moon({
 			game: this
@@ -30,21 +33,20 @@ s.SatelliteGame = new Class({
 		// Add a ship
 		this.ship = new s.Ship({
 			game: this,
-			shipClass: 'human_ship_heavy',
-			position: new THREE.Vector3(-300, 100, 0),
-			rotation: new THREE.Vector3(0, Math.PI, 0)
-		});
-
-		// Add another ship
-		this.ship2 = new s.Ship({
-			game: this,
 			shipClass: 'human_ship_light',
-			position: new THREE.Vector3(300, 100, 0),
-			rotation: new THREE.Vector3(0, 0, 0)
+			position: new THREE.Vector3(10000, 2000, 10000),
+			rotation: new THREE.Vector3(0, Math.PI/4, 0)
 		});
 
+		// Setup camera
+		this.ship.root.add(this.camera);
+		this.camera.position.set(0,75,350);
 
-		this.addStars();
+
+		this.addSkybox();
+
+		// Add dust
+		this.addDust();
 
 		// Temporary trackball controls
 		this.controls = new THREE.TrackballControls(this.camera);
@@ -67,16 +69,45 @@ s.SatelliteGame = new Class({
 		this.controls.update();
 	},
 
-	addStars: function() {
-		var radius = 5000;
+	addSkybox: function() {
+		var urlPrefix = "game/textures/skybox/Purple_Nebula_";
+		var urls = [
+			urlPrefix + "right1.png", urlPrefix + "left2.png",
+			urlPrefix + "top3.png", urlPrefix + "bottom4.png",
+			urlPrefix + "front5.png", urlPrefix + "back6.png"
+		];
 
+		var textureCube = THREE.ImageUtils.loadTextureCube(urls);
+		textureCube.format = THREE.RGBFormat;
+		var shader = THREE.ShaderLib.cube;
+
+		var uniforms = THREE.UniformsUtils.clone(shader.uniforms);
+		uniforms.tCube.value = textureCube;
+
+		var material = new THREE.ShaderMaterial({
+			fragmentShader: shader.fragmentShader,
+			vertexShader: shader.vertexShader,
+			uniforms: uniforms,
+			side: THREE.BackSide
+		});
+
+		this.skyboxMesh = new THREE.Mesh(new THREE.CubeGeometry(100000, 100000, 100000, 1, 1, 1, null, true ), material);
+		this.scene.add(this.skyboxMesh);
+	},
+
+	addDust: function() {
 		var starSprite = THREE.ImageUtils.loadTexture('game/textures/particle.png');
 		var geometry = new THREE.Geometry();
 
 		// Set to false for "dust", true for stars
 		var outer = false;
 
-		for (var i = 0; i < 5000; i ++ ) {
+		// Spec size
+		var radius = 100000;
+		var size = 100;
+		var count = 5000;
+
+		for (var i = 0; i < count; i ++ ) {
 
 			var vertex = new THREE.Vector3();
 
@@ -89,9 +120,9 @@ s.SatelliteGame = new Class({
 			}
 			else {
 				// Distribute "dust" throughout near space
-				vertex.x = Math.random() * 2000 - 1000;
-				vertex.y = Math.random() * 2000 - 1000;
-				vertex.z = Math.random() * 2000 - 1000;
+				vertex.x = Math.random() * radius - radius/2;
+				vertex.y = Math.random() * radius - radius/2;
+				vertex.z = Math.random() * radius - radius/2;
 			}
 
 			geometry.vertices.push( vertex );
@@ -99,7 +130,7 @@ s.SatelliteGame = new Class({
 		}
 
 		var material = new THREE.ParticleBasicMaterial({
-			size: 5,
+			size: size,
 			map: starSprite,
 			blending: THREE.AdditiveBlending,
 			depthTest: true,
