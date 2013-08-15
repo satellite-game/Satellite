@@ -110,6 +110,8 @@ module.exports = function(grunt) {
 	grunt.registerTask('server', ['jshint:server', 'copy:server']);
 	grunt.registerTask('client', ['jshint:client', 'copy:client', 'concat', 'stylus']);
 	grunt.registerTask('client-prod', ['client', 'uglify']);
+
+	grunt.registerTask('dev', ['default', 'watch']);
 	
 	grunt.registerTask('default', ['server', 'client']);
 };
