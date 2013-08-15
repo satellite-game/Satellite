@@ -233,6 +233,7 @@ s.Game = new Class({
 			this.lastRender = now;
 
 			// Run each hooked function before rendering
+			// This may need to happen BEFORE physics simulation
 			this.hookedFuncs.forEach(function(func) {
 				func(now, delta);
 			});

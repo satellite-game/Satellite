@@ -11,7 +11,7 @@ function watch() {
 # Serve the client in the background
 function server() {
 	cd build/client/
-	python -m SimpleHTTPServer &	
+	python -m SimpleHTTPServer &
 }
 
 # Perform build

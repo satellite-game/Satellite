@@ -15,6 +15,7 @@ s.Controls = new Class({
 		// Store references to game objects
 		this.game = options.game;
 		this.player = options.player;
+		this.camera = options.camera;
 
 		// Create interpreters for controllers
 		this.keyboard = new s.Keyboard();
