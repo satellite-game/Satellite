@@ -4,7 +4,7 @@ s.SatelliteGame = new Class({
 	
 	// Models that should be loaded
 	models: [
-		'phobos_large_hifi',
+		'phobos_hifi',
 		'human_ship_heavy',
 		'human_ship_light'
 	],

@@ -8,8 +8,8 @@ s.Moon = new Class({
 			rotation: new THREE.Vector3(0, 0, 0)
 		}, options);
 
-		var geometry = s.models.phobos_large_hifi.geometry;
-		var materials = s.models.phobos_large_hifi.materials;
+		var geometry = s.models.phobos_hifi.geometry;
+		var materials = s.models.phobos_hifi.materials;
 
 		// Make the moon a bit red
 		materials[0].color.setHex(0x704030); 
