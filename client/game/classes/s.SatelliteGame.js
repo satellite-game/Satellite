@@ -16,12 +16,11 @@ s.SatelliteGame = new Class({
 		this.scene.setGravity(new THREE.Vector3(0, 0, 0));
 
 		// Ambient light
-		// this.ambientLight = new THREE.AmbientLight(0x222222);
-		this.ambientLight = new THREE.AmbientLight(0x555555);
+		this.ambientLight = new THREE.AmbientLight(0x382828);
 		this.scene.add(this.ambientLight);
 	
 		// Directional light
-		this.light = new THREE.DirectionalLight(0xFFFFFF, 2);
+		this.light = new THREE.DirectionalLight(0xEEEEEE, 2);
 		this.light.position.set(-100000, 0, 0);
 		this.scene.add(this.light);
 		
@@ -31,37 +30,49 @@ s.SatelliteGame = new Class({
 		});
 
 		// Add a ship
-		this.ship = new s.Ship({
+		this.player = new s.Player({
 			game: this,
 			shipClass: 'human_ship_light',
 			position: new THREE.Vector3(10000, 2000, 10000),
 			rotation: new THREE.Vector3(0, Math.PI/4, 0)
 		});
 
-		// Setup camera
-		this.ship.root.add(this.camera);
-		this.camera.position.set(0,75,350);
+		// Setup camera: Chase camera
+		this.player.root.add(this.camera);
+		this.camera.position.set(0,0,350); // Odd to stare at the ass of the craft constantly
+		// this.camera.position.set(0,75,350); // Makes flight feel funny
 
+		// Planet camera
+		// this.scene.add(this.camera);
+		// this.camera.position.set(10000,2000,10000);
 
+		// Add skybox
 		this.addSkybox();
 
-		// Add dust
+		// lazd: Dust is kinda lame. But I want some sort of thing that shows you're moving
 		this.addDust();
 
-		// Temporary trackball controls
+		// Fly controls
+		this.controls = new s.Controls({
+			game: this,
+			player: this.player,
+			camera: this.camera
+		});
+
+		// Camera controls
 		this.controls = new THREE.TrackballControls(this.camera);
 
 		this.controls.rotateSpeed = 1.0;
 		this.controls.zoomSpeed = 0.25;
 		this.controls.panSpeed = 0.8;
 
-		this.controls.noZoom = false;
+		this.controls.noZoom = true;
 		this.controls.noPan = false;
 
 		this.controls.staticMoving = true;
 		this.controls.dynamicDampingFactor = 0.3;
 
-		this.controls.keys = [ 65, 83, 68 ];
+		this.controls.keys = [ 65, 83, 68 ]; // What does this do?
 	},
 
 	render: function(_super, time) {
