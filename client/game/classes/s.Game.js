@@ -26,7 +26,7 @@ s.Game = new Class({
 		this.renderer.setClearColor(0x87CCEB);
 		
 		// Create a camera
-		this.camera = new THREE.PerspectiveCamera(35, 1, 1, 100000);
+		this.camera = new THREE.PerspectiveCamera(35, 1, 1, 300000);
 		
 		// Configure shadows
 		this.renderer.shadowMapEnabled = true;

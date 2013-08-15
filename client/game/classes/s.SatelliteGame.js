@@ -102,7 +102,7 @@ s.SatelliteGame = new Class({
 			side: THREE.BackSide
 		});
 
-		this.skyboxMesh = new THREE.Mesh(new THREE.CubeGeometry(100000, 100000, 100000, 1, 1, 1, null, true ), material);
+		this.skyboxMesh = new THREE.Mesh(new THREE.CubeGeometry(200000, 200000, 200000, 1, 1, 1, null, true ), material);
 		this.scene.add(this.skyboxMesh);
 	},
 
@@ -111,12 +111,12 @@ s.SatelliteGame = new Class({
 		var geometry = new THREE.Geometry();
 
 		// Set to false for "dust", true for stars
-		var outer = false;
+		var outer = true;
 
 		// Spec size
 		var radius = 100000;
 		var size = 100;
-		var count = 5000;
+		var count = 1000;
 
 		for (var i = 0; i < count; i ++ ) {
 
