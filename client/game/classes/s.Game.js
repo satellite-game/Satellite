@@ -1,33 +1,33 @@
 s.Game = new Class({
 	extend: s.EventEmitter,
-	
+
 	construct: function(options) {
 		var self = this;
-		
+
 		this.doRender = false;
 		this.lastRender = 0;
-		
+
 		// Store functions that should be called before render
 		this.hookedFuncs = [];
-		
+
 		// Bind render function permenantly
 		this.render = this.render.bind(this);
-		
+
 		// Configure Physijs
 		Physijs.scripts.worker = 'lib/physijs_worker.js';
 		Physijs.scripts.ammo = 'ammo.js';
-		
+
 		// Create renderer
 		this.renderer = new THREE.WebGLRenderer({
 			antialias: true // to get smoother output
 		});
-		
+
 		// Set sky color
 		this.renderer.setClearColor(0x87CCEB);
-		
+
 		// Create a camera
 		this.camera = new THREE.PerspectiveCamera(35, 1, 1, 300000);
-		
+
 		// Configure shadows
 		this.renderer.shadowMapEnabled = true;
 		this.renderer.shadowMapSoft = true;
@@ -42,25 +42,25 @@ s.Game = new Class({
 		// Add the renderer's canvas to the DOM
 		this.el = this.renderer.domElement;
 		$(document.body).append(this.el);
-		
+
 		// TODO: abstract key listening
 		$(document).on('keydown', function(evt) {
 			if (evt.which === 13)
 				self.toggleFullScreen();
 		});
-		
+
 		// Handle window resizes
 		$(window).on('resize', this.fitWindow.bind(this));
 		this.fitWindow();
-		
-		// Handle fullscreen state changes		
+
+		// Handle fullscreen state changes
 		$(document).on('fullscreenchange mozfullscreenchange webkitfullscreenchange', this.handleFullscreenChange.bind(this));
 		this.handleFullscreenChange();
 
 		// Handle pointer lock changes
 		$(document).on('pointerlockchange mozpointerlockchange webkitpointerlockchange', this.handlePointerLockChange.bind(this));
 		$(document).on('pointerlockerror mozpointerlockerror webkitpointerlockerror', this.handlePointerLockError.bind(this));
-		
+
 		// Monitor rendering stats
 		this.render_stats = new Stats();
 		$(this.render_stats.domElement).css({
@@ -75,7 +75,7 @@ s.Game = new Class({
 			top: '50px',
 			zIndex: 100
 		}).appendTo(document.body);
-		
+
 		// Physics engine statistics
 		this.scene.addEventListener(
 			'update',
@@ -83,18 +83,18 @@ s.Game = new Class({
 				physics_stats.update();
 			}
 		);
-		
+
 		// Physics engine ready state
 		// TODO: This event seems to fire before the engine is actually doing anything
 		this.physicsStarted = false;
 		this.scene.addEventListener(
-			'ready', 
+			'ready',
 			function() {
 				self.physicsStarted = true;
 				self.tryInitialize();
 			}
 		);
-		
+
 		// Start loading models
 		// TODO: Load different conditionally based on game type
 		s.util.loadModels({
@@ -110,7 +110,7 @@ s.Game = new Class({
 			}
 		});
 	},
-	
+
 	// Start the game
 	// This method should be overridden
 	initialize: function() {
@@ -187,7 +187,7 @@ s.Game = new Class({
 	fitWindow: function() {
 		this.setSize(window.innerWidth, window.innerHeight);
 	},
-	
+
 	// Set the size of the renderer
 	setSize: function(width, height) {
 		this.width = width;
@@ -198,19 +198,19 @@ s.Game = new Class({
 			this.camera.updateProjectionMatrix();
 		}
 	},
-	
+
 	// Add a callback to the rendering loop
 	hook: function(callback) {
 		this.hookedFuncs.push(callback);
 	},
-	
+
 	// Remove a callback from the rendering loop
 	unhook: function(callback) {
 		var index = this.hookedFuncs.indexOf(callback);
 		if (~index)
 			this.hookedFuncs.splice(index, 1);
 	},
-	
+
 	// Start rendering
 	start: function() {
 		this.doRender = true;
@@ -221,23 +221,23 @@ s.Game = new Class({
 	stop: function() {
 		this.doRender = false;
 	},
-	
+
 	// Perform render
 	render: function(now) {
 		if (this.doRender) {
 			// Simulate physics
 			this.scene.simulate();
-		
+
 			// Calculate the time since the last frame was rendered
 			var delta = now - this.lastRender;
 			this.lastRender = now;
-
+            //this.camera.position.z += delta/200;
 			// Run each hooked function before rendering
 			// This may need to happen BEFORE physics simulation
 			this.hookedFuncs.forEach(function(func) {
 				func(now, delta);
 			});
-			
+
 			// Re-render the scene
 			this.renderer.render(this.scene, this.camera);
 			this.render_stats.update();
