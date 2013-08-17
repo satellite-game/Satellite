@@ -14,5 +14,14 @@ s.Ship = new Class({
 		this.root = new Physijs.ConvexMesh(geometry, new THREE.MeshFaceMaterial(materials), 100);
 		this.root.position.copy(options.position);
 		this.root.rotation.copy(options.rotation);
+	},
+
+	fire: function(){
+		// fire
+		new s.Turret({
+			game: this.options.game, 
+			position: this.root.position, 
+			rotation: this.root.rotation
+		});
 	}
 });
