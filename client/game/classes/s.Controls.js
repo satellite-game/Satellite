@@ -104,12 +104,12 @@ s.Controls = new Class({
 		// Then apply forward impulse
 		if (thrust){
 			if (this.options.thrustImpulse < 2000){
-				this.options.thrustImpulse += 2;
+				this.options.thrustImpulse += 5;
 			}
 		}		
 		if (brakes) {
 			if (this.options.thrustImpulse > 0){
-				this.options.thrustImpulse -= 2;
+				this.options.thrustImpulse -= 5;
 			}
 		}
 		var impulse;

@@ -6,7 +6,6 @@ module.exports = function(grunt) {
 		'client/lib/three.js',
 		'client/lib/physi.js',
 		'client/lib/Stats.js',
-		'client/lib/TrackballControls.js',
 		'client/game/s.js',
 		'client/game/s.util.js',
 		'client/game/classes/s.EventEmitter.js',
@@ -18,7 +17,8 @@ module.exports = function(grunt) {
 		'client/game/classes/s.Keyboard.js',
 		'client/game/classes/s.Controls.js',
 		'client/game/classes/s.Game.js',
-		'client/game/classes/s.SatelliteGame.js'
+		'client/game/classes/s.SatelliteGame.js',
+		'client/game/classes/s.Hud.js'
 	];
 
 	grunt.initConfig({

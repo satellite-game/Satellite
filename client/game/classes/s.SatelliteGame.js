@@ -59,20 +59,10 @@ s.SatelliteGame = new Class({
 			camera: this.camera
 		});
 
-		// Camera controls
-		this.controls = new THREE.TrackballControls(this.camera);
-
-		this.controls.rotateSpeed = 1.0;
-		this.controls.zoomSpeed = 0.25;
-		this.controls.panSpeed = 0.8;
-
-		this.controls.noZoom = true;
-		this.controls.noPan = false;
-
-		this.controls.staticMoving = true;
-		this.controls.dynamicDampingFactor = 0.3;
-
-		this.controls.keys = [ 65, 83, 68 ]; // What does this do?
+		this.HUD = new s.HUD({
+			game: this,
+			controls: this.controls
+		});
 	},
 
 	render: function(_super, time) {
