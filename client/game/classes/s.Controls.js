@@ -81,6 +81,10 @@ s.Controls = new Class({
 			yaw = -1*this.options.yawSpeed;
 		}
 
+		if(this.keyboard.pressed('space')){
+			this.player.fire();
+		}
+
 		var linearVelocity = root.getLinearVelocity().clone();
 		var angularVelocity = root.getAngularVelocity().clone();
 		var rotationMatrix = new THREE.Matrix4();
