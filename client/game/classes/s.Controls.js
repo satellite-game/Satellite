@@ -50,12 +50,11 @@ s.Controls = new Class({
 		}
 
 		if (this.keyboard.pressed('left')) {
-			// Roll left
-			roll = this.options.rotationSpeed;
+			yaw = this.options.yawSpeed;
+			
 		}
 		else if (this.keyboard.pressed('right')) {
-			// Roll right
-			roll = -1*this.options.rotationSpeed;
+			yaw = -1*this.options.yawSpeed;
 		}
 
 		if (this.keyboard.pressed('up')) {
@@ -75,10 +74,10 @@ s.Controls = new Class({
 		}
 
 		if (this.keyboard.pressed('a')) {
-			yaw = this.options.yawSpeed;
+			roll = this.options.rotationSpeed;
 		}
 		else if (this.keyboard.pressed('d')) {
-			yaw = -1*this.options.yawSpeed;
+			roll = -1*this.options.rotationSpeed;
 		}
 
 		if(this.keyboard.pressed('space')){
