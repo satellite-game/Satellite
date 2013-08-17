@@ -39,7 +39,7 @@ s.SatelliteGame = new Class({
 
 		// Setup camera: Chase camera
 		this.player.root.add(this.camera);
-		this.camera.position.set(0,75,350); // Odd to stare at the ass of the craft constantly
+		this.camera.position.set(0,35,350); // Odd to stare at the ass of the craft constantly
 		// this.camera.position.set(0,75,350); // Makes flight feel funny
 
 		// Planet camera

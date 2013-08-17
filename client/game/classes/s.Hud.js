@@ -7,8 +7,8 @@ s.HUD = new Class({
 		this.canvas.style.top = '0';
 		this.canvas.style.left = '0';
 		this.ctx = this.canvas.getContext('2d');
-
-
+		this.crosshairs = new Image();
+		this.crosshairs.src = 'game/textures/crosshairs.png';
 		this.update = this.update.bind(this);
 		this.game.hook(this.update);
 		document.body.appendChild(this.canvas);
@@ -20,6 +20,7 @@ s.HUD = new Class({
 		this.ctx.font= '30px Futura';
 		this.ctx.fillStyle = '#33FF00';
 		this.ctx.fillText(velocity,125,50);
+		this.ctx.drawImage(this.crosshairs,this.canvas.width/2- this.crosshairs.width/2,this.canvas.height/2-this.crosshairs.height/2);
 	}
 
 });
