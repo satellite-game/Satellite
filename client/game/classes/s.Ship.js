@@ -17,7 +17,7 @@ s.Ship = new Class({
 
 		this.lastTime = 0;
 
-		this.bulletOffset = new THREE.Vector3(0, 0, -100);
+		this.bulletOffset = new THREE.Vector3(0, 0, -200);
 	},
 
 	getEulerRotation: function() {
@@ -40,7 +40,7 @@ s.Ship = new Class({
 
 	fire: function(){
 		var now =new Date().getTime();
-		if( now - this.lastTime > 1000){
+		if( now - this.lastTime > 200){
 			// fire
 			new s.Turret({
 				game: this.options.game,
