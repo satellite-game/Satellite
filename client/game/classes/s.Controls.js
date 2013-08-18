@@ -5,7 +5,7 @@ s.Controls = new Class({
 		rotationSpeed: Math.PI/2,
 		pitchSpeed: Math.PI/6,
 		yawSpeed: Math.PI/6,
-		thrustImpulse: 2000,
+		thrustImpulse: 0,
 		brakePower: 0.85,
 		velocityFadeFactor: 16,
 		rotationFadeFactor: 4
@@ -102,21 +102,20 @@ s.Controls = new Class({
 		// Invert existing linear velocity
 		// Fractionally apply the opposite impulse
 		// Then apply forward impulse
+		if (thrust){
+			if (this.options.thrustImpulse < 2000){
+				this.options.thrustImpulse += 2;
+			}
+		}		
+		if (brakes) {
+			if (this.options.thrustImpulse > 0){
+				this.options.thrustImpulse -= 2;
+			}
+		}
 		var impulse;
-		if (thrust) {
-			impulse = linearVelocity.clone().negate();
-			root.applyCentralImpulse(impulse);
-
-			var forceVector = new THREE.Vector3(0, 0, -1*this.options.thrustImpulse).applyMatrix4(rotationMatrix);
-			root.applyCentralImpulse(forceVector);
-		}
-		else if (brakes) {
-			impulse = linearVelocity.clone().negate().multiplyScalar(this.options.brakePower);
-			root.applyCentralImpulse(impulse);
-		}
-		else {
-			impulse = linearVelocity.clone().negate().divideScalar(this.options.velocityFadeFactor);
-			root.applyCentralImpulse(impulse);
-		}
+		impulse = linearVelocity.clone().negate();
+		root.applyCentralImpulse(impulse);
+		var forceVector = new THREE.Vector3(0, 0, -1*this.options.thrustImpulse).applyMatrix4(rotationMatrix);
+		root.applyCentralImpulse(forceVector);
 	}
 });
