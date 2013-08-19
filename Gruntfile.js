@@ -23,6 +23,7 @@ module.exports = function(grunt) {
 
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
+		jshint: grunt.file.readJSON('package.json'),
 		clean: {
 			build: 'build/'
 		},
@@ -62,14 +63,12 @@ module.exports = function(grunt) {
 			}
 		},
 		jshint: {
+		    options: {
+		    	jshintrc: '.jshintrc'
+		    },
 			gruntfile: ['Gruntfile.js'],
 			server: ['server/**/*.js'],
-			client: ['client/**/*.js', '!**/models/**', '!**/lib/**'],
-			options: {
-				globals: {
-					eqeqeq: true
-				}
-			}
+			client: ['client/**/*.js', '!**/models/**', '!**/lib/**']
 		},
 		stylus: {
 			compile: {
