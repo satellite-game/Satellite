@@ -10,6 +10,7 @@ s.SatelliteGame = new Class({
 	],
 
 	initialize: function(_super) {
+		var that = this;
 		_super.call(this);
 		
 		// No gravity
@@ -62,6 +63,11 @@ s.SatelliteGame = new Class({
 		this.HUD = new s.HUD({
 			game: this,
 			controls: this.controls
+		});
+
+		window.addEventListener('mousemove', function(e){
+			that.HUD.targetX = e.pageX;
+			that.HUD.targetY = e.pageY;
 		});
 	},
 

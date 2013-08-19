@@ -16,9 +16,9 @@ module.exports = function(grunt) {
 		'client/game/classes/s.Moon.js',
 		'client/game/classes/s.Keyboard.js',
 		'client/game/classes/s.Controls.js',
+		'client/game/classes/s.Hud.js',
 		'client/game/classes/s.Game.js',
-		'client/game/classes/s.SatelliteGame.js',
-		'client/game/classes/s.Hud.js'
+		'client/game/classes/s.SatelliteGame.js'
 	];
 
 	grunt.initConfig({

@@ -20,7 +20,7 @@ s.Turret = new Class({
 		this.rotationMatrix.extractRotation(this.root.matrix);
 
         // Apply bullet impulse
-        this.forceVector = new THREE.Vector3(0, 0, -4000 + (this.iv.z>0 ? this.iv.z*-1 : this.iv.z )).applyMatrix4(this.rotationMatrix);
+        this.forceVector = new THREE.Vector3(0, 0, -4000 + (this.initialVelocity.z>0 ? this.initialVelocity.z*-1 : this.initialVelocity.z )).applyMatrix4(this.rotationMatrix);
 		this.root.applyCentralImpulse(this.forceVector);
 	}
 
