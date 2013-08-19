@@ -6,7 +6,7 @@ s.Turret = new Class({
 
 		this.root.position.copy(options.position);
 		this.root.rotation.copy(options.rotation);
-
+        this.root.creationTime = new Date();
 		// this.root.position.x -= 100;
 		// this.root.position.z -= 100;
 
@@ -25,6 +25,7 @@ s.Turret = new Class({
 
 		var forceVector = new THREE.Vector3(0, 0, -10).applyMatrix4(rotationMatrix);
 		root.applyCentralImpulse(forceVector);
+
 	}
 
 });

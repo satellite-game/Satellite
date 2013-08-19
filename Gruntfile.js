@@ -18,7 +18,8 @@ module.exports = function(grunt) {
 		'client/game/classes/s.Controls.js',
 		'client/game/classes/s.Game.js',
 		'client/game/classes/s.SatelliteGame.js',
-		'client/game/classes/s.Hud.js'
+		'client/game/classes/s.HUD.js',
+        'client/game/classes/s.Radar.js'
 	];
 
 	grunt.initConfig({
@@ -84,7 +85,7 @@ module.exports = function(grunt) {
 				}
 			}
 		},
-		watch: {	
+		watch: {
 			gruntfile: {
 				files: ['Gruntfile.js'],
 				tasks: ['jshint:gruntfile']
@@ -113,6 +114,6 @@ module.exports = function(grunt) {
 	grunt.registerTask('client-prod', ['client', 'uglify']);
 
 	grunt.registerTask('dev', ['default', 'watch']);
-	
+
 	grunt.registerTask('default', ['server', 'client']);
 };

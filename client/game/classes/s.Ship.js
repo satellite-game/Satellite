@@ -2,6 +2,7 @@ s.Ship = new Class({
 	extend: s.GameObject,
 
 	construct: function(options) {
+
 		// handle parameters
 		this.options = options = jQuery.extend({
 			position: new THREE.Vector3(0, 0, 0),
@@ -21,6 +22,7 @@ s.Ship = new Class({
 	},
 
 	getEulerRotation: function() {
+
 		// Update the matrix
 		this.root.updateMatrix();
 
@@ -39,16 +41,17 @@ s.Ship = new Class({
 	},
 
 	fire: function(){
-		var now =new Date().getTime();
+
+		var now = new Date().getTime();
 		if( now - this.lastTime > 200){
 			// fire
 			new s.Turret({
 				game: this.options.game,
-				position: this.getEulerRotation(), 
+				position: this.getEulerRotation(),
 				rotation: this.root.rotation.clone()
 			});
 			this.lastTime = now;
-		}         
-		
+		}
+
 	}
 });
