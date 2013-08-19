@@ -10,6 +10,7 @@ s.SatelliteGame = new Class({
 	],
 
 	initialize: function(_super) {
+		var that = this;
 		_super.call(this);
 
 		// No gravity
@@ -37,9 +38,11 @@ s.SatelliteGame = new Class({
 			rotation: new THREE.Vector3(0, Math.PI/4, 0)
 		});
 
-		// Setup camera: Cockpit camera
+		// Setup camera
 		this.player.root.add(this.camera);
-		this.camera.position.set(0,0,28);
+
+		///////// COMMENT THIS LINE OUT AND UNCOMMENT CHASE CAM BELOW
+        this.camera.position.set(0,0,28);
 
         // Setup camera: Chase camera
 		// this.camera.position.set(0,15,350);
@@ -66,7 +69,12 @@ s.SatelliteGame = new Class({
 			controls: this.controls
 		});
 
-        this.Radar = new s.Radar({
+		window.addEventListener('mousemove', function(e){
+			that.HUD.targetX = e.pageX;
+			that.HUD.targetY = e.pageY;
+		});
+
+        this.radar = new s.Radar({
             game: this,
             player: this.player
         });
