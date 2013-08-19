@@ -20,6 +20,7 @@ s.Ship = new Class({
 		this.bulletOffset = new THREE.Vector3(0, 0, -200);
 	},
 
+    // Calculate the position og the bullet
 	getEulerRotation: function() {
 		// Update the matrix
 		this.root.updateMatrix();
@@ -30,7 +31,7 @@ s.Ship = new Class({
 
 		// Convert the rotation to euler coordinates with the proper order
 		var rotation = new THREE.Vector3();
-		rotation.setEulerFromRotationMatrix(rotation_matrix, 'XZY');
+		rotation.setEulerFromRotationMatrix(rotation_matrix, 'XYZ');
 
 		this.root.eulerRotation = rotation;
 
@@ -39,16 +40,18 @@ s.Ship = new Class({
 	},
 
 	fire: function(){
+        // Throttle the number of turrets fired per second
 		var now =new Date().getTime();
 		if( now - this.lastTime > 200){
-			// fire
+            // Create a new turret
 			new s.Turret({
 				game: this.options.game,
-				position: this.getEulerRotation(), 
-				rotation: this.root.rotation.clone()
+				position: this.getEulerRotation(),
+				rotation: this.root.rotation.clone(),
+                initialVelocity: this.root.getLinearVelocity().clone()
 			});
 			this.lastTime = now;
-		}         
-		
+		}
+
 	}
 });

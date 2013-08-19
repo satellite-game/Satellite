@@ -6,23 +6,22 @@ s.Turret = new Class({
 
 		this.root.position.copy(options.position);
 		this.root.rotation.copy(options.rotation);
+        this.initialVelocity = options.initialVelocity;
 	},
 
 	init: function(_super){
         _super.call(this);
 
-		var root = this.root;
-
         // Make sure the bullets matrix is up to date
-        root.updateMatrix();
+        this.root.updateMatrix();
 
         // Extract the rotation from the bullets matrix
-		var rotationMatrix = new THREE.Matrix4();
-		rotationMatrix.extractRotation(root.matrix);
+		this.rotationMatrix = new THREE.Matrix4();
+		this.rotationMatrix.extractRotation(this.root.matrix);
 
-        this.forceVector = new THREE.Vector3(0, 0, -100).applyMatrix4(rotationMatrix);
-
-		root.applyCentralImpulse(this.forceVector);
+        // Apply bullet impulse
+        this.forceVector = new THREE.Vector3(0, 0, -4000 + (this.iv.z>0 ? this.iv.z*-1 : this.iv.z )).applyMatrix4(this.rotationMatrix);
+		this.root.applyCentralImpulse(this.forceVector);
 	}
 
 });
