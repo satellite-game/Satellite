@@ -2,29 +2,27 @@ s.Turret = new Class({
 	extend: s.GameObject,
 
 	construct: function(options){
-		this.root = new Physijs.SphereMesh(new THREE.SphereGeometry(20,16,16), new THREE.MeshNormalMaterial(), 0.05);
+		this.root = new Physijs.SphereMesh(new THREE.SphereGeometry(20,16,16), new THREE.MeshNormalMaterial(), 1);
 
 		this.root.position.copy(options.position);
 		this.root.rotation.copy(options.rotation);
-
-		// this.root.position.x -= 100;
-		// this.root.position.z -= 100;
-
-		// this.update = this.update.bind(this);
-		// this.game.hook(this.update);
 	},
 
-	update: function(delta, time){
+	init: function(_super){
+        _super.call(this);
+
 		var root = this.root;
+
+        // Make sure the bullets matrix is up to date
+        root.updateMatrix();
+
+        // Extract the rotation from the bullets matrix
 		var rotationMatrix = new THREE.Matrix4();
 		rotationMatrix.extractRotation(root.matrix);
 
-		var linearVelocity = root.getLinearVelocity().clone();
-		impulse = linearVelocity.clone().negate();
-		root.applyCentralImpulse(impulse);
+        this.forceVector = new THREE.Vector3(0, 0, -100).applyMatrix4(rotationMatrix);
 
-		var forceVector = new THREE.Vector3(0, 0, -10).applyMatrix4(rotationMatrix);
-		root.applyCentralImpulse(forceVector);
+		root.applyCentralImpulse(this.forceVector);
 	}
 
 });
