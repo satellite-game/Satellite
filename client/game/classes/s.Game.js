@@ -251,12 +251,12 @@ s.Game = new Class({
             var selfPosition = s.game.player.root.position.clone();
 
             // Apply negative scaling to position to compensate for moon size
-            selfPosition.addScalar(-250);
+            selfPosition.addScalar(-500);
 
-            // Apply log scaling to better distribute position
-//            selfPosition.x = Math.log(selfPosition.x);
-//            selfPosition.y = Math.log(selfPosition.y);
-//            selfPosition.z = Math.log(selfPosition.z);
+//            // Apply log scaling to better distribute position
+//            selfPosition.x = Math.log(selfPosition.x) * Math.log(selfPosition.x);
+//            selfPosition.y = Math.log(selfPosition.y) * Math.log(selfPosition.y);
+//            selfPosition.z = Math.log(selfPosition.z) * Math.log(selfPosition.z);
 
             // Apply position clamping to prevent exceeding visible radar range
             selfPosition.clamp(0,this.radius);
