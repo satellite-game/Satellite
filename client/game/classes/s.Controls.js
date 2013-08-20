@@ -20,10 +20,22 @@ s.Controls = new Class({
 
 		// Create interpreters for controllers
 		this.keyboard = new s.Keyboard();
-
 		// Hook to the gameloop
 		this.update = this.update.bind(this);
 		this.game.hook(this.update);
+
+		this.firing = false;
+
+		window.addEventListener('mousedown',function(){
+			this.firing = true;
+			console.log("HEY!");
+		});
+		window.addEventListener('mouseup',function(){
+			this.firing = false;
+			console.log("YOU!");
+		});
+
+
 	},
 
 	destruct: function() {
@@ -95,6 +107,10 @@ s.Controls = new Class({
 		}
 
 		if(this.keyboard.pressed('space')){
+			this.player.fire();
+		}
+
+		if (this.firing){
 			this.player.fire();
 		}
 

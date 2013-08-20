@@ -57,10 +57,6 @@ s.SatelliteGame = new Class({
 			game: this
 		});
 
-		window.addEventListener('mousemove', function(e){
-			that.HUD.targetX = e.pageX;
-			that.HUD.targetY = e.pageY;
-		});
 		// Fly controls
 		this.controls = new s.Controls({
 			game: this,
@@ -68,6 +64,18 @@ s.SatelliteGame = new Class({
 			camera: this.camera,
 			HUD: this.HUD
 		});
+
+		window.addEventListener('mousemove', function(e){
+			that.HUD.targetX = e.pageX;
+			that.HUD.targetY = e.pageY;
+		});
+		window.addEventListener('mousedown',function(){
+			that.controls.firing = true;
+		});
+		window.addEventListener('mouseup',function(){
+			that.controls.firing = false;
+		});
+
 
 		this.HUD.controls = this.controls;
 
