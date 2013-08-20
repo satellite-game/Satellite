@@ -240,9 +240,13 @@ s.Game = new Class({
 				func(now, delta);
 			});
 
-			// Re-render the scene
-			this.renderer.render(this.scene, this.camera);
-			this.render_stats.update();
+            // Render radar
+            this.radarRenderer.render( this.radarScene, this.radarCamera );
+
+			// Render main scene
+			this.renderer.render( this.scene, this.camera );
+
+            this.render_stats.update();
 
 			// Request the next frame to be rendered
 			requestAnimationFrame(this.render);
