@@ -10,6 +10,7 @@ module.exports = function(grunt) {
 		'client/game/s.util.js',
 		'client/game/classes/s.EventEmitter.js',
 		'client/game/classes/s.GameObject.js',
+        'client/game/classes/s.Projectile.js',
 		'client/game/classes/s.Turret.js',
 		'client/game/classes/s.Ship.js',
 		'client/game/classes/s.Player.js',

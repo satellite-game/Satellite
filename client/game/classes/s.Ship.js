@@ -17,8 +17,9 @@ s.Ship = new Class({
 		this.root.rotation.copy(options.rotation);
 
 		this.lastTime = 0;
-
 		this.bulletOffset = new THREE.Vector3(0, 0, -200);
+
+        this.team = 'alliance';
 	},
 
     // Calculate the position og the bullet
@@ -50,7 +51,8 @@ s.Ship = new Class({
 				game: this.options.game,
 				position: this.getEulerRotation(),
 				rotation: this.root.rotation.clone(),
-                initialVelocity: this.root.getLinearVelocity().clone()
+                initialVelocity: this.root.getLinearVelocity().clone(),
+                team: this.team
 			});
 			this.lastTime = now;
 		}
