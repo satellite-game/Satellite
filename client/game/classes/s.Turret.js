@@ -2,11 +2,9 @@ s.Turret = new Class({
 	extend: s.GameObject,
 
 	construct: function(options){
-        var material = Physijs.createMaterial(
-            new THREE.MeshBasicMaterial({color:'blue', transparent: true}),
-            0.8,
-            0.3
-        );
+        this.color = s.config.weapons.bullets.color[options.team];
+        this.velocity = s.config.weapons.bullets.velocity;
+        var material = Physijs.createMaterial( new THREE.MeshBasicMaterial({color: this.color}), 0.8, 0.3);
 		this.root = new Physijs.SphereMesh(new THREE.SphereGeometry(3,4,4), material, 1);
         this.root.instance = this;
 		this.root.position.copy(options.position);
@@ -26,7 +24,7 @@ s.Turret = new Class({
 
         // Apply bullet impulse
 
-        this.forceVector = new THREE.Vector3(0, 0, -8000 + (this.initialVelocity.z>0 ? this.initialVelocity.z*-1 : this.initialVelocity.z )).applyMatrix4(this.rotationMatrix);
+        this.forceVector = new THREE.Vector3(0, 0, (this.velocity * -1) + (this.initialVelocity.z > 0 ? this.initialVelocity.z * -1 : this.initialVelocity.z )).applyMatrix4(this.rotationMatrix);
 		this.root.applyCentralImpulse(this.forceVector);
         this.root.addEventListener('collision', this.handleCollision.bind(this));
     },
