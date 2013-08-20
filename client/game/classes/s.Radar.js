@@ -78,7 +78,7 @@ s.Radar = new Class({
         that.radarScene.add( selfMarker );
 
         var moonMarker = new THREE.Mesh(
-            new THREE.SphereGeometry(10),
+            new THREE.SphereGeometry(5),
             new THREE.MeshBasicMaterial( { color: 0x994411, shading: THREE.FlatShading } ) );
 
         moonMarker.name = "moon";
