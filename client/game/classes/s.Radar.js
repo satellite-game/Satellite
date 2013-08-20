@@ -70,7 +70,7 @@ s.Radar = new Class({
         this.update = this.update.bind(this);
         this.game.hook(this.update);
 
-        document.body.appendChild(this.radarCanvas);
+//        document.body.appendChild(this.radarCanvas);
 
 
     },
