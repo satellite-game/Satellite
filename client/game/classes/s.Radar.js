@@ -2,81 +2,70 @@ s.Radar = new Class({
 
     construct: function(options){
 
-        this.game = options.game;
-
-        this.radarCanvas = document.createElement( 'canvas' );
-
-        this.radarCanvas.style.position = 'absolute';
-
-        this.radarCanvas.width = 128;
-        this.radarCanvas.height = 128;
-        this.radarCanvas.style.top = '600px';
-        this.radarCanvas.style.left = '600px';
-        //this.radarCanvas.style.top = window.innerHeight - this.radarCanvas.height;
-        //this.radarCanvas.style.left = window.innerWidth - this.radarCanvas.width;
-
-        this.radarCamera = new THREE.PerspectiveCamera( 20, this.radarCanvas.width / this.radarCanvas.height, 1, 10000 );
-        this.radarCamera.position.z = 1800;
-
+        // Init THREE Environment
         this.radarScene = new THREE.Scene();
+        this.radarCamera = new THREE.PerspectiveCamera( 40, 1, 1, 1000 );
+        this.radarRenderer = new THREE.WebGLRenderer( { antialias: true } );
+        this.radar = '';
 
-        var light = new THREE.DirectionalLight( 0xffffff );
-        light.position.set( 0, 0, 1 ).normalize();
+        // Append Renderer+Canvas
+        this.radarRenderer.setSize( 256, 256 );
+        this.radarCanvas = document.body.appendChild( this.radarRenderer.domElement );
+
+        this.game = options.game;
+        this.controls = options.controls;
+
+        // Styling
+        this.radarCanvas.style.position = 'absolute';
+        this.radarCanvas.style.top = '800px';
+        this.radarCanvas.style.left = '10px';
+
+
+        // Init Camera
+        this.radarCamera.position.x = 0;
+        this.radarCamera.position.y = 0;
+        this.radarCamera.position.z = 180;
+        this.radarScene.add( this.radarCamera );
+
+        // Init Lights
+        var light = new THREE.DirectionalLight( 0x000000 );
+        light.position.set( 0, 1, 1 ).normalize();
         this.radarScene.add( light );
 
+        this.radarRenderer.setClearColor( 0x212121, 1 );
 
-        var context = this.radarCanvas.getContext( '2d' );
+        var radius = 32,
+            mesh = new THREE.MeshNormalMaterial(),
+            sphere = new THREE.Mesh(new THREE.SphereGeometry( radius, 70, 70 ), mesh),
+            geometry = new THREE.SphereGeometry( radius, 70, 70 );
+        this.radarScene.add( sphere );
 
-        var shadowTexture = new THREE.Texture( this.radarCanvas );
-        shadowTexture.needsUpdate = true;
+//        var materials = [
+//
+//            new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
+//            new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true, transparent: true } )
+//
+//        ];
 
-        var shadowMaterial = new THREE.MeshBasicMaterial( { map: shadowTexture } );
-        var shadowGeo = new THREE.PlaneGeometry( 300, 300, 1, 1 );
+        //var group = THREE.SceneUtils.createMultiMaterialObject( geometry, materials );
+//        group.position.x = 0;
+//        group.position.y = 0;
+//        group.position.z = 0;
+//        group.rotation.x = -1.87;
+//        this.radarScene.add( group );
 
-        var mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
-        mesh.position.x = 400;
-        mesh.position.y = -250;
-        mesh.rotation.x = -Math.PI / 2;
-        this.radarScene.add( mesh );
+//        this.update = this.update.bind(this);
+//        this.game.hook(this.update);
 
-        var color, f1, f2, f3, p, n, vertexIndex,
-            radius = 80,
-            geometry = new THREE.SphereGeometry( radius );
+        this.radarRenderer.render( this.radarScene, this.radarCamera );
 
-
-        var materials = [
-
-            new THREE.MeshLambertMaterial( {
-                color: 0xffffff,
-                shading: THREE.FlatShading,
-                vertexColors: THREE.VertexColors } ),
-            new THREE.MeshBasicMaterial( { color: 0x000000,
-                shading: THREE.FlatShading,
-                wireframe: true,
-                transparent: true } )
-
-        ];
-
-        this.group = THREE.SceneUtils.createMultiMaterialObject( geometry, materials );
-        this.group.position.x = -400;
-        this.group.rotation.x = -1.87;
-        this.radarScene.add( this.group );
-
-        this.radarRenderer = new THREE.WebGLRenderer( { antialias: true } );
-        this.radarRenderer.setSize( this.radarCanvas.width, this.radarCanvas.height );
-
-        this.radarCanvas.appendChild( this.radarRenderer.domElement );
-
-        this.update = this.update.bind(this);
-        this.game.hook(this.update);
-
-//        document.body.appendChild(this.radarCanvas);
-
-
+        this.render = this.render.bind(this);
+        this.game.hook(this.render);
+        this.render();
     },
 
     update: function() {
-        //debugger;
+        debugger;
         this.render();
 
     },
@@ -88,6 +77,8 @@ s.Radar = new Class({
 
         this.radarCamera.lookAt( this.radarScene.position );
 
+        requestAnimationFrame(this.render);
+        this.controls.update();
         this.radarRenderer.render( this.radarScene, this.radarCamera );
 
     }

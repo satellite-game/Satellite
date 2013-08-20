@@ -69,15 +69,16 @@ s.SatelliteGame = new Class({
 			controls: this.controls
 		});
 
+        this.radar = new s.Radar({
+            game: this,
+            controls: this.controls
+        });
+
 		window.addEventListener('mousemove', function(e){
 			that.HUD.targetX = e.pageX;
 			that.HUD.targetY = e.pageY;
 		});
 
-        this.radar = new s.Radar({
-            game: this,
-            player: this.player
-        });
 	},
 
 	render: function(_super, time) {
