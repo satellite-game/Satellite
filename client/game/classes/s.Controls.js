@@ -66,6 +66,12 @@ s.Controls = new Class({
 		if (this.HUD.targetY > this.HUD.canvas.height/2){
 			pitch = -1 * (this.options.pitchSpeed/(this.HUD.subreticleBound.top/((this.HUD.targetY - centerY) * 4)))  / thrustScalar;
 		}
+		if (this.HUD.targetY > centerY - this.HUD.crosshairs.height/2 && this.HUD.targetY < centerY + this.HUD.crosshairs.height/2){
+			pitch = 0;
+		}
+		if (this.HUD.targetX > centerX - this.HUD.crosshairs.width/2 && this.HUD.targetX < centerX + this.HUD.crosshairs.width/2){
+			yaw = 0;
+		}
 
 		if (this.keyboard.pressed('left')) {
 			yaw = this.options.yawSpeed / thrustScalar;
