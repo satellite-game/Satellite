@@ -2,6 +2,7 @@ s.Ship = new Class({
 	extend: s.GameObject,
 
 	construct: function(options) {
+
 		// handle parameters
 		this.options = options = jQuery.extend({
 			position: new THREE.Vector3(0, 0, 0),
@@ -22,6 +23,7 @@ s.Ship = new Class({
 
     // Calculate the position og the bullet
 	getEulerRotation: function() {
+
 		// Update the matrix
 		this.root.updateMatrix();
 

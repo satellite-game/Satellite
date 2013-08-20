@@ -134,7 +134,9 @@ s.Game = new Class({
 		if (this.isFullScreen()) {
 			console.log('Full screen mode entered!');
 
-			this.el.requestPointerLock = this.el.requestPointerLock || this.el.mozRequestPointerLock || this.el.webkitRequestPointerLock;
+			this.el.requestPointerLock = this.el.requestPointerLock ||
+                                         this.el.mozRequestPointerLock ||
+                                         this.el.webkitRequestPointerLock;
 			this.el.requestPointerLock();
 		}
 		else {
