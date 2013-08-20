@@ -233,23 +233,45 @@ s.Game = new Class({
 			// Calculate the time since the last frame was rendered
 			var delta = now - this.lastRender;
 			this.lastRender = now;
-            //this.camera.position.z += delta/200;
 			// Run each hooked function before rendering
 			// This may need to happen BEFORE physics simulation
 			this.hookedFuncs.forEach(function(func) {
 				func(now, delta);
 			});
 
+
+            //////////////////////////
+            // RADAR RENDER SEGMENT //
+            //////////////////////////
+
+            // Radar sphere rotation with respect to player's current rotation
             this.radarScene.children[3].rotation = s.game.player.root.rotation;
 
+            // Clone of the current player's position
             var selfPosition = s.game.player.root.position.clone();
-            //selfPosition.add(new THREE.Vector3(-10,-10,-10));
+
+            // Apply negative scaling to position to compensate for moon size
+            selfPosition.addScalar(-250);
+
+            // Apply log scaling to better distribute position
+//            selfPosition.x = Math.log(selfPosition.x);
+//            selfPosition.y = Math.log(selfPosition.y);
+//            selfPosition.z = Math.log(selfPosition.z);
+
+            // Apply position clamping to prevent exceeding visible radar range
+            selfPosition.clamp(0,this.radius);
+
+            // Apply normalization and multiplier to cover full sphere coordinates and set the position
             this.radarScene.getChildByName( 'self' ).position = selfPosition.normalize().multiplyScalar(this.radius);
 
+            // moon radar positioning
             var moonPosition = s.game.scene.getChildByName( 'moon').position.clone();
             this.radarScene.getChildByName( 'moon' ).position = moonPosition.normalize().multiplyScalar(this.radius);
-            // Render radar
+
+            // radar render loop
             this.radarRenderer.render( this.radarScene, this.radarCamera );
+
+            // END RADAR //
 
 			// Render main scene
 			this.renderer.render( this.scene, this.camera );

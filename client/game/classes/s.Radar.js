@@ -25,7 +25,7 @@ s.Radar = new Class({
         // Styling
         that.radarCanvas.style.position = 'absolute';
         that.radarCanvas.style.top = '0px';
-        that.radarCanvas.style.right = window.innerWidth;
+        that.radarCanvas.style.left = window.innerWidth-256+"px";
 
         // Init Camera
         that.radarCamera.position.x = 0;
