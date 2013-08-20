@@ -34,7 +34,8 @@ s.Controls = new Class({
 		game.unhook(this.update);
 	},
 
-	update: function(delta, time) {
+	update: function(time, delta) {
+		console.log(delta);
 		var root = this.player.root;
 		var pitch = 0;
 		var roll = 0;
@@ -55,16 +56,16 @@ s.Controls = new Class({
 		}
 
 		if (this.HUD.targetX < this.HUD.canvas.width/2){
-			yaw = (this.options.yawSpeed/(this.HUD.subreticleBound.left/(this.HUD.canvas.width/2 - this.HUD.targetX))) * this.options.thrustImpulse/1000 ;
+			yaw = (this.options.yawSpeed/(this.HUD.subreticleBound.left/(this.HUD.canvas.width/2 - this.HUD.targetX)) * 3) / (this.options.thrustImpulse/1000 + 1);
 		}
 		if (this.HUD.targetX > this.HUD.canvas.width/2){
-			yaw = (-1*(this.options.yawSpeed/(this.HUD.subreticleBound.right/(this.HUD.targetX - this.HUD.canvas.width/2)))) * this.options.thrustImpulse/1000;
+			yaw = (-1*(this.options.yawSpeed/(this.HUD.subreticleBound.right/(this.HUD.targetX - this.HUD.canvas.width/2))) * 3) / (this.options.thrustImpulse/1000 + 1);
 		}
 		if (this.HUD.targetY < this.HUD.canvas.height/2){
-			pitch = (this.options.pitchSpeed/(this.HUD.subreticleBound.top/(this.HUD.canvas.height/2 - this.HUD.targetY))) *  this.options.thrustImpulse/1000;
+			pitch = (this.options.pitchSpeed/(this.HUD.subreticleBound.top/(this.HUD.canvas.height/2 - this.HUD.targetY)) * 3) /  (this.options.thrustImpulse/1000 + 1);
 		}
 		if (this.HUD.targetY > this.HUD.canvas.height/2){
-			pitch = (-1*(this.options.pitchSpeed/(this.HUD.subreticleBound.top/(this.HUD.targetY - this.HUD.canvas.height/2))))  * this.options.thrustImpulse/1000;
+			pitch = (-1*(this.options.pitchSpeed/(this.HUD.subreticleBound.top/(this.HUD.targetY - this.HUD.canvas.height/2))) * 3)  / (this.options.thrustImpulse/1000 + 1);
 		}
 
 		if (this.keyboard.pressed('left')) {
