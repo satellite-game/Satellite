@@ -243,9 +243,11 @@ s.Game = new Class({
             this.radarScene.children[3].rotation = s.game.player.root.rotation;
 
             var selfPosition = s.game.player.root.position.clone();
+            //selfPosition.add(new THREE.Vector3(-10,-10,-10));
             this.radarScene.getChildByName( 'self' ).position = selfPosition.normalize().multiplyScalar(this.radius);
 
-            //var moonPosition = s.game
+            var moonPosition = s.game.scene.getChildByName( 'moon').position.clone();
+            this.radarScene.getChildByName( 'moon' ).position = moonPosition.normalize().multiplyScalar(this.radius);
             // Render radar
             this.radarRenderer.render( this.radarScene, this.radarCamera );
 

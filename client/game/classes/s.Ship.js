@@ -16,7 +16,7 @@ s.Ship = new Class({
 		this.root.position.copy(options.position);
 		this.root.rotation.copy(options.rotation);
 
-		this.lastTime = 0;
+        this.lastTime = 0;
 		this.bulletOffset = new THREE.Vector3(0, 0, -200);
 
         this.team = 'alliance';

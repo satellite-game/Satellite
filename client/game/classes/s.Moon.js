@@ -12,7 +12,7 @@ s.Moon = new Class({
 		var materials = s.models.phobos_hifi.materials;
 
 		// Make the moon a bit red
-		materials[0].color.setHex(0x704030); 
+		materials[0].color.setHex(0x704030);
 
 		// Setup physical properties
 		materials[0] = Physijs.createMaterial(
@@ -22,6 +22,7 @@ s.Moon = new Class({
 		);
 
 		this.root = new Physijs.ConvexMesh(geometry, new THREE.MeshFaceMaterial(materials), 0);
+        this.root.name = "moon";
 		// this.root.scale.set(2, 2, 2); // Can't set scale on convex meshes due to https://github.com/chandlerprall/Physijs/issues/60
 		this.root.position.copy(options.position);
 		this.root.rotation.copy(options.rotation);
