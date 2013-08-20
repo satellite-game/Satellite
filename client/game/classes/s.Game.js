@@ -239,8 +239,13 @@ s.Game = new Class({
 			this.hookedFuncs.forEach(function(func) {
 				func(now, delta);
 			});
+
             this.radarScene.children[3].rotation = s.game.player.root.rotation;
-//            this.radarScene.children[3].position = this.game.player.root.position;
+
+            var selfPosition = s.game.player.root.position.clone();
+            this.radarScene.getChildByName( 'self' ).position = selfPosition.normalize().multiplyScalar(this.radius);
+
+            //var moonPosition = s.game
             // Render radar
             this.radarRenderer.render( this.radarScene, this.radarCamera );
 
