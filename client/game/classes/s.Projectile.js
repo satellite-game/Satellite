@@ -15,9 +15,9 @@ s.Projectile = new Class({
 
     addCollisionMesh: function(geometry){
         // Create a physijs mesh for real physics motion and collision detection.
-        var material = Physijs.createMaterial(new THREE.MeshBasicMaterial({visible: true, color: 'red'}), 0.8, 0.3);
+        var material = Physijs.createMaterial(new THREE.MeshBasicMaterial({visible: false}));
         var collisionMesh = new Physijs.SphereMesh(geometry, material, 0.1);
-        this.root = collisionMesh;        
+        this.root = collisionMesh;
         this.root.addEventListener('collision', this.handleCollision.bind(this));
     },
 

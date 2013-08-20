@@ -3,7 +3,7 @@ s.Turret = new Class({
 
 	construct: function(options){
         // Add a collision mesh
-        this.addCollisionMesh(new THREE.SphereGeometry(60));
+        this.addCollisionMesh(new THREE.SphereGeometry(16));
 
         // Draw the projectile to the screen
         this.geometry = new THREE.SphereGeometry(12,20,20);
