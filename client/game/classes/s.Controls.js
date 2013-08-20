@@ -26,14 +26,6 @@ s.Controls = new Class({
 
 		this.firing = false;
 
-		window.addEventListener('mousedown',function(){
-			this.firing = true;
-			console.log("HEY!");
-		});
-		window.addEventListener('mouseup',function(){
-			this.firing = false;
-			console.log("YOU!");
-		});
 
 
 	},
