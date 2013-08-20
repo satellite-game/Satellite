@@ -245,7 +245,7 @@ s.Game = new Class({
             var selfPosition = s.game.player.root.position.clone();
             this.radarScene.getChildByName( 'self' ).position = selfPosition.normalize().multiplyScalar(this.radius);
 
-            var moonPosition = s.game
+            //var moonPosition = s.game
             // Render radar
             this.radarRenderer.render( this.radarScene, this.radarCamera );
 
