@@ -3,8 +3,8 @@ s.Controls = new Class({
 
 	options: {
 		rotationSpeed: Math.PI/2,
-		pitchSpeed: Math.PI/2,
-		yawSpeed: Math.PI/2,
+		pitchSpeed: Math.PI/3,
+		yawSpeed: Math.PI/3,
 		thrustImpulse: 0,
 		brakePower: 0.85,
 		velocityFadeFactor: 16,
