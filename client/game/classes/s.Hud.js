@@ -23,7 +23,6 @@ s.HUD = new Class({
 
 		this.ctx = this.canvas.getContext('2d');
 
-
 		this.crosshairs = new Image();
 
 		this.crosshairs.src = 'game/textures/crosshairs.png';
@@ -39,14 +38,6 @@ s.HUD = new Class({
 
 
 		this.subreticleBound = {};
-
-		this.subreticleBound.left = this.canvas.width/2 - this.canvas.width/8;
-
-		this.subreticleBound.right = this.canvas.width/2 + this.canvas.width/8;
-
-		this.subreticleBound.top = this.canvas.height/2 - this.canvas.height/8;
-
-		this.subreticleBound.bottom = this.canvas.height/2 + this.canvas.height/8;
 
 
 		this.update = this.update.bind(this);
@@ -66,14 +57,23 @@ s.HUD = new Class({
 
 		this.canvas.width = window.innerWidth;
 
+		var centerY = this.canvas.height/2;
 
-		this.subreticleBound.left = this.canvas.width/2 - this.canvas.width/8;
+		var centerX = this.canvas.width/2;
 
-		this.subreticleBound.right = this.canvas.width/2 + this.canvas.width/8;
+		var borderWidth = this.canvas.width/8;
 
-		this.subreticleBound.top = this.canvas.height/2 - this.canvas.height/8;
+		var borderHeight = this.canvas.height/8;
 
-		this.subreticleBound.bottom = this.canvas.height/2 + this.canvas.height/8;
+
+
+		this.subreticleBound.left = centerX - borderWidth;
+
+		this.subreticleBound.right = centerX + borderWidth;
+
+		this.subreticleBound.top = centerY - borderHeight;
+
+		this.subreticleBound.bottom = centerY + borderHeight;
 
 
 		this.ctx.font= '30px Futura';
@@ -100,7 +100,7 @@ s.HUD = new Class({
 		}
 
 
-		this.ctx.drawImage(this.crosshairs,this.canvas.width/2- this.crosshairs.width/2,this.canvas.height/2-this.crosshairs.height/2);
+		this.ctx.drawImage(this.crosshairs,centerX - this.crosshairs.width/2,centerY - this.crosshairs.height/2);
 		
 		this.ctx.drawImage(this.subreticle,this.targetX,this.targetY);
 	}

@@ -3,8 +3,8 @@ s.Controls = new Class({
 
 	options: {
 		rotationSpeed: Math.PI/2,
-		pitchSpeed: Math.PI/6,
-		yawSpeed: Math.PI/6,
+		pitchSpeed: Math.PI/2,
+		yawSpeed: Math.PI/2,
 		thrustImpulse: 0,
 		brakePower: 0.85,
 		velocityFadeFactor: 16,
@@ -25,9 +25,6 @@ s.Controls = new Class({
 		this.game.hook(this.update);
 
 		this.firing = false;
-
-
-
 	},
 
 	destruct: function() {
@@ -41,6 +38,9 @@ s.Controls = new Class({
 		var yaw = 0;
 		var thrust = 0;
 		var brakes = 0;
+		var thrustScalar = this.options.thrustImpulse/1000 + 1;
+		var centerY = this.HUD.canvas.height/2; 
+		var centerX = this.HUD.canvas.width/2;
 
 		if (this.keyboard.pressed('backtick')) {
 			root.position.set(10000, 2000, 10000);
@@ -55,33 +55,33 @@ s.Controls = new Class({
 		}
 
 		if (this.HUD.targetX < this.HUD.canvas.width/2){
-			yaw = (this.options.yawSpeed/(this.HUD.subreticleBound.left/(this.HUD.canvas.width/2 - this.HUD.targetX)) * 3) / (this.options.thrustImpulse/1000 + 1);
+			yaw = this.options.yawSpeed/(this.HUD.subreticleBound.left/(centerX- this.HUD.targetX)) / thrustScalar;
 		}
 		if (this.HUD.targetX > this.HUD.canvas.width/2){
-			yaw = (-1*(this.options.yawSpeed/(this.HUD.subreticleBound.right/(this.HUD.targetX - this.HUD.canvas.width/2))) * 3) / (this.options.thrustImpulse/1000 + 1);
+			yaw = -1 * (this.options.yawSpeed/(this.HUD.subreticleBound.right/(this.HUD.targetX - centerX))) / thrustScalar;
 		}
 		if (this.HUD.targetY < this.HUD.canvas.height/2){
-			pitch = (this.options.pitchSpeed/(this.HUD.subreticleBound.top/(this.HUD.canvas.height/2 - this.HUD.targetY)) * 3) /  (this.options.thrustImpulse/1000 + 1);
+			pitch = this.options.pitchSpeed/(this.HUD.subreticleBound.top/(centerY - this.HUD.targetY)) /  thrustScalar;
 		}
 		if (this.HUD.targetY > this.HUD.canvas.height/2){
-			pitch = (-1*(this.options.pitchSpeed/(this.HUD.subreticleBound.top/(this.HUD.targetY - this.HUD.canvas.height/2))) * 3)  / (this.options.thrustImpulse/1000 + 1);
+			pitch = -1 * (this.options.pitchSpeed/(this.HUD.subreticleBound.top/(this.HUD.targetY - centerY)))  / thrustScalar;
 		}
 
 		if (this.keyboard.pressed('left')) {
-			yaw = this.options.yawSpeed;
+			yaw = this.options.yawSpeed / thrustScalar;
 
 		}
 		else if (this.keyboard.pressed('right')) {
-			yaw = -1*this.options.yawSpeed;
+			yaw = -1*this.options.yawSpeed / thrustScalar;
 		}
 
 		if (this.keyboard.pressed('up')) {
 			// Pitch down
-			pitch = -1*this.options.pitchSpeed;
+			pitch = -1*this.options.pitchSpeed / thrustScalar;
 		}
 		else if (this.keyboard.pressed('down')) {
 			// Pitch up
-			pitch = this.options.pitchSpeed;
+			pitch = this.options.pitchSpeed / thrustScalar;
 		}
 
 		if (this.keyboard.pressed('w')) {
