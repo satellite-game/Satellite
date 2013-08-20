@@ -1,85 +1,61 @@
 s.Radar = new Class({
+    toString: 'Radar',
+    extend: s.Game,
 
     construct: function(options){
 
+        this.game = options.game;
+        var that = this.game;
+
         // Init THREE Environment
-        this.radarScene = new THREE.Scene();
-        this.radarCamera = new THREE.PerspectiveCamera( 40, 1, 1, 1000 );
-        this.radarRenderer = new THREE.WebGLRenderer( { antialias: true } );
-        this.radar = '';
+        that.radarScene = new THREE.Scene();
+        that.radarCamera = new THREE.PerspectiveCamera( 40, 1, 1, 1000 );
+        that.radarRenderer = this.renderer || new THREE.WebGLRenderer();
+        that.radar = '';
 
         // Append Renderer+Canvas
-        this.radarRenderer.setSize( 256, 256 );
-        this.radarCanvas = document.body.appendChild( this.radarRenderer.domElement );
-
-        this.game = options.game;
-        this.controls = options.controls;
+        that.radarRenderer.setSize( 256, 256 );
+        that.radarCanvas = document.body.appendChild( that.radarRenderer.domElement );
 
         // Styling
-        this.radarCanvas.style.position = 'absolute';
-        this.radarCanvas.style.top = '800px';
-        this.radarCanvas.style.left = '10px';
+        that.radarCanvas.style.position = 'absolute';
+        that.radarCanvas.style.top = '700px';
+        that.radarCanvas.style.left = '10px';
 
 
         // Init Camera
-        this.radarCamera.position.x = 0;
-        this.radarCamera.position.y = 0;
-        this.radarCamera.position.z = 180;
-        this.radarScene.add( this.radarCamera );
+        that.radarCamera.position.x = 0;
+        that.radarCamera.position.y = 0;
+        that.radarCamera.position.z = 180;
+        that.radarScene.add( that.radarCamera );
 
         // Init Lights
         var light = new THREE.DirectionalLight( 0x000000 );
         light.position.set( 0, 1, 1 ).normalize();
-        this.radarScene.add( light );
+        that.radarScene.add( light );
 
-        this.radarRenderer.setClearColor( 0x212121, 1 );
+        that.radarRenderer.setClearColor( 0x212121, 1 );
 
         var radius = 32,
             mesh = new THREE.MeshNormalMaterial(),
             sphere = new THREE.Mesh(new THREE.SphereGeometry( radius, 70, 70 ), mesh),
             geometry = new THREE.SphereGeometry( radius, 70, 70 );
-        this.radarScene.add( sphere );
+//        that.radarScene.add( sphere );
 
-//        var materials = [
-//
-//            new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
-//            new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true, transparent: true } )
-//
-//        ];
+        var materials = [
 
-        //var group = THREE.SceneUtils.createMultiMaterialObject( geometry, materials );
-//        group.position.x = 0;
-//        group.position.y = 0;
-//        group.position.z = 0;
-//        group.rotation.x = -1.87;
-//        this.radarScene.add( group );
+            new THREE.MeshLambertMaterial( { color: 0xcccccc, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
+            new THREE.MeshBasicMaterial( { color: 0x333333, shading: THREE.FlatShading, wireframe: true, transparent: true } )
 
-//        this.update = this.update.bind(this);
-//        this.game.hook(this.update);
+        ];
 
-        this.radarRenderer.render( this.radarScene, this.radarCamera );
-
-        this.render = this.render.bind(this);
-        this.game.hook(this.render);
-        this.render();
+        var group = THREE.SceneUtils.createMultiMaterialObject( geometry, materials );
+        group.position.x = 0;
+        group.position.y = 0;
+        group.position.z = 0;
+        group.rotation.x = -1.87;
+        that.radarScene.add( group );
+        that.radarRenderer.render( that.radarScene, that.radarCamera );
     },
 
-    update: function() {
-        debugger;
-        this.render();
-
-    },
-
-    render: function() {
-
-        this.radarCamera.position.x += ( this.radarCamera.position.x ) * 0.05;
-        this.radarCamera.position.y += ( this.radarCamera.position.y ) * 0.05;
-
-        this.radarCamera.lookAt( this.radarScene.position );
-
-        requestAnimationFrame(this.render);
-        this.controls.update();
-        this.radarRenderer.render( this.radarScene, this.radarCamera );
-
-    }
 });

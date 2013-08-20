@@ -1,7 +1,7 @@
 s.SatelliteGame = new Class({
 	toString: 'SatelliteGame',
 	extend: s.Game,
-	
+
 	// Models that should be loaded
 	models: [
 		'phobos_hifi',
@@ -12,19 +12,19 @@ s.SatelliteGame = new Class({
 	initialize: function(_super) {
 		var that = this;
 		_super.call(this);
-		
+
 		// No gravity
 		this.scene.setGravity(new THREE.Vector3(0, 0, 0));
 
 		// Ambient light
 		this.ambientLight = new THREE.AmbientLight(0x382828);
 		this.scene.add(this.ambientLight);
-	
+
 		// Directional light
 		this.light = new THREE.DirectionalLight(0xEEEEEE, 2);
 		this.light.position.set(-100000, 0, 0);
 		this.scene.add(this.light);
-		
+
 		// Add moon
 		this.moon = new s.Moon({
 			game: this
@@ -40,8 +40,6 @@ s.SatelliteGame = new Class({
 
 		// Root camera to the player's position
 		this.player.root.add(this.camera);
-		this.camera.position.set(0,35,350); // Odd to stare at the ass of the craft constantly
-		// this.camera.position.set(0,75,350); // Makes flight feel funny
 
         //// Setup camera: Cockpit view; COMMENT OUT FOR CHASE CAM
 		this.camera.position.set(0,0,28);
@@ -71,12 +69,12 @@ s.SatelliteGame = new Class({
         });
 
         // Dependent on controls; needs to be below s.Controls
-        // this.radar = new s.Radar({
-        //     game: this,
-        //     controls: this.controls
-        // });
+        this.radar = new s.Radar({
+            game: this,
+            controls: this.controls
+        });
 
-	
+
 
 		window.addEventListener('mousemove', function(e){
 			that.HUD.targetX = e.pageX;

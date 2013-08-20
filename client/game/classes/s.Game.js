@@ -239,10 +239,15 @@ s.Game = new Class({
 			this.hookedFuncs.forEach(function(func) {
 				func(now, delta);
 			});
+            this.radarScene.children[3].rotation = s.game.player.root.rotation;
+//            this.radarScene.children[3].position = this.game.player.root.position;
+            // Render radar
+            this.radarRenderer.render( this.radarScene, this.radarCamera );
 
-			// Re-render the scene
-			this.renderer.render(this.scene, this.camera);
-			this.render_stats.update();
+			// Render main scene
+			this.renderer.render( this.scene, this.camera );
+
+            this.render_stats.update();
 
 			// Request the next frame to be rendered
 			requestAnimationFrame(this.render);
