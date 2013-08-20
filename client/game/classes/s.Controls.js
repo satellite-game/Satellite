@@ -21,7 +21,7 @@ s.Controls = new Class({
 		// Create interpreters for controllers
 		this.keyboard = new s.Keyboard();
 
-		// Hook to the gameloop		
+		// Hook to the gameloop
 		this.update = this.update.bind(this);
 		this.game.hook(this.update);
 	},
@@ -65,7 +65,7 @@ s.Controls = new Class({
 
 		if (this.keyboard.pressed('left')) {
 			yaw = this.options.yawSpeed;
-			
+
 		}
 		else if (this.keyboard.pressed('right')) {
 			yaw = -1*this.options.yawSpeed;
@@ -120,13 +120,13 @@ s.Controls = new Class({
 			if (this.options.thrustImpulse < 2000){
 				this.options.thrustImpulse += 5;
 			}
-		}		
+		}
 		if (brakes) {
 			if (this.options.thrustImpulse > 0){
 				this.options.thrustImpulse -= 5;
 			}
 		}
-		var impulse;
+        var impulse;
 		impulse = linearVelocity.clone().negate();
 		root.applyCentralImpulse(impulse);
 		var forceVector = new THREE.Vector3(0, 0, -1*this.options.thrustImpulse).applyMatrix4(rotationMatrix);
