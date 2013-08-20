@@ -20,10 +20,14 @@ s.Controls = new Class({
 
 		// Create interpreters for controllers
 		this.keyboard = new s.Keyboard();
-
 		// Hook to the gameloop
 		this.update = this.update.bind(this);
 		this.game.hook(this.update);
+
+		this.firing = false;
+
+
+
 	},
 
 	destruct: function() {
@@ -51,16 +55,16 @@ s.Controls = new Class({
 		}
 
 		if (this.HUD.targetX < this.HUD.canvas.width/2){
-			yaw = this.options.yawSpeed/(this.HUD.subreticleBound.left/(this.HUD.canvas.width/2 - this.HUD.targetX));
+			yaw = (this.options.yawSpeed/(this.HUD.subreticleBound.left/(this.HUD.canvas.width/2 - this.HUD.targetX))) * this.options.thrustImpulse/1000 ;
 		}
 		if (this.HUD.targetX > this.HUD.canvas.width/2){
-			yaw = -1*(this.options.yawSpeed/(this.HUD.subreticleBound.right/(this.HUD.targetX - this.HUD.canvas.width/2)));
+			yaw = (-1*(this.options.yawSpeed/(this.HUD.subreticleBound.right/(this.HUD.targetX - this.HUD.canvas.width/2)))) * this.options.thrustImpulse/1000;
 		}
 		if (this.HUD.targetY < this.HUD.canvas.height/2){
-			pitch = this.options.pitchSpeed/(this.HUD.subreticleBound.top/(this.HUD.canvas.height/2 - this.HUD.targetY));
+			pitch = (this.options.pitchSpeed/(this.HUD.subreticleBound.top/(this.HUD.canvas.height/2 - this.HUD.targetY))) *  this.options.thrustImpulse/1000;
 		}
 		if (this.HUD.targetY > this.HUD.canvas.height/2){
-			pitch = -1*(this.options.pitchSpeed/(this.HUD.subreticleBound.top/(this.HUD.targetY - this.HUD.canvas.height/2)));
+			pitch = (-1*(this.options.pitchSpeed/(this.HUD.subreticleBound.top/(this.HUD.targetY - this.HUD.canvas.height/2))))  * this.options.thrustImpulse/1000;
 		}
 
 		if (this.keyboard.pressed('left')) {
@@ -95,6 +99,10 @@ s.Controls = new Class({
 		}
 
 		if(this.keyboard.pressed('space')){
+			this.player.fire();
+		}
+
+		if (this.firing){
 			this.player.fire();
 		}
 
