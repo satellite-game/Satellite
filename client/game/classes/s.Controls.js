@@ -13,6 +13,7 @@ s.Controls = new Class({
 
 	construct: function(options) {
 		// Store references to game objects
+		this.HUD = options.HUD;
 		this.game = options.game;
 		this.player = options.player;
 		this.camera = options.camera;
@@ -47,6 +48,19 @@ s.Controls = new Class({
 			root.__dirtyPosition = true;
 			root.__dirtyRotation = true;
 			return;
+		}
+
+		if (this.HUD.targetX < this.HUD.canvas.width/2){
+			yaw = this.options.yawSpeed/(this.HUD.subreticleBound.left/(this.HUD.canvas.width/2 - this.HUD.targetX));
+		}
+		if (this.HUD.targetX > this.HUD.canvas.width/2){
+			yaw = -1*(this.options.yawSpeed/(this.HUD.subreticleBound.right/(this.HUD.targetX - this.HUD.canvas.width/2)));
+		}
+		if (this.HUD.targetY < this.HUD.canvas.height/2){
+			pitch = this.options.pitchSpeed/(this.HUD.subreticleBound.top/(this.HUD.canvas.height/2 - this.HUD.targetY));
+		}
+		if (this.HUD.targetY > this.HUD.canvas.height/2){
+			pitch = -1*(this.options.pitchSpeed/(this.HUD.subreticleBound.top/(this.HUD.targetY - this.HUD.canvas.height/2)));
 		}
 
 		if (this.keyboard.pressed('left')) {
