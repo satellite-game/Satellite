@@ -16,14 +16,12 @@ s.Ship = new Class({
 		this.root.position.copy(options.position);
 		this.root.rotation.copy(options.rotation);
 
-        this.lastTime = 0;
-		this.bulletOffset = new THREE.Vector3(0, 0, -200);
-
+		this.lastTime = 0;
         this.team = 'alliance';
 	},
 
     // Calculate the position og the bullet
-	getEulerRotation: function() {
+	getEulerRotation: function(bulletOffset) {
 
 		// Update the matrix
 		this.root.updateMatrix();
@@ -39,21 +37,31 @@ s.Ship = new Class({
 		this.root.eulerRotation = rotation;
 
 		// Store position of bullet relative to the world
-		return this.bulletOffset.clone().applyMatrix4(this.root.matrixWorld);
+		return bulletOffset.clone().applyMatrix4(this.root.matrixWorld);
 	},
 
 	fire: function(){
         // Throttle the number of turrets fired per second
 		var now =new Date().getTime();
-		if( now - this.lastTime > 200){
-            // Create a new turret
-			new s.Turret({
-				game: this.options.game,
-				position: this.getEulerRotation(),
-				rotation: this.root.rotation.clone(),
+		if( now - this.lastTime > 300){
+
+            // Right turret
+            new s.Turret({
+                game: this.options.game,
+                position: this.getEulerRotation(new THREE.Vector3(25, 0, -120)),
+                rotation: this.root.rotation.clone(),
                 initialVelocity: this.root.getLinearVelocity().clone(),
                 team: this.team
-			});
+            });
+
+            // Left turret
+            new s.Turret({
+                game: this.options.game,
+                position: this.getEulerRotation(new THREE.Vector3(-25, 0, -120)),
+                rotation: this.root.rotation.clone(),
+                initialVelocity: this.root.getLinearVelocity().clone(),
+                team: this.team
+            });
 			this.lastTime = now;
 		}
 

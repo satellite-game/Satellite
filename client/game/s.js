@@ -12,7 +12,7 @@ var s = {
                     rebels: 'red'
                 },
                 damage: 10,
-                velocity: 8000
+                velocity: 2000
             }
         }
     },
