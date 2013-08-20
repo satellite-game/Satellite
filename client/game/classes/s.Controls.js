@@ -77,11 +77,11 @@ s.Controls = new Class({
 
 		if (this.keyboard.pressed('up')) {
 			// Pitch down
-			pitch = -1*this.options.pitchSpeed * 3 / thrustScalar;
+			pitch = -1*this.options.pitchSpeed / thrustScalar;
 		}
 		else if (this.keyboard.pressed('down')) {
 			// Pitch up
-			pitch = this.options.pitchSpeed * 3 / thrustScalar;
+			pitch = this.options.pitchSpeed / thrustScalar;
 		}
 
 		if (this.keyboard.pressed('w')) {
