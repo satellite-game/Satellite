@@ -35,7 +35,6 @@ s.Controls = new Class({
 	},
 
 	update: function(time, delta) {
-		console.log(delta);
 		var root = this.player.root;
 		var pitch = 0;
 		var roll = 0;

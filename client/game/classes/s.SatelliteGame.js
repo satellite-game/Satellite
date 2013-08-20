@@ -42,7 +42,7 @@ s.SatelliteGame = new Class({
 		this.player.root.add(this.camera);
 
         //// Setup camera: Cockpit view; COMMENT OUT FOR CHASE CAM
-		this.camera.position.set(0,0,25);
+		this.camera.position.set(0,0,23);
         //// Setup camera: Chase view
         //this.camera.position.set(0,35,350);
 
