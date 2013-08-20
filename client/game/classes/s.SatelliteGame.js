@@ -38,10 +38,15 @@ s.SatelliteGame = new Class({
 			rotation: new THREE.Vector3(0, Math.PI/4, 0)
 		});
 
-		// Setup camera: Chase camera
+		// Root camera to the player's position
 		this.player.root.add(this.camera);
 		this.camera.position.set(0,35,350); // Odd to stare at the ass of the craft constantly
 		// this.camera.position.set(0,75,350); // Makes flight feel funny
+
+        //// Setup camera: Cockpit view; COMMENT OUT FOR CHASE CAM
+		this.camera.position.set(0,0,28);
+        //// Setup camera: Chase view
+        //this.camera.position.set(0,35,350);
 
 		// Planet camera
 		// this.scene.add(this.camera);
@@ -57,13 +62,21 @@ s.SatelliteGame = new Class({
 			game: this
 		});
 
-		// Fly controls
-		this.controls = new s.Controls({
-			game: this,
-			player: this.player,
-			camera: this.camera,
-			HUD: this.HUD
-		});
+        // Fly controls
+        this.controls = new s.Controls({
+            game: this,
+            player: this.player,
+            camera: this.camera,
+            HUD: this.HUD
+        });
+
+        // Dependent on controls; needs to be below s.Controls
+        this.radar = new s.Radar({
+            game: this,
+            controls: this.controls
+        });
+
+	
 
 		window.addEventListener('mousemove', function(e){
 			that.HUD.targetX = e.pageX;
