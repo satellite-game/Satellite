@@ -13,7 +13,7 @@ app.listen(process.env.PORT || 3000);
 
 function handler(req, res) {
 	// Dump out a basic server status page
-	var data = '<!doctype html><head><title>Satellite Server</title></head><body>';
+	var data = '<!doctype html><head><script src="http://localhost:35729/livereload.js"></script><title>DuneBuggy Server</title></head><body>';
 
 	data += '<h1>Satellite Server</h1>';
 
