@@ -40,21 +40,21 @@ s.Radar = new Class({
             mesh = new THREE.MeshNormalMaterial(),
             sphere = new THREE.Mesh(new THREE.SphereGeometry( radius, 70, 70 ), mesh),
             geometry = new THREE.SphereGeometry( radius, 70, 70 );
-        that.radarScene.add( sphere );
+//        that.radarScene.add( sphere );
 
-//        var materials = [
-//
-//            new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
-//            new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true, transparent: true } )
-//
-//        ];
-//
-//        var group = THREE.SceneUtils.createMultiMaterialObject( geometry, materials );
-//        group.position.x = 0;
-//        group.position.y = 0;
-//        group.position.z = 0;
-//        group.rotation.x = -1.87;
-//        that.radarScene.add( group );
+        var materials = [
+
+            new THREE.MeshLambertMaterial( { color: 0xcccccc, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
+            new THREE.MeshBasicMaterial( { color: 0x333333, shading: THREE.FlatShading, wireframe: true, transparent: true } )
+
+        ];
+
+        var group = THREE.SceneUtils.createMultiMaterialObject( geometry, materials );
+        group.position.x = 0;
+        group.position.y = 0;
+        group.position.z = 0;
+        group.rotation.x = -1.87;
+        that.radarScene.add( group );
         that.radarRenderer.render( that.radarScene, that.radarCamera );
     },
 
