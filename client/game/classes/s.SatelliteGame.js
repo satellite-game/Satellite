@@ -53,22 +53,24 @@ s.SatelliteGame = new Class({
 		// lazd: Dust is kinda lame. But I want some sort of thing that shows you're moving
 		this.addDust();
 
-		// Fly controls
-		this.controls = new s.Controls({
-			game: this,
-			player: this.player,
-			camera: this.camera
-		});
-
 		this.HUD = new s.HUD({
-			game: this,
-			controls: this.controls
+			game: this
 		});
 
 		window.addEventListener('mousemove', function(e){
 			that.HUD.targetX = e.pageX;
 			that.HUD.targetY = e.pageY;
 		});
+		// Fly controls
+		this.controls = new s.Controls({
+			game: this,
+			player: this.player,
+			camera: this.camera,
+			HUD: this.HUD
+		});
+
+		this.HUD.controls = this.controls;
+
 	},
 
 	render: function(_super, time) {

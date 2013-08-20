@@ -1,7 +1,7 @@
 s.HUD = new Class({
 	construct: function(options){
 		this.game = options.game;
-		this.controls = options.controls;
+		this.player = options.player;
 		this.canvas = document.createElement('canvas');
 		this.canvas.height = window.innerHeight;
 		this.canvas.width = window.innerWidth;
@@ -47,6 +47,7 @@ s.HUD = new Class({
 		if (this.targetY > this.subreticleBound.bottom){
 			this.targetY = this.subreticleBound.bottom;
 		}
+
 		this.ctx.drawImage(this.crosshairs,this.canvas.width/2- this.crosshairs.width/2,this.canvas.height/2-this.crosshairs.height/2);
 		this.ctx.drawImage(this.subreticle,this.targetX,this.targetY);
 	}
