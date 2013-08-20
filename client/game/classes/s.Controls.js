@@ -55,16 +55,16 @@ s.Controls = new Class({
 		}
 
 		if (this.HUD.targetX < this.HUD.canvas.width/2){
-			yaw = this.options.yawSpeed/(this.HUD.subreticleBound.left/(centerX- this.HUD.targetX)) / thrustScalar;
+			yaw = this.options.yawSpeed/(this.HUD.subreticleBound.left/((centerX - this.HUD.targetX) * 4))  / thrustScalar;
 		}
 		if (this.HUD.targetX > this.HUD.canvas.width/2){
-			yaw = -1 * (this.options.yawSpeed/(this.HUD.subreticleBound.right/(this.HUD.targetX - centerX))) / thrustScalar;
+			yaw = -1 * (this.options.yawSpeed/(this.HUD.subreticleBound.right/((this.HUD.targetX - centerX) * 4))) / thrustScalar;
 		}
 		if (this.HUD.targetY < this.HUD.canvas.height/2){
-			pitch = this.options.pitchSpeed/(this.HUD.subreticleBound.top/(centerY - this.HUD.targetY)) /  thrustScalar;
+			pitch = this.options.pitchSpeed/(this.HUD.subreticleBound.top/((centerY - this.HUD.targetY) * 4)) /  thrustScalar;
 		}
 		if (this.HUD.targetY > this.HUD.canvas.height/2){
-			pitch = -1 * (this.options.pitchSpeed/(this.HUD.subreticleBound.top/(this.HUD.targetY - centerY)))  / thrustScalar;
+			pitch = -1 * (this.options.pitchSpeed/(this.HUD.subreticleBound.top/((this.HUD.targetY - centerY) * 4)))  / thrustScalar;
 		}
 
 		if (this.keyboard.pressed('left')) {
