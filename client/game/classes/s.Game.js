@@ -259,13 +259,13 @@ s.Game = new Class({
 //            selfPosition.z = Math.log(selfPosition.z) * Math.log(selfPosition.z);
 
             // Apply position clamping to prevent exceeding visible radar range
-            selfPosition.clamp(0,this.radius);
+            selfPosition.clamp( new THREE.Vector3(0,0,0), new THREE.Vector3(this.radius,this.radius,this.radius) );
 
             // Apply normalization and multiplier to cover full sphere coordinates and set the position
-            this.radarScene.getChildByName( 'self' ).position = selfPosition.normalize().multiplyScalar(this.radius);
+            this.radarScene.getChildByName( 'self' ).position = selfPosition.normalize().multiplyScalar(this.radius-5.0);
 
             // moon radar positioning
-            var moonPosition = s.game.scene.getChildByName( 'moon').position.clone();
+            var moonPosition = s.game.scene.getChildByName( 'moon' ).position.clone();
             this.radarScene.getChildByName( 'moon' ).position = moonPosition.normalize().multiplyScalar(this.radius);
 
             // radar render loop
