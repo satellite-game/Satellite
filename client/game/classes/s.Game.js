@@ -4,6 +4,43 @@ s.Game = new Class({
 	construct: function(options) {
 		var self = this;
 
+		/*===============================================
+		=             Comms Handler Binding            =
+		===================================================*/
+		
+
+		/*========== Start of Comms Handlers  ==========*/
+		// console.log(typeof this);
+		// // Bind functions
+		// this.bind(this.handleFire);
+		// this.bind(this.handleJoin);
+		// this.bind(this.handleLeave);
+		// this.bind(this.handleMove);
+		// this.bind(this.handleEnemyFire);
+		// this.bind(this.handleHit);
+		// this.bind(this.handlePlayerList);
+		// this.bind(this.handleKill);
+
+		/*==========  End of Comms Handler Binding   ==========*/
+
+
+		// Communication
+		// this.comm = new s.Comm({
+			// player: this.player,
+			// ship: this.ship,
+			// server: window.location.hostname + ':1935'
+		// });
+		
+        // this.comm.on('fire', this.handleEnemyFire);
+        // this.comm.on('hit', this.handleHit);
+        // this.comm.on('player list', this.handlePlayerList);
+        // this.comm.on('killed', this.handleKill);
+        // this.comm.on('join', this.handleJoin);
+        // this.comm.on('leave', this.handleLeave);
+        // this.comm.on('move', this.handleMove);
+		
+		/*-----  End of  Comms Handler Binding  ------*/
+
 		this.doRender = false;
 		this.lastRender = 0;
 

@@ -13,42 +13,6 @@ s.SatelliteGame = new Class({
 		var that = this;
 		_super.call(this);
 		
-		/*===============================================
-		=             Comms Handler Binding            =
-		===================================================*/
-		
-
-		/*========== Start of Comms Handlers  ==========*/
-		
-		// Bind functions
-		this.bind(this.handleFire);
-		this.bind(this.handleJoin);
-		this.bind(this.handleLeave);
-		this.bind(this.handleMove);
-		this.bind(this.handleEnemyFire);
-		this.bind(this.handleHit);
-		this.bind(this.handlePlayerList);
-		this.bind(this.handleKill);
-
-		/*==========  End of Comms Handler Binding   ==========*/
-
-
-		// Communication
-		this.comm = new db.Comm({
-			player: this.player,
-			ship: this.ship,
-			server: window.location.hostname + ':1935'
-		});
-		
-        this.comm.on('fire', this.handleEnemyFire);
-        this.comm.on('hit', this.handleHit);
-        this.comm.on('player list', this.handlePlayerList);
-        this.comm.on('killed', this.handleKill);
-        this.comm.on('join', this.handleJoin);
-        this.comm.on('leave', this.handleLeave);
-        this.comm.on('move', this.handleMove);
-		
-		/*-----  End of  Comms Handler Binding  ------*/
 
 		// No gravity
 		this.scene.setGravity(new THREE.Vector3(0, 0, 0));
@@ -235,7 +199,7 @@ s.SatelliteGame = new Class({
 	handleKill: function(message) {
 		var enemy = this.enemies.get(message.name);
 		
-		new db.Explosion({
+		new s.Explosion({
 			game: this,
 			position: enemy.getPosition().pos
 		});
@@ -262,7 +226,7 @@ s.SatelliteGame = new Class({
 		
 		var bulletModel;
 		if (message.type == 'missile') {
-			bulletModel = new db.Missile({
+			bulletModel = new s.Missile({
 				game: this,
 				position: bulletPosition,
 				rotation: bulletRotation,
@@ -270,7 +234,7 @@ s.SatelliteGame = new Class({
 			});
 		}
 		else {
-			bulletModel = new db.Bullet({
+			bulletModel = new s.Bullet({
 				game: this,
 				position: bulletPosition,
 				rotation: bulletRotation,
@@ -307,7 +271,7 @@ s.SatelliteGame = new Class({
 		this.comm.fire(props.pos, props.rot, this.currentWeapon);
 	},
 	handleDie: function(otherPlayerName) {
-		new db.Explosion({
+		new s.Explosion({
 			game: this,
 			position: this.ship.getRoot().position
 		});

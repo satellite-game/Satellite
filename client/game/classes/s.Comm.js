@@ -1,4 +1,4 @@
-db.Comm = new Class( {
+s.Comm = new Class( {
     extend: s.EventEmitter,
     makeTrigger: function ( evt ) {
         var that = this;
