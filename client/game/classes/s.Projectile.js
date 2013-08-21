@@ -3,8 +3,6 @@ s.Projectile = new Class({
 
     construct: function(options){
         // handle parameters
-        this.color = s.config.weapons.bullets.color[options.team];
-        this.velocity = s.config.weapons.bullets.velocity;
         this.initialVelocity = options.initialVelocity;
     },
 

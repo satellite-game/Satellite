@@ -40,30 +40,48 @@ s.Ship = new Class({
 		return bulletOffset.clone().applyMatrix4(this.root.matrixWorld);
 	},
 
-	fire: function(){
+	fire: function(weapon){
         // Throttle the number of turrets fired per second
 		var now =new Date().getTime();
-		if( now - this.lastTime > 300){
 
-            // Right turret
-            new s.Turret({
-                game: this.options.game,
-                position: this.getEulerRotation(new THREE.Vector3(25, 0, -120)),
-                rotation: this.root.rotation.clone(),
-                initialVelocity: this.root.getLinearVelocity().clone(),
-                team: this.team
-            });
+        // Turrets
+        if(weapon === 'turret'){
+            if( now - this.lastTime > 300){
 
-            // Left turret
-            new s.Turret({
-                game: this.options.game,
-                position: this.getEulerRotation(new THREE.Vector3(-25, 0, -120)),
-                rotation: this.root.rotation.clone(),
-                initialVelocity: this.root.getLinearVelocity().clone(),
-                team: this.team
-            });
-			this.lastTime = now;
-		}
+                // Right turret
+                new s.Turret({
+                    game: this.options.game,
+                    position: this.getEulerRotation(new THREE.Vector3(25, 0, -120)),
+                    rotation: this.root.rotation.clone(),
+                    initialVelocity: this.root.getLinearVelocity().clone(),
+                    team: this.team
+                });
 
+                // Left turret
+                new s.Turret({
+                    game: this.options.game,
+                    position: this.getEulerRotation(new THREE.Vector3(-25, 0, -120)),
+                    rotation: this.root.rotation.clone(),
+                    initialVelocity: this.root.getLinearVelocity().clone(),
+                    team: this.team
+                });
+                this.lastTime = now;
+            }
+        }
+
+        // Missiles
+        if(weapon === 'missile'){
+            if( now - this.lastTime > 300){
+
+                new s.Missile({
+                    game: this.options.game,
+                    position: this.getEulerRotation(new THREE.Vector3(0, 0, -120)),
+                    rotation: this.root.rotation.clone(),
+                    initialVelocity: this.root.getLinearVelocity().clone(),
+                    team: this.team
+                });
+                this.lastTime = now;
+            }
+        }
 	}
 });

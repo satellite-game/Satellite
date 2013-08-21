@@ -39,7 +39,7 @@ s.Controls = new Class({
 		var thrust = 0;
 		var brakes = 0;
 		var thrustScalar = this.options.thrustImpulse/1000 + 1;
-		var centerY = this.HUD.canvas.height/2; 
+		var centerY = this.HUD.canvas.height/2;
 		var centerX = this.HUD.canvas.width/2;
 
 		if (this.keyboard.pressed('backtick')) {
@@ -104,8 +104,12 @@ s.Controls = new Class({
 			roll = -1*this.options.rotationSpeed;
 		}
 
-		if(this.keyboard.pressed('space')){
-			this.player.fire();
+        if(this.keyboard.pressed('space')){
+            this.player.fire('turret');
+        }
+
+		if(this.keyboard.pressed('x')){
+			this.player.fire('missile');
 		}
 
 		if (this.firing){

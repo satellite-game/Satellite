@@ -6,9 +6,17 @@ Copyright (C) 2013 Larry Davis
 var s = {
     config: {
         weapons: {
-            bullets: {
+            turret: {
                 color: {
                     alliance: 'blue',
+                    rebels: 'red'
+                },
+                damage: 10,
+                velocity: 2000
+            },
+            missile: {
+                color: {
+                    alliance: 'green',
                     rebels: 'red'
                 },
                 damage: 10,
