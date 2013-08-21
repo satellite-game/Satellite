@@ -38,6 +38,8 @@ s.Radar = new Class({
         light.position.set( 0, 1, 1 ).normalize();
         that.radarScene.add( light );
 
+        that.radarScene.tempLog = [];
+
         that.radarRenderer.setClearColor( 0x212121, 1 );
 
 
@@ -60,6 +62,7 @@ s.Radar = new Class({
         group.position.y = 0;
         group.position.z = 0;
         group.rotation.x = -1.87;
+        group.name = "radar";
         that.radarScene.add( group );
 
 

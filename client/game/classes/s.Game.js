@@ -7,7 +7,7 @@ s.Game = new Class({
 		/*===============================================
 		=             Comms Handler Binding            =
 		===================================================*/
-		
+
 
 		/*========== Start of Comms Handlers  ==========*/
 		// console.log(typeof this);
@@ -30,7 +30,7 @@ s.Game = new Class({
 			// ship: this.ship,
 			// server: window.location.hostname + ':1935'
 		// });
-		
+
         // this.comm.on('fire', this.handleEnemyFire);
         // this.comm.on('hit', this.handleHit);
         // this.comm.on('player list', this.handlePlayerList);
@@ -38,7 +38,7 @@ s.Game = new Class({
         // this.comm.on('join', this.handleJoin);
         // this.comm.on('leave', this.handleLeave);
         // this.comm.on('move', this.handleMove);
-		
+
 		/*-----  End of  Comms Handler Binding  ------*/
 
 		this.doRender = false;
@@ -282,24 +282,30 @@ s.Game = new Class({
             //////////////////////////
 
             // Radar sphere rotation with respect to player's current rotation
-            this.radarScene.children[3].rotation = s.game.player.root.rotation;
+            this.radarScene.getChildByName( 'radar' ).rotation = s.game.player.root.rotation;
 
             // Clone of the current player's position
             var selfPosition = s.game.player.root.position.clone();
 
+            var selfLength   = s.game.player.root.position.length();
+            selfLength = Math.log( selfLength ) - 8 || .001;
             // Apply negative scaling to position to compensate for moon size
-            selfPosition.addScalar(-200);
+            //selfPosition.addScalar(-800);
 
 //            // Apply log scaling to better distribute position
-//            selfPosition.x = Math.log(selfPosition.x) * Math.log(selfPosition.x);
-//            selfPosition.y = Math.log(selfPosition.y) * Math.log(selfPosition.y);
-//            selfPosition.z = Math.log(selfPosition.z) * Math.log(selfPosition.z);
+//            selfPosition.x = Math.log(selfPosition.x);
+//            selfPosition.y = Math.log(selfPosition.y);
+//            selfPosition.z = Math.log(selfPosition.z);
 
             // Apply position clamping to prevent exceeding visible radar range
-            selfPosition.max( new THREE.Vector3(0,0,0) );
+            //selfPosition.max( new THREE.Vector3(0,0,0) );
 
             // Apply normalization and multiplier to cover full sphere coordinates and set the position
-            //this.radarScene.getChildByName( 'self' ).position = selfPosition.normalize().multiplyScalar(this.radius);
+            this.radarScene.getChildByName( 'self' ).position = selfPosition.normalize().multiplyScalar(selfLength*(this.radius/3));
+
+            this.radarScene.tempLog.push(this.radarScene.getChildByName('self').position);
+            if ( !this.radarScene.tempLog.length%120 )
+                console.log(this.radarScene.tempLog[this.radarScene.tempLog.length-1]);
 
             // moon radar positioning
             var moonPosition = s.game.scene.getChildByName( 'moon' ).position.clone();
