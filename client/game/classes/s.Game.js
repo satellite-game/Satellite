@@ -19,7 +19,7 @@ s.Game = new Class({
 
 		// Create renderer
 		this.renderer = new THREE.WebGLRenderer({
-			antialias: true // to get smoother output
+			antialias: true
 		});
 
 		// Set sky color
@@ -251,7 +251,7 @@ s.Game = new Class({
             var selfPosition = s.game.player.root.position.clone();
 
             // Apply negative scaling to position to compensate for moon size
-            selfPosition.addScalar(-500);
+            selfPosition.addScalar(-200);
 
 //            // Apply log scaling to better distribute position
 //            selfPosition.x = Math.log(selfPosition.x) * Math.log(selfPosition.x);
@@ -259,10 +259,10 @@ s.Game = new Class({
 //            selfPosition.z = Math.log(selfPosition.z) * Math.log(selfPosition.z);
 
             // Apply position clamping to prevent exceeding visible radar range
-            selfPosition.clamp( new THREE.Vector3(0,0,0), new THREE.Vector3(this.radius,this.radius,this.radius) );
+            selfPosition.max( new THREE.Vector3(0,0,0) );
 
             // Apply normalization and multiplier to cover full sphere coordinates and set the position
-            this.radarScene.getChildByName( 'self' ).position = selfPosition.normalize().multiplyScalar(this.radius-5.0);
+            //this.radarScene.getChildByName( 'self' ).position = selfPosition.normalize().multiplyScalar(this.radius);
 
             // moon radar positioning
             var moonPosition = s.game.scene.getChildByName( 'moon' ).position.clone();

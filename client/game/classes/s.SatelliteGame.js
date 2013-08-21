@@ -107,8 +107,8 @@ s.SatelliteGame = new Class({
 
         // Dependent on controls; needs to be below s.Controls
         this.radar = new s.Radar({
-            game: this,
-            controls: this.controls
+            game: this
+            //controls: this.controls
         });
 
 		window.addEventListener('mousemove', function(e){
