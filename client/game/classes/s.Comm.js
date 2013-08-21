@@ -1,3 +1,10 @@
+/**
+*
+* s.Comm is responsible for alerting the server things that happen to a player (via emit events that the server is lisenting for)
+*
+*
+**/
+
 s.Comm = new Class( {
     extend: s.EventEmitter,
     makeTrigger: function ( evt ) {
@@ -10,14 +17,15 @@ s.Comm = new Class( {
         // TODO: Send server some kind of destruct message?
     },
     construct: function ( options ) {
+        this.options = options;        
         options = jQuery.extend( {
             server: 'localhost:1935'
         }, options );
 
         // Prepend http
-        options.server = 'http://' + options.server;
+        this.options.server = 'http://' + this.options.server;
 
-        this.player = options.player;
+        this.player = this.options.player;
         this.ship = options.ship;
 
         var that = this;
@@ -46,10 +54,10 @@ s.Comm = new Class( {
 
         this.socket.on( 'move', this.makeTrigger( 'move' ) );
 
-        this.bind( this.position );
-        this.bind( this.fire );
-        this.bind( this.died );
-        this.bind( this.hit );
+        // this.bind( this.position );
+        // this.bind( this.fire );
+        // this.bind( this.died );
+        // this.bind( this.hit );
     },
 
     connected: function ( ) {

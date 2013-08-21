@@ -19,6 +19,7 @@ module.exports = function(grunt) {
 		'client/game/classes/s.Controls.js',
 		'client/game/classes/s.Hud.js',
         'client/game/classes/s.Radar.js',
+        'client/game/classes/s.Comm.js',
 		'client/game/classes/s.Game.js',
 		'client/game/classes/s.SatelliteGame.js'
 	];
