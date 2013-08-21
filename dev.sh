@@ -9,23 +9,23 @@ function watch() {
 }
 
 # Serve the client in the background
-function server() {
-	cd build/client/
-	python -m SimpleHTTPServer &
-}
+# function server() {
+# 	cd build/client/
+# 	python -m SimpleHTTPServer &
+# }
 
 # Perform build
 grunt default
 
 # Start server
-server
+node app.js
 
 # Start watching
 watch
 
 # Wait a second, then open the server
 sleep 2
-open http://localhost:8000
+open http://localhost:1337
 
 # Kill child processes when the script is killed
 trap 'kill $(jobs -p)' EXIT
