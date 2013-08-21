@@ -5,14 +5,16 @@ s.SatelliteGame = new Class({
 	// Models that should be loaded
 	models: [
 		'phobos_hifi',
-		'human_ship_heavy',
-		'human_ship_light'
+		'phobos_lofi',
+        'human_ship_heavy',
+		'human_ship_light',
+
 	],
 
 	initialize: function(_super) {
 		var that = this;
 		_super.call(this);
-		
+
 
 		// No gravity
 		this.scene.setGravity(new THREE.Vector3(0, 0, 0));
@@ -185,7 +187,7 @@ s.SatelliteGame = new Class({
 		if (message.name == this.player.name) {
 			// server told us to move
 			console.log('Server reset position');
-			
+
 			// Return to center
 			this.ship.setPosition(message.pos, message.rot, message.tRot, message.aVeloc, message.lVeloc, false); // Never interpolate our own movement
 		}
@@ -198,12 +200,12 @@ s.SatelliteGame = new Class({
 	},
 	handleKill: function(message) {
 		var enemy = this.enemies.get(message.name);
-		
+
 		new s.Explosion({
 			game: this,
 			position: enemy.getPosition().pos
 		});
-		
+
 		if (message.killer == this.player.name)
 			console.warn('You killed %s!', message.name);
 		else
@@ -213,17 +215,17 @@ s.SatelliteGame = new Class({
 		for (var otherPlayerName in message) {
 			// don't add self
 			if (otherPlayerName == this.player.name) continue;
-			
+
 			var otherPlayer = message[otherPlayerName];
 			this.enemies.add(otherPlayer);
 		}
 	},
 	handleEnemyFire: function(message) {
 		var time = new Date().getTime();
-		
+
 		var bulletPosition = new THREE.Vector3(message.pos[0], message.pos[1], message.pos[2]);
 		var bulletRotation = new THREE.Vector3(message.rot[0], message.rot[1], message.rot[2]);
-		
+
 		var bulletModel;
 		if (message.type == 'missile') {
 			bulletModel = new s.Missile({
@@ -241,14 +243,14 @@ s.SatelliteGame = new Class({
 				alliance: 'enemy'
 			});
 		}
-		
+
 		// Calculated volume based on distance
 		var volume = this.getVolumeAt(bulletPosition);
-		
+
 		// Play sound
 		var soundInfo = this.options.weapons[message.type].sound;
 		this.sound.play(soundInfo.file, soundInfo.volume*volume);
-		
+
 		this.enemyBullets.push({
 			instance: bulletModel,
 			alliance: 'enemy',
@@ -258,10 +260,10 @@ s.SatelliteGame = new Class({
 	handleHit: function(message) {
 		// Decrement HP
 		this.player.hp -= this.options.weapons[message.type].damage;
-		
+
 		this.sound.play('hit_ship_self');
 		console.log('You were hit with a %s by %s! Your HP: %d', message.type, message.name, this.player.hp);
-		
+
 		if (this.player.hp <= 0) {
 			// Player is dead
 			this.handleDie(message.name);
@@ -275,12 +277,12 @@ s.SatelliteGame = new Class({
 			game: this,
 			position: this.ship.getRoot().position
 		});
-		
+
 		this.comm.died(otherPlayerName);
-		
+
 		// Restore health
 		this.player.hp = 100;
-		
+
 		console.warn('You were killed by %s', otherPlayerName);
 	}
 

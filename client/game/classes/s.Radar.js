@@ -61,7 +61,7 @@ s.Radar = new Class({
         group.position.x = 0;
         group.position.y = 0;
         group.position.z = 0;
-        group.rotation.x = -1.87;
+
         group.name = "radar";
         that.radarScene.add( group );
 
@@ -69,7 +69,6 @@ s.Radar = new Class({
         ////////////////////////
         //  PLAYER LOCATIONS  //
         ////////////////////////
-
 
         var selfMarker = new THREE.Mesh(
             new THREE.SphereGeometry(2),
@@ -80,13 +79,18 @@ s.Radar = new Class({
 
         that.radarScene.add( selfMarker );
 
-        var moonMarker = new THREE.Mesh(
-            new THREE.SphereGeometry(5),
-            new THREE.MeshBasicMaterial( { color: 0x994411, shading: THREE.FlatShading } ) );
+        // moon instantiation
+        var moonGeo = s.models.phobos_lofi.geometry;
+        var moonMats = s.models.phobos_lofi.materials;
+        moonMats[0].color.setHex(0x704030);
+        var moonMarker = new THREE.Mesh( moonGeo, new THREE.MeshFaceMaterial(moonMats) );
 
         moonMarker.name = "moon";
 
         that.radarScene.add( moonMarker );
+        debugger;
+        moonMarker.scale.multiplyScalar(0.005);
+
 //        var particleMaterial = new THREE.ParticleBasicMaterial({
 //            color:0xffffff,
 //            size: 10,

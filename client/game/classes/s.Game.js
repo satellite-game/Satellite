@@ -41,7 +41,12 @@ s.Game = new Class({
 
 		/*-----  End of  Comms Handler Binding  ------*/
 
-		this.doRender = false;
+
+        ///////////////////////////////////
+        // THREE.js / PhysiJS Scene Init //
+		///////////////////////////////////
+
+        this.doRender = false;
 		this.lastRender = 0;
 
 		// Store functions that should be called before render
@@ -282,30 +287,19 @@ s.Game = new Class({
             //////////////////////////
 
             // Radar sphere rotation with respect to player's current rotation
-            this.radarScene.getChildByName( 'radar' ).rotation = s.game.player.root.rotation;
+            // modify this so that player position is rooted to the rotation
+            this.radarScene.getChildByName( 'radar' ).rotation.y = s.game.player.root.rotation.y;
 
             // Clone of the current player's position
             var selfPosition = s.game.player.root.position.clone();
 
             var selfLength   = s.game.player.root.position.length();
-            selfLength = Math.log( selfLength ) - 8 || .001;
-            // Apply negative scaling to position to compensate for moon size
-            //selfPosition.addScalar(-800);
+            selfLength = Math.log( selfLength ) - 7 || 0.1;
 
-//            // Apply log scaling to better distribute position
-//            selfPosition.x = Math.log(selfPosition.x);
-//            selfPosition.y = Math.log(selfPosition.y);
-//            selfPosition.z = Math.log(selfPosition.z);
-
-            // Apply position clamping to prevent exceeding visible radar range
-            //selfPosition.max( new THREE.Vector3(0,0,0) );
 
             // Apply normalization and multiplier to cover full sphere coordinates and set the position
-            this.radarScene.getChildByName( 'self' ).position = selfPosition.normalize().multiplyScalar(selfLength*(this.radius/3));
-
-            this.radarScene.tempLog.push(this.radarScene.getChildByName('self').position);
-            if ( !this.radarScene.tempLog.length%120 )
-                console.log(this.radarScene.tempLog[this.radarScene.tempLog.length-1]);
+            this.radarScene.getChildByName( 'self' ).position = selfPosition.normalize().multiplyScalar(selfLength*(this.radius/4));
+            //this.radarScene.getChildByName( 'self' ).rotation = this.radarScene.getChildByName( 'radar' ).rotation;
 
             // moon radar positioning
             var moonPosition = s.game.scene.getChildByName( 'moon' ).position.clone();
