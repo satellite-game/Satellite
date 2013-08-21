@@ -113,7 +113,7 @@ s.Controls = new Class({
 		}
 
 		if (this.firing){
-			this.player.fire();
+			this.player.fire('turret');
 		}
 
 		var linearVelocity = root.getLinearVelocity().clone();
