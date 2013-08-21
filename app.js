@@ -1,11 +1,11 @@
 // creating global parameters and start
 // listening to 'port', we are creating an express
 // server and then we are binding it with socket.io
-var express 	= require('express');
-var app			= express();
-var server  	= require('http').createServer(app);
-var io      	= require('socket.io').listen(server);
-var port    	= 1337;
+var express     = require('express');
+var app         = express();
+var server      = require('http').createServer(app);
+var io          = require('socket.io').listen(server);
+var port        = 1337;
 var path        = require('path');
 
 // listening to port...
