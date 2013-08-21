@@ -81,8 +81,8 @@ function getTime() {
 }
 
 io.sockets.on('connection', function (socket) {
-    var ip = socket.handshake.address.address;
-    console.log('Client connected from '+ip+'...');
+    var address = socket.handshake.address;
+    console.log("New connection from " + address.address + ":" + address.port);
 
     // Send welcome message
     socket.emit('welcome', {
