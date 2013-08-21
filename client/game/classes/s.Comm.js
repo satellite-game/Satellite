@@ -10,9 +10,6 @@ s.Comm = new Class( {
         // TODO: Send server some kind of destruct message?
     },
     construct: function ( options ) {
-        options = jQuery.extend( {
-            server: 'localhost:1935'
-        }, options );
 
         // Prepend http
         options.server = 'http://' + options.server;
@@ -26,6 +23,11 @@ s.Comm = new Class( {
 
         // Create socket connection
         this.socket = io.connect( options.server );
+
+        this.socket.on('welcome', function(data){
+            console.log('yolo! we be connected');
+            console.log('data:', data);
+        });
 
         this.socket.on( 'join', this.makeTrigger( 'join' ) );
 
