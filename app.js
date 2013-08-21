@@ -87,6 +87,18 @@ io.sockets.on('connection', function (socket) {
         message: 'Welcome to Satellite'
     });
 
+    socket.emit('skirmish-start', function (data) {
+        // codes
+    })
+
+    socket.emit('skirmish-end', function (data) {
+        // codes
+    })
+
+    socket.emit('skirmish-reset', function (data) {
+        // codes
+    })
+
     // Setup message handlers
     socket.on('join', function(message) {
         if (players[message.name] !== undefined && ip === players[message.name].ip) {

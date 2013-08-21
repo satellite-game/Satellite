@@ -48,10 +48,6 @@ s.Comm = new Class( {
 
         this.socket.on( 'move', this.makeTrigger( 'move' ) );
 
-        this.bind( this.position );
-        this.bind( this.fire );
-        this.bind( this.died );
-        this.bind( this.hit );
     },
 
     connected: function ( ) {
