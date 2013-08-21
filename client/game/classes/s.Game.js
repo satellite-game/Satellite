@@ -4,6 +4,9 @@ s.Game = new Class({
 	construct: function(options) {
 		var self = this;
 
+
+
+
 		/*===============================================
 		=             Comms Handler Binding            =
 		===================================================*/
@@ -25,11 +28,11 @@ s.Game = new Class({
 
 
 		// Communication
-		// this.comm = new s.Comm({
-			// player: this.player,
-			// ship: this.ship,
-			// server: window.location.hostname + ':1935'
-		// });
+		this.comm = new s.Comm({
+			player: this.player,
+			ship: this.ship,
+			server: window.location.hostname + ':1337'
+		});
 		
         // this.comm.on('fire', this.handleEnemyFire);
         // this.comm.on('hit', this.handleHit);
