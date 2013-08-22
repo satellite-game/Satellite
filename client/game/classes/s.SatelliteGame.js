@@ -11,7 +11,7 @@ s.SatelliteGame = new Class( {
 
 	],
 
-	initialize: function(super) {
+	initialize: function(_super) {
 		var that = this;
 		_super.call(this);
 		
