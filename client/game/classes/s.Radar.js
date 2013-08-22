@@ -54,7 +54,7 @@ s.Radar = new Class({
 
         var materials = [
             //new THREE.MeshLambertMaterial( { color: 0xcccccc, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
-            new THREE.MeshBasicMaterial( { color: 0x5dfc0a, shading: THREE.FlatShading, wireframe: true, transparent: true } )
+            new THREE.MeshBasicMaterial( { color:0x5dfc0a, shading: THREE.FlatShading, wireframe: true, transparent: true } )
         ];
 
         var group = THREE.SceneUtils.createMultiMaterialObject( sphere, materials );
@@ -66,18 +66,33 @@ s.Radar = new Class({
         that.radarScene.add( group );
 
 
-        ////////////////////////
-        //  PLAYER LOCATIONS  //
-        ////////////////////////
+        ///////////////////////
+        //  PLAYER LOCATION  //
+        ///////////////////////
 
+        // marker for player position
         var selfMarker = new THREE.Mesh(
             new THREE.SphereGeometry(2),
             new THREE.MeshBasicMaterial( { color: 0x123456, shading: THREE.FlatShading } ) );
 
         selfMarker.name = "self";
-        //selfMarker.position = new THREE.Vector3(10,10,10);
 
         that.radarScene.add( selfMarker );
+
+
+        // marker for player motion
+        var trajectoryGeo = new THREE.Geometry();
+        trajectoryGeo.vertices.push(new THREE.Vector3(0,0,0));
+        trajectoryGeo.vertices.push(new THREE.Vector3(0,0,0));
+
+        var selfTrajectory = new THREE.Line(
+            trajectoryGeo,
+            new THREE.LineBasicMaterial( { color: 0x5dfc0a } )
+        );
+        selfTrajectory.name = "selfTrajectory";
+
+        that.radarScene.add( selfTrajectory );
+
 
         // moon instantiation
         var moonGeo = s.models.phobos_lofi.geometry;
@@ -85,11 +100,10 @@ s.Radar = new Class({
         moonMats[0].color.setHex(0x704030);
         var moonMarker = new THREE.Mesh( moonGeo, new THREE.MeshNormalMaterial(moonMats) );
 
+        moonMarker.scale.multiplyScalar(0.005);
         moonMarker.name = "moon";
 
         that.radarScene.add( moonMarker );
-        debugger;
-        moonMarker.scale.multiplyScalar(0.005);
 
 //        var particleMaterial = new THREE.ParticleBasicMaterial({
 //            color:0xffffff,
