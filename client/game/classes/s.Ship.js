@@ -41,14 +41,11 @@ s.Ship = new Class({
 	},
 
 	fire: function(weapon){
-        // Throttle the number of turrets fired per second
 		var now =new Date().getTime();
 
         // Turrets
-        if(weapon === 'turret'){
             if( now - this.lastTime > 300){
 
-                // Right turret
                 new s.Turret({
                     game: this.options.game,
                     position: this.getEulerRotation(new THREE.Vector3(25, 0, -120)),
@@ -57,7 +54,6 @@ s.Ship = new Class({
                     team: this.team
                 });
 
-                // Left turret
                 new s.Turret({
                     game: this.options.game,
                     position: this.getEulerRotation(new THREE.Vector3(-25, 0, -120)),
@@ -67,7 +63,7 @@ s.Ship = new Class({
                 });
                 this.lastTime = now;
             }
-        }
+        
 
         // Missiles
         if(weapon === 'missile'){
@@ -83,5 +79,24 @@ s.Ship = new Class({
                 this.lastTime = now;
             }
         }
-	}
+    },
+
+    getPositionPacket: function() {
+        var root = this.getRoot();
+        
+        // Position & rotation
+        var shipPosition = (root && root.position) || new THREE.Vector3();
+        var shipRotation = (root && root.rotation) || new THREE.Vector3();
+
+        // Velocity
+        var linearVelocity = (root.getLinearVelocity && root.getLinearVelocity()) || new THREE.Vector3();
+        var angularVelocity = (root.getAngularVelocity && root.getAngularVelocity()) || new THREE.Vector3();
+        
+        return {
+            pos: [shipPosition.x, shipPosition.y, shipPosition.z],
+            rot: [shipRotation.x, shipRotation.y, shipRotation.z],
+            aVeloc: [angularVelocity.x, angularVelocity.y, angularVelocity.z],
+            lVeloc: [linearVelocity.x, linearVelocity.y, linearVelocity.z]
+        };
+    }
 });

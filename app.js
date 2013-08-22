@@ -24,17 +24,6 @@ app.get('/', function (req, res) {
     res.sendfile(path.join(__dirname, '/build/client/index.html'));
 });
 
-
-/*================================
-=            original            =
-================================*/
-
-// var app = require('http').createServer(handler);
-// var io = require('socket.io').listen(app);
-// // Enable logging for Socket.IO
-// io.set('log level', 1);
-// app.listen(process.env.PORT || 3000);
-
 function handler(req, res) {
     // Dump out a basic server status page
     var data = '<!doctype html><head><script src="http://localhost:35729/livereload.js"></script><title>DuneBuggy Server</title></head><body>';
@@ -80,11 +69,14 @@ function getTime() {
 
 io.sockets.on('connection', function (socket) {
     var address = socket.handshake.address;
+    var ip = socket.handshake.address.address;
     console.log("New connection from " + address.address + ":" + address.port);
 
+
+    
     // Setup message handlers
     socket.on('join', function(message) {
-        
+        console.dir(message)
         if (players[message.name] !== undefined && ip === players[message.name].ip) {
             console.warn('Error: '+message.name+' tried to join twice!');
             return;
@@ -150,86 +142,6 @@ io.sockets.on('connection', function (socket) {
             // Notify players
             socket.broadcast.emit('leave', {
                 name: name
-            });
-        });
-    });
-
-    socket.on('hit', function(message) {
-        socket.get('name', function (err, name) {
-            socket.broadcast.emit('hit', {
-                name: name,
-                type: message.type
-            });
-        });
-    });
-
-    socket.on('mapItem hit', function(message) {
-        // Get the map item
-        var mapItem = mapItems[message.id];
-
-        if (!mapItem) {
-            console.warn('Tried to take hit on non-existant map item at index '+message.id);
-            return;
-        }
-
-        // Subtract the damage
-        mapItem.hp -= mesage.damage;
-
-        var newMessage = {
-            id: message.id,
-            hp: mapItem.hp
-        };
-
-        // Destroy if necessary
-        if (mapItems.hp < 0) {
-            // Remove the map item reference
-            mapItems[message.id] = undefined;
-
-            // Broadcast destroyed
-            socket.emit('mapItem destroyed', newMessage);
-            socket.broadcast('mapItem destroyed', newMessage);
-        }
-        else {
-            // Broadcast hit
-            socket.emit('mapItem hit', newMessage);
-            socket.broadcast('mapItem hit', newMessage);
-        }
-    });
-
-    socket.on('killed', function(message) {
-        socket.get('name', function (err, name) {
-            socket.broadcast.emit('killed', {
-                name: name,
-                killer: message.killer
-            });
-
-            var newPos = getRandomPosition();
-            var packet = {
-                name: name,
-                pos: newPos,
-                rot: [0, 0, 0],
-                aVeloc: [0, 0, 0],
-                lVeloc: [0, 0, 0],
-                interp: false
-            };
-
-            players[name].pos = newPos;
-
-            // Notify self
-            socket.emit('move', packet);
-
-            // Notify players
-            socket.broadcast.emit('move', packet);
-        });
-    });
-
-    socket.on('fire', function(message) {
-        socket.get('name', function (err, name) {
-            socket.broadcast.emit('fire', {
-                name: name,
-                pos: message.pos,
-                rot: message.rot,
-                type: message.type
             });
         });
     });

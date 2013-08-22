@@ -23,13 +23,14 @@ s.Comm = new Class( {
         // TODO: Send server some kind of destruct message?
     },
     construct: function ( options ) {
-
+        this.game = options.game;
         // Prepend http
         options.server = 'http://' + options.server;
 
         this.player = options.player;
         this.ship = options.ship;
 
+        this.pilot = options.pilot;
         var that = this;
 
         this.lastMessageTime = 0;
@@ -46,12 +47,6 @@ s.Comm = new Class( {
 
         this.socket.on( 'player list', this.makeTrigger( 'player list' ) );
 
-        this.socket.on( 'killed', this.makeTrigger( 'killed' ) );
-
-        this.socket.on( 'fire', this.makeTrigger( 'fire' ) );
-
-        this.socket.on( 'hit', this.makeTrigger( 'hit' ) );
-
         this.socket.on( 'leave', this.makeTrigger( 'leave' ) );
 
         this.socket.on( 'move', this.makeTrigger( 'move' ) );
@@ -60,15 +55,14 @@ s.Comm = new Class( {
 
     connected: function ( ) {
         var time = new Date( ).getTime( );
-        var shipPosition = this.ship.getPositionPacket( );
+        var shipPosition = this.game.player.getPositionPacket( );
 
         var packet = {
             evt: 'joined',
-            name: this.player.name,
+            name: this.pilot.name,
             time: time,
             pos: shipPosition.pos,
             rot: shipPosition.rot,
-            tRot: shipPosition.tRot,
             aVeloc: shipPosition.aVeloc,
             lVeloc: shipPosition.lVeloc
         };
@@ -103,23 +97,5 @@ s.Comm = new Class( {
                 this.lastMessageTime = time;
             }
         }
-    },
-    fire: function ( pos, rot, type ) {
-        this.socket.emit( 'fire', {
-            pos: pos,
-            rot: rot,
-            type: type
-        } );
-    },
-    died: function ( otherPlayerName ) {
-        this.socket.emit( 'killed', {
-            killer: otherPlayerName
-        } );
-    },
-    hit: function ( otherPlayerName, type ) {
-        this.socket.emit( 'hit', {
-            name: otherPlayerName,
-            type: type
-        } );
     }
 } );
