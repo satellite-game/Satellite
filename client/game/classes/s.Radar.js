@@ -40,7 +40,6 @@ s.Radar = new Class({
 
         that.radarScene.tempLog = [];
 
-        that.radarRenderer.setClearColor( 0x212121, 1 );
 
 
         ///////////////////////////////

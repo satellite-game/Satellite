@@ -64,8 +64,8 @@ s.Game = new Class({
 			antialias: true
 		});
 
-		// Set sky color
-		this.renderer.setClearColor(0x87CCEB);
+		// Enable alpha
+		this.renderer.setClearColorHex(0x000000, 0);
 
 		// Create a camera
 		this.camera = new THREE.PerspectiveCamera(35, 1, 1, 300000);
