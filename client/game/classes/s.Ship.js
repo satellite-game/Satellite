@@ -20,7 +20,7 @@ s.Ship = new Class({
         this.team = 'alliance';
 	},
 
-    // Calculate the position og the bullet
+    // Calculate the position of the bullet
 	getEulerRotation: function(bulletOffset) {
 
 		// Update the matrix
