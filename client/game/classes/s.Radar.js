@@ -73,7 +73,7 @@ s.Radar = new Class({
         // marker for player position
         var selfMarker = new THREE.Mesh(
             new THREE.SphereGeometry(2),
-            new THREE.MeshBasicMaterial( { color: 0x123456, shading: THREE.FlatShading } ) );
+            new THREE.MeshBasicMaterial( { color: 0xabcdef, shading: THREE.FlatShading } ) );
 
         selfMarker.name = "self";
 
@@ -87,11 +87,12 @@ s.Radar = new Class({
 
         var selfTrajectory = new THREE.Line(
             trajectoryGeo,
-            new THREE.LineBasicMaterial( { color: 0x5dfc0a } )
+            new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 10 } ),
+            THREE.LineStrip
         );
         selfTrajectory.name = "selfTrajectory";
 
-        that.radarScene.add( selfTrajectory );
+        selfMarker.add( selfTrajectory );
 
 
         // moon instantiation

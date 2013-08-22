@@ -285,9 +285,12 @@ s.Game = new Class({
             //////////////////////////
             // RADAR RENDER SEGMENT //
             //////////////////////////
-
+            var radar      = this.radarScene.getChildByName( 'radar' ),
+                self       = this.radarScene.getChildByName( 'self' ),
+                moon       = this.radarScene.getChildByName( 'moon' ),
+                trajectory = self.getChildByName( 'selfTrajectory' );
             // Radar sphere rotation with respect to player's current rotation
-            this.radarScene.getChildByName( 'radar' ).rotation.y = s.game.player.root.rotation.y;
+            radar.rotation.y = s.game.player.root.rotation.y;
 
             // Clone of the current player's position
             var selfPosition = s.game.player.root.position.clone();
@@ -296,17 +299,17 @@ s.Game = new Class({
             var selfLength   = s.game.player.root.position.length();
             selfLength = Math.log( selfLength ) - 7 || 0.1;
 
-            var selfTrajectory = this.radarScene.getChildByName( 'selfTrajectory' );
-            selfTrajectory.geometry.vertices[0] = selfPosition;
-            selfTrajectory.geometry.vertices[1] = selfPosition.add( s.game.player.root.getLinearVelocity() ).multiplyScalar(2);
-            //debugger;
-
             // Apply normalization and multiplier to cover full sphere coordinates and set the position
-            this.radarScene.getChildByName( 'self' ).position = selfPosition.normalize().multiplyScalar(selfLength*(this.radius/4));
+            self.position = selfPosition.normalize().multiplyScalar(selfLength*(this.radius/4));
+
+            var playerVelocity = s.game.player.root.getLinearVelocity().clone();
+            trajectory.geometry.vertices[1] = self.position.clone().add( playerVelocity.multiplyScalar(1/20) );
+            trajectory.geometry.verticesNeedUpdate = true;
+
 
             // moon radar positioning
             var moonPosition = s.game.scene.getChildByName( 'moon' ).position.clone();
-            this.radarScene.getChildByName( 'moon' ).position = moonPosition.normalize().multiplyScalar(this.radius);
+            moon.position = moonPosition.normalize().multiplyScalar(this.radius);
 
             // radar render loop
             this.radarRenderer.render( this.radarScene, this.radarCamera );
