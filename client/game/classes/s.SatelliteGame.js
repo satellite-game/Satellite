@@ -2,20 +2,22 @@ s.SatelliteGame = new Class( {
     toString: 'SatelliteGame',
     extend: s.Game,
 
-    // Models that should be loaded
-    models: [
-        'phobos_hifi',
+	// Models that should be loaded
+	models: [
+		'phobos_hifi',
+		'phobos_lofi',
         'human_ship_heavy',
-        'human_ship_light'
-    ],
+		'human_ship_light',
 
-    initialize: function ( _super ) {
-        var that = this;
-        _super.call( this );
+	],
 
+	initialize: function(super) {
+		var that = this;
+		_super.call(this);
+		
 
-        // No gravity
-        this.scene.setGravity( new THREE.Vector3( 0, 0, 0 ) );
+		// No gravity
+		this.scene.setGravity(new THREE.Vector3(0, 0, 0));
 
         // Ambient light
         this.ambientLight = new THREE.AmbientLight( 0x382828 );

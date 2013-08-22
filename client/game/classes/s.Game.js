@@ -31,8 +31,8 @@ s.Game = new Class({
 			antialias: true
 		});
 
-		// Set sky color
-		this.renderer.setClearColor(0x87CCEB);
+		// Enable alpha
+		this.renderer.setClearColorHex(0x000000, 0);
 
 		// Create a camera
 		this.camera = new THREE.PerspectiveCamera(35, 1, 1, 300000);
@@ -250,26 +250,10 @@ s.Game = new Class({
 				func(now, delta);
 			});
 
+            // Render radar loop
+            this.radarRenderer.render( this.radarScene, this.radarCamera );
 
-            //////////////////////////
-            // RADAR RENDER SEGMENT //
-            //////////////////////////
-
-            // Radar sphere rotation with respect to player's current rotation
-            this.radarScene.children[3].rotation = s.game.player.root.rotation;
-
-            // Clone of the current player's position
-            var selfPosition = s.game.player.root.position.clone();
-
-            // Apply negative scaling to position to compensate for moon size
-            selfPosition.addScalar(-200);
-
-
-
-            /////////////////////////////
-            // UNIVERSE RENDER SEGMENT //
-            /////////////////////////////
-
+			// Render main scene
 			this.renderer.render( this.scene, this.camera );
 
             this.render_stats.update();
@@ -277,6 +261,5 @@ s.Game = new Class({
 			// Request the next frame to be rendered
 			requestAnimationFrame(this.render);
 		}
-	},
-
+	}
 });
