@@ -134,6 +134,7 @@ s.Radar = new Class({
 
     },
     update: function(options){
+
         //////////////////////////
         // RADAR RENDER SEGMENT //
         //////////////////////////
@@ -142,18 +143,32 @@ s.Radar = new Class({
             self       = radar.getChildByName( 'self' ),
             moon       = radar.getChildByName( 'moon' ),
             trajectory = self.getChildByName( 'selfTrajectory' );
-        // Radar sphere rotation with respect to player's current rotation
-        radar.rotation.y = this.player.root.rotation.y;
 
         // Clone of the current player's position
-        var selfPosition = this.player.root.position.clone();
+        this.selfPosition = this.player.root.position.clone();
 
+        // Radar sphere rotation with respect to player's current rotation
+        // MO' FXQK'N PARTIAL DOT PRODUCT
+        var now = this.selfPosition.clone();
+        var last = this.lastPosition || now;
+        var top = last.x*now.x + last.z*now.z;
+        var bot1 = Math.sqrt( last.x*last.x + last.z*last.z );
+        var bot2 = Math.sqrt(  now.x*now.x  +  now.z*now.z );
+
+        var findTheta = top/(bot1*bot2);
+        // Javascript is a floating point failbus.
+        radar.rotation.y += findTheta>1 || findTheta<-1 ? Math.acos( Math.round( findTheta ) ) : Math.acos( findTheta );
+
+        this.lastPosition = this.selfPosition.clone();
+
+//        radar.rotation.y = (selfPosition.x > 0 && selfPosition.z > 0 ? this.player.root.rotation.y*2 : this.player.root.rotation.y+(Math.PI/2-this.player.root.rotation.y)*2);
+        //radar.rotation.y += 0.03;
         // Distance from center of the map, scaled logarithmically
         var selfLength   = this.player.root.position.length();
         selfLength = Math.log( selfLength ) - 7 || 0.1;
 
         // Apply normalization and multiplier to cover full sphere coordinates and set the position
-        self.position = selfPosition.normalize().multiplyScalar(selfLength*(this.radius/4));
+        self.position = this.selfPosition.normalize().multiplyScalar(selfLength*(this.radius/4));
 
         // Player trajectory marker; scales with velocity, and is never shorter than length 3
         var playerTrajectory = this.player.root.getLinearVelocity().clone().multiplyScalar(1/40);
