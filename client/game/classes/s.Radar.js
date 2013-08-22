@@ -56,13 +56,13 @@ s.Radar = new Class({
             new THREE.MeshBasicMaterial( { color:0x5dfc0a, shading: THREE.FlatShading, wireframe: true, transparent: true } )
         ];
 
-        var group = THREE.SceneUtils.createMultiMaterialObject( sphere, materials );
-        group.position.x = 0;
-        group.position.y = 0;
-        group.position.z = 0;
+        var radar = THREE.SceneUtils.createMultiMaterialObject( sphere, materials );
+        radar.position.x = 0;
+        radar.position.y = 0;
+        radar.position.z = 0;
 
-        group.name = "radar";
-        that.radarScene.add( group );
+        radar.name = "radar";
+        that.radarScene.add( radar );
 
 
         ///////////////////////
@@ -76,7 +76,7 @@ s.Radar = new Class({
 
         selfMarker.name = "self";
 
-        that.radarScene.add( selfMarker );
+        radar.add( selfMarker );
 
 
         // marker for player motion
@@ -100,10 +100,16 @@ s.Radar = new Class({
         moonMats[0].color.setHex(0x704030);
         var moonMarker = new THREE.Mesh( moonGeo, new THREE.MeshNormalMaterial(moonMats) );
 
+        // Moon marker size scaling
+        /* TODO: scale in a more meaningful way */
         moonMarker.scale.multiplyScalar(0.005);
         moonMarker.name = "moon";
 
-        that.radarScene.add( moonMarker );
+        // Moon radar positioning
+        var moonPosition = that.scene.getChildByName( 'moon' ).position.clone();
+        moonMarker.position = moonPosition.normalize().multiplyScalar(that.radius);
+
+        radar.add( moonMarker );
 
 //        var particleMaterial = new THREE.ParticleBasicMaterial({
 //            color:0xffffff,
@@ -133,8 +139,8 @@ s.Radar = new Class({
         //////////////////////////
 
         var radar      = this.radarScene.getChildByName( 'radar' ),
-            self       = this.radarScene.getChildByName( 'self' ),
-            moon       = this.radarScene.getChildByName( 'moon' ),
+            self       = radar.getChildByName( 'self' ),
+            moon       = radar.getChildByName( 'moon' ),
             trajectory = self.getChildByName( 'selfTrajectory' );
         // Radar sphere rotation with respect to player's current rotation
         radar.rotation.y = this.player.root.rotation.y;
@@ -149,16 +155,14 @@ s.Radar = new Class({
         // Apply normalization and multiplier to cover full sphere coordinates and set the position
         self.position = selfPosition.normalize().multiplyScalar(selfLength*(this.radius/4));
 
+        // Player trajectory marker; scales with velocity, and is never shorter than length 3
         var playerTrajectory = this.player.root.getLinearVelocity().clone().multiplyScalar(1/40);
-        playerTrajectory = playerTrajectory.length()>1 ? playerTrajectory : playerTrajectory.normalize().multiplyScalar(5);
+        playerTrajectory = playerTrajectory.length()>3 ? playerTrajectory : playerTrajectory.normalize().multiplyScalar(3);
 
+        // Set the second line vertex
         trajectory.geometry.vertices[1] = trajectory.geometry.vertices[0].clone().add( playerTrajectory );
         trajectory.geometry.verticesNeedUpdate = true;
 
-
-        // moon radar positioning
-        var moonPosition = this.scene.getChildByName( 'moon' ).position.clone();
-        moon.position = moonPosition.normalize().multiplyScalar(this.radius);
 
     }
 });
