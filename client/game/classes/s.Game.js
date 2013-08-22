@@ -280,11 +280,9 @@ s.Game = new Class({
 			this.hookedFuncs.forEach(function(func) {
 				func(now, delta);
 			});
-    
-            // radar render loop
-            this.radarRenderer.render( this.radarScene, this.radarCamera );
 
-            // END RADAR //
+            // Render radar loop
+            this.radarRenderer.render( this.radarScene, this.radarCamera );
 
 			// Render main scene
 			this.renderer.render( this.scene, this.camera );

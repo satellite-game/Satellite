@@ -149,8 +149,10 @@ s.Radar = new Class({
         // Apply normalization and multiplier to cover full sphere coordinates and set the position
         self.position = selfPosition.normalize().multiplyScalar(selfLength*(this.radius/4));
 
-        var playerVelocity = this.player.root.getLinearVelocity().clone();
-        trajectory.geometry.vertices[1] = self.position.clone().add( playerVelocity.multiplyScalar(1/20) );
+        var playerTrajectory = this.player.root.getLinearVelocity().clone().multiplyScalar(1/40);
+        playerTrajectory = playerTrajectory.length()>1 ? playerTrajectory : playerTrajectory.normalize().multiplyScalar(5);
+
+        trajectory.geometry.vertices[1] = trajectory.geometry.vertices[0].clone().add( playerTrajectory );
         trajectory.geometry.verticesNeedUpdate = true;
 
 
