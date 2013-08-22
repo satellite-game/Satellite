@@ -150,7 +150,7 @@ s.Radar = new Class({
         self.position = selfPosition.normalize().multiplyScalar(selfLength*(this.radius/4));
 
         var playerTrajectory = this.player.root.getLinearVelocity().clone().multiplyScalar(1/40);
-        playerTrajectory = playerTrajectory.length()>1 ? playerTrajectory : playerTrajectory.normalize().multiplyScalar(5);
+        playerTrajectory = playerTrajectory.length()>1 ? playerTrajectory : playerTrajectory.normalize().multiplyScalar(2);
 
         trajectory.geometry.vertices[1] = trajectory.geometry.vertices[0].clone().add( playerTrajectory );
         trajectory.geometry.verticesNeedUpdate = true;
