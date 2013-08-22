@@ -50,11 +50,11 @@ s.Radar = new Class({
         that.radius = 60;
 
         var mesh = new THREE.MeshNormalMaterial(),
-            sphere = new THREE.SphereGeometry( that.radius, that.radius, that.radius );
+            sphere = new THREE.SphereGeometry( that.radius, 32, 32 );
 
         var materials = [
             //new THREE.MeshLambertMaterial( { color: 0xcccccc, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
-            new THREE.MeshBasicMaterial( { color: 0x333333, shading: THREE.FlatShading, wireframe: true, transparent: true } )
+            new THREE.MeshBasicMaterial( { color: 0x5dfc0a, shading: THREE.FlatShading, wireframe: true, transparent: true } )
         ];
 
         var group = THREE.SceneUtils.createMultiMaterialObject( sphere, materials );
@@ -83,7 +83,7 @@ s.Radar = new Class({
         var moonGeo = s.models.phobos_lofi.geometry;
         var moonMats = s.models.phobos_lofi.materials;
         moonMats[0].color.setHex(0x704030);
-        var moonMarker = new THREE.Mesh( moonGeo, new THREE.MeshFaceMaterial(moonMats) );
+        var moonMarker = new THREE.Mesh( moonGeo, new THREE.MeshNormalMaterial(moonMats) );
 
         moonMarker.name = "moon";
 
