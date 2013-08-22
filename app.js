@@ -82,25 +82,9 @@ io.sockets.on('connection', function (socket) {
     var address = socket.handshake.address;
     console.log("New connection from " + address.address + ":" + address.port);
 
-    // Send welcome message
-    socket.emit('welcome', {
-        message: 'Welcome to Satellite'
-    });
-
-    socket.emit('skirmish-start', function (data) {
-        // codes
-    })
-
-    socket.emit('skirmish-end', function (data) {
-        // codes
-    })
-
-    socket.emit('skirmish-reset', function (data) {
-        // codes
-    })
-
     // Setup message handlers
     socket.on('join', function(message) {
+        
         if (players[message.name] !== undefined && ip === players[message.name].ip) {
             console.warn('Error: '+message.name+' tried to join twice!');
             return;

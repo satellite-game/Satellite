@@ -1,5 +1,18 @@
+/**
+* 
+* s.Comm ---
+* allows us to compartmentalize all interactions
+* with the server to this class (s.Comm) --this class
+* is the only place that holds the logic that allows
+* the client to communicate with the server.
+*
+**/
+
 s.Comm = new Class( {
     extend: s.EventEmitter,
+    
+    // makeTrigger is responsible for broadcasting all events
+    // receieved from the server to the rest of the game.
     makeTrigger: function ( evt ) {
         var that = this;
         return function ( message ) {
@@ -23,11 +36,6 @@ s.Comm = new Class( {
 
         // Create socket connection
         this.socket = io.connect( options.server );
-
-        this.socket.on('welcome', function(data){
-            console.log('yolo! we be connected');
-            console.log('data:', data);
-        });
 
         this.socket.on( 'join', this.makeTrigger( 'join' ) );
 
