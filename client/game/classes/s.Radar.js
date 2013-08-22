@@ -100,8 +100,14 @@ s.Radar = new Class({
         moonMats[0].color.setHex(0x704030);
         var moonMarker = new THREE.Mesh( moonGeo, new THREE.MeshNormalMaterial(moonMats) );
 
+        // Moon marker size scaling
+        /* TODO: scale in a more meaningful way */
         moonMarker.scale.multiplyScalar(0.005);
         moonMarker.name = "moon";
+
+        // Moon radar positioning
+        var moonPosition = that.scene.getChildByName( 'moon' ).position.clone();
+        moonMarker.position = moonPosition.normalize().multiplyScalar(that.radius);
 
         radar.add( moonMarker );
 
@@ -149,16 +155,14 @@ s.Radar = new Class({
         // Apply normalization and multiplier to cover full sphere coordinates and set the position
         self.position = selfPosition.normalize().multiplyScalar(selfLength*(this.radius/4));
 
+        // Player trajectory marker; scales with velocity, and is never shorter than length 3
         var playerTrajectory = this.player.root.getLinearVelocity().clone().multiplyScalar(1/40);
-        playerTrajectory = playerTrajectory.length()>1 ? playerTrajectory : playerTrajectory.normalize().multiplyScalar(2);
+        playerTrajectory = playerTrajectory.length()>3 ? playerTrajectory : playerTrajectory.normalize().multiplyScalar(3);
 
+        // Set the second line vertex
         trajectory.geometry.vertices[1] = trajectory.geometry.vertices[0].clone().add( playerTrajectory );
         trajectory.geometry.verticesNeedUpdate = true;
 
-
-        // moon radar positioning
-        var moonPosition = this.scene.getChildByName( 'moon' ).position.clone();
-        moon.position = moonPosition.normalize().multiplyScalar(this.radius);
 
     }
 });
