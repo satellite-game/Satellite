@@ -21,10 +21,6 @@ s.Turret = new Class({
         sprite.scale.set(50,50,1.0);
         this.root.add(sprite);
 
-        // add point lights
-        var pointLight = new THREE.SpotLight(0xffffff);
-        this.root.add(pointLight);
-
         // Position the projectile relative to the ship
         this.root.position.copy(options.position);
         this.root.rotation.copy(options.rotation);

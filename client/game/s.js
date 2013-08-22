@@ -8,8 +8,8 @@ var s = {
         weapons: {
             turret: {
                 color: {
-                    alliance: 'blue',
-                    rebels: 'red'
+                    alliance: 0x00F2FF,
+                    rebels: 0xFF0000
                 },
                 damage: 10,
                 velocity: 2000

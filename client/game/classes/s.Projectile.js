@@ -19,7 +19,7 @@ s.Projectile = new Class({
         this.root.addEventListener('collision', this.handleCollision.bind(this));
     },
 
-    handleCollision: function(mesh){
+    handleCollision: function(mesh, position){
         var target = mesh.instance.name;
         this.destruct();
     },
@@ -36,5 +36,4 @@ s.Projectile = new Class({
         this.forceVector = new THREE.Vector3(0, 0, (this.velocity * -1) + (this.initialVelocity.z > 0 ? this.initialVelocity.z * -1 : this.initialVelocity.z )).applyMatrix4(this.rotationMatrix);
         this.root.applyCentralImpulse(this.forceVector);
     }
-
 });
