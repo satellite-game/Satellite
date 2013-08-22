@@ -10,9 +10,20 @@ s.Turret = new Class({
         this.addCollisionMesh(new THREE.SphereGeometry(16));
 
         // Draw the projectile to the screen
-        this.geometry = new THREE.SphereGeometry(12,20,20);
-        this.material = new THREE.MeshBasicMaterial({color: this.color});
-        this.root.add(new THREE.Mesh(this.geometry, this.material, 0.1));
+        var spriteImg = new THREE.ImageUtils.loadTexture("game/textures/particle.png");
+        var sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: spriteImg,
+            useScreenCoordinates: false,
+            blending: THREE.AdditiveBlending,
+            color: this.color
+        }));
+        // sprite.position.set(10,10,0);
+        sprite.scale.set(50,50,1.0);
+        this.root.add(sprite);
+
+        // add point lights
+        var pointLight = new THREE.SpotLight(0xffffff);
+        this.root.add(pointLight);
 
         // Position the projectile relative to the ship
         this.root.position.copy(options.position);
