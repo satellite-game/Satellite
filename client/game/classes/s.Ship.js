@@ -45,19 +45,19 @@ s.Ship = new Class({
             if( now - this.lastTime > 300){
 
                 new s.Turret({
-                    game: this.options.game,
+                    game: this.game,
                     position: this.getEulerRotation(new THREE.Vector3(25, 0, -120)),
                     rotation: this.root.rotation.clone(),
                     initialVelocity: this.root.getLinearVelocity().clone(),
-                    team: this.team
+                    team: this.alliance
                 });
 
                 new s.Turret({
-                    game: this.options.game,
+                    game: this.game,
                     position: this.getEulerRotation(new THREE.Vector3(-25, 0, -120)),
                     rotation: this.root.rotation.clone(),
                     initialVelocity: this.root.getLinearVelocity().clone(),
-                    team: this.team
+                    team: this.alliance
                 });
                 this.lastTime = now;
             }
@@ -68,11 +68,11 @@ s.Ship = new Class({
             if( now - this.lastTime > 300){
 
                 new s.Missile({
-                    game: this.options.game,
+                    game: this.game,
                     position: this.getEulerRotation(new THREE.Vector3(0, 0, -120)),
                     rotation: this.root.rotation.clone(),
                     initialVelocity: this.root.getLinearVelocity().clone(),
-                    team: this.team
+                    team: this.alliance
                 });
                 this.lastTime = now;
             }
