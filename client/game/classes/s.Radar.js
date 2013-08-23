@@ -112,6 +112,10 @@ s.Radar = new Class({
 
         radar.add( moonMarker );
 
+        // Move radar on screen resize
+        var context = this;
+        $(window).on('resize', context.fitWindow.bind(that));
+        context.fitWindow();
 //        var particleMaterial = new THREE.ParticleBasicMaterial({
 //            color:0xffffff,
 //            size: 10,
@@ -129,10 +133,13 @@ s.Radar = new Class({
 //        var particleSystem = new THREE.ParticleSystem(particleGeometry, particleMaterial);
 //        particleSystem.sortParticles = true;
 //        that.radarScene.add(particleSystem);
-        this.update = this.update.bind(this.game);
+        this.update = this.update.bind(that);
         that.hook(this.update);
         that.radarRenderer.render( that.radarScene, that.radarCamera );
 
+    },
+    fitWindow: function(){
+        s.game.radarCanvas.style.left = window.innerWidth-256+"px";
     },
     update: function(options){
 
@@ -147,7 +154,7 @@ s.Radar = new Class({
 
         // Clone of the current player's position
         this.selfPosition = this.player.root.position.clone();
-
+        self.rotation = this.player.root.rotation;
         // Radar sphere rotation with respect to player's current rotation
         var now = this.selfPosition.clone();
         var last = this.lastPosition || now;

@@ -10,7 +10,7 @@ s.Game = new Class({
 
 		// Communication
 
-		
+
 		/*-----  End of  Comms Handler Binding  ------*/
 
 		this.doRender = false;
