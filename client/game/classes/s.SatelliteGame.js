@@ -282,10 +282,10 @@ s.SatelliteGame = new Class( {
             console.log( 'Server reset position' );
 
             // Return to center
-            s.game.player.setPosition( message.pos, message.rot, message.tRot, message.aVeloc, message.lVeloc, false ); // Never interpolate our own movement
+            s.game.player.setPosition( message.pos, message.rot, message.aVeloc, message.lVeloc, false ); // Never interpolate our own movement
         } else {
             // Enemy moved
-            if ( !s.game.enemies.execute( message.name, 'setPosition', [ message.pos, message.rot, message.tRot, message.aVeloc, message.lVeloc, message.interp ] ) ) {
+            if ( !s.game.enemies.execute( message.name, 'setPosition', [ message.pos, message.rot, message.aVeloc, message.lVeloc, message.interp ] ) ) {
                 s.game.enemies.add( message );
             }
         }
