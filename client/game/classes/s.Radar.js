@@ -197,7 +197,7 @@ s.Radar = new Class({
         var findTheta = top/(bot1*bot2);
 
         // Javascript is a floating point failbus.
-        radar.rotation.y += findTheta>1 || findTheta<-1 ? Math.acos( Math.round( findTheta ) ) : Math.acos( findTheta );
+        //radar.rotation.y += findTheta>1 || findTheta<-1 ? Math.acos( Math.round( findTheta ) ) : Math.acos( findTheta );
 
         this.lastPosition = this.selfPosition.clone();
 
@@ -206,7 +206,7 @@ s.Radar = new Class({
         ////////////////////////////////
 
         // Rotation of player indicator
-        self.rotation = this.player.root.rotation;
+//        self.rotation = this.player.root.rotation;
 
         // Distance from center of the map, scaled logarithmically
         var selfLength   = this.player.root.position.length();
