@@ -72,7 +72,7 @@ s.Radar = new Class({
         // marker for player position
         var selfMarker = new THREE.Mesh(
             new THREE.SphereGeometry(2),
-            new THREE.MeshBasicMaterial( { color: 0xabcdef, shading: THREE.FlatShading } ) );
+            new THREE.MeshBasicMaterial( { color: 0xffffff, shading: THREE.FlatShading } ) );
 
         selfMarker.name = "self";
 
@@ -86,7 +86,7 @@ s.Radar = new Class({
 
         var selfTrajectory = new THREE.Line(
             trajectoryGeo,
-            new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 10 } ),
+            new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 2 } ),
             THREE.LineStrip
         );
         selfTrajectory.name = "selfTrajectory";
@@ -171,7 +171,7 @@ s.Radar = new Class({
         self.position = this.selfPosition.normalize().multiplyScalar(selfLength*(this.radius/4));
 
         // Player trajectory marker; scales with velocity, and is never shorter than length 3
-        var playerTrajectory = this.player.root.getLinearVelocity().clone().multiplyScalar(1/40);
+        var playerTrajectory = this.player.root.getLinearVelocity().clone().multiplyScalar(1/80);
         playerTrajectory = playerTrajectory.length()>3 ? playerTrajectory : playerTrajectory.normalize().multiplyScalar(3);
 
         // Set the second line vertex

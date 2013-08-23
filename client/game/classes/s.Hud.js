@@ -50,7 +50,7 @@ s.HUD = new Class({
 	},
 	update: function(){
 
-		var velocity = "Throttle: " + String(this.controls.options.thrustImpulse);
+		var velocity = this.controls.options.thrustImpulse/10;
 
 
 		this.canvas.height = window.innerHeight;
@@ -77,11 +77,16 @@ s.HUD = new Class({
 
 
 		this.ctx.font= '30px Futura';
-
+		this.ctx.rect(100, 50, velocity, 10);
 		this.ctx.fillStyle = '#33FF00';
 
-		this.ctx.fillText(velocity,125,50);
+		this.ctx.fillText("Throttle",100,40);
+        this.ctx.fill();
 
+        this.ctx.rect(100,50,200,1);
+        this.ctx.fill();
+        this.ctx.font = '10px Futura';
+        this.ctx.fillText("SET",93 + velocity,80);
 
 		if (this.targetX < this.subreticleBound.left){
 			this.targetX = this.subreticleBound.left;
