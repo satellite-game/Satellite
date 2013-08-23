@@ -38,8 +38,6 @@ module.exports = (grunt) ->
           message: "Change detected: refresh!"
 
     open:
-      server:
-        path: "http://localhost:1338"
       client:
         path: "http://localhost:1337"
 
