@@ -59,7 +59,7 @@ s.Radar = new Class({
         radar.position.x = 0;
         radar.position.y = 0;
         radar.position.z = 0;
-        radar.rotation.y = -Math.PI/4;
+        //radar.rotation.y = -Math.PI/4;
 
         radar.name = "radar";
         that.radarScene.add( radar );
@@ -69,14 +69,21 @@ s.Radar = new Class({
         //  PLAYER LOCATION  //
         ///////////////////////
 
+        var selfGeo = new THREE.TetrahedronGeometry(5);
+        selfGeo.faces[0].color.setHex(0x330066);
+        selfGeo.faces[1].color.setHex(0x003366);
+        selfGeo.faces[2].color.setHex(0x336666);
+        selfGeo.faces[3].color.setHex(0x000000);
+        //selfGeo.colorsNeedUpdate = true;
+
         // marker for player position
         var selfMarker = new THREE.Mesh(
-            new THREE.TetrahedronGeometry(5),
-            new THREE.MeshBasicMaterial( { color: 0xffffff, shading: THREE.FlatShading } ) );
+            selfGeo,
+            new THREE.MeshBasicMaterial( { color: 0xffffff, vertexColors: THREE.FaceColors } ) );
 
         selfMarker.name = "self";
-
         radar.add( selfMarker );
+
 
 
         // marker for player motion
@@ -94,17 +101,31 @@ s.Radar = new Class({
         radar.add( selfTrajectory );
 
 
-        /////////////////
-        // ALLY MARKER //
-        /////////////////
-
-
-
         //////////////////
-        // ENEMY MARKER //
+        // ALLY MARKERS //
         //////////////////
 
 
+
+        ///////////////////
+        // ENEMY MARKERS //
+        ///////////////////
+
+        s.game.enemies.add({ name: 'blah', pos: [5000,2000,2000], rot: [0,0,0], aVeloc: [0,0,0], lVeloc: [0,0,0] } );
+        var enemyGeo = [], enemyMarker = [];
+        for (var i = 0, len = that.enemies.list().length; i < len; i++){
+
+            enemyGeo[i] = new THREE.TetrahedronGeometry(5);
+
+            // marker for player position
+            enemyMarker[i] = new THREE.Mesh(
+                enemyGeo[i],
+                new THREE.MeshBasicMaterial( { color: 0xff000000, shading: THREE.FlatShading } ) );
+
+            enemyMarker[i].name = "enemy"+i;
+            radar.add( enemyMarker[i] );
+
+        }
 
         /////////////////
         // MOON MARKER //
@@ -133,25 +154,6 @@ s.Radar = new Class({
         var context = this;
         $(window).on('resize', context.fitWindow.bind(that));
         context.fitWindow();
-//        var particleMaterial = new THREE.ParticleBasicMaterial({
-//            color:0xffffff,
-//            size: 10,
-//            blending: THREE.AdditiveBlending,
-//            transparent:true
-//        });
-//        var pX = Math.random() * 100 - 50;
-//        var pY = Math.random() * 100 - 50;
-//        var pZ = Math.random() * 100 - 50;
-//        var particle = new THREE.Particle();
-//
-//        particle.velocity = new THREE.Vector3(1,0,0);
-//        particleGeometry.vertices.push(particle);
-//
-//        var particleSystem = new THREE.ParticleSystem(particleGeometry, particleMaterial);
-//        particleSystem.sortParticles = true;
-//        that.radarScene.add(particleSystem);
-        //
-        //
 
         // Trigger render loop and assign bindings
         this.update = this.update.bind(that);
@@ -175,7 +177,7 @@ s.Radar = new Class({
             moon       = radar.getChildByName( 'moon' ),
             trajectory = radar.getChildByName( 'selfTrajectory'),
             allies     = radar.getChildByName( 'allies' ),
-            enemies    = radar.getChildByName( 'enemies' );
+            enemies    = this.enemies.list();
 
 
         ////////////////////
@@ -185,30 +187,28 @@ s.Radar = new Class({
         // Clone of the current player's position
         this.selfPosition = this.player.root.position.clone();
 
+        // Rotate player tetrahedron in accordance with ship rotation
         self.rotation = this.player.root.rotation;
 
         // Radar sphere rotation with respect to player's current rotation
-        var now = this.selfPosition.clone();
+        var now  = this.selfPosition.clone();
         var last = this.lastPosition || now;
 
         // xz dot product parameters
-        var top = last.x*now.x + last.z*now.z;
+        var top  = last.x*now.x + last.z*now.z;
         var bot1 = Math.sqrt( last.x*last.x + last.z*last.z );
         var bot2 = Math.sqrt(  now.x*now.x  +  now.z*now.z );
 
         var findTheta = top/(bot1*bot2);
 
-        // Javascript is a floating point failbus.
-        //radar.rotation.y += findTheta>1 || findTheta<-1 ? Math.acos( Math.round( findTheta ) ) : Math.acos( findTheta );
+        // Calculate angle of rotation; Javascript is a floating point failbus.
+        radar.rotation.y += findTheta>1 || findTheta<-1 ? Math.acos( Math.round( findTheta ) ) : Math.acos( findTheta );
 
         this.lastPosition = this.selfPosition.clone();
 
         ////////////////////////////////
         // SELF POSITION AND ROTATION //
         ////////////////////////////////
-
-        // Rotation of player indicator
-//
 
         // Distance from center of the map, scaled logarithmically
         var selfLength   = this.player.root.position.length();
@@ -226,28 +226,22 @@ s.Radar = new Class({
         trajectory.geometry.vertices[1] = trajectory.geometry.vertices[0].clone().add( playerTrajectory );
         trajectory.geometry.verticesNeedUpdate = true;
 
-        ////////////////////////////////
-        // ALLY POSITION AND ROTATION //
-        ////////////////////////////////
+        /////////////////////////////////
+        // ENEMY POSITION AND ROTATION //
+        /////////////////////////////////
+        var enemyLength = [], enemyPosition = [];
+        for (var i = 0, len = enemies.length; i < len; i++){
 
-//        for (var i = 0, len = allies.children.length; i < len; i++){
-//            allies.children[i].rotation = '';
-//
-//            // Distance from center of the map, scaled logarithmically
-//            var selfLength   = //allies.children[i].position.length();
-//            selfLength = Math.log( selfLength ) - 7 || 0.1;
-//
-//            // Apply normalization and multiplier to cover full sphere coordinates and set the position
-//            self.position = this.selfPosition.normalize().multiplyScalar(selfLength*(this.radius/4));
-//
-//            // Player trajectory marker; scales with velocity, and is never shorter than length 3
-//            var playerTrajectory = this.player.root.getLinearVelocity().clone().multiplyScalar(1/80);
-//            playerTrajectory = playerTrajectory.length()>3 ? playerTrajectory : playerTrajectory.normalize().multiplyScalar(3);
-//
-//            // Set the second line vertex
-//            trajectory.geometry.vertices[1] = trajectory.geometry.vertices[0].clone().add( playerTrajectory );
-//            trajectory.geometry.verticesNeedUpdate = true;
-//
-//        }
+            enemyPosition[i] = enemies.children[i].position.clone();
+
+            // Distance from center of the map, scaled logarithmically
+            enemyLength[i] = enemies.children[i].root.position.clone().length();
+            enemyLength[i] = Math.log( enemyLength[i] ) - 7 || 0.1;
+
+            // Apply normalization and multiplier to cover full sphere coordinates and set the position
+            enemies.children[i].root.position = enemyPosition[i].normalize().multiplyScalar(enemyLength[i]*(this.radius/4));
+
+
+        }
     }
 });
