@@ -148,9 +148,9 @@ s.Radar = new Class({
         this.selfPosition = this.player.root.position.clone();
 
         // Radar sphere rotation with respect to player's current rotation
-        // MO' FXQK'N PARTIAL DOT PRODUCT
         var now = this.selfPosition.clone();
         var last = this.lastPosition || now;
+
         var top = last.x*now.x + last.z*now.z;
         var bot1 = Math.sqrt( last.x*last.x + last.z*last.z );
         var bot2 = Math.sqrt(  now.x*now.x  +  now.z*now.z );
@@ -158,7 +158,7 @@ s.Radar = new Class({
         var findTheta = top/(bot1*bot2);
         // Javascript is a floating point failbus.
         radar.rotation.y += findTheta>1 || findTheta<-1 ? Math.acos( Math.round( findTheta ) ) : Math.acos( findTheta );
-
+        radar.rotation.y -= Math.PI/2;
         this.lastPosition = this.selfPosition.clone();
 
 //        radar.rotation.y = (selfPosition.x > 0 && selfPosition.z > 0 ? this.player.root.rotation.y*2 : this.player.root.rotation.y+(Math.PI/2-this.player.root.rotation.y)*2);
