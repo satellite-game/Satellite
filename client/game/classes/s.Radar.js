@@ -41,7 +41,6 @@ s.Radar = new Class({
         that.radarScene.tempLog = [];
 
 
-
         ///////////////////////////////
         //  RADAR SPHERE PROPERTIES  //
         ///////////////////////////////
@@ -95,6 +94,22 @@ s.Radar = new Class({
         selfMarker.add( selfTrajectory );
 
 
+        /////////////////
+        // ALLY MARKER //
+        /////////////////
+
+
+
+        //////////////////
+        // ENEMY MARKER //
+        //////////////////
+
+
+
+        /////////////////
+        // MOON MARKER //
+        /////////////////
+
         // moon instantiation
         var moonGeo = s.models.phobos_lofi.geometry;
         var moonMats = s.models.phobos_lofi.materials;
@@ -111,6 +126,8 @@ s.Radar = new Class({
         moonMarker.position = moonPosition.normalize().multiplyScalar(that.radius);
 
         radar.add( moonMarker );
+
+
 
         // Move radar on screen resize
         var context = this;
@@ -133,41 +150,63 @@ s.Radar = new Class({
 //        var particleSystem = new THREE.ParticleSystem(particleGeometry, particleMaterial);
 //        particleSystem.sortParticles = true;
 //        that.radarScene.add(particleSystem);
+        //
+        //
+
+        // Trigger render loop and assign bindings
         this.update = this.update.bind(that);
         that.hook(this.update);
         that.radarRenderer.render( that.radarScene, that.radarCamera );
 
     },
+
     fitWindow: function(){
         s.game.radarCanvas.style.left = window.innerWidth-256+"px";
     },
+
     update: function(options){
 
-        //////////////////////////
-        // RADAR RENDER SEGMENT //
-        //////////////////////////
+        ///////////////////////
+        // RADAR RENDER LOOP //
+        ///////////////////////
 
         var radar      = this.radarScene.getChildByName( 'radar' ),
             self       = radar.getChildByName( 'self' ),
             moon       = radar.getChildByName( 'moon' ),
-            trajectory = self.getChildByName( 'selfTrajectory' );
+            trajectory = self.getChildByName( 'selfTrajectory'),
+            allies     = radar.getChildByName( 'allies' ),
+            enemies    = radar.getChildByName( 'enemies' );
+
+
+        ////////////////////
+        // RADAR ROTATION //
+        ////////////////////
 
         // Clone of the current player's position
         this.selfPosition = this.player.root.position.clone();
-        self.rotation = this.player.root.rotation;
+
         // Radar sphere rotation with respect to player's current rotation
         var now = this.selfPosition.clone();
         var last = this.lastPosition || now;
 
+        // xz dot product parameters
         var top = last.x*now.x + last.z*now.z;
         var bot1 = Math.sqrt( last.x*last.x + last.z*last.z );
         var bot2 = Math.sqrt(  now.x*now.x  +  now.z*now.z );
 
         var findTheta = top/(bot1*bot2);
+
         // Javascript is a floating point failbus.
-        //radar.rotation.y += findTheta>1 || findTheta<-1 ? Math.acos( Math.round( findTheta ) ) : Math.acos( findTheta );
-        //radar.rotation.y -= Math.PI/2;
+        radar.rotation.y += findTheta>1 || findTheta<-1 ? Math.acos( Math.round( findTheta ) ) : Math.acos( findTheta );
+
         this.lastPosition = this.selfPosition.clone();
+
+        ////////////////////////////////
+        // SELF POSITION AND ROTATION //
+        ////////////////////////////////
+
+        // Rotation of player indicator
+        self.rotation = this.player.root.rotation;
 
         // Distance from center of the map, scaled logarithmically
         var selfLength   = this.player.root.position.length();
@@ -184,6 +223,28 @@ s.Radar = new Class({
         trajectory.geometry.vertices[1] = trajectory.geometry.vertices[0].clone().add( playerTrajectory );
         trajectory.geometry.verticesNeedUpdate = true;
 
+        ////////////////////////////////
+        // ALLY POSITION AND ROTATION //
+        ////////////////////////////////
 
+//        for (var i = 0, len = allies.children.length; i < len; i++){
+//            allies.children[i].rotation = '';
+//
+//            // Distance from center of the map, scaled logarithmically
+//            var selfLength   = //allies.children[i].position.length();
+//            selfLength = Math.log( selfLength ) - 7 || 0.1;
+//
+//            // Apply normalization and multiplier to cover full sphere coordinates and set the position
+//            self.position = this.selfPosition.normalize().multiplyScalar(selfLength*(this.radius/4));
+//
+//            // Player trajectory marker; scales with velocity, and is never shorter than length 3
+//            var playerTrajectory = this.player.root.getLinearVelocity().clone().multiplyScalar(1/80);
+//            playerTrajectory = playerTrajectory.length()>3 ? playerTrajectory : playerTrajectory.normalize().multiplyScalar(3);
+//
+//            // Set the second line vertex
+//            trajectory.geometry.vertices[1] = trajectory.geometry.vertices[0].clone().add( playerTrajectory );
+//            trajectory.geometry.verticesNeedUpdate = true;
+//
+//        }
     }
 });
