@@ -24,26 +24,6 @@ app.get('/', function (req, res) {
     res.sendfile(path.join(__dirname, '/build/client/index.html'));
 });
 
-function handler(req, res) {
-    // Dump out a basic server status page
-    var data = '<!doctype html><head><script src="http://localhost:35729/livereload.js"></script><title>DuneBuggy Server</title></head><body>';
-
-    data += '<h1>Satellite Server</h1>';
-
-    data += '<table><thead><th>Name</th><th>IP</th><th>Position</th></thead><tbody>';
-    for (var player in players) {
-        var playerInfo = players[player];
-        data += '<tr><td>'+playerInfo.name+'</td><td>'+playerInfo.ip+'</td><td>'+playerInfo.pos+'</td></tr>';
-    }
-
-    data += '</tbody></table>';
-
-    data += '</body></html>';
-
-    res.writeHead(200);
-    res.end(data);
-}
-
 // Holds players
 var players = {};
 
@@ -76,7 +56,7 @@ io.sockets.on('connection', function (socket) {
     
     // Setup message handlers
     socket.on('join', function(message) {
-        console.dir(message)
+        console.dir(message);
         if (players[message.name] !== undefined && ip === players[message.name].ip) {
             console.warn('Error: '+message.name+' tried to join twice!');
             return;
