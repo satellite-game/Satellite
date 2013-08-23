@@ -44,6 +44,7 @@ s.Ship = new Class({
 		var now =new Date().getTime();
 
         // Turrets
+        if(weapon === 'turret'){
             if( now - this.lastTime > 300){
 
                 new s.Turret({
@@ -63,7 +64,7 @@ s.Ship = new Class({
                 });
                 this.lastTime = now;
             }
-        
+        }
 
         // Missiles
         if(weapon === 'missile'){
@@ -83,7 +84,7 @@ s.Ship = new Class({
 
     getPositionPacket: function() {
         var root = this.getRoot();
-        
+
         // Position & rotation
         var shipPosition = (root && root.position) || new THREE.Vector3();
         var shipRotation = (root && root.rotation) || new THREE.Vector3();
@@ -91,7 +92,7 @@ s.Ship = new Class({
         // Velocity
         var linearVelocity = (root.getLinearVelocity && root.getLinearVelocity()) || new THREE.Vector3();
         var angularVelocity = (root.getAngularVelocity && root.getAngularVelocity()) || new THREE.Vector3();
-        
+
         return {
             pos: [shipPosition.x, shipPosition.y, shipPosition.z],
             rot: [shipRotation.x, shipRotation.y, shipRotation.z],
