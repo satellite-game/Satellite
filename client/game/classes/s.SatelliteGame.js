@@ -14,7 +14,7 @@ s.SatelliteGame = new Class( {
 	initialize: function(_super) {
 		var that = this;
 		_super.call(this);
-		
+
 
 		// No gravity
 		this.scene.setGravity(new THREE.Vector3(0, 0, 0));
@@ -45,7 +45,7 @@ s.SatelliteGame = new Class( {
         this.player.root.add( this.camera );
 
         //// Setup camera: Cockpit view; COMMENT OUT FOR CHASE CAM
-        this.camera.position.set( 0, 0, 23 );
+        this.camera.position.set( 0, 0, 0 );
         //// Setup camera: Chase view
         //this.camera.position.set(0,35,350);
 

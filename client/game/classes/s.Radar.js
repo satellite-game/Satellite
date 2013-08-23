@@ -60,6 +60,7 @@ s.Radar = new Class({
         radar.position.x = 0;
         radar.position.y = 0;
         radar.position.z = 0;
+        radar.rotation.y = -Math.PI/4;
 
         radar.name = "radar";
         that.radarScene.add( radar );
@@ -157,12 +158,10 @@ s.Radar = new Class({
 
         var findTheta = top/(bot1*bot2);
         // Javascript is a floating point failbus.
-        radar.rotation.y += findTheta>1 || findTheta<-1 ? Math.acos( Math.round( findTheta ) ) : Math.acos( findTheta );
-        radar.rotation.y -= Math.PI/2;
+        //radar.rotation.y += findTheta>1 || findTheta<-1 ? Math.acos( Math.round( findTheta ) ) : Math.acos( findTheta );
+        //radar.rotation.y -= Math.PI/2;
         this.lastPosition = this.selfPosition.clone();
 
-//        radar.rotation.y = (selfPosition.x > 0 && selfPosition.z > 0 ? this.player.root.rotation.y*2 : this.player.root.rotation.y+(Math.PI/2-this.player.root.rotation.y)*2);
-        //radar.rotation.y += 0.03;
         // Distance from center of the map, scaled logarithmically
         var selfLength   = this.player.root.position.length();
         selfLength = Math.log( selfLength ) - 7 || 0.1;
