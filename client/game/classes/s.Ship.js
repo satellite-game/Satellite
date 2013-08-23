@@ -3,12 +3,6 @@ s.Ship = new Class({
 
 	construct: function(options) {
 
-		// handle parameters
-		this.options = options = jQuery.extend({
-			position: new THREE.Vector3(0, 0, 0),
-			rotation: new THREE.Vector3(0, 0, 0)
-		}, options);
-
 		var geometry = s.models[options.shipClass].geometry;
 		var materials = s.models[options.shipClass].materials;
 
@@ -17,7 +11,10 @@ s.Ship = new Class({
 		this.root.rotation.copy(options.rotation);
 
 		this.lastTime = 0;
-        this.team = 'alliance';
+        this.alliance = options.alliance;
+
+        this.game = options.game;
+        this.name = options.name || '';
 	},
 
     // Calculate the position of the bullet
