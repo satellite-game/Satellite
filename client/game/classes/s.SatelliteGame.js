@@ -11,6 +11,15 @@ s.SatelliteGame = new Class( {
 
 	],
 
+    getRandomCoordinate: function(){
+        var coefficient = 1;
+        if (Math.random() > 0.5){
+            coefficient = -1;
+        }
+        var coord = Math.floor(Math.random()* 30000 + 15000) * coefficient;
+        return coord;
+    },
+
 	initialize: function(_super) {
 		var that = this;
 		_super.call(this);
@@ -37,7 +46,7 @@ s.SatelliteGame = new Class( {
         this.player = new s.Player( {
             game: this,
             shipClass: 'human_ship_light',
-            position: new THREE.Vector3( 10000, 2000, 10000 ),
+            position: new THREE.Vector3(this.getRandomCoordinate(),this.getRandomCoordinate(),this.getRandomCoordinate()),
             rotation: new THREE.Vector3( 0, Math.PI / 4, 0 )
         } );
 
