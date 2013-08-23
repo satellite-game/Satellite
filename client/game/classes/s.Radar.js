@@ -49,7 +49,7 @@ s.Radar = new Class({
         that.radius = 60;
 
         var mesh = new THREE.MeshNormalMaterial(),
-            sphere = new THREE.SphereGeometry( that.radius, 32, 32 );
+            sphere = new THREE.SphereGeometry( that.radius, 16, 16 );
 
         var materials = [
             //new THREE.MeshLambertMaterial( { color: 0xcccccc, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
@@ -71,7 +71,7 @@ s.Radar = new Class({
 
         // marker for player position
         var selfMarker = new THREE.Mesh(
-            new THREE.SphereGeometry(2),
+            new THREE.TetrahedronGeometry(3),
             new THREE.MeshBasicMaterial( { color: 0xffffff, shading: THREE.FlatShading } ) );
 
         selfMarker.name = "self";
@@ -86,7 +86,7 @@ s.Radar = new Class({
 
         var selfTrajectory = new THREE.Line(
             trajectoryGeo,
-            new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 2 } ),
+            new THREE.LineBasicMaterial( { color: 0xffffff } ),
             THREE.LineStrip
         );
         selfTrajectory.name = "selfTrajectory";
