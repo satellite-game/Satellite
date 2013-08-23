@@ -71,7 +71,7 @@ s.Radar = new Class({
 
         // marker for player position
         var selfMarker = new THREE.Mesh(
-            new THREE.TetrahedronGeometry(3),
+            new THREE.TetrahedronGeometry(5),
             new THREE.MeshBasicMaterial( { color: 0xffffff, shading: THREE.FlatShading } ) );
 
         selfMarker.name = "self";
