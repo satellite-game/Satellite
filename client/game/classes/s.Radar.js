@@ -91,7 +91,7 @@ s.Radar = new Class({
         );
         selfTrajectory.name = "selfTrajectory";
 
-        selfMarker.add( selfTrajectory );
+        radar.add( selfTrajectory );
 
 
         /////////////////
@@ -173,7 +173,7 @@ s.Radar = new Class({
         var radar      = this.radarScene.getChildByName( 'radar' ),
             self       = radar.getChildByName( 'self' ),
             moon       = radar.getChildByName( 'moon' ),
-            trajectory = self.getChildByName( 'selfTrajectory'),
+            trajectory = radar.getChildByName( 'selfTrajectory'),
             allies     = radar.getChildByName( 'allies' ),
             enemies    = radar.getChildByName( 'enemies' );
 
@@ -184,6 +184,8 @@ s.Radar = new Class({
 
         // Clone of the current player's position
         this.selfPosition = this.player.root.position.clone();
+
+        self.rotation = this.player.root.rotation;
 
         // Radar sphere rotation with respect to player's current rotation
         var now = this.selfPosition.clone();
@@ -206,7 +208,7 @@ s.Radar = new Class({
         ////////////////////////////////
 
         // Rotation of player indicator
-//        self.rotation = this.player.root.rotation;
+//
 
         // Distance from center of the map, scaled logarithmically
         var selfLength   = this.player.root.position.length();
@@ -220,6 +222,7 @@ s.Radar = new Class({
         playerTrajectory = playerTrajectory.length()>3 ? playerTrajectory : playerTrajectory.normalize().multiplyScalar(3);
 
         // Set the second line vertex
+        trajectory.geometry.vertices[0] = self.position.clone();
         trajectory.geometry.vertices[1] = trajectory.geometry.vertices[0].clone().add( playerTrajectory );
         trajectory.geometry.verticesNeedUpdate = true;
 
