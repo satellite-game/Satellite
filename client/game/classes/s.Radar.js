@@ -184,7 +184,8 @@ s.Radar = new Class({
             allies     = radar.getChildByName( 'allies' ),
             enemies    = this.enemies.list(),
 
-            radarRadius = this.radius/5;
+            radarRadius = this.radius/ 5,
+            that        = s.game;
 
 
         ////////////////////
