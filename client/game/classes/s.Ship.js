@@ -82,7 +82,7 @@ s.Ship = new Class({
     setPosition: function (position, rotation, aVeloc, lVeloc, interpolate) {
         var posInterpolation = 0.05;
         var rotInerpolation = 0.50;
-        
+
         if (interpolate) {
             // Interpolate position by adding the difference of the calulcated position and the position sent by the authoritative client
             var newPositionVec = new THREE.Vector3(position[0], position[1], position[2]);
@@ -97,13 +97,13 @@ s.Ship = new Class({
         // Set rotation
         if (rotation)
             this.root.rotation.set(rotation[0], rotation[1], rotation[2]);
-            
+
         if (aVeloc !== undefined && this.root.setAngularVelocity)
             this.root.setAngularVelocity({ x: aVeloc[0], y: aVeloc[1], z: aVeloc[2] });
-            
+
         if (lVeloc !== undefined && this.root.setLinearVelocity)
             this.root.setLinearVelocity({ x: lVeloc[0], y: lVeloc[1], z: lVeloc[2] });
-            
+
         // Tell the physics engine to update our position
         this.root.__dirtyPosition = true;
         this.root.__dirtyRotation = true;

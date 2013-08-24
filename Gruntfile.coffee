@@ -1,5 +1,5 @@
 module.exports = (grunt) ->
-  
+
   # Order of concatonation/minification
   includeOrder = [
     "client/lib/jquery.js"
@@ -11,6 +11,7 @@ module.exports = (grunt) ->
     "client/game/s.util.js"
     "client/game/classes/s.EventEmitter.js"
     "client/game/classes/s.GameObject.js"
+    "client/game/classes/s.Explosion.js"
     "client/game/classes/s.Projectile.js"
     "client/game/classes/s.Turret.js"
     "client/game/classes/s.Missile.js"
@@ -28,7 +29,7 @@ module.exports = (grunt) ->
 
   grunt.initConfig
     pkg: grunt.file.readJSON("package.json")
-    
+
     notify:
       watch:
         options:
@@ -58,7 +59,7 @@ module.exports = (grunt) ->
         tasks: ["notify:changes", "client"]
         options:
           livereload: true
-          
+
     clean:
       build: "build/"
 
@@ -107,12 +108,12 @@ module.exports = (grunt) ->
         files:
           "build/client/game/s.css": "client/game/styl/s.styl"
 
-    concurrent: 
-      target: 
+    concurrent:
+      target:
         tasks: ['nodemon', 'watch'],
-        options: 
+        options:
           logConcurrentOutput: true
-        
+
     nodemon: {
       dev: {}
     }
