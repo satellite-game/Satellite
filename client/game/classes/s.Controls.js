@@ -151,7 +151,6 @@ s.Controls = new Class({
 				this.options.thrustImpulse -= difference/5;
 			}
 		}
-		console.log(difference);
         var impulse;
 		impulse = linearVelocity.clone().negate();
 		root.applyCentralImpulse(impulse);
