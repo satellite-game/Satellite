@@ -46,7 +46,7 @@ s.SatelliteGame = new Class( {
             shipClass: 'human_ship_light',
             position: new THREE.Vector3(this.getRandomCoordinate(),this.getRandomCoordinate(),this.getRandomCoordinate()),
             rotation: new THREE.Vector3( 0, Math.PI / 4, 0 ),
-            alliance: 'self'
+            alliance: 'alliance'
         } );
 
         // Root camera to the player's position
