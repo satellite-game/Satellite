@@ -16,7 +16,6 @@ s.Comm = new Class( {
     makeTrigger: function ( evt ) {
         var that = this;
         return function ( message ) {
-            console.log(evt,message);
             that.trigger.call( that, evt, message );
         };
     },
@@ -34,7 +33,7 @@ s.Comm = new Class( {
         this.pilot = options.pilot;
         var that = this;
 
-        this.lastMessageTime = 0;
+        this.lastMessageTime = new Date( ).getTime( );
 
         // Create socket connection
         this.socket = io.connect( options.server );
@@ -75,10 +74,9 @@ s.Comm = new Class( {
     },
     position: function ( ) {
         var time = new Date( ).getTime( );
-
         // Never send faster than server can handle
-        if ( time - this.lastMessageTime >= 15 ) {
-            var shipPosition = this.ship.getPositionPacket( );
+        if ( time - s.game.comm.lastMessageTime >= 15 ) {
+            var shipPosition = s.game.player.getPositionPacket( );
 
             // TODO: Figure out if ship or turret actually moved
             var shipMoved = true;
@@ -94,8 +92,8 @@ s.Comm = new Class( {
                     lVeloc: shipPosition.lVeloc
                 };
                 // Broadcast position
-                this.socket.emit( 'move', packet );
-                this.lastMessageTime = time;
+                s.game.comm.socket.emit( 'move', packet );
+                s.game.comm.lastMessageTime = time;
             }
         }
     }
