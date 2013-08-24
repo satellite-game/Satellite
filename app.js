@@ -200,10 +200,10 @@ io.sockets.on('connection', function (socket) {
     socket.on('fire', function(message) {
         socket.get('name', function (err, name) {
             socket.broadcast.emit('fire', {
-                name: name,
-                pos: message.pos,
-                rot: message.rot,
-                type: message.type
+                name: message.name,
+                position: message.position,
+                rotation: message.rotation,
+                initialVelocity: message.initialVelocity
             });
         });
     });

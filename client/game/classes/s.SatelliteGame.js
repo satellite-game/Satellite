@@ -329,39 +329,25 @@ s.SatelliteGame = new Class( {
     handleEnemyFire: function(message) {
         var time = new Date().getTime();
         
-        var bulletPosition = new THREE.Vector3(message.pos[0], message.pos[1], message.pos[2]);
-        var bulletRotation = new THREE.Vector3(message.rot[0], message.rot[1], message.rot[2]);
+        var bulletPosition = message.position;
+        var bulletRotation = message.rotation;
+        var initialVelocity = message.initialVelocity;
         
-        var bulletModel;
-        if (message.type == 'missile') {
-            bulletModel = new db.Missile({
-                game: this,
+            new s.Turret({
+                game: s.game,
                 position: bulletPosition,
                 rotation: bulletRotation,
+                initialVelocity: initialVelocity,
                 alliance: 'enemy'
             });
-        }
-        else {
-            bulletModel = new db.Bullet({
-                game: this,
-                position: bulletPosition,
+
+            new s.Turret({
+                game: s.game,
+                position: -bulletPosition,
                 rotation: bulletRotation,
+                initialVelocity: initialVelocity,
                 alliance: 'enemy'
             });
-        }
-        
-        // Calculated volume based on distance
-        var volume = this.getVolumeAt(bulletPosition);
-        
-        // Play sound
-        var soundInfo = this.options.weapons[message.type].sound;
-        this.sound.play(soundInfo.file, soundInfo.volume*volume);
-        
-        this.enemyBullets.push({
-            instance: bulletModel,
-            alliance: 'enemy',
-            time: time
-        });
     },
 
     handleHit: function(message) {
@@ -377,7 +363,7 @@ s.SatelliteGame = new Class( {
     },
     
     handleFire: function(props) {
-        this.comm.fire(props.pos, props.rot, this.currentWeapon);
+        s.game.comm.fire(props.pos, props.rot, this.currentWeapon);
     },
     
     handleDie: function(otherPlayerName) {

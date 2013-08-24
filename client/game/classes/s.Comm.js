@@ -105,9 +105,9 @@ s.Comm = new Class( {
     },
     fire: function(pos, rot, type) {
         this.socket.emit('fire', {
-            pos: pos,
-            rot: rot,
-            type: type
+            position: position,
+            rotation: rotation,
+            initialVelocity: initialVelocity
         });
     },
     died: function(otherPlayerName) {

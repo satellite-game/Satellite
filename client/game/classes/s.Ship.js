@@ -39,28 +39,30 @@ s.Ship = new Class({
 
 	fire: function(weapon){
 		var now =new Date().getTime();
-
+        var position = this.getEulerRotation(new THREE.Vector3(25, 0, -120));
+        var rotation = this.root.rotation.clone();
+        var initialVelocity = this.root.rotation.clone();
         // Turrets
         if(weapon === 'turret'){
             if( now - this.lastTime > 300){
 
                 new s.Turret({
                     game: this.game,
-                    position: this.getEulerRotation(new THREE.Vector3(25, 0, -120)),
-                    rotation: this.root.rotation.clone(),
-                    initialVelocity: this.root.getLinearVelocity().clone(),
+                    position: position,
+                    rotation: rotation,
+                    initialVelocity: initialVelocity,
                     team: this.alliance
                 });
                 this.trigger('fire', {
-                    pos: [bulletPosition.x, bulletPosition.y, bulletPosition.z],
-                    rot: [bulletRotation.x, bulletRotation.y, bulletRotation.z],
-                    type: type
+                    position: position,
+                    rotation: rotation,
+                    initialVelocity: initialVelocity,
                 });
                 new s.Turret({
                     game: this.game,
-                    position: this.getEulerRotation(new THREE.Vector3(-25, 0, -120)),
-                    rotation: this.root.rotation.clone(),
-                    initialVelocity: this.root.getLinearVelocity().clone(),
+                    position: -position,
+                    rotation: rotation,
+                    initialVelocity: initialVelocity,
                     team: this.alliance
                 });
                 this.lastTime = now;
