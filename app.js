@@ -127,7 +127,6 @@ io.sockets.on('connection', function (socket) {
     });
 
     socket.on('move', function(message) {
-        console.log('MOVE',message);
         socket.get('name', function (err, name) {
             if (players[name]) {
                 var player = players[name];
