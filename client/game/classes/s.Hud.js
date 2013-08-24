@@ -105,9 +105,9 @@ s.HUD = new Class({
 		}
 
 
-		this.ctx.drawImage(this.crosshairs,centerX - this.crosshairs.width/3,centerY - this.crosshairs.height/3);
+		this.ctx.drawImage(this.crosshairs,centerX - this.crosshairs.width/2,centerY - this.crosshairs.height/2);
 		
-		this.ctx.drawImage(this.subreticle,this.targetX,this.targetY);
+		this.ctx.drawImage(this.subreticle,this.targetX - this.subreticle.width/2,this.targetY - this.subreticle.height/2);
 	}
 
 });
