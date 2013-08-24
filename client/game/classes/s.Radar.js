@@ -251,7 +251,7 @@ s.Radar = new Class({
                         enemyGeo,
                         new THREE.MeshBasicMaterial( { color: 0xff0000, shading: THREE.FlatShading } ) );
 
-                    enemyMarker.name = "enemy"+i;
+                    enemyMarker.name = "enemy"+j;
                     radar.add( enemyMarker );
 
                     radar.enemyCount = j+1;
