@@ -79,25 +79,9 @@ s.SatelliteGame = new Class( {
             HUD: this.HUD
         } );
 
-        // Dependent on controls; needs to be below s.Controls
-        this.radar = new s.Radar( {
-            game: this
-            //controls: this.controls
-        } );
-
-        window.addEventListener( 'mousemove', function ( e ) {
-            that.HUD.targetX = e.pageX;
-            that.HUD.targetY = e.pageY;
-        } );
-        window.addEventListener( 'mousedown', function ( ) {
-            that.controls.firing = true;
-        } );
-        window.addEventListener( 'mouseup', function ( ) {
-            that.controls.firing = false;
-        } );
         /******************
-        Enemy setup
-        ******************/
+         Enemy setup
+         ******************/
         this.enemies = {
             _list: [ ],
             _map: {}, // new WeakMap()
@@ -170,6 +154,24 @@ s.SatelliteGame = new Class( {
                 this._map[ enemyInfo.name ] = enemyShip; // this._map.set(enemyInfo.name, otherShip);
             }
         };
+
+        // Dependent on controls; needs to be below s.Controls
+        this.radar = new s.Radar( {
+            game: this
+            //controls: this.controls
+        } );
+
+        window.addEventListener( 'mousemove', function ( e ) {
+            that.HUD.targetX = e.pageX;
+            that.HUD.targetY = e.pageY;
+        } );
+        window.addEventListener( 'mousedown', function ( ) {
+            that.controls.firing = true;
+        } );
+        window.addEventListener( 'mouseup', function ( ) {
+            that.controls.firing = false;
+        } );
+
         this.pilot = {};
         this.pilot.name = navigator.platform + ' ' + ~~( new Date( ).getTime( ) / 100 % 1000 ) + Math.floor( Math.random( ) * 100 );
 

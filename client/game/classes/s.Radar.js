@@ -111,7 +111,7 @@ s.Radar = new Class({
         // ENEMY MARKERS //
         ///////////////////
 
-        s.game.enemies.add({ name: 'blah', pos: [5000,2000,2000], rot: [0,0,0], aVeloc: [0,0,0], lVeloc: [0,0,0] } );
+        that.enemies.add( { name: 'blah', pos: [5000,2000,2000], rot: [0,0,0], aVeloc: [0,0,0], lVeloc: [0,0,0] } );
         var enemyGeo = [], enemyMarker = [];
         for (var i = 0, len = that.enemies.list().length; i < len; i++){
 
@@ -121,7 +121,7 @@ s.Radar = new Class({
             enemyMarker[i] = new THREE.Mesh(
                 enemyGeo[i],
                 new THREE.MeshBasicMaterial( { color: 0xff000000, shading: THREE.FlatShading } ) );
-
+            console.log(enemyMarker[i].material.color);
             enemyMarker[i].name = "enemy"+i;
             radar.add( enemyMarker[i] );
 
@@ -168,9 +168,9 @@ s.Radar = new Class({
 
     update: function(options){
 
-        ///////////////////////
-        // RADAR RENDER LOOP //
-        ///////////////////////
+        /////////////////////////
+        // 3JS SCENE SELECTORS //
+        /////////////////////////
 
         var radar      = this.radarScene.getChildByName( 'radar' ),
             self       = radar.getChildByName( 'self' ),
@@ -206,6 +206,7 @@ s.Radar = new Class({
 
         this.lastPosition = this.selfPosition.clone();
 
+
         ////////////////////////////////
         // SELF POSITION AND ROTATION //
         ////////////////////////////////
@@ -226,20 +227,22 @@ s.Radar = new Class({
         trajectory.geometry.vertices[1] = trajectory.geometry.vertices[0].clone().add( playerTrajectory );
         trajectory.geometry.verticesNeedUpdate = true;
 
+
         /////////////////////////////////
         // ENEMY POSITION AND ROTATION //
         /////////////////////////////////
+
         var enemyLength = [], enemyPosition = [];
         for (var i = 0, len = enemies.length; i < len; i++){
 
-            enemyPosition[i] = enemies.children[i].position.clone();
+            enemyPosition[i] = enemies[i].root.position.clone();
 
             // Distance from center of the map, scaled logarithmically
-            enemyLength[i] = enemies.children[i].root.position.clone().length();
+            enemyLength[i] = enemyPosition[i].clone().length();
             enemyLength[i] = Math.log( enemyLength[i] ) - 7 || 0.1;
 
             // Apply normalization and multiplier to cover full sphere coordinates and set the position
-            enemies.children[i].root.position = enemyPosition[i].normalize().multiplyScalar(enemyLength[i]*(this.radius/4));
+            enemies[i].root.position = enemyPosition[i].normalize().multiplyScalar(enemyLength[i]*(this.radius/4));
 
 
         }
