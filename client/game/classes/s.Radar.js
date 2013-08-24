@@ -111,8 +111,9 @@ s.Radar = new Class({
         // ENEMY MARKERS //
         ///////////////////
 
-        that.enemies.add( { name: 'blah', pos: [5000,2000,2000], rot: [0,0,0], aVeloc: [0,0,0], lVeloc: [0,0,0] } );
-        that.enemies.add( { name: 'blah2', pos: [6000,2000,2000], rot: [0,0,0], aVeloc: [0,0,0], lVeloc: [0,0,0] } );
+        that.enemies.add( { name: 'blah', pos: [Math.random()*100000-50000,Math.random()*100000-50000,Math.random()*100000-50000], rot: [0,0,0], aVeloc: [0,0,0], lVeloc: [0,0,0] } );
+        that.enemies.add( { name: 'blah2', pos: [Math.random()*100000-50000,Math.random()*100000-50000,Math.random()*100000-50000], rot: [0,0,0], aVeloc: [0,0,0], lVeloc: [0,0,0] } );
+        that.enemies.add( { name: 'blah3', pos: [Math.random()*100000-50000,Math.random()*100000-50000,Math.random()*100000-50000], rot: [0,0,0], aVeloc: [0,0,0], lVeloc: [0,0,0] } );
 
         var enemyGeo = [], enemyMarker = [];
         for (var i = 0, len = that.enemies.list().length; i < len; i++){
@@ -123,9 +124,11 @@ s.Radar = new Class({
             enemyMarker[i] = new THREE.Mesh(
                 enemyGeo[i],
                 new THREE.MeshBasicMaterial( { color: 0xff0000, shading: THREE.FlatShading } ) );
-            console.log(enemyMarker[i].material.color);
+
             enemyMarker[i].name = "enemy"+i;
             radar.add( enemyMarker[i] );
+
+            radar.enemyCount = i+1;
 
         }
 
@@ -179,7 +182,9 @@ s.Radar = new Class({
             moon       = radar.getChildByName( 'moon' ),
             trajectory = radar.getChildByName( 'selfTrajectory'),
             allies     = radar.getChildByName( 'allies' ),
-            enemies    = this.enemies.list();
+            enemies    = this.enemies.list(),
+
+            radarRadius = this.radius/5;
 
 
         ////////////////////
@@ -218,7 +223,7 @@ s.Radar = new Class({
         selfLength = Math.log( selfLength ) - 7 || 0.1;
 
         // Apply normalization and multiplier to cover full sphere coordinates and set the position
-        self.position = this.selfPosition.normalize().multiplyScalar(selfLength*(this.radius/4));
+        self.position = this.selfPosition.normalize().multiplyScalar(selfLength*(radarRadius));
 
         // Player trajectory marker; scales with velocity, and is never shorter than length 3
         var playerTrajectory = this.player.root.getLinearVelocity().clone().multiplyScalar(1/80);
@@ -235,6 +240,25 @@ s.Radar = new Class({
         /////////////////////////////////
 
         var enemyLength = [], enemyPosition = [];
+        //debugger;
+        if (enemies.length > radar.enemyCount){
+            for (var i = 0, len = that.enemies.list().length; i < len; i++){
+                if (!radar.getChildByName('enemy'+i)){
+                    enemyGeo[i] = new THREE.TetrahedronGeometry(5);
+
+                    // marker for player position
+                    enemyMarker[i] = new THREE.Mesh(
+                        enemyGeo[i],
+                        new THREE.MeshBasicMaterial( { color: 0xff0000, shading: THREE.FlatShading } ) );
+
+                    enemyMarker[i].name = "enemy"+i;
+                    radar.add( enemyMarker[i] );
+
+                    radar.enemyCount = i+1;
+                };
+
+            }
+        }
         for (var i = 0, len = enemies.length; i < len; i++){
 
             enemyPosition[i] = enemies[i].root.position.clone();
@@ -244,7 +268,7 @@ s.Radar = new Class({
             enemyLength[i] = Math.log( enemyLength[i] ) - 7 || 0.1;
 
             // Apply normalization and multiplier to cover full sphere coordinates and set the position
-            enemies[i].root.position = enemyPosition[i].normalize().multiplyScalar(enemyLength[i]*(this.radius/4));
+            radar.getChildByName('enemy'+i).position = enemyPosition[i].normalize().multiplyScalar(enemyLength[i]*(radarRadius));
 
 
         }
