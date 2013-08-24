@@ -240,23 +240,21 @@ s.Radar = new Class({
         /////////////////////////////////
 
         var enemyLength = [], enemyPosition = [];
-        //debugger;
         if (enemies.length > radar.enemyCount){
-            for (var i = 0, len = that.enemies.list().length; i < len; i++){
-                if (!radar.getChildByName('enemy'+i)){
-                    enemyGeo[i] = new THREE.TetrahedronGeometry(5);
+            for (var j = 0, lenj = that.enemies.list().length; j < lenj; j++){
+                if (!radar.getChildByName('enemy'+j)){
+                    var enemyGeo = new THREE.TetrahedronGeometry(5);
 
                     // marker for player position
-                    enemyMarker[i] = new THREE.Mesh(
-                        enemyGeo[i],
+                    var enemyMarker = new THREE.Mesh(
+                        enemyGeo,
                         new THREE.MeshBasicMaterial( { color: 0xff0000, shading: THREE.FlatShading } ) );
 
-                    enemyMarker[i].name = "enemy"+i;
-                    radar.add( enemyMarker[i] );
+                    enemyMarker.name = "enemy"+i;
+                    radar.add( enemyMarker );
 
-                    radar.enemyCount = i+1;
-                };
-
+                    radar.enemyCount = j+1;
+                }
             }
         }
         for (var i = 0, len = enemies.length; i < len; i++){
