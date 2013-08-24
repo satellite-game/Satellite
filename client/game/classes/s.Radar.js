@@ -112,6 +112,8 @@ s.Radar = new Class({
         ///////////////////
 
         that.enemies.add( { name: 'blah', pos: [5000,2000,2000], rot: [0,0,0], aVeloc: [0,0,0], lVeloc: [0,0,0] } );
+        that.enemies.add( { name: 'blah2', pos: [6000,2000,2000], rot: [0,0,0], aVeloc: [0,0,0], lVeloc: [0,0,0] } );
+
         var enemyGeo = [], enemyMarker = [];
         for (var i = 0, len = that.enemies.list().length; i < len; i++){
 
@@ -120,7 +122,7 @@ s.Radar = new Class({
             // marker for player position
             enemyMarker[i] = new THREE.Mesh(
                 enemyGeo[i],
-                new THREE.MeshBasicMaterial( { color: 0xff000000, shading: THREE.FlatShading } ) );
+                new THREE.MeshBasicMaterial( { color: 0xff0000, shading: THREE.FlatShading } ) );
             console.log(enemyMarker[i].material.color);
             enemyMarker[i].name = "enemy"+i;
             radar.add( enemyMarker[i] );

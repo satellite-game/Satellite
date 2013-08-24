@@ -1,5 +1,5 @@
 /**
-* 
+*
 * s.Comm ---
 * allows us to compartmentalize all interactions
 * with the server to this class (s.Comm) --this class
@@ -10,7 +10,7 @@
 
 s.Comm = new Class( {
     extend: s.EventEmitter,
-    
+
     // makeTrigger is responsible for broadcasting all events
     // receieved from the server to the rest of the game.
     makeTrigger: function ( evt ) {
@@ -87,7 +87,7 @@ s.Comm = new Class( {
                     time: time,
                     pos: shipPosition.pos,
                     rot: shipPosition.rot,
-                    tRot: shipPosition.tRot,
+                   // tRot: shipPosition.tRot,
                     aVeloc: shipPosition.aVeloc,
                     lVeloc: shipPosition.lVeloc
                 };
