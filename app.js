@@ -12,7 +12,7 @@ var path        = require('path');
 server.listen(port);
 
 // log it all
-io.set('log level', 3);
+io.set('log level', 2);
 
 // give the client access to all client files
 app.use(express.static(path.join(__dirname, '/build/client')));

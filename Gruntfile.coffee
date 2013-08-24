@@ -117,25 +117,6 @@ module.exports = (grunt) ->
       dev: {}
     }
 
-    
-
-  grunt.event.on "watch", (action, filepath, target) ->
-    grunt.log.writeln target + ": " + filepath + " has " + action
-
-  delayTime = 2000
-
-  grunt.registerTask "delayed-open", "wait for game to load.", ->
-    done = @async()
-    setTimeout ->
-      do grunt.task.run('open')
-    , delayTime 
-
-  # grunt.registerTask "delayed-server-open", "wait for game to load.", ->
-  #   done = @async()
-  #   setTimeout ->
-  #     do grunt.task.run(['open:server'])
-  #   , delayTime
-
   grunt.loadNpmTasks "grunt-contrib-clean"
   grunt.loadNpmTasks "grunt-contrib-concat"
   grunt.loadNpmTasks "grunt-contrib-copy"
@@ -147,9 +128,6 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks "grunt-open"
   grunt.loadNpmTasks "grunt-nodemon"
   grunt.loadNpmTasks "grunt-concurrent"
-
-  # grunt.registerTask "server", ["jshint:server", "copy:server", "delayed-server-open", "notify:server"]
-  # grunt.registerTask "client", ["jshint:client", "copy:client", "concat", "stylus", "delayed-client-open", "notify:client"]
 
   grunt.registerTask "server", ["jshint:server", "copy:server"]
   grunt.registerTask "client", ["jshint:client", "copy:client", "concat", "stylus"]

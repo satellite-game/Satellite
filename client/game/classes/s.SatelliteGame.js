@@ -45,6 +45,7 @@ s.SatelliteGame = new Class( {
         // Add a ship
         this.player = new s.Player( {
             game: this,
+            alliance: 'alliance',
             shipClass: 'human_ship_light',
             position: new THREE.Vector3(this.getRandomCoordinate(),this.getRandomCoordinate(),this.getRandomCoordinate()),
             rotation: new THREE.Vector3( 0, Math.PI / 4, 0 ),
@@ -284,10 +285,10 @@ s.SatelliteGame = new Class( {
             console.log( 'Server reset position' );
 
             // Return to center
-            s.game.player.setPosition( message.pos, message.rot, message.tRot, message.aVeloc, message.lVeloc, false ); // Never interpolate our own movement
+            s.game.player.setPosition( message.pos, message.rot, message.aVeloc, message.lVeloc, false ); // Never interpolate our own movement
         } else {
             // Enemy moved
-            if ( !s.game.enemies.execute( message.name, 'setPosition', [ message.pos, message.rot, message.tRot, message.aVeloc, message.lVeloc, message.interp ] ) ) {
+            if ( !s.game.enemies.execute( message.name, 'setPosition', [ message.pos, message.rot, message.aVeloc, message.lVeloc, message.interp ] ) ) {
                 s.game.enemies.add( message );
             }
         }

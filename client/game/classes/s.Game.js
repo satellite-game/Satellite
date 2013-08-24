@@ -118,9 +118,6 @@ s.Game = new Class({
 				self.tryInitialize(this);
 			}
 		});
-
-
-
 	},
 
 	// Start the game
