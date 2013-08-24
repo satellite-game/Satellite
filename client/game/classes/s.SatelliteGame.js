@@ -45,7 +45,6 @@ s.SatelliteGame = new Class( {
         // Add a ship
         this.player = new s.Player( {
             game: this,
-            alliance: 'alliance',
             shipClass: 'human_ship_light',
             position: new THREE.Vector3(this.getRandomCoordinate(),this.getRandomCoordinate(),this.getRandomCoordinate()),
             rotation: new THREE.Vector3( 0, Math.PI / 4, 0 ),
