@@ -74,19 +74,27 @@ s.Controls = new Class({
 		}
 
 		if (this.keyboard.pressed('left')) {
+			this.HUD.targetX = centerX;
+			this.HUD.targetY = centerY;
 			yaw = this.options.yawSpeed / thrustScalar;
 
 		}
 		else if (this.keyboard.pressed('right')) {
+			this.HUD.targetX = centerX;
+			this.HUD.targetY = centerY;
 			yaw = -1*this.options.yawSpeed / thrustScalar;
 		}
 
 		if (this.keyboard.pressed('up')) {
 			// Pitch down
+			this.HUD.targetX = centerX;
+			this.HUD.targetY = centerY;
 			pitch = -1*this.options.pitchSpeed / thrustScalar;
 		}
 		else if (this.keyboard.pressed('down')) {
 			// Pitch up
+			this.HUD.targetX = centerX;
+			this.HUD.targetY = centerY;
 			pitch = this.options.pitchSpeed / thrustScalar;
 		}
 

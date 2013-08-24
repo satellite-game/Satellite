@@ -93,7 +93,6 @@ s.Comm = new Class( {
                     aVeloc: shipPosition.aVeloc,
                     lVeloc: shipPosition.lVeloc
                 };
-
                 // Broadcast position
                 this.socket.emit( 'move', packet );
                 this.lastMessageTime = time;
