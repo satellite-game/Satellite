@@ -89,6 +89,7 @@ s.Comm = new Class( {
                 var packet = {
                     time: time,
                     pos: shipPosition.pos,
+                    rot: shipPosition.rot,
                     aVeloc: shipPosition.aVeloc,
                     lVeloc: shipPosition.lVeloc
                 };
