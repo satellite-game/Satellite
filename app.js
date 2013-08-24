@@ -82,7 +82,7 @@ io.sockets.on('connection', function (socket) {
             // Store client info
             players[message.name] = {
                 name: message.name,
-                pos: pos,
+                pos: message.pos,
                 rot: message.rot,
                 aVeloc: message.aVeloc,
                 lVeloc: message.lVeloc,
@@ -92,7 +92,7 @@ io.sockets.on('connection', function (socket) {
 
             var packet = {
                 name: message.name,
-                pos: pos,
+                pos: message.pos,
                 rot: [0, 0, 0],
                 aVeloc: [0, 0, 0],
                 lVeloc: [0, 0, 0],
@@ -104,7 +104,7 @@ io.sockets.on('connection', function (socket) {
             // Notify players of new challenger
             socket.broadcast.emit('join', {
                 name: message.name,
-                pos: pos,
+                pos: message.pos,
                 rot: message.rot,
                 aVeloc: message.aVeloc,
                 lVeloc: message.lVeloc

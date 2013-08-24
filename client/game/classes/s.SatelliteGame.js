@@ -47,7 +47,8 @@ s.SatelliteGame = new Class( {
             game: this,
             shipClass: 'human_ship_light',
             position: new THREE.Vector3(this.getRandomCoordinate(),this.getRandomCoordinate(),this.getRandomCoordinate()),
-            rotation: new THREE.Vector3( 0, Math.PI / 4, 0 )
+            rotation: new THREE.Vector3( 0, Math.PI / 4, 0 ),
+            alliance: 'self'
         } );
 
         // Root camera to the player's position
@@ -158,12 +159,13 @@ s.SatelliteGame = new Class( {
                 }
 
                 // TODO: include velocities?
-                var enemyShip = new s.Ship( {
+                var enemyShip = new s.Player( {
                     game: that,
                     shipClass: 'human_ship_light',
                     name: enemyInfo.name,
                     position: new THREE.Vector3( enemyInfo.pos[ 0 ], enemyInfo.pos[ 1 ], enemyInfo.pos[ 2 ] ),
                     rotation: new THREE.Vector3( enemyInfo.rot[ 0 ], enemyInfo.rot[ 1 ], enemyInfo.rot[ 2 ] ),
+                    alliance: 'enemy'
                 } );
 
                 this._list.push( enemyShip );
@@ -269,7 +271,7 @@ s.SatelliteGame = new Class( {
     },
 
     handleJoin: function ( message ) {
-        s.game.enemies.add( message );
+           s.game.enemies.add( message );
     },
     handleLeave: function ( message ) {
         if ( s.game.enemies.delete( message.name ) ) {
