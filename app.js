@@ -153,4 +153,61 @@ io.sockets.on('connection', function (socket) {
             }
         });
     });
+    socket.on('hit', function(message) {
+        socket.get('name', function (err, name) {
+            socket.broadcast.emit('hit', {
+                name: name,
+                type: message.type
+            });
+        });
+    });
+
+    
+    socket.on('killed', function(message) {
+        socket.get('name', function (err, name) {
+            if (name === null) {
+                console.error('killed failed: Player name was null!');
+                console.log(err, name, message);
+                throw new Error('Player name was null!');
+            }
+
+            socket.broadcast.emit('killed', {
+                name: name,
+                killer: message.killer
+            });
+            
+            var newPos = getRandomPosition();
+            var packet = {
+                name: name,
+                pos: newPos,
+                rot: [0, 0, 0],
+                tRot: [0, 0, 0],
+                aVeloc: [0, 0, 0],
+                lVeloc: [0, 0, 0],
+                interp: false
+            };
+            
+            players[name].pos = newPos;
+            
+            // Notify self
+            socket.emit('move', packet);
+            
+            // Notify players
+            socket.broadcast.emit('move', packet);
+        });
+    });
+    
+    socket.on('fire', function(message) {
+        socket.get('name', function (err, name) {
+            socket.broadcast.emit('fire', {
+                name: name,
+                pos: message.pos,
+                rot: message.rot,
+                type: message.type
+            });
+        });
+    });
 });
+
+
+    

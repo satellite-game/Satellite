@@ -25,6 +25,7 @@ s.Controls = new Class({
 		this.game.hook(this.update);
 
 		this.firing = false;
+		this.lastTime = new Date().getTime();
 	},
 
 	destruct: function() {
@@ -32,6 +33,8 @@ s.Controls = new Class({
 	},
 
 	update: function(time, delta) {
+		var now = new Date().getTime();
+		var difference = now - this.lastTime;
 		var root = this.player.root;
 		var pitch = 0;
 		var roll = 0;
@@ -140,18 +143,20 @@ s.Controls = new Class({
 		// Then apply forward impulse
 		if (thrust){
 			if (this.options.thrustImpulse < 2000){
-				this.options.thrustImpulse += 5;
+				this.options.thrustImpulse += difference/5;
 			}
 		}
 		if (brakes) {
 			if (this.options.thrustImpulse > 0){
-				this.options.thrustImpulse -= 5;
+				this.options.thrustImpulse -= difference/5;
 			}
 		}
+		console.log(difference);
         var impulse;
 		impulse = linearVelocity.clone().negate();
 		root.applyCentralImpulse(impulse);
 		var forceVector = new THREE.Vector3(0, 0, -1*this.options.thrustImpulse).applyMatrix4(rotationMatrix);
 		root.applyCentralImpulse(forceVector);
+		this.lastTime = now;
 	}
 });

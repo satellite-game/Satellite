@@ -51,6 +51,12 @@ s.Comm = new Class( {
 
         this.socket.on( 'move', this.makeTrigger( 'move' ) );
 
+        this.socket.on('killed', this.makeTrigger('killed'));
+        
+        this.socket.on('fire', this.makeTrigger('fire'));
+        
+        this.socket.on('hit', this.makeTrigger('hit'));
+
         this.game.hook(this.position);
 
     },
@@ -96,5 +102,23 @@ s.Comm = new Class( {
                 s.game.comm.lastMessageTime = time;
             }
         }
+    },
+    fire: function(pos, rot, type) {
+        this.socket.emit('fire', {
+            pos: pos,
+            rot: rot,
+            type: type
+        });
+    },
+    died: function(otherPlayerName) {
+        this.socket.emit('killed', {
+            killer: otherPlayerName
+        });
+    },
+    hit: function(otherPlayerName, type) {
+        this.socket.emit('hit', {
+            name: otherPlayerName,
+            type: type
+        });
     }
 } );

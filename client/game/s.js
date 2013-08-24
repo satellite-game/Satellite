@@ -22,6 +22,9 @@ var s = {
                 damage: 10,
                 velocity: 2000
             }
+        },
+        ship: {
+        health: 100
         }
     },
 

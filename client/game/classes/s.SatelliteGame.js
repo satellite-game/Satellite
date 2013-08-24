@@ -182,9 +182,18 @@ s.SatelliteGame = new Class( {
             server: window.location.hostname + ':1337'
         } );
 
-        this.comm.on( 'player list', that.handlePlayerList );
+        this.comm.on('fire', this.handleEnemyFire);
+        
+        this.comm.on('hit', this.handleHit);
+        
+        this.comm.on('player list', this.handlePlayerList);
+        
+        this.comm.on('killed', this.handleKill);
+
         this.comm.on( 'join', that.handleJoin );
+
         this.comm.on( 'leave', that.handleLeave );
+
         this.comm.on( 'move', that.handleMove );
 
         this.HUD.controls = this.controls;
@@ -234,7 +243,7 @@ s.SatelliteGame = new Class( {
         // Spec size
         var radius = 100000;
         var size = 100;
-        var count = 1000;
+        var count = 10000;
 
         for ( var i = 0; i < count; i++ ) {
 
@@ -292,14 +301,98 @@ s.SatelliteGame = new Class( {
             }
         }
     },
-    handlePlayerList: function ( message ) {
-        for ( var otherPlayerName in message ) {
-            // don't add self
-            if ( otherPlayerName == s.game.player.name ) continue;
 
-            var otherPlayer = message[ otherPlayerName ];
-            s.game.enemies.add( otherPlayer );
+    handlePlayerList: function(message) {
+        for (var otherPlayerName in message) {
+            // don't add self
+            if (otherPlayerName == this.player.name) continue;
+            
+            var otherPlayer = message[otherPlayerName];
+            this.enemies.add(otherPlayer);
         }
+    },
+
+    handleKill: function(message) {
+        var enemy = this.enemies.get(message.name);
+        
+        new db.Explosion({
+            game: this,
+            position: enemy.getPosition().pos
+        });
+        
+        if (message.killer == this.player.name)
+            console.warn('You killed %s!', message.name);
+        else
+            console.log('%s was killed by %s', message.name, message.killer);
+    },
+
+    handleEnemyFire: function(message) {
+        var time = new Date().getTime();
+        
+        var bulletPosition = new THREE.Vector3(message.pos[0], message.pos[1], message.pos[2]);
+        var bulletRotation = new THREE.Vector3(message.rot[0], message.rot[1], message.rot[2]);
+        
+        var bulletModel;
+        if (message.type == 'missile') {
+            bulletModel = new db.Missile({
+                game: this,
+                position: bulletPosition,
+                rotation: bulletRotation,
+                alliance: 'enemy'
+            });
+        }
+        else {
+            bulletModel = new db.Bullet({
+                game: this,
+                position: bulletPosition,
+                rotation: bulletRotation,
+                alliance: 'enemy'
+            });
+        }
+        
+        // Calculated volume based on distance
+        var volume = this.getVolumeAt(bulletPosition);
+        
+        // Play sound
+        var soundInfo = this.options.weapons[message.type].sound;
+        this.sound.play(soundInfo.file, soundInfo.volume*volume);
+        
+        this.enemyBullets.push({
+            instance: bulletModel,
+            alliance: 'enemy',
+            time: time
+        });
+    },
+
+    handleHit: function(message) {
+        // Decrement HP
+        this.player.hp -= this.options.weapons[message.type].damage;
+
+        console.log('You were hit with a %s by %s! Your HP: %d', message.type, message.name, this.player.hp);
+        
+        if (this.player.hp <= 0) {
+            // Player is dead
+            this.handleDie(message.name);
+        }
+    },
+    
+    handleFire: function(props) {
+        this.comm.fire(props.pos, props.rot, this.currentWeapon);
+    },
+    
+    handleDie: function(otherPlayerName) {
+        new db.Explosion({
+            game: this,
+            position: this.tank.getRoot().position
+        });
+        
+        this.comm.died(otherPlayerName);
+        
+        // Restore health
+        this.player.hp = 100;
+        
+        console.warn('You were killed by %s', otherPlayerName);
     }
+    
 
 } );

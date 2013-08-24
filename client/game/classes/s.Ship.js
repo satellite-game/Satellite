@@ -51,7 +51,11 @@ s.Ship = new Class({
                     initialVelocity: this.root.getLinearVelocity().clone(),
                     team: this.alliance
                 });
-
+                this.trigger('fire', {
+                    pos: [bulletPosition.x, bulletPosition.y, bulletPosition.z],
+                    rot: [bulletRotation.x, bulletRotation.y, bulletRotation.z],
+                    type: type
+                });
                 new s.Turret({
                     game: this.game,
                     position: this.getEulerRotation(new THREE.Vector3(-25, 0, -120)),
