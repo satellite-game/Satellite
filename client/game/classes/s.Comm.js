@@ -16,6 +16,7 @@ s.Comm = new Class( {
     makeTrigger: function ( evt ) {
         var that = this;
         return function ( message ) {
+            console.log(evt,message);
             that.trigger.call( that, evt, message );
         };
     },
@@ -50,6 +51,8 @@ s.Comm = new Class( {
         this.socket.on( 'leave', this.makeTrigger( 'leave' ) );
 
         this.socket.on( 'move', this.makeTrigger( 'move' ) );
+
+        this.game.hook(this.position);
 
     },
 
@@ -86,8 +89,6 @@ s.Comm = new Class( {
                 var packet = {
                     time: time,
                     pos: shipPosition.pos,
-                    rot: shipPosition.rot,
-                    tRot: shipPosition.tRot,
                     aVeloc: shipPosition.aVeloc,
                     lVeloc: shipPosition.lVeloc
                 };
