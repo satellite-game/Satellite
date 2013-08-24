@@ -13,7 +13,7 @@ s.SatelliteGame = new Class( {
 
     getRandomCoordinate: function(){
         var coefficient = 1;
-        if (Math.random() > 0.5){   
+        if (Math.random() > 0.5){
             coefficient = -1;
         }
         var coord = Math.floor(Math.random()* 30000 + 15000) * coefficient;
