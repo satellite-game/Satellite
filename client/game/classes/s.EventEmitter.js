@@ -3,7 +3,7 @@
  *
  * @class	
  */
-s.EventEmitter = new Class(/** @lends EventEmitter# */{
+s.EventEmitter = new Class({
 	/** @constructs */
 	construct: function() {
 		this._events = {};

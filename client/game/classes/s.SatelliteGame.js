@@ -20,10 +20,8 @@ s.SatelliteGame = new Class( {
         return coord;
     },
 
-	initialize: function(_super) {
+	initialize: function() {
 		var that = this;
-		_super.call(this);
-
 
 		// No gravity
 		this.scene.setGravity(new THREE.Vector3(0, 0, 0));
@@ -190,7 +188,7 @@ s.SatelliteGame = new Class( {
         this.HUD.controls = this.controls;
 
         this.comm.connected( );
-
+        this.start();
     },
 
     render: function ( _super, time ) {

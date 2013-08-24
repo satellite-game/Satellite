@@ -120,13 +120,6 @@ s.Game = new Class({
 		});
 	},
 
-	// Start the game
-	// This method should be overridden
-	initialize: function() {
-		console.log('Game ready.');
-		this.start();
-	},
-
 	// Attempt to start the game (if models and physics have begun)
 	tryInitialize: function() {
 		if (this.modelsLoaded && this.physicsStarted && !this.initialized) {
