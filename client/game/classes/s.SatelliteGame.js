@@ -45,9 +45,12 @@ s.SatelliteGame = new Class( {
             game: this,
             shipClass: 'human_ship_light',
             position: new THREE.Vector3(this.getRandomCoordinate(),this.getRandomCoordinate(),this.getRandomCoordinate()),
-            rotation: new THREE.Vector3( 0, Math.PI / 4, 0 ),
+            //position: new THREE.Vector3(2000,2000,2000),
+            rotation: new THREE.Vector3( 0, Math.PI/2, 0 ),
             alliance: 'alliance'
         } );
+        // Moon facing initilization
+        this.player.root.lookAt(this.moon.root.position);
 
         // Root camera to the player's position
         this.player.root.add( this.camera );

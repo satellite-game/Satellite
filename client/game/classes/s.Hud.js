@@ -114,17 +114,64 @@ s.HUD = new Class({
         // ENEMY-LOCK INDICATOR //
         //////////////////////////
 
+        /**
+         Get 2D coordinates from a Vector3
+
+         @param {THREE.Vector3} objVector  Vector representing the object position
+         @param {Number} width  Width of canvas
+         @param {Number} height  Height of canvas
+         */
         this.lockedOn = true;
-        this.inScope = false;
-        if ( this.lockedOn && this.inScope ) {
-            this.ctx.strokeRect( x1, y1, x2, y2 );
-        } else if ( this.lockedOn ) {
-            this.ctx.beginPath();
-            this.ctx.arc( 10, 10, 10, 0, 2*Math.PI, false);
-            //this.ctx.endPath();
-            this.ctx.fillStyle = "green";
-            this.ctx.fill();
+        if ( this.lockedOn ){
+
+            var height = window.innerHeight;
+            var width  = window.innerWidth;
+
+            this.target = s.game.moon.root.position;
+            var vector3D = this.target.clone();
+            var vector2D = s.projector.projectVector(vector3D, s.game.camera);
+
+            if (Math.abs(vector2D.x) <= 1 && Math.abs(vector2D.y) <= 1){
+
+                vector2D.x = ( width  + vector2D.x*width  )/2;
+                vector2D.y = ( height + vector2D.y*height )/2;
+                console.log(vector2D);
+                this.inScope = true;
+
+            } else {
+
+                if ( Math.abs(vector2D.x*width) > Math.abs(vector2D.y*height) ){
+                    vector2D.x
+                }
+                vector2D.x = ( vector2D.x );
+                vector2D.y = (  );
+                this.inScope = false;
+
+            }
+
+
+            if ( this.lockedOn && this.inScope ) {
+
+                this.ctx.strokeRect( vector2D.x-5, vector2D.y-5, vector2D.x+5, vector2D.y+5 );
+                this.ctx.lineWidth = 5;
+                this.ctx.strokeStyle = '0xff0000';
+
+            } else {
+
+                this.ctx.beginPath();
+                this.ctx.arc( vector2D.x, vector2D.y, 10, 0, 2*Math.PI, false);
+                this.ctx.fillStyle = "0x0000ff";
+                this.ctx.fill();
+                this.ctx.lineWidth = 5;
+                this.ctx.strokeStyle = '0xff0000';
+                this.ctx.stroke();
+
+            }
+
+        } else {
+
         }
+
 	}
 
 });

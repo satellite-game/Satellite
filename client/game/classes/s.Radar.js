@@ -235,8 +235,7 @@ s.Radar = new Class({
 
         // Search for new enemies and add them to the map
         if (enemies.length > radar.enemyCount){
-            for (var j = 0,
-                     lenj = that.enemies.list().length; j < lenj; j++){
+            for (var j = 0, lenj = that.enemies.list().length; j < lenj; j++){
                 if (!radar.getChildByName('enemy'+j)){
                     var enemyGeo = new THREE.TetrahedronGeometry(5);
 
