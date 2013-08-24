@@ -106,8 +106,25 @@ s.HUD = new Class({
 
 
 		this.ctx.drawImage(this.crosshairs,centerX - this.crosshairs.width/2,centerY - this.crosshairs.height/2);
-		
+
 		this.ctx.drawImage(this.subreticle,this.targetX - this.subreticle.width/2,this.targetY - this.subreticle.height/2);
+
+
+        //////////////////////////
+        // ENEMY-LOCK INDICATOR //
+        //////////////////////////
+
+        this.lockedOn = true;
+        this.inScope = false;
+        if ( this.lockedOn && this.inScope ) {
+            this.ctx.strokeRect( x1, y1, x2, y2 );
+        } else if ( this.lockedOn ) {
+            this.ctx.beginPath();
+            this.ctx.arc( 10, 10, 10, 0, 2*Math.PI, false);
+            //this.ctx.endPath();
+            this.ctx.fillStyle = "green";
+            this.ctx.fill();
+        }
 	}
 
 });

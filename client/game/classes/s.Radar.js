@@ -100,20 +100,11 @@ s.Radar = new Class({
 
         radar.add( selfTrajectory );
 
-
-        //////////////////
-        // ALLY MARKERS //
-        //////////////////
-
-
-
         ///////////////////
         // ENEMY MARKERS //
         ///////////////////
 
-        that.enemies.add( { name: 'blah', pos: [Math.random()*100000-50000,Math.random()*100000-50000,Math.random()*100000-50000], rot: [0,0,0], aVeloc: [0,0,0], lVeloc: [0,0,0] } );
-        that.enemies.add( { name: 'blah2', pos: [Math.random()*100000-50000,Math.random()*100000-50000,Math.random()*100000-50000], rot: [0,0,0], aVeloc: [0,0,0], lVeloc: [0,0,0] } );
-        that.enemies.add( { name: 'blah3', pos: [Math.random()*100000-50000,Math.random()*100000-50000,Math.random()*100000-50000], rot: [0,0,0], aVeloc: [0,0,0], lVeloc: [0,0,0] } );
+        //that.enemies.add( { name: 'blah', pos: [Math.random()*100000-50000,Math.random()*100000-50000,Math.random()*100000-50000], rot: [0,0,0], aVeloc: [0,0,0], lVeloc: [0,0,0] } );
 
         var enemyGeo = [], enemyMarker = [];
         for (var i = 0, len = that.enemies.list().length; i < len; i++){
@@ -241,8 +232,11 @@ s.Radar = new Class({
         /////////////////////////////////
 
         var enemyLength = [], enemyPosition = [];
+
+        // Search for new enemies and add them to the map
         if (enemies.length > radar.enemyCount){
-            for (var j = 0, lenj = that.enemies.list().length; j < lenj; j++){
+            for (var j = 0,
+                     lenj = that.enemies.list().length; j < lenj; j++){
                 if (!radar.getChildByName('enemy'+j)){
                     var enemyGeo = new THREE.TetrahedronGeometry(5);
 
@@ -258,6 +252,8 @@ s.Radar = new Class({
                 }
             }
         }
+
+        // Update positions of enemies
         for (var i = 0, len = enemies.length; i < len; i++){
 
             enemyPosition[i] = enemies[i].root.position.clone();
@@ -273,3 +269,4 @@ s.Radar = new Class({
         }
     }
 });
+
