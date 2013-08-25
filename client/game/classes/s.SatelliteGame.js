@@ -185,13 +185,13 @@ s.SatelliteGame = new Class( {
             server: window.location.hostname + ':1337'
         } );
 
-        this.comm.on('fire', this.handleEnemyFire);
+        this.comm.on('fire', that.handleEnemyFire);
         
-        this.comm.on('hit', this.handleHit);
+        this.comm.on('hit', that.handleHit);
         
-        this.comm.on('player list', this.handlePlayerList);
+        this.comm.on('player list', that.handlePlayerList);
         
-        this.comm.on('killed', this.handleKill);
+        this.comm.on('killed', that.handleKill);
 
         this.comm.on( 'join', that.handleJoin );
 
@@ -329,9 +329,7 @@ s.SatelliteGame = new Class( {
             console.log('%s was killed by %s', message.name, message.killer);
     },
 
-    handleEnemyFire: function(message) {
-        var time = new Date().getTime();
-        
+    handleEnemyFire: function(message) {        
         var bulletPosition = message.position;
         var bulletRotation = message.rotation;
         var initialVelocity = message.initialVelocity;
@@ -341,16 +339,9 @@ s.SatelliteGame = new Class( {
                 position: bulletPosition,
                 rotation: bulletRotation,
                 initialVelocity: initialVelocity,
-                alliance: 'enemy'
+                alliance: 'rebels'
             });
 
-            new s.Turret({
-                game: s.game,
-                position: -bulletPosition,
-                rotation: bulletRotation,
-                initialVelocity: initialVelocity,
-                alliance: 'enemy'
-            });
     },
 
     handleHit: function(message) {
@@ -366,7 +357,7 @@ s.SatelliteGame = new Class( {
     },
     
     handleFire: function(props) {
-        s.game.comm.fire(props.pos, props.rot, this.currentWeapon);
+        s.game.comm.fire(props.position, props.rotation, props.initialVelocity);
     },
     
     handleDie: function(otherPlayerName) {

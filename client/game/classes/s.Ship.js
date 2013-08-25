@@ -53,14 +53,14 @@ s.Ship = new Class({
                     initialVelocity: initialVelocity,
                     team: this.alliance
                 });
-                this.trigger('fire', {
-                    position: position,
-                    rotation: rotation,
-                    initialVelocity: initialVelocity,
+                this.game.handleFire({
+                    position:position,
+                    rotation:rotation,
+                    initialVelocity:initialVelocity
                 });
                 new s.Turret({
                     game: this.game,
-                    position: -position,
+                    position: this.getEulerRotation(new THREE.Vector3(-25, 0, -120)),
                     rotation: rotation,
                     initialVelocity: initialVelocity,
                     team: this.alliance
