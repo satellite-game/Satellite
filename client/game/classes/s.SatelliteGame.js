@@ -339,7 +339,7 @@ s.SatelliteGame = new Class( {
                 position: bulletPosition,
                 rotation: bulletRotation,
                 initialVelocity: initialVelocity,
-                alliance: 'rebels'
+                team: 'rebels'
             });
 
     },

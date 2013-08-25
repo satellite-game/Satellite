@@ -65,6 +65,12 @@ s.Ship = new Class({
                     initialVelocity: initialVelocity,
                     team: this.alliance
                 });
+                position = this.getEulerRotation(new THREE.Vector3(-25, 0, -120));
+                this.game.handleFire({
+                    position:position,
+                    rotation:rotation,
+                    initialVelocity:initialVelocity
+                });
                 this.lastTime = now;
             }
         }
