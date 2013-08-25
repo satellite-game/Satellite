@@ -111,9 +111,9 @@ s.HUD = new Class({
 		this.ctx.drawImage(this.subreticle,this.targetX - this.subreticle.width/2,this.targetY - this.subreticle.height/2);
 
 
-        //////////////////////////
-        // ENEMY-LOCK INDICATOR //
-        //////////////////////////
+        //////////////////////////////
+        ///  ENEMY-LOCK INDICATOR  ///
+        //////////////////////////////
 
         /**
          Get 2D coordinates from a Vector3
@@ -121,57 +121,55 @@ s.HUD = new Class({
          @param {THREE.Vector3} objVector  Vector representing the object position
          @param {Number} width  Width of canvas
          @param {Number} height  Height of canvas
-//         */
-//        this.lockedOn = true;
-//        if ( this.lockedOn ){
-//
-//            var height = window.innerHeight;
-//            var width  = window.innerWidth;
-//
-//            this.target = s.game.moon.root.position;
-//            var vector3D = this.target.clone();
-//            var vector2D = s.projector.projectVector(vector3D, s.game.camera);
-//
-//            if (Math.abs(vector2D.x) <= 1 && Math.abs(vector2D.y) <= 1){
-//
-//                vector2D.x = ( width  + vector2D.x*width  )/2;
-//                vector2D.y = ( height + vector2D.y*height )/2;
-//                console.log(vector2D);
-//                this.inScope = true;
-//
-//            } else {
-//
-//                if ( Math.abs(vector2D.x*width) > Math.abs(vector2D.y*height) ){
-//                    vector2D.x
-//                }
-//                vector2D.x = ( vector2D.x );
-//                vector2D.y = (  );
-//                this.inScope = false;
-//
-//            }
-//
-//
-//            if ( this.lockedOn && this.inScope ) {
-//
-//                this.ctx.strokeRect( vector2D.x-5, vector2D.y-5, vector2D.x+5, vector2D.y+5 );
-//                this.ctx.lineWidth = 5;
-//                this.ctx.strokeStyle = '0xff0000';
-//
-//            } else {
-//
-//                this.ctx.beginPath();
-//                this.ctx.arc( vector2D.x, vector2D.y, 10, 0, 2*Math.PI, false);
-//                this.ctx.fillStyle = "0x0000ff";
-//                this.ctx.fill();
-//                this.ctx.lineWidth = 5;
-//                this.ctx.strokeStyle = '0xff0000';
-//                this.ctx.stroke();
-//
-//            }
-//
-//        } else {
-//
-//        }
+         */
+        // TODO: Make the pointer go around a ring
+        // TODO: Fix the z-axis messing up the result
+
+        this.lockedOn = true;
+        if ( this.lockedOn ){
+
+            var height = window.innerHeight;
+            var width  = window.innerWidth;
+
+            this.target = s.game.moon.root.position;
+            var vector3D = this.target.clone();
+            var vector2D = s.projector.projectVector(vector3D, s.game.camera);
+
+            if ( Math.abs(vector2D.x) <= 1 && Math.abs(vector2D.y) <= 1 ){
+
+                vector2D.x =  ( width  + vector2D.x*width  )/2;
+                vector2D.y = -(-height + vector2D.y*height )/2;
+
+                var size = 50;
+
+                this.ctx.strokeRect( vector2D.x-size, vector2D.y-size, size*2, size*2 );
+                this.ctx.lineWidth = 5;
+                this.ctx.strokeStyle = '0xff0000';
+
+
+            } else {
+
+                if ( Math.abs(vector2D.x*width) > Math.abs(vector2D.y*height) ){
+                    vector2D.x = vector2D.x > 0 ? width - 20 : 0 + 20;
+                    vector2D.y = ( height + vector2D.y*height )/2;
+                } else {
+                    vector2D.x = ( width + vector2D.x*width )/2;
+                    vector2D.y = vector2D.y < 0 ? height - 20 : 0 + 20;
+                }
+
+                this.ctx.beginPath();
+                this.ctx.arc( vector2D.x, vector2D.y, 10, 0, 2*Math.PI, false);
+                this.ctx.fillStyle = "0x0000ff";
+                this.ctx.fill();
+                this.ctx.lineWidth = 5;
+                this.ctx.strokeStyle = '0xff0000';
+                this.ctx.stroke();
+
+            }
+
+        } else {
+
+        }
 
 	}
 
