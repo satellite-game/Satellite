@@ -186,11 +186,11 @@ s.SatelliteGame = new Class( {
         } );
 
         this.comm.on('fire', that.handleEnemyFire);
-        
+
         this.comm.on('hit', that.handleHit);
-        
+
         this.comm.on('player list', that.handlePlayerList);
-        
+
         this.comm.on('killed', that.handleKill);
 
         this.comm.on( 'join', that.handleJoin );
@@ -291,7 +291,7 @@ s.SatelliteGame = new Class( {
         }
     },
     handleMove: function ( message ) {
-        if ( message.name == s.game.player.name ) {
+        if ( message.name == this.pilot.name ) {
             // server told us to move
             console.log( 'Server reset position' );
 
@@ -309,7 +309,7 @@ s.SatelliteGame = new Class( {
         for (var otherPlayerName in message) {
             // don't add self
             if (otherPlayerName == this.player.name) continue;
-            
+
             var otherPlayer = message[otherPlayerName];
             this.enemies.add(otherPlayer);
         }
@@ -317,23 +317,23 @@ s.SatelliteGame = new Class( {
 
     handleKill: function(message) {
         var enemy = this.enemies.get(message.name);
-        
+
         new db.Explosion({
             game: this,
             position: enemy.getPosition().pos
         });
-        
+
         if (message.killer == this.player.name)
             console.warn('You killed %s!', message.name);
         else
             console.log('%s was killed by %s', message.name, message.killer);
     },
 
-    handleEnemyFire: function(message) {        
+    handleEnemyFire: function(message) {
         var bulletPosition = message.position;
         var bulletRotation = message.rotation;
         var initialVelocity = message.initialVelocity;
-        
+
             new s.Turret({
                 game: s.game,
                 position: bulletPosition,
@@ -349,30 +349,30 @@ s.SatelliteGame = new Class( {
         this.player.hp -= this.options.weapons[message.type].damage;
 
         console.log('You were hit with a %s by %s! Your HP: %d', message.type, message.name, this.player.hp);
-        
+
         if (this.player.hp <= 0) {
             // Player is dead
             this.handleDie(message.name);
         }
     },
-    
+
     handleFire: function(props) {
         s.game.comm.fire(props.position, props.rotation, props.initialVelocity);
     },
-    
+
     handleDie: function(otherPlayerName) {
         new db.Explosion({
             game: this,
             position: this.tank.getRoot().position
         });
-        
+
         this.comm.died(otherPlayerName);
-        
+
         // Restore health
         this.player.hp = 100;
-        
+
         console.warn('You were killed by %s', otherPlayerName);
     }
-    
+
 
 } );
