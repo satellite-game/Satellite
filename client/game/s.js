@@ -24,7 +24,7 @@ var s = {
             }
         },
         ship: {
-        health: 100
+        hull: 80
         }
     },
 

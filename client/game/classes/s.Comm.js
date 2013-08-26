@@ -110,10 +110,8 @@ s.Comm = new Class( {
             initialVelocity: velocity
         });
     },
-    died: function(otherPlayerName) {
-        this.socket.emit('killed', {
-            killer: otherPlayerName
-        });
+    died: function() {
+        this.socket.emit('killed');
     },
     hit: function(otherPlayerName, type) {
         this.socket.emit('hit', {

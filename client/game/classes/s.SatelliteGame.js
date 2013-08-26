@@ -318,11 +318,6 @@ s.SatelliteGame = new Class( {
     handleKill: function(message) {
         var enemy = this.enemies.get(message.name);
 
-        new db.Explosion({
-            game: this,
-            position: enemy.getPosition().pos
-        });
-
         if (message.killer == this.player.name)
             console.warn('You killed %s!', message.name);
         else
@@ -335,6 +330,7 @@ s.SatelliteGame = new Class( {
         var initialVelocity = message.initialVelocity;
 
             new s.Turret({
+                pilot: message.name,
                 game: s.game,
                 position: bulletPosition,
                 rotation: bulletRotation,
@@ -360,18 +356,13 @@ s.SatelliteGame = new Class( {
         s.game.comm.fire(props.position, props.rotation, props.initialVelocity);
     },
 
-    handleDie: function(otherPlayerName) {
-        new db.Explosion({
-            game: this,
-            position: this.tank.getRoot().position
-        });
-
-        this.comm.died(otherPlayerName);
-
-        // Restore health
-        this.player.hp = 100;
-
-        console.warn('You were killed by %s', otherPlayerName);
+    handleDie: function() {
+        s.game.stop();
+        s.game.HUD.canvas.clearRect(0,0,s.game.HUD.canvas.height,s.game.HUD.canvas.width);
+        s.game.HUD.ctx.rect(0,0,s.game.HUD.canvas.height,s.game.HUD.canvas.width);
+        s.game.HUD.ctx.fillStyle = 'black';
+        s.game.HUD.ctx.fill();
+        s.game.comm.died();
     }
 
 

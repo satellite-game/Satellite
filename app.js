@@ -172,28 +172,8 @@ io.sockets.on('connection', function (socket) {
             }
 
             socket.broadcast.emit('killed', {
-                name: name,
-                killer: message.killer
+                name: name
             });
-            
-            var newPos = getRandomPosition();
-            var packet = {
-                name: name,
-                pos: newPos,
-                rot: [0, 0, 0],
-                tRot: [0, 0, 0],
-                aVeloc: [0, 0, 0],
-                lVeloc: [0, 0, 0],
-                interp: false
-            };
-            
-            players[name].pos = newPos;
-            
-            // Notify self
-            socket.emit('move', packet);
-            
-            // Notify players
-            socket.broadcast.emit('move', packet);
         });
     });
     

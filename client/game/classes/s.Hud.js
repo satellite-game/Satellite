@@ -75,7 +75,7 @@ s.HUD = new Class({
 
 		this.subreticleBound.bottom = centerY + borderHeight;
 
-
+		this.ctx.clearRect(0,0,this.canvas.height,this.canvas.width);
 		this.ctx.font= '30px Futura';
 		this.ctx.rect(100, 50, velocity, 10);
 		this.ctx.fillStyle = '#33FF00';

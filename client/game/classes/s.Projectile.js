@@ -2,6 +2,8 @@ s.Projectile = new Class({
 	extend: s.GameObject,
 
     construct: function(options){
+        this.game = options.game;
+        this.pilot = options.pilot;
         // handle parameters
         this.initialVelocity = options.initialVelocity;
         var that = this;
@@ -23,7 +25,10 @@ s.Projectile = new Class({
     },
 
     handleCollision: function(mesh, position){
-        var target = mesh.instance.name;
+        var target = mesh.name;
+        if (this.pilot === this.game.pilot.name){
+            console.log(target);
+        }
         this.destruct();
     },
 

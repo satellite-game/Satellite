@@ -15,6 +15,7 @@ s.Ship = new Class({
 
         this.game = options.game;
         this.name = options.name || '';
+        this.hull = s.config.ship.hull;
 	},
 
     // Calculate the position of the bullet
@@ -48,6 +49,7 @@ s.Ship = new Class({
 
                 new s.Turret({
                     game: this.game,
+                    pilot: this.game.pilot.name,
                     position: position,
                     rotation: rotation,
                     initialVelocity: initialVelocity,
@@ -60,6 +62,7 @@ s.Ship = new Class({
                 });
                 new s.Turret({
                     game: this.game,
+                    pilot: this.game.pilot.name,
                     position: this.getEulerRotation(new THREE.Vector3(-25, 0, -120)),
                     rotation: rotation,
                     initialVelocity: initialVelocity,
