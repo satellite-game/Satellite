@@ -1,8 +1,15 @@
 s.Ship = new Class({
 	extend: s.GameObject,
 
-	construct: function(options) {
+    options: {
+        leftTurretOffset: new THREE.Vector3(25, 0, -120),
+        rightTurretOffset: new THREE.Vector3(-25, 0, -120),
+        missileOffset: new THREE.Vector3(0, 0, -120),
+        turretFireTime: 100,
+        missileFireTime: 1000
+    },
 
+	construct: function(options) {
 		var geometry = s.models[options.shipClass].geometry;
 		var materials = s.models[options.shipClass].materials;
 
@@ -10,42 +17,30 @@ s.Ship = new Class({
 		this.root.position.copy(options.position);
 		this.root.rotation.copy(options.rotation);
 
-		this.lastTime = 0;
+        this.lastTurretFire = 0;
+        this.lastMissileFire = 0;
         this.alliance = options.alliance;
 
         this.game = options.game;
         this.name = options.name || '';
 	},
 
-    // Calculate the position of the bullet
-	getEulerRotation: function(bulletOffset) {
-
-		// Update the matrix
-		this.root.updateMatrix();
-
-		// Extract just the rotation from the matrix
-		var rotation_matrix = new THREE.Matrix4();
-		rotation_matrix.extractRotation(this.root.matrix);
-
-		// Convert the rotation to euler coordinates with the proper order
-		var rotation = new THREE.Vector3();
-		rotation.setEulerFromRotationMatrix(rotation_matrix, 'XYZ');
-
-		this.root.eulerRotation = rotation;
-
-		// Store position of bullet relative to the world
-		return bulletOffset.clone().applyMatrix4(this.root.matrixWorld);
-	},
+    getOffset: function(offset) {
+        return offset.clone().applyMatrix4(this.root.matrixWorld);
+    },
 
 	fire: function(weapon){
 		var now =new Date().getTime();
-        var position = this.getEulerRotation(new THREE.Vector3(25, 0, -120));
+        var position;
         var rotation = this.root.rotation.clone();
-        var initialVelocity = this.root.rotation.clone();
-        // Turrets
-        if(weapon === 'turret'){
-            if( now - this.lastTime > 300){
+        var initialVelocity = this.root.getLinearVelocity().clone();
 
+        // Turrets
+        if (weapon === 'turret'){
+            if (now - this.lastTurretFire > this.options.turretFireTime){
+
+                // Left bullet
+                position = this.getOffset(this.options.leftTurretOffset);
                 new s.Turret({
                     game: this.game,
                     position: position,
@@ -54,39 +49,44 @@ s.Ship = new Class({
                     team: this.alliance
                 });
                 this.game.handleFire({
-                    position:position,
-                    rotation:rotation,
-                    initialVelocity:initialVelocity
+                    position: position,
+                    rotation: rotation,
+                    initialVelocity: initialVelocity
                 });
+
+                // Right bullet
+                position = this.getOffset(this.options.rightTurretOffset);
                 new s.Turret({
                     game: this.game,
-                    position: this.getEulerRotation(new THREE.Vector3(-25, 0, -120)),
+                    position: position,
                     rotation: rotation,
                     initialVelocity: initialVelocity,
                     team: this.alliance
                 });
-                position = this.getEulerRotation(new THREE.Vector3(-25, 0, -120));
                 this.game.handleFire({
-                    position:position,
-                    rotation:rotation,
-                    initialVelocity:initialVelocity
+                    position: position,
+                    rotation: rotation,
+                    initialVelocity: initialVelocity
                 });
-                this.lastTime = now;
+
+                this.lastTurretFire = now;
             }
         }
 
         // Missiles
-        if(weapon === 'missile'){
-            if( now - this.lastTime > 300){
+        if (weapon === 'missile'){
+            if(now - this.lastMissileFire > this.options.missileFireTime){
+                position = this.getOffset(this.options.missileOffset);
 
                 new s.Missile({
                     game: this.game,
-                    position: this.getEulerRotation(new THREE.Vector3(0, 0, -120)),
-                    rotation: this.root.rotation.clone(),
-                    initialVelocity: this.root.getLinearVelocity().clone(),
+                    position: position,
+                    rotation: rotation,
+                    initialVelocity: initialVelocity,
                     team: this.alliance
                 });
-                this.lastTime = now;
+
+                this.lastMissileFire = now;
             }
         }
     },

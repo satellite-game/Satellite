@@ -1,22 +1,35 @@
 s.Missile = new Class({
+    toString: 'Missile',
+    
     extend: s.Projectile,
 
-    construct: function(options){
+    options: {
+        mass: 1,
+        color: {
+            alliance: 0x00F2FF,
+            rebels: 0xFF0000
+        },
+        damage: 100,
+        velocity: 1000
+    },
 
-    // handle parameters
-    this.color = s.config.weapons.missile.color[options.team];
-    this.velocity = s.config.weapons.missile.velocity;
+    construct: function(options) {
+        // handle parameters
+        this.color = this.options.color[options.team];
+        this.velocity = this.options.velocity;
 
-    // Add a collision mesh
-    this.addCollisionMesh(new THREE.CylinderGeometry(12, 12, 40));
+        // Create a cylinder
+        var geometry = new THREE.CylinderGeometry(3,3,40);
+        var material = new THREE.MeshBasicMaterial({ color: this.color });
 
-    // Draw the projectile to the screen
-    this.geometry = new THREE.CylinderGeometry(6,6,40);
-    this.material = new THREE.MeshBasicMaterial({color: this.color});
-    this.root.add(new THREE.Mesh(this.geometry, this.material, 0.1));
+        // Rotate the cylinder to face the Z direction
+        geometry.applyMatrix(new THREE.Matrix4().makeRotationX(Math.PI/2));
+        
+        // Create the mesh
+        this.root = new Physijs.CylinderMesh(geometry, material, this.options.mass);
 
-    // Position the projectile relative to the ship
-    this.root.position.copy(options.position);
-    this.root.rotation.copy(options.rotation);
+        // Position the projectile relative to the ship
+        this.root.position.copy(options.position);
+        this.root.rotation.copy(options.rotation);
     }
 });
