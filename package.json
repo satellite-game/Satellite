@@ -40,5 +40,15 @@
     "socket.io": "~0.9.16",
     "express": "~3.3.5",
     "path": "~0.4.9"
+  },
+  "scripts": {
+    "start": "app.js"
+  },
+  "subdomain": "satellite",
+  "engines": {
+    "node": "0.10.15",
+    "npm": "1.1.x"
   }
 }
+
+
