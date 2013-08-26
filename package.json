@@ -1,7 +1,7 @@
 {
   "name": "Satellite",
   "main": "app.js",
-  "version": "0.0.0",
+  "version": "0.0.0-1",
   "private": true,
   "homepage": "https://lazd.github.com/Satellite",
   "author": "Larry Davis <lazdnet@gmail.com>",
@@ -29,7 +29,8 @@
     "grunt-notify": "~0.2.11"
   },
   "engines": {
-    "node": ">=0.8"
+    "node": "0.10.15",
+    "npm": "1.1.x"
   },
   "keywords": [
     "game",
@@ -44,7 +45,7 @@
   "scripts": {
     "start": "app.js"
   },
-  "subdomain": "satellite",
+  "subdomain": "lockon",
   "engines": {
     "node": "0.10.15",
     "npm": "1.1.x"
