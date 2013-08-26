@@ -4,6 +4,9 @@ s.Projectile = new Class({
     construct: function(options){
         // handle parameters
         this.initialVelocity = options.initialVelocity;
+        var that = this;
+        // Destory projectile after 3 secs
+        setTimeout(function(){that.destruct();}, 3000);
     },
 
 	init: function(_super){
