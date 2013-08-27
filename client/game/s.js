@@ -6,7 +6,7 @@ Copyright (C) 2013 Larry Davis
 var s = {
     config: {
         ship: {
-        	hull: 80
+			hull: 200
         }
     },
 

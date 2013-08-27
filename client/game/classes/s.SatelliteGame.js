@@ -343,6 +343,7 @@ s.SatelliteGame = new Class( {
 
     handleHit: function(message) {
         // Decrement HP
+        console.log(message.name);
         if (message.name === s.game.pilot.name){
             s.game.player.hull -= 20;
 
