@@ -22,6 +22,7 @@ s.SatelliteGame = new Class( {
 	initialize: function() {
 		var that = this;
         this.IDs = [];
+        this.rechargeShields = s.util.debounce(s.game.shieldBoost,5000);
 		// No gravity
 		this.scene.setGravity(new THREE.Vector3(0, 0, 0));
 
@@ -347,11 +348,11 @@ s.SatelliteGame = new Class( {
     },
 
     handleHit: function(message) {
-        var rechargeShields = s.util.debounce(s.game.shieldBoost,5000);
         var you = message.otherPlayerName;
         var killer = message.yourName;
         if (you === s.game.pilot.name){
-            rechargeShields();
+            s.game.stopShields();
+            s.game.rechargeShields();
             if (s.game.player.shields > 0){
                 s.game.player.shields -= 20;
             } else {
@@ -366,9 +367,7 @@ s.SatelliteGame = new Class( {
             var enemy = s.game.enemies.get(you);
             console.log('hit: ', enemy);
         }
-        for (var i = 0; i < s.game.IDs.length; i++){
-            clearInterval(s.game.IDs[i]);
-        }
+
     },
 
     handleFire: function(props) {
@@ -394,9 +393,12 @@ s.SatelliteGame = new Class( {
         if (s.game.player.shields < 400){
             s.game.player.shields += 1;
         } else {
-            for (var i = 0; i < s.game.IDs.length; i++){
-                clearInterval(s.game.IDs[i]);
-            }
+            s.game.stopShields();
+        }
+    },
+    stopShields: function(){
+        for (var i = 0; i < s.game.IDs.length; i++){
+            clearInterval(s.game.IDs[i]);
         }
     }
 
