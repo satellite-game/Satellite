@@ -387,7 +387,7 @@ s.SatelliteGame = new Class( {
 
     },
     shieldBoost: function(){
-        var shieldBooster = setInterval(s.game.shieldAnimate,20);
+        window.shieldBooster = setInterval(s.game.shieldAnimate,20);
     },
     shieldAnimate: function(){
         if (s.game.player.shelds < s.game.player.oldShields){
