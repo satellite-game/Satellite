@@ -43,8 +43,6 @@ s.Ship = new Class({
         // Turrets
         if (weapon === 'turret'){
             if (now - this.lastTurretFire > this.options.turretFireTime){
-                console.log(this.getForceVector());
-
                 // Left bullet
                 position = this.getOffset(this.options.leftTurretOffset);
                 new s.Turret({
