@@ -390,16 +390,15 @@ s.SatelliteGame = new Class( {
         window.shieldBooster = setInterval(s.game.shieldAnimate,20);
     },
     shieldAnimate: function(){
-        if (s.game.player.shelds < s.game.player.oldShields){
-            clearInterval(shieldBooster);
+        if (s.game.player.shields < s.game.player.oldShields){
+            clearInterval(window.shieldBooster);
         }
         if (s.game.player.shields < 400){
             s.game.player.shields += 1;
         } else {
-            clearInterval(shieldBooster);
+            clearInterval(window.shieldBooster);
         }
         s.game.player.oldShields = s.game.player.shields;
-
     }
 
 
