@@ -1,6 +1,6 @@
 s.Missile = new Class({
     toString: 'Missile',
-    
+
     extend: s.Projectile,
 
     options: {
@@ -9,7 +9,7 @@ s.Missile = new Class({
             alliance: 0x00F2FF,
             rebels: 0xFF0000
         },
-        damage: 100,
+        damage: 500,
         velocity: 1000
     },
 
@@ -24,7 +24,7 @@ s.Missile = new Class({
 
         // Rotate the cylinder to face the Z direction
         geometry.applyMatrix(new THREE.Matrix4().makeRotationX(Math.PI/2));
-        
+
         // Create the mesh
         this.root = new Physijs.CylinderMesh(geometry, material, this.options.mass);
 

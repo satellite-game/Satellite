@@ -2,15 +2,16 @@ s.Shield = new Class({
 	extend: s.GameObject,
 
 	construct: function(options){
+        this.ship = options.ship;
         var geometry = new THREE.SphereGeometry(50,50,50);
         var material = new THREE.MeshLambertMaterial({
             color: 0x00F2FF,
-            ambient: 0x00F2FF,
+            ambient: 0xFFFFFF,
             transparent: true,
-            opacity: 0.4
+            opacity: 0.8
         });
         this.mesh = new THREE.Mesh(geometry, material);
-        options.ship.add(this.mesh);
+        this.ship.add(this.mesh);
         this.startTime = null;
 	},
 
@@ -23,15 +24,11 @@ s.Shield = new Class({
 
         if(progress > 1000){
             this.destruct();
+            this.ship.remove(this.root);
         }
 
         if(this.mesh.material.opacity > 0){
             this.mesh.material.opacity -= 0.04;
         }
-    },
-
-    destruct: function(_super){
-        _super.call(this);
-        this.ship.remove(this.root);
     }
 });
