@@ -8,6 +8,7 @@ s.Shield = new Class({
             color: 0x00F2FF,
             ambient: 0x00F2FF,
             transparent: true,
+            blending: THREE.AdditiveBlending,
             opacity: 0.7
         });
         this.mesh = new THREE.Mesh(geometry, material);
