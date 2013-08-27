@@ -70,12 +70,15 @@ s.HUD = new Class({
         this.ctx.font = '10px Futura';
         this.ctx.fillText("SET",93 + velocity,80);
 
+
+
         this.subreticleBound.radius = width/8;
         this.ctx.beginPath();
         this.ctx.arc( centerX, centerY, this.subreticleBound.radius, 0, 2*Math.PI, false);
         this.ctx.lineWidth = 5;
         this.ctx.strokeStyle = '#5DFC0A';
         this.ctx.stroke();
+   
 
         if (this.cursorVector.length() > this.subreticleBound.radius) {
             this.cursorVector.normalize().multiplyScalar(this.subreticleBound.radius);
@@ -83,10 +86,15 @@ s.HUD = new Class({
             this.targetY = this.cursorVector.y+centerY;
         }
 
+        this.ctx.beginPath();
+        this.ctx.arc(this.targetX, this.targetY, 5, 0, 2 * Math.PI, false);
+        this.ctx.fillStyle = '#5DFC0A';
+        this.ctx.fill();
+
 
 		this.ctx.drawImage(this.crosshairs,centerX - this.crosshairs.width/2,centerY - this.crosshairs.height/2);
 
-		this.ctx.drawImage(this.subreticle,this.targetX - this.subreticle.width/2,this.targetY - this.subreticle.height/2);
+
 
 
         //////////////////////////////

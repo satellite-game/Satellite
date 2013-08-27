@@ -27,7 +27,7 @@ s.Ship = new Class({
 
         this.root.name = this.name;
         this.hull = s.config.ship.hull;
-        this.health = 100;
+        this.shields = s.config.ship.shields;
 	},
 
     getOffset: function(offset) {

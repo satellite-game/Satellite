@@ -7,8 +7,7 @@ s.SatelliteGame = new Class( {
 		'phobos_hifi',
 		'phobos_lofi',
         'human_ship_heavy',
-		'human_ship_light',
-
+		'human_ship_light'
 	],
 
     getRandomCoordinate: function(){
@@ -365,9 +364,9 @@ s.SatelliteGame = new Class( {
         s.game.HUD.ctx.rect(0,0,s.game.HUD.canvas.width,s.game.HUD.canvas.height);
         s.game.HUD.ctx.fillStyle = 'black';
         s.game.HUD.ctx.fill();
-        s.game.HUD.ctx.font= '250px Futura';
+        s.game.HUD.ctx.font= String(s.game.HUD.canvas.width/10) + 'px Futura';
         s.game.HUD.ctx.fillStyle = '#5DFC0A';
-        s.game.HUD.ctx.fillText("YOU DIED",0,(s.game.HUD.canvas.height/2) + 125);
+        s.game.HUD.ctx.fillText("YOU DIED",0,s.game.HUD.canvas.height/2);
         s.game.comm.died(you, killer);
 
     }
