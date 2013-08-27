@@ -363,6 +363,9 @@ s.SatelliteGame = new Class( {
             if (s.game.player.hull <= 0) {
                 s.game.handleDie(you, killer);
             }
+        } else {
+            var enemy = s.game.enemies.get(you);
+            console.log('hit: ', enemy);
         }
     },
 

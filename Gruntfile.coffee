@@ -6,6 +6,7 @@ module.exports = (grunt) ->
     "client/game/s.util.js"
     "client/game/classes/s.EventEmitter.js"
     "client/game/classes/s.GameObject.js"
+    "client/game/classes/s.Shield.js"
     "client/game/classes/s.Explosion.js"
     "client/game/classes/s.Projectile.js"
     "client/game/classes/s.Turret.js"
