@@ -347,10 +347,10 @@ s.SatelliteGame = new Class( {
         if (message.name === s.game.pilot.name){
             s.game.player.hull -= 20;
 
-            console.log('You were hit with a %s by %s! Your HP: %d', message.type, message.name, this.player.hp);
+            console.log('You were hit with a laser by %s! Your HP: %d', message.name, s.game.player.hull);
 
             if (s.game.player.hull <= 0) {
-                s.game.handleDie(message.name);
+                s.game.handleDie();
             }
         }
     },
@@ -361,11 +361,11 @@ s.SatelliteGame = new Class( {
 
     handleDie: function() {
         s.game.stop();
-        s.game.HUD.canvas.clearRect(0,0,s.game.HUD.canvas.height,s.game.HUD.canvas.width);
+        s.game.HUD.ctx.clearRect(0,0,s.game.HUD.canvas.height,s.game.HUD.canvas.width);
         s.game.HUD.ctx.rect(0,0,s.game.HUD.canvas.height,s.game.HUD.canvas.width);
         s.game.HUD.ctx.fillStyle = 'black';
         s.game.HUD.ctx.fill();
-        s.game.comm.died();
+        s.game.comm.died(s.game.pilot.name);
     }
 
 
