@@ -120,11 +120,11 @@ s.HUD = new Class({
         this.lockedOn = true;
         if ( this.lockedOn ){
 
-
-            this.target = s.game.moon.root.position;
-            var vector3D = this.target.clone();
+            this.target = s.game.moon.root;
+            var vector3D = this.target.position.clone();
             var vector2D = s.projector.projectVector(vector3D, s.game.camera);
 
+            // Targeting box
             if ( Math.abs(vector2D.x) <= 0.95 && Math.abs(vector2D.y) <= 0.95 && vector2D.z < 1 ){
 
                 vector2D.x =  ( width  + vector2D.x*width  )/2;
@@ -136,6 +136,7 @@ s.HUD = new Class({
                 this.ctx.lineWidth = 5;
                 this.ctx.strokeStyle = '#5DFC0A';
 
+            // Radial direction marker
             } else {
 
                 var v2D = new THREE.Vector2(vector2D.x, vector2D.y);
@@ -160,6 +161,25 @@ s.HUD = new Class({
             // PREDICTIVE TARGETING SYSTEM //
             /////////////////////////////////
 
+         // t = ( (a ev cos[beta]) + sqrt[(a ev cos[beta])^2 + (bv^2-ev^2)(a^2)] )  / (bv^2 - ev^2)
+
+            // a = distance between self and target
+            // eV = magnitude of enemy's current velocity vector
+            // bV = magnitude of bullet's velocity vector
+            // beta = angle between a and eV, via dot product
+            // angD = angular differential; scales down with increased beta
+            // velD = velocity
+
+//            var a = vector3D.length();
+//            var eV = this.target.getLinearVelocity().clone();
+//            var bV = 2500;
+//            var beta = vector3D.multiplyScalar(-1).dot(eV);
+//
+//            var angD = a*eV*Math.cos(beta);
+//            var velD   = (Math.pow(bV, 2) - Math.pow(eV, 2));
+//            var top = angD + Math.sqrt( Math.pow(angD, 2) +  velD*Math.pow(a, 2) );
+//            var bot = vDiff;
+//            var t = top/bot;
 
         } else {
 

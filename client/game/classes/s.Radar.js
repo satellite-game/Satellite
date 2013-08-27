@@ -168,13 +168,12 @@ s.Radar = new Class({
         // 3JS SCENE SELECTORS //
         /////////////////////////
 
-        var radar      = this.radarScene.getChildByName( 'radar' ),
-            self       = radar.getChildByName( 'self' ),
-            moon       = radar.getChildByName( 'moon' ),
-            trajectory = radar.getChildByName( 'selfTrajectory'),
-            allies     = radar.getChildByName( 'allies' ),
-            enemies    = this.enemies.list(),
-
+        var radar       = this.radarScene.getChildByName( 'radar' ),
+            self        = radar.getChildByName( 'self' ),
+            moon        = radar.getChildByName( 'moon' ),
+            trajectory  = radar.getChildByName( 'selfTrajectory'),
+            allies      = radar.getChildByName( 'allies' ),
+            enemies     = this.enemies.list(),
             radarRadius = this.radius/ 5,
             that        = s.game;
 

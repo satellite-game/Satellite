@@ -164,21 +164,20 @@ s.Controls = new Class({
 		// Invert existing linear velocity
 		// Fractionally apply the opposite impulse
 		// Then apply forward impulse
-        var thrustImpulse = this.options.thrustImpulse;
 		if (thrust){
-			if (thrustImpulse < 2000){
-				thrustImpulse += difference;
+			if (this.options.thrustImpulse < 2000){
+				this.options.thrustImpulse += difference;
 			}
 		}
 		if (brakes) {
-			if (thrustImpulse > 0){
-				thrustImpulse -= difference;
+			if (this.options.thrustImpulse > 0){
+				this.options.thrustImpulse -= difference;
 			}
 		}
         var impulse;
 		impulse = linearVelocity.clone().negate();
 		root.applyCentralImpulse(impulse);
-		var forceVector = new THREE.Vector3(0, 0, -1*thrustImpulse).applyMatrix4(rotationMatrix);
+		var forceVector = new THREE.Vector3(0, 0, -1*this.options.thrustImpulse).applyMatrix4(rotationMatrix);
 		root.applyCentralImpulse(forceVector);
 		this.lastTime = now;
 	}
