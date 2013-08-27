@@ -6,9 +6,9 @@ s.Shield = new Class({
         var geometry = new THREE.SphereGeometry(50,50,50);
         var material = new THREE.MeshLambertMaterial({
             color: 0x00F2FF,
-            ambient: 0xFFFFFF,
+            ambient: 0x00F2FF,
             transparent: true,
-            opacity: 0.8
+            opacity: 0.7
         });
         this.mesh = new THREE.Mesh(geometry, material);
         this.ship.add(this.mesh);
