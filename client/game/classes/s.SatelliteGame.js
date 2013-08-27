@@ -361,10 +361,13 @@ s.SatelliteGame = new Class( {
 
     handleDie: function() {
         s.game.stop();
-        s.game.HUD.ctx.clearRect(0,0,s.game.HUD.canvas.height,s.game.HUD.canvas.width);
-        s.game.HUD.ctx.rect(0,0,s.game.HUD.canvas.height,s.game.HUD.canvas.width);
+        s.game.HUD.ctx.clearRect(0,0,s.game.HUD.canvas.width,s.game.HUD.canvas.height);
+        s.game.HUD.ctx.rect(0,0,s.game.HUD.canvas.width,s.game.HUD.canvas.height);
         s.game.HUD.ctx.fillStyle = 'black';
         s.game.HUD.ctx.fill();
+        s.game.HUD.ctx.font= '500px Futura';
+        s.game.HUD.ctx.fillStyle = '#5DFC0A';
+        s.game.HUD.ctx.fillText("YOU DIED",0,(s.game.HUD.canvas.height/2)-250);
         s.game.comm.died(s.game.pilot.name);
     }
 

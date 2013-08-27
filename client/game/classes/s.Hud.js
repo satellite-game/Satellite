@@ -47,35 +47,20 @@ s.HUD = new Class({
             centerX = width/ 2,
             centerY = height/2;
 
-        this.canvas.height = window.innerHeight;
-        this.canvas.width = window.innerWidth;
-        this.ctx.clearRect(0, 0, this.canvas.height, this.canvas.width);
+        this.canvas.height = height;
+        this.canvas.width = width;
+        this.ctx.clearRect(0, 0, height, width);
 
         // Vector for cursor location centered around the center of the screen
         this.cursorVector = new THREE.Vector2(this.targetX - centerX, this.targetY - centerY);
 
-		var centerY = this.canvas.height/2;
+		var borderWidth = width/8;
 
-		var centerX = this.canvas.width/2;
-
-		var borderWidth = this.canvas.width/8;
-
-		var borderHeight = this.canvas.height/8;
-
-
-
-		this.subreticleBound.left = centerX - borderWidth;
-
-		this.subreticleBound.right = centerX + borderWidth;
-
-		this.subreticleBound.top = centerY - borderHeight;
-
-		this.subreticleBound.bottom = centerY + borderHeight;
-
+		var borderHeight = height/8;
 
 		this.ctx.font= '30px Futura';
 		this.ctx.rect(100, 50, velocity, 10);
-		this.ctx.fillStyle = '#33FF00';
+		this.ctx.fillStyle = '#5DFC0A';
 		this.ctx.fillText("Throttle",100,40);
         this.ctx.fill();
 
@@ -89,7 +74,7 @@ s.HUD = new Class({
         this.ctx.beginPath();
         this.ctx.arc( centerX, centerY, this.subreticleBound.radius, 0, 2*Math.PI, false);
         this.ctx.lineWidth = 5;
-        //this.ctx.strokeStyle = '0xff0000';
+        this.ctx.strokeStyle = '#5DFC0A';
         this.ctx.stroke();
 
         if (this.cursorVector.length() > this.subreticleBound.radius) {
@@ -134,7 +119,7 @@ s.HUD = new Class({
 
                 this.ctx.strokeRect( vector2D.x-size, vector2D.y-size, size*2, size*2 );
                 this.ctx.lineWidth = 5;
-                this.ctx.strokeStyle = '0xff0000';
+                this.ctx.strokeStyle = '#5DFC0A';
 
             } else {
 
@@ -147,10 +132,10 @@ s.HUD = new Class({
                 else
                     this.ctx.arc( v2D.x+centerX, -(v2D.y-centerY), 10, 0, 2*Math.PI, false);
 
-                this.ctx.fillStyle = "0x0000ff";
+                this.ctx.fillStyle = "black";
                 this.ctx.fill();
                 this.ctx.lineWidth = 5;
-                this.ctx.strokeStyle = '0xff0000';
+                this.ctx.strokeStyle = '#5DFC0A';
                 this.ctx.stroke();
 
             }
