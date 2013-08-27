@@ -69,20 +69,20 @@ s.Controls = new Class({
             crosshairs = this.HUD.crosshairs;
 
         // Set yaw to zero if cursor is inside the crosshair region
-        if (targetX > centerX - crosshairs.width/2 && targetX < centerX + crosshairs.width/2){
+        if (this.HUD.targetX > centerX - crosshairs.width/2 && this.HUD.targetX < centerX + crosshairs.width/2){
             yaw = 0;
         } else {
             // X scales yaw
-            var yawDivisor = targetX < centerX ? (centerX-radius)/((centerX-targetX)*4) : -(centerX+radius)/((-centerX+targetX)*4);
+            var yawDivisor = this.HUD.targetX < centerX ? (centerX-radius)/((centerX-this.HUD.targetX)*4) : -(centerX+radius)/((-centerX+this.HUD.targetX)*4);
             yaw = yawSpeed/yawDivisor/thrustScalar;
         }
 
         // Set pitch to zero if cursor is inside the crosshair region
-        if (targetY > centerY - crosshairs.height/2 && targetY < centerY + crosshairs.height/2){
+        if (this.HUD.targetY > centerY - crosshairs.height/2 && this.HUD.targetY < centerY + crosshairs.height/2){
             pitch = 0;
         } else {
             // Y scales pitch
-            var pitchDivisor = targetY < centerY ? (centerY+radius)/((centerY-targetY)*4) : -(centerY+radius)/((-centerY+targetY)*4);
+            var pitchDivisor = this.HUD.targetY < centerY ? (centerY+radius)/((centerY-this.HUD.targetY)*4) : -(centerY+radius)/((-centerY+this.HUD.targetY)*4);
             pitch = pitchSpeed/pitchDivisor/thrustScalar;
         }
 
@@ -105,14 +105,14 @@ s.Controls = new Class({
 
 		if (this.keyboard.pressed('up')) {
 			// Pitch down
-			targetX = centerX;
-			targetY = centerY;
+			this.HUD.targetX = centerX;
+			this.HUD.targetY = centerY;
 			pitch = -1*pitchSpeed / thrustScalar;
 		}
 		else if (this.keyboard.pressed('down')) {
 			// Pitch up
-			targetX = centerX;
-			targetY = centerY;
+			this.HUD.targetX = centerX;
+			this.HUD.targetY = centerY;
 			pitch = pitchSpeed / thrustScalar;
 		}
 
