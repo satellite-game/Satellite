@@ -5,7 +5,7 @@ s.Ship = new Class({
         leftTurretOffset: new THREE.Vector3(25, 0, -120),
         rightTurretOffset: new THREE.Vector3(-25, 0, -120),
         missileOffset: new THREE.Vector3(0, 0, -120),
-        turretFireTime: 100,
+        turretFireTime: 300,
         missileFireTime: 1000
     },
 
@@ -13,7 +13,8 @@ s.Ship = new Class({
 		var geometry = s.models[options.shipClass].geometry;
 		var materials = s.models[options.shipClass].materials;
 
-		this.root = new Physijs.ConvexMesh(geometry, new THREE.MeshFaceMaterial(materials), 100);
+        var physiMaterial = Physijs.createMaterial(new THREE.MeshFaceMaterial(materials));
+		this.root = new Physijs.ConvexMesh(geometry, physiMaterial, 100);
 		this.root.position.copy(options.position);
 		this.root.rotation.copy(options.rotation);
 
@@ -23,8 +24,10 @@ s.Ship = new Class({
 
         this.game = options.game;
         this.name = options.name || '';
+
         this.root.name = this.name;
         this.hull = s.config.ship.hull;
+        this.health = 100;
 	},
 
     getOffset: function(offset) {
@@ -40,6 +43,7 @@ s.Ship = new Class({
         // Turrets
         if (weapon === 'turret'){
             if (now - this.lastTurretFire > this.options.turretFireTime){
+                console.log(this.getForceVector());
 
                 // Left bullet
                 position = this.getOffset(this.options.leftTurretOffset);
@@ -61,7 +65,7 @@ s.Ship = new Class({
                 position = this.getOffset(this.options.rightTurretOffset);
                 new s.Turret({
                     game: this.game,
-                    pilot: this.game.pilot.name, 
+                    pilot: this.game.pilot.name,
                     position: position,
                     rotation: rotation,
                     initialVelocity: initialVelocity,
@@ -143,5 +147,19 @@ s.Ship = new Class({
             aVeloc: [angularVelocity.x, angularVelocity.y, angularVelocity.z],
             lVeloc: [linearVelocity.x, linearVelocity.y, linearVelocity.z]
         };
+    },
+
+    getForceVector: function(){
+
+        // Extract the rotation from the projectile's matrix
+        var rotationMatrix = new THREE.Matrix4();
+        rotationMatrix.extractRotation(this.root.matrix);
+
+        // Apply bullet impulse in the correct direction
+        return new THREE.Vector3(0, 0, 1500 * -1).applyMatrix4(rotationMatrix);
+    },
+
+    handleDie: function(){
+        this.destruct();
     }
 });

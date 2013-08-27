@@ -2,11 +2,6 @@ module.exports = (grunt) ->
 
   # Order of concatonation/minification
   includeOrder = [
-    "client/lib/jquery.js"
-    "client/lib/Class.js"
-    "client/lib/three.js"
-    "client/lib/physi.js"
-    "client/lib/Stats.js"
     "client/game/s.js"
     "client/game/s.util.js"
     "client/game/classes/s.EventEmitter.js"
@@ -70,12 +65,6 @@ module.exports = (grunt) ->
         src: ["**", "!**/styl/**", "!**/classes/**"]
         dest: "build/client/"
 
-      server:
-        expand: true
-        cwd: "/"
-        src: ["app.js"]
-        dest: "build/server/"
-
     uglify:
       options:
         banner: "/*! <%= pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today(\"yyyy-mm-dd\") %>\n" + "* <%= pkg.homepage %>/\n" + "* Copyright (c) <%= grunt.template.today(\"yyyy\") %> <%= pkg.author %>; Licensed <%= pkg.license %> */\n"
@@ -130,7 +119,7 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks "grunt-nodemon"
   grunt.loadNpmTasks "grunt-concurrent"
 
-  grunt.registerTask "server", ["jshint:server", "copy:server"]
+  grunt.registerTask "server", ["jshint:server"]
   grunt.registerTask "client", ["jshint:client", "copy:client", "concat", "stylus"]
   grunt.registerTask "client-prod", ["client", "uglify"]
   grunt.registerTask "default", ["server", "client", "concurrent", "watch"]

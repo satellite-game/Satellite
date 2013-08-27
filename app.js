@@ -7,7 +7,7 @@ var server      = require('http').createServer(app);
 var io          = require('socket.io').listen(server);
 var port        = 1337;
 var path        = require('path');
-var url  = 'http://localhost:' + port + '/';
+var url         = 'http://localhost:' + port + '/';
 /* We can access nodejitsu enviroment variables from process.env */
 /* Note: the SUBDOMAIN variable will always be defined for a nodejitsu app */
 if(process.env.SUBDOMAIN){
