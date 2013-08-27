@@ -66,6 +66,13 @@ s.HUD = new Class({
         this.ctx.font = '10px Futura';
         this.ctx.fillText("SET",95 + velocity,75);
 
+        this.ctx.fillStyle = '#FF0000';
+        this.ctx.font = '20px Futura';
+        this.ctx.fillRect(100, 170, this.game.player.hull/4, 10);
+        this.ctx.fillRect(100,170,200,1);
+        this.ctx.fillText("HULL",100,160);
+
+
         this.ctx.fillStyle = '#00FFFF';
 
         this.ctx.font= '20px Futura';

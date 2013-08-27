@@ -357,6 +357,7 @@ s.SatelliteGame = new Class( {
             } else {
                 s.game.player.hull -= 20;
             }
+            s.game.debounce(s.game.recharge,1000);
 
             console.log('You were hit with a laser by %s! Your HP: %d', killer, s.game.player.hull);
 
@@ -381,6 +382,61 @@ s.SatelliteGame = new Class( {
         s.game.HUD.ctx.fillText("YOU DIED",0,s.game.HUD.canvas.height/2);
         s.game.comm.died(you, killer);
 
+    },
+    debounce : function(func, wait, immediate) {
+        console.log(1);
+        var result;
+        var timeout = null;
+        return function() {
+            var context = this, args = arguments;
+                var later = function() {
+                    timeout = null;
+                    if (!immediate) result = func.apply(context, args);
+                };
+            var callNow = immediate && !timeout;
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+            if (callNow) result = func.apply(context, args);
+            return result;
+        };
+  },
+    throttle : function(func, wait, options) {
+        console.log(3);
+        var context, args, result;
+        var timeout = null;
+        var previous = 0;
+        options = options || {};
+        var later = function() {
+          previous = options.leading === false ? 0 : new Date();
+          timeout = null;
+          result = func.apply(context, args);
+        };
+        return function() {
+          var now = new Date();
+          if (!previous && options.leading === false) previous = now;
+          var remaining = wait - (now - previous);
+          context = this;
+          args = arguments;
+          if (remaining <= 0) {
+            clearTimeout(timeout);
+            timeout = null;
+            previous = now;
+            result = func.apply(context, args);
+          } else if (!timeout && options.trailing !== false) {
+            timeout = setTimeout(later, remaining);
+          }
+          return result;
+        };
+  },
+    recharge: function(){
+        console.log(2);
+        while (s.game.player.shields < s.config.ship.shields){
+            s.game.throttle(s.game.shieldBoost,5); 
+        }
+    },
+    shieldBoost: function(){
+        console.log(4);
+        s.game.player.shields +=5;
     }
 
 

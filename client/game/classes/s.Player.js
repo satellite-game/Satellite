@@ -9,5 +9,6 @@ s.Player = new Class({
 		if (this.hull <= 0){
 			this.game.handleDie();
 		}
-	}
+	},
+
 });

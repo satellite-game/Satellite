@@ -62,9 +62,7 @@ s.Controls = new Class({
         // RADIAL SUBRETICLE //
         ///////////////////////
 
-        var targetX = this.HUD.targetX,
-            targetY = this.HUD.targetY,
-            yawSpeed = this.options.yawSpeed,
+        var yawSpeed = this.options.yawSpeed,
             pitchSpeed = this.options.pitchSpeed,
             cursor = this.HUD.cursorVector,
             radius = this.HUD.subreticleBound.radius,
@@ -94,14 +92,14 @@ s.Controls = new Class({
         ///////////////////////
 
 		if (this.keyboard.pressed('left')) {
-			targetX = centerX;
-			targetY = centerY;
+			this.HUD.targetX = centerX;
+			this.HUD.targetY = centerY;
 			yaw = yawSpeed / thrustScalar;
 
 		}
 		else if (this.keyboard.pressed('right')) {
-			targetX = centerX;
-			targetY = centerY;
+			this.HUD.targetX = centerX;
+			this.HUD.targetY = centerY;
 			yaw = -1*yawSpeed / thrustScalar;
 		}
 
