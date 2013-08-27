@@ -70,21 +70,23 @@ s.Controls = new Class({
             radius = this.HUD.subreticleBound.radius,
             crosshairs = this.HUD.crosshairs;
 
-        // X scales yaw
-        var yawDivisor = targetX < centerX ? (centerX-radius)/((centerX-targetX)*4) : -(centerX+radius)/((-centerX+targetX)*4);
-        yaw = yawSpeed/yawDivisor/thrustScalar;
+        // Set yaw to zero if cursor is inside the crosshair region
+        if (targetX > centerX - crosshairs.width/2 && targetX < centerX + crosshairs.width/2){
+            yaw = 0;
+        } else {
+            // X scales yaw
+            var yawDivisor = targetX < centerX ? (centerX-radius)/((centerX-targetX)*4) : -(centerX+radius)/((-centerX+targetX)*4);
+            yaw = yawSpeed/yawDivisor/thrustScalar;
+        }
 
-        // Y scales pitch
-        var pitchDivisor = targetY < centerY ? (centerY+radius)/((centerY-targetY)*4) : -(centerY+radius)/((-centerY+targetY)*4);
-        pitch = pitchSpeed/pitchDivisor/thrustScalar;
-
-        // Set pitch/yaw to zero if inside the crosshair region
-		if (targetY > centerY - crosshairs.height/2 && targetY < centerY + crosshairs.height/2){
-			pitch = 0;
-		}
-		if (targetX > centerX - crosshairs.width/2 && targetX < centerX + crosshairs.width/2){
-			yaw = 0;
-		}
+        // Set pitch to zero if cursor is inside the crosshair region
+        if (targetY > centerY - crosshairs.height/2 && targetY < centerY + crosshairs.height/2){
+            pitch = 0;
+        } else {
+            // Y scales pitch
+            var pitchDivisor = targetY < centerY ? (centerY+radius)/((centerY-targetY)*4) : -(centerY+radius)/((-centerY+targetY)*4);
+            pitch = pitchSpeed/pitchDivisor/thrustScalar;
+        }
 
 
         ///////////////////////
