@@ -25,14 +25,6 @@ module.exports = (grunt) ->
   grunt.initConfig
     pkg: grunt.file.readJSON("package.json")
 
-    notify:
-      watch:
-        options:
-          message: "Files are watched"
-      changes:
-        options:
-          message: "Change detected: refresh!"
-
     open:
       client:
         path: "http://localhost:1337"
@@ -45,13 +37,12 @@ module.exports = (grunt) ->
           livereload: true
       server:
         files: ["app.js"]
-        tasks: ["notify:changes","server"]
+        tasks: ["server"]
         options:
           livereload: true
-
       client:
         files: ["client/**"]
-        tasks: ["notify:changes", "client"]
+        tasks: ["client"]
         options:
           livereload: true
 
@@ -70,7 +61,6 @@ module.exports = (grunt) ->
         banner: "/*! <%= pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today(\"yyyy-mm-dd\") %>\n" + "* <%= pkg.homepage %>/\n" + "* Copyright (c) <%= grunt.template.today(\"yyyy\") %> <%= pkg.author %>; Licensed <%= pkg.license %> */\n"
         mangle:
           except: ["_super"]
-
       client:
         files:
           "build/client/game/s.js": [includeOrder]
@@ -114,7 +104,6 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks "grunt-contrib-stylus"
   grunt.loadNpmTasks "grunt-contrib-uglify"
   grunt.loadNpmTasks "grunt-contrib-watch"
-  grunt.loadNpmTasks "grunt-notify"
   grunt.loadNpmTasks "grunt-open"
   grunt.loadNpmTasks "grunt-nodemon"
   grunt.loadNpmTasks "grunt-concurrent"
