@@ -316,6 +316,13 @@ s.SatelliteGame = new Class( {
     },
 
     handleKill: function(message) {
+        debugger;
+        // get enemy position
+        var position = s.game.enemies.get(message.killed).root.position;
+        new s.Explosion({
+            game: this.game,
+            position: position
+        });
         s.game.enemies.delete(message.killed);
         if (message.killer == s.game.pilot.name)
             console.warn('You killed %s!', message.killed);
