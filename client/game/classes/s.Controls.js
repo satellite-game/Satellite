@@ -94,28 +94,28 @@ s.Controls = new Class({
         ///////////////////////
 
 		if (this.keyboard.pressed('left')) {
-			this.HUD.targetX = centerX;
-			this.HUD.targetY = centerY;
-			yaw = this.options.yawSpeed / thrustScalar;
+			targetX = centerX;
+			targetY = centerY;
+			yaw = yawSpeed / thrustScalar;
 
 		}
 		else if (this.keyboard.pressed('right')) {
-			this.HUD.targetX = centerX;
-			this.HUD.targetY = centerY;
-			yaw = -1*this.options.yawSpeed / thrustScalar;
+			targetX = centerX;
+			targetY = centerY;
+			yaw = -1*yawSpeed / thrustScalar;
 		}
 
 		if (this.keyboard.pressed('up')) {
 			// Pitch down
-			this.HUD.targetX = centerX;
-			this.HUD.targetY = centerY;
-			pitch = -1*this.options.pitchSpeed / thrustScalar;
+			targetX = centerX;
+			targetY = centerY;
+			pitch = -1*pitchSpeed / thrustScalar;
 		}
 		else if (this.keyboard.pressed('down')) {
 			// Pitch up
-			this.HUD.targetX = centerX;
-			this.HUD.targetY = centerY;
-			pitch = this.options.pitchSpeed / thrustScalar;
+			targetX = centerX;
+			targetY = centerY;
+			pitch = pitchSpeed / thrustScalar;
 		}
 
 		if (this.keyboard.pressed('w')) {
@@ -164,20 +164,21 @@ s.Controls = new Class({
 		// Invert existing linear velocity
 		// Fractionally apply the opposite impulse
 		// Then apply forward impulse
+        var thrustImpulse = this.options.thrustImpulse;
 		if (thrust){
-			if (this.options.thrustImpulse < 2000){
-				this.options.thrustImpulse += difference;
+			if (thrustImpulse < 2000){
+				thrustImpulse += difference;
 			}
 		}
 		if (brakes) {
-			if (this.options.thrustImpulse > 0){
-				this.options.thrustImpulse -= difference;
+			if (thrustImpulse > 0){
+				thrustImpulse -= difference;
 			}
 		}
         var impulse;
 		impulse = linearVelocity.clone().negate();
 		root.applyCentralImpulse(impulse);
-		var forceVector = new THREE.Vector3(0, 0, -1*this.options.thrustImpulse).applyMatrix4(rotationMatrix);
+		var forceVector = new THREE.Vector3(0, 0, -1*thrustImpulse).applyMatrix4(rotationMatrix);
 		root.applyCentralImpulse(forceVector);
 		this.lastTime = now;
 	}
