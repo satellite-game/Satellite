@@ -352,7 +352,11 @@ s.SatelliteGame = new Class( {
         var killer = message.yourName;
 
         if (you === s.game.pilot.name){
-            s.game.player.hull -= 20;
+            if (s.game.player.shields > 0){
+                s.game.player.shields -= 20;
+            } else {
+                s.game.player.hull -= 20;
+            }
 
             console.log('You were hit with a laser by %s! Your HP: %d', killer, s.game.player.hull);
 
