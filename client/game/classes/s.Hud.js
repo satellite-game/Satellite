@@ -58,7 +58,11 @@ s.HUD = new Class({
 
 		var borderHeight = height/8;
 
-        this.ctx.fillStyle = '#5DFC0A';
+		this.ctx.font= '30px Futura';
+		this.ctx.rect(100, 50, velocity, 10);
+		this.ctx.fillStyle = '#5DFC0A';
+		this.ctx.fillText("Throttle",100,40);
+        this.ctx.fill();
 
 		this.ctx.font= '20px Futura';
 		this.ctx.fillRect(100, 50, velocity, 10);
@@ -150,6 +154,12 @@ s.HUD = new Class({
                 this.ctx.stroke();
 
             }
+
+
+            /////////////////////////////////
+            // PREDICTIVE TARGETING SYSTEM //
+            /////////////////////////////////
+
 
         } else {
 

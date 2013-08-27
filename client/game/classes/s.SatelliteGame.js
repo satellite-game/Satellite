@@ -316,8 +316,9 @@ s.SatelliteGame = new Class( {
     },
 
     handleKill: function(message) {
+        s.game.enemies.delete(message.killed);
         if (message.killer == s.game.pilot.name)
-            console.warn('You killed %s!', message.name);
+            console.warn('You killed %s!', message.killed);
         else
             console.log('%s was killed by %s', message.killed, message.killer);
     },
