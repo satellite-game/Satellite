@@ -5,7 +5,7 @@ s.Ship = new Class({
         leftTurretOffset: new THREE.Vector3(25, 0, -120),
         rightTurretOffset: new THREE.Vector3(-25, 0, -120),
         missileOffset: new THREE.Vector3(0, 0, -120),
-        turretFireTime: 300,
+        turretFireTime: 150,
         missileFireTime: 1000
     },
 

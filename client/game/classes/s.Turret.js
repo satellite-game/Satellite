@@ -6,7 +6,7 @@ s.Turret = new Class({
     options: {
         mass: 1,
         size: 16,
-        velocity: 2000,
+        velocity: 10000,
         damage: 10,
         scale: new THREE.Vector3(50, 50, 1.0),
         color: {

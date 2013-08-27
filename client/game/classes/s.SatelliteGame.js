@@ -22,7 +22,7 @@ s.SatelliteGame = new Class( {
 	initialize: function() {
 		var that = this;
         this.IDs = [];
-        this.rechargeShields = s.util.debounce(s.game.shieldBoost,5000);
+        this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
 		// No gravity
 		this.scene.setGravity(new THREE.Vector3(0, 0, 0));
 
