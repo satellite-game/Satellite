@@ -58,19 +58,21 @@ s.HUD = new Class({
 
 		var borderHeight = height/8;
 
-		this.ctx.font= '30px Futura';
-		this.ctx.rect(100, 50, velocity, 10);
-		this.ctx.fillStyle = '#5DFC0A';
-		this.ctx.fillText("Throttle",100,40);
-        this.ctx.fill();
+        this.ctx.fillStyle = '#5DFC0A';
 
-        this.ctx.rect(100,50,200,1);
-        this.ctx.fill();
-
+		this.ctx.font= '20px Futura';
+		this.ctx.fillRect(100, 50, velocity, 10);
+        this.ctx.fillRect(100,50,200,1);
+        this.ctx.fillText("Throttle",100,40);
         this.ctx.font = '10px Futura';
-        this.ctx.fillText("SET",93 + velocity,80);
+        this.ctx.fillText("SET",95 + velocity,75);
 
+        this.ctx.fillStyle = '#00FFFF';
 
+        this.ctx.font= '20px Futura';
+        this.ctx.fillRect(100, 110, this.game.player.shields/2, 10);
+        this.ctx.fillRect(100,110,200,1);
+        this.ctx.fillText("Shields",100,100);
 
         this.subreticleBound.radius = width/8;
         this.ctx.beginPath();
@@ -87,8 +89,9 @@ s.HUD = new Class({
         }
 
         this.ctx.beginPath();
-        this.ctx.arc(this.targetX, this.targetY, 5, 0, 2 * Math.PI, false);
         this.ctx.fillStyle = '#5DFC0A';
+        this.ctx.arc(this.targetX, this.targetY, 5, 0, 2 * Math.PI, false);
+
         this.ctx.fill();
 
 
