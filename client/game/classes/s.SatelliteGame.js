@@ -348,7 +348,6 @@ s.SatelliteGame = new Class( {
 
     handleHit: function(message) {
         // Decrement HP
-        clearInterval(shieldBooster);
         var rechargeShields = s.util.debounce(s.game.shieldBoost,10000);
         var you = message.otherPlayerName;
         var killer = message.yourName;
