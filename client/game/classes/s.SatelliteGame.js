@@ -365,9 +365,9 @@ s.SatelliteGame = new Class( {
         s.game.HUD.ctx.rect(0,0,s.game.HUD.canvas.width,s.game.HUD.canvas.height);
         s.game.HUD.ctx.fillStyle = 'black';
         s.game.HUD.ctx.fill();
-        s.game.HUD.ctx.font= '500px Futura';
+        s.game.HUD.ctx.font= '250px Futura';
         s.game.HUD.ctx.fillStyle = '#5DFC0A';
-        s.game.HUD.ctx.fillText("YOU DIED",0,(s.game.HUD.canvas.height/2)-250);
+        s.game.HUD.ctx.fillText("YOU DIED",0,(s.game.HUD.canvas.height/2) + 125);
         s.game.comm.died(s.game.pilot.name);
     }
 
