@@ -57,24 +57,39 @@ s.Controls = new Class({
 			return;
 		}
 
-		if (this.HUD.targetX < this.HUD.canvas.width/2){
-			yaw = this.options.yawSpeed/(this.HUD.subreticleBound.left/((centerX - this.HUD.targetX) * 4))  / thrustScalar;
-		}
-		if (this.HUD.targetX > this.HUD.canvas.width/2){
-			yaw = -1 * (this.options.yawSpeed/(this.HUD.subreticleBound.right/((this.HUD.targetX - centerX) * 4))) / thrustScalar;
-		}
-		if (this.HUD.targetY < this.HUD.canvas.height/2){
-			pitch = this.options.pitchSpeed/(this.HUD.subreticleBound.top/((centerY - this.HUD.targetY) * 4)) /  thrustScalar;
-		}
-		if (this.HUD.targetY > this.HUD.canvas.height/2){
-			pitch = -1 * (this.options.pitchSpeed/(this.HUD.subreticleBound.top/((this.HUD.targetY - centerY) * 4)))  / thrustScalar;
-		}
-		if (this.HUD.targetY > centerY - this.HUD.crosshairs.height/2 && this.HUD.targetY < centerY + this.HUD.crosshairs.height/2){
+
+        ///////////////////////
+        // RADIAL SUBRETICLE //
+        ///////////////////////
+
+        var targetX = this.HUD.targetX,
+            targetY = this.HUD.targetY,
+            yawSpeed = this.options.yawSpeed,
+            pitchSpeed = this.options.pitchSpeed,
+            cursor = this.HUD.cursorVector,
+            radius = this.HUD.subreticleBound.radius,
+            crosshairs = this.HUD.crosshairs;
+
+        // X scales yaw
+        var yawDivisor = targetX < centerX ? (centerX-radius)/((centerX-targetX)*4) : -(centerX+radius)/((-centerX+targetX)*4);
+        yaw = yawSpeed/yawDivisor/thrustScalar;
+
+        // Y scales pitch
+        var pitchDivisor = targetY < centerY ? (centerY+radius)/((centerY-targetY)*4) : -(centerY+radius)/((-centerY+targetY)*4);
+        pitch = pitchSpeed/pitchDivisor/thrustScalar;
+
+        // Set pitch/yaw to zero if inside the crosshair region
+		if (targetY > centerY - crosshairs.height/2 && targetY < centerY + crosshairs.height/2){
 			pitch = 0;
 		}
-		if (this.HUD.targetX > centerX - this.HUD.crosshairs.width/2 && this.HUD.targetX < centerX + this.HUD.crosshairs.width/2){
+		if (targetX > centerX - crosshairs.width/2 && targetX < centerX + crosshairs.width/2){
 			yaw = 0;
 		}
+
+
+        ///////////////////////
+        // KEYBOARD COMMANDS //
+        ///////////////////////
 
 		if (this.keyboard.pressed('left')) {
 			this.HUD.targetX = centerX;
@@ -123,7 +138,13 @@ s.Controls = new Class({
 			this.player.fire('turret');
 		}
 
-		var linearVelocity = root.getLinearVelocity().clone();
+
+        //////////////////////////////
+        // MOTION AND PHYSICS LOGIC //
+		//////////////////////////////
+
+
+        var linearVelocity = root.getLinearVelocity().clone();
 		var angularVelocity = root.getAngularVelocity().clone();
 		var rotationMatrix = new THREE.Matrix4();
 		rotationMatrix.extractRotation(root.matrix);

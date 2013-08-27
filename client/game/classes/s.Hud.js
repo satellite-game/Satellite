@@ -5,57 +5,54 @@ s.HUD = new Class({
 
 
 		this.game = options.game;
-
 		this.controls = options.controls;
 
 
 		this.canvas = document.createElement('canvas');
 
 		this.canvas.height = window.innerHeight;
-
 		this.canvas.width = window.innerWidth;
 
 		this.canvas.style.position = 'absolute';
-
 		this.canvas.style.top = '0';
-
 		this.canvas.style.left = '0';
 
 		this.ctx = this.canvas.getContext('2d');
 
 		this.crosshairs = new Image();
-
 		this.crosshairs.src = 'game/textures/crosshairs.png';
 
 		this.subreticle = new Image();
-
 		this.subreticle.src = 'game/textures/Subreticle.png';
 
-
 		this.targetX = 0;
-
 		this.targetY = 0;
-
 
 		this.subreticleBound = {};
 
-
 		this.update = this.update.bind(this);
-
 		this.game.hook(this.update);
-
-
 		document.body.appendChild(this.canvas);
 
 	},
 	update: function(){
 
-		var velocity = this.controls.options.thrustImpulse/10;
+        ///////////////////////
+        // RADIAL SUBRETICLE //
+        ///////////////////////
 
+        var velocity = this.controls.options.thrustImpulse/10,
+            height = window.innerHeight,
+            width = window.innerWidth,
+            centerX = width/ 2,
+            centerY = height/2;
 
-		this.canvas.height = window.innerHeight;
+        this.canvas.height = window.innerHeight;
+        this.canvas.width = window.innerWidth;
+        this.ctx.clearRect(0, 0, this.canvas.height, this.canvas.width);
 
-		this.canvas.width = window.innerWidth;
+        // Vector for cursor location centered around the center of the screen
+        this.cursorVector = new THREE.Vector2(this.targetX - centerX, this.targetY - centerY);
 
 		var centerY = this.canvas.height/2;
 
@@ -75,35 +72,31 @@ s.HUD = new Class({
 
 		this.subreticleBound.bottom = centerY + borderHeight;
 
-		this.ctx.clearRect(0,0,this.canvas.height,this.canvas.width);
-		
+
 		this.ctx.font= '30px Futura';
 		this.ctx.rect(100, 50, velocity, 10);
 		this.ctx.fillStyle = '#33FF00';
-
 		this.ctx.fillText("Throttle",100,40);
         this.ctx.fill();
 
         this.ctx.rect(100,50,200,1);
         this.ctx.fill();
+
         this.ctx.font = '10px Futura';
         this.ctx.fillText("SET",93 + velocity,80);
 
-		if (this.targetX < this.subreticleBound.left){
-			this.targetX = this.subreticleBound.left;
-		}
+        this.subreticleBound.radius = width/8;
+        this.ctx.beginPath();
+        this.ctx.arc( centerX, centerY, this.subreticleBound.radius, 0, 2*Math.PI, false);
+        this.ctx.lineWidth = 5;
+        //this.ctx.strokeStyle = '0xff0000';
+        this.ctx.stroke();
 
-		if (this.targetX > this.subreticleBound.right){
-			this.targetX = this.subreticleBound.right;
-		}
-
-		if (this.targetY < this.subreticleBound.top){
-			this.targetY = this.subreticleBound.top;
-		}
-
-		if (this.targetY > this.subreticleBound.bottom){
-			this.targetY = this.subreticleBound.bottom;
-		}
+        if (this.cursorVector.length() > this.subreticleBound.radius) {
+            this.cursorVector.normalize().multiplyScalar(this.subreticleBound.radius);
+            this.targetX = this.cursorVector.x+centerX;
+            this.targetY = this.cursorVector.y+centerY;
+        }
 
 
 		this.ctx.drawImage(this.crosshairs,centerX - this.crosshairs.width/2,centerY - this.crosshairs.height/2);
@@ -122,20 +115,17 @@ s.HUD = new Class({
          @param {Number} width  Width of canvas
          @param {Number} height  Height of canvas
          */
-        // TODO: Make the pointer go around a ring
         // TODO: Fix the z-axis messing up the result
 
         this.lockedOn = true;
         if ( this.lockedOn ){
 
-            var height = window.innerHeight;
-            var width  = window.innerWidth;
 
             this.target = s.game.moon.root.position;
             var vector3D = this.target.clone();
             var vector2D = s.projector.projectVector(vector3D, s.game.camera);
 
-            if ( Math.abs(vector2D.x) <= 1 && Math.abs(vector2D.y) <= 1 ){
+            if ( Math.abs(vector2D.x) <= 0.95 && Math.abs(vector2D.y) <= 0.95 && vector2D.z < 1 ){
 
                 vector2D.x =  ( width  + vector2D.x*width  )/2;
                 vector2D.y = -(-height + vector2D.y*height )/2;
@@ -146,19 +136,17 @@ s.HUD = new Class({
                 this.ctx.lineWidth = 5;
                 this.ctx.strokeStyle = '0xff0000';
 
-
             } else {
 
-                if ( Math.abs(vector2D.x*width) > Math.abs(vector2D.y*height) ){
-                    vector2D.x = vector2D.x > 0 ? width - 20 : 0 + 20;
-                    vector2D.y = ( height + vector2D.y*height )/2;
-                } else {
-                    vector2D.x = ( width + vector2D.x*width )/2;
-                    vector2D.y = vector2D.y < 0 ? height - 20 : 0 + 20;
-                }
+                var v2D = new THREE.Vector2(vector2D.x, vector2D.y);
+                v2D.multiplyScalar(1/v2D.length()).multiplyScalar(this.subreticleBound.radius+15);
 
                 this.ctx.beginPath();
-                this.ctx.arc( vector2D.x, vector2D.y, 10, 0, 2*Math.PI, false);
+                if (vector2D.z > 1)
+                    this.ctx.arc( -v2D.x+centerX, (-v2D.y+centerY), 10, 0, 2*Math.PI, false);
+                else
+                    this.ctx.arc( v2D.x+centerX, -(v2D.y-centerY), 10, 0, 2*Math.PI, false);
+
                 this.ctx.fillStyle = "0x0000ff";
                 this.ctx.fill();
                 this.ctx.lineWidth = 5;
