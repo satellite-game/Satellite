@@ -140,3 +140,20 @@ s.util.get2DCoords = function(objVector, width, height) {
 	
 	return vector2D;
 };
+
+s.util.debounce = function(func, wait, immediate) {
+    var result;
+    var timeout = null;
+    return function() {
+      var context = this, args = arguments;
+      var later = function() {
+        timeout = null;
+        if (!immediate) result = func.apply(context, args);
+      };
+      var callNow = immediate && !timeout;
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+      if (callNow) result = func.apply(context, args);
+      return result;
+    };
+  };
