@@ -89,13 +89,16 @@ module.exports = (grunt) ->
 
     concurrent:
       target:
-        tasks: ['nodemon', 'watch'],
+        tasks: ['nodemon', 'watch', "delayed-open"],
         options:
           logConcurrentOutput: true
 
     nodemon: {
       dev: {}
     }
+
+    grunt.registerTask "delayed-open", "open the local host after the server has spun up.", ->
+      setInterval grunt.task.run("open"), 3000
 
   grunt.loadNpmTasks "grunt-contrib-clean"
   grunt.loadNpmTasks "grunt-contrib-concat"
@@ -111,4 +114,4 @@ module.exports = (grunt) ->
   grunt.registerTask "server", ["jshint:server"]
   grunt.registerTask "client", ["jshint:client", "copy:client", "concat", "stylus"]
   grunt.registerTask "client-prod", ["client", "uglify"]
-  grunt.registerTask "default", ["server", "client", "concurrent", "watch"]
+  grunt.registerTask "default", ["server", "client","concurrent"]
