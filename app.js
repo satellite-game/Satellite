@@ -24,7 +24,6 @@ io.set('log level', 2);
 
 // give the client access to all client files
 app.use(express.static(path.join(__dirname, '/build/client')));
-// app.use(express.static(path.join(__dirname, '/build/lib')));
 
 // serving the main applicaion file (index.html)
 // when a client makes a request to the app root
