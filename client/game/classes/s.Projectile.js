@@ -3,6 +3,8 @@ s.Projectile = new Class({
 
     construct: function(options){
         this.game = options.game;
+        this.comm = this.game.comm;
+        this.game = options.game;
         this.pilot = options.pilot;
         // handle parameters
         this.initialVelocity = options.initialVelocity;
@@ -25,9 +27,10 @@ s.Projectile = new Class({
     },
 
     handleCollision: function(mesh, position){
-        var target = mesh.name;
         if (this.pilot === this.game.pilot.name){
-            console.log(target);
+            if (mesh.instance.alliance && mesh.instance.alliance === "enemy"){
+                this.comm.hit(mesh.name);
+            }
         }
         this.destruct();
     },

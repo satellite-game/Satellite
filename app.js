@@ -156,8 +156,7 @@ io.sockets.on('connection', function (socket) {
     socket.on('hit', function(message) {
         socket.get('name', function (err, name) {
             socket.broadcast.emit('hit', {
-                name: name,
-                type: message.type
+                name: name
             });
         });
     });

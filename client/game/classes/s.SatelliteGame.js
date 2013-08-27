@@ -40,12 +40,14 @@ s.SatelliteGame = new Class( {
             game: this
         } );
 
+        this.pilot = {};
+        this.pilot.name = navigator.platform + ' ' + ~~( new Date( ).getTime( ) / 100 % 1000 ) + Math.floor( Math.random( ) * 100 );
         // Add a ship
         this.player = new s.Player( {
             game: this,
             shipClass: 'human_ship_light',
             position: new THREE.Vector3(this.getRandomCoordinate(),this.getRandomCoordinate(),this.getRandomCoordinate()),
-            //position: new THREE.Vector3(2000,2000,2000),
+            name: this.pilot.name,
             rotation: new THREE.Vector3( 0, Math.PI/2, 0 ),
             alliance: 'alliance'
         } );
@@ -175,8 +177,7 @@ s.SatelliteGame = new Class( {
             that.controls.firing = false;
         } );
 
-        this.pilot = {};
-        this.pilot.name = navigator.platform + ' ' + ~~( new Date( ).getTime( ) / 100 % 1000 ) + Math.floor( Math.random( ) * 100 );
+
 
         this.comm = new s.Comm( {
             game: that,
@@ -342,13 +343,14 @@ s.SatelliteGame = new Class( {
 
     handleHit: function(message) {
         // Decrement HP
-        this.player.hp -= this.options.weapons[message.type].damage;
+        if (message.name === s.game.pilot.name){
+            s.game.player.hull -= 20;
 
-        console.log('You were hit with a %s by %s! Your HP: %d', message.type, message.name, this.player.hp);
+            console.log('You were hit with a %s by %s! Your HP: %d', message.type, message.name, this.player.hp);
 
-        if (this.player.hp <= 0) {
-            // Player is dead
-            this.handleDie(message.name);
+            if (s.game.player.hull <= 0) {
+                s.game.handleDie(message.name);
+            }
         }
     },
 

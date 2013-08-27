@@ -113,10 +113,9 @@ s.Comm = new Class( {
     died: function() {
         this.socket.emit('killed');
     },
-    hit: function(otherPlayerName, type) {
+    hit: function(otherPlayerName) {
         this.socket.emit('hit', {
-            name: otherPlayerName,
-            type: type
+            name: otherPlayerName
         });
     }
 } );

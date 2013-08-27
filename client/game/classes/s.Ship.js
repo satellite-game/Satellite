@@ -15,6 +15,7 @@ s.Ship = new Class({
 
         this.game = options.game;
         this.name = options.name || '';
+        this.root.name = this.name;
         this.hull = s.config.ship.hull;
 	},
 
