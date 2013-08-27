@@ -83,7 +83,7 @@ s.HUD = new Class({
         this.subreticleBound.radius = width/8;
         this.ctx.beginPath();
         this.ctx.arc( centerX, centerY, this.subreticleBound.radius, 0, 2*Math.PI, false);
-        this.ctx.lineWidth = 5;
+        this.ctx.lineWidth = 1;
         this.ctx.strokeStyle = '#5DFC0A';
         this.ctx.stroke();
    
@@ -135,7 +135,7 @@ s.HUD = new Class({
                 var size = 50;
 
                 this.ctx.strokeRect( vector2D.x-size, vector2D.y-size, size*2, size*2 );
-                this.ctx.lineWidth = 5;
+                this.ctx.lineWidth = 1;
                 this.ctx.strokeStyle = '#5DFC0A';
 
             // Radial direction marker
@@ -152,7 +152,7 @@ s.HUD = new Class({
 
                 this.ctx.fillStyle = "black";
                 this.ctx.fill();
-                this.ctx.lineWidth = 5;
+                this.ctx.lineWidth = 2;
                 this.ctx.strokeStyle = '#5DFC0A';
                 this.ctx.stroke();
 
