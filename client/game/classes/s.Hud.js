@@ -86,7 +86,7 @@ s.HUD = new Class({
         this.ctx.lineWidth = 1;
         this.ctx.strokeStyle = '#5DFC0A';
         this.ctx.stroke();
-   
+
 
         if (this.cursorVector.length() > this.subreticleBound.radius) {
             this.cursorVector.normalize().multiplyScalar(this.subreticleBound.radius);
@@ -122,19 +122,20 @@ s.HUD = new Class({
         this.lockedOn = true;
         if ( this.lockedOn ){
 
-            this.target = s.game.moon.root;
+            this.target = s.game.enemies.list()[1] || s.game.moon;
+            this.target = this.target.root;
             var vector3D = this.target.position.clone();
             var vector2D = s.projector.projectVector(vector3D, s.game.camera);
 
             // Targeting box
             if ( Math.abs(vector2D.x) <= 0.95 && Math.abs(vector2D.y) <= 0.95 && vector2D.z < 1 ){
-
-                vector2D.x =  ( width  + vector2D.x*width  )/2;
-                vector2D.y = -(-height + vector2D.y*height )/2;
+                v2D = vector2D.clone();
+                v2D.x =  ( width  + v2D.x*width  )/2;
+                v2D.y = -(-height + v2D.y*height )/2;
 
                 var size = 50;
 
-                this.ctx.strokeRect( vector2D.x-size, vector2D.y-size, size*2, size*2 );
+                this.ctx.strokeRect( v2D.x-size, v2D.y-size, size*2, size*2 );
                 this.ctx.lineWidth = 1;
                 this.ctx.strokeStyle = '#5DFC0A';
 
@@ -165,23 +166,60 @@ s.HUD = new Class({
 
          // t = ( (a ev cos[beta]) + sqrt[(a ev cos[beta])^2 + (bv^2-ev^2)(a^2)] )  / (bv^2 - ev^2)
 
-            // a = distance between self and target
-            // eV = magnitude of enemy's current velocity vector
-            // bV = magnitude of bullet's velocity vector
+            // PARAMETERS
+            // a    = distance between self and target
+            // eV   = magnitude of enemy's current velocity vector
+            // bV   = magnitude of bullet's velocity vector
             // beta = angle between a and eV, via dot product
             // angD = angular differential; scales down with increased beta
             // velD = velocity
+            // top  = upper quotient for quadratic solution
+            // bot  = lower quotient for quadratic solution
+            // t    = time at which player bullet and enemy ship will simultaneously reach a given location
+            this.dummyData = this.dummyData || [];
+            if ( s.game.enemies.list()[1] && this.target == s.game.enemies.list()[1] && Math.abs(vector2D.x) <= 0.95 && Math.abs(vector2D.y) <= 0.95 ){
 
-//            var a = vector3D.length();
-//            var eV = this.target.getLinearVelocity().clone();
-//            var bV = 2500;
-//            var beta = vector3D.multiplyScalar(-1).dot(eV);
-//
-//            var angD = a*eV*Math.cos(beta);
-//            var velD   = (Math.pow(bV, 2) - Math.pow(eV, 2));
-//            var top = angD + Math.sqrt( Math.pow(angD, 2) +  velD*Math.pow(a, 2) );
-//            var bot = vDiff;
-//            var t = top/bot;
+                var enemyV3D = this.target.root.position.clone();
+                if (enemyV3D){
+
+                    var a = enemyV3D.clone().length();
+                    var aV = enemyV3D.add(s.game.player.root.position.clone().multiplyScalar(-1));
+                    console.log(aV);
+                    var eV = this.target.root.getLinearVelocity();
+                    var bV = 2500;
+                    var beta = aV.dot(eV)/(a*eV.length());
+                    if (Math.abs(beta) > Math.PI/2)
+                        debugger;
+
+                    if (beta && eV && bV && aV){
+
+                        var angD = a*eV.length()*Math.cos(beta);
+                        var velD   = (bV*bV - eV.length()*eV.length());
+
+                        var t = angD/velD + Math.sqrt( angD*angD + velD*a*a )/velD;
+
+                        this.dummyData.push(t);
+                        //if (!this.dummyData.length%50)
+                            //console.log(t);
+
+                        var enemyV2D = s.projector.projectVector(eV.multiplyScalar(t), s.game.camera);
+                        enemyV2D.x =  ( width  + enemyV2D.x*width  )/2;
+                        enemyV2D.y = -(-height + enemyV2D.y*height )/2;
+
+                        //if (!this.dummyData.length%50)
+                            //console.log(enemyV2D);
+
+                        this.ctx.beginPath();
+                        this.ctx.arc(enemyV2D.x, enemyV2D.y, 10, 0, 2*Math.PI, false);
+                        this.ctx.fillStyle = "black";
+                        this.ctx.fill();
+                        this.ctx.lineWidth = 5;
+                        this.ctx.strokeStyle = '#5DFC0A';
+                        this.ctx.stroke();
+
+                    }
+                }
+            }
 
         } else {
 
