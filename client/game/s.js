@@ -5,26 +5,8 @@ Copyright (C) 2013 Larry Davis
 
 var s = {
     config: {
-        weapons: {
-            turret: {
-                color: {
-                    alliance: 0x00F2FF,
-                    rebels: 0xFF0000
-                },
-                damage: 10,
-                velocity: 2000
-            },
-            missile: {
-                color: {
-                    alliance: 'green',
-                    rebels: 'red'
-                },
-                damage: 10,
-                velocity: 2000
-            }
-        },
         ship: {
-        hull: 80
+        	hull: 80
         }
     },
 

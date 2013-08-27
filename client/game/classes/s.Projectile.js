@@ -18,14 +18,6 @@ s.Projectile = new Class({
         this.applyForce();
     },
 
-    addCollisionMesh: function(geometry){
-        // Create a physijs mesh for real physics motion and collision detection.
-        var material = Physijs.createMaterial(new THREE.MeshBasicMaterial({visible: false}));
-        var collisionMesh = new Physijs.SphereMesh(geometry, material, 0.1);
-        this.root = collisionMesh;
-        this.root.addEventListener('collision', this.handleCollision.bind(this));
-    },
-
     handleCollision: function(mesh, position){
         if (this.pilot === this.game.pilot.name){
             if (mesh.instance.alliance && mesh.instance.alliance === "enemy"){
@@ -35,16 +27,23 @@ s.Projectile = new Class({
         this.destruct();
     },
 
-    applyForce: function(){
-        // Make sure the bullets matrix is up to date
+    applyForce: function() {
+        // Take on the initial velocity
+        this.root.setLinearVelocity(this.initialVelocity);
+
+        // Apply an impulse to move forward
+        this.root.applyCentralImpulse(this.getForceVector());
+    },
+
+    getForceVector: function(){
+        // Make sure the projectile's matrix is up to date
         this.root.updateMatrix();
 
-        // Extract the rotation from the bullets matrix
+        // Extract the rotation from the projectile's matrix
         this.rotationMatrix = new THREE.Matrix4();
         this.rotationMatrix.extractRotation(this.root.matrix);
 
-        // Apply bullet impulse
-        this.forceVector = new THREE.Vector3(0, 0, (this.velocity * -1) + (this.initialVelocity.z > 0 ? this.initialVelocity.z * -1 : this.initialVelocity.z )).applyMatrix4(this.rotationMatrix);
-        this.root.applyCentralImpulse(this.forceVector);
+        // Apply bullet impulse in the correct direction
+        return new THREE.Vector3(0, 0, this.options.velocity * -1).applyMatrix4(this.rotationMatrix);
     }
 });
