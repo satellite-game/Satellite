@@ -347,6 +347,7 @@ s.SatelliteGame = new Class( {
     },
 
     handleHit: function(message) {
+        debugger;
         // Decrement HP
         var rechargeShields = s.util.debounce(s.game.shieldBoost,10000);
         var you = message.otherPlayerName;

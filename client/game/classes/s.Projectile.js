@@ -21,6 +21,10 @@ s.Projectile = new Class({
     handleCollision: function(mesh, position){
         if (this.pilot === this.game.pilot.name){
             if (mesh.instance.alliance && mesh.instance.alliance === "enemy"){
+                new s.Shield({
+                    game: this.game,
+                    ship: mesh
+                });
                 this.comm.hit(mesh.name,this.game.pilot.name);
             }
         }
