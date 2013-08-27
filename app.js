@@ -163,22 +163,16 @@ io.sockets.on('connection', function (socket) {
     });
     socket.on('hit', function(message) {
             socket.broadcast.emit('hit', {
-                name: message.name
+                otherPlayerName: message.otherPlayerName,
+                yourName: message.yourName
             });
     });
 
     
     socket.on('killed', function(message) {
-        socket.get('name', function (err, name) {
-            if (name === null) {
-                console.error('killed failed: Player name was null!');
-                console.log(err, name, message);
-                throw new Error('Player name was null!');
-            }
-
             socket.broadcast.emit('killed', {
-                name: name
-            });
+                killed: message.you,
+                killer: message.killer
         });
     });
     

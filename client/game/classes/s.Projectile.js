@@ -21,7 +21,7 @@ s.Projectile = new Class({
     handleCollision: function(mesh, position){
         if (this.pilot === this.game.pilot.name){
             if (mesh.instance.alliance && mesh.instance.alliance === "enemy"){
-                this.comm.hit(mesh.name);
+                this.comm.hit(mesh.name,this.game.pilot.name);
             }
         }
         this.destruct();

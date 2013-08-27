@@ -317,12 +317,10 @@ s.SatelliteGame = new Class( {
     },
 
     handleKill: function(message) {
-        var enemy = this.enemies.get(message.name);
-
-        if (message.killer == this.player.name)
+        if (message.killer == s.game.pilot.name)
             console.warn('You killed %s!', message.name);
         else
-            console.log('%s was killed by %s', message.name, message.killer);
+            console.log('%s was killed by %s', message.killed, message.killer);
     },
 
     handleEnemyFire: function(message) {
@@ -343,14 +341,16 @@ s.SatelliteGame = new Class( {
 
     handleHit: function(message) {
         // Decrement HP
-        console.log(message.name);
-        if (message.name === s.game.pilot.name){
+        var you = message.otherPlayerName;
+        var killer = message.yourName;
+
+        if (you === s.game.pilot.name){
             s.game.player.hull -= 20;
 
-            console.log('You were hit with a laser by %s! Your HP: %d', message.name, s.game.player.hull);
+            console.log('You were hit with a laser by %s! Your HP: %d', killer, s.game.player.hull);
 
             if (s.game.player.hull <= 0) {
-                s.game.handleDie();
+                s.game.handleDie(you, killer);
             }
         }
     },
@@ -359,7 +359,7 @@ s.SatelliteGame = new Class( {
         s.game.comm.fire(props.position, props.rotation, props.initialVelocity);
     },
 
-    handleDie: function() {
+    handleDie: function(you, killer) {
         s.game.stop();
         s.game.HUD.ctx.clearRect(0,0,s.game.HUD.canvas.width,s.game.HUD.canvas.height);
         s.game.HUD.ctx.rect(0,0,s.game.HUD.canvas.width,s.game.HUD.canvas.height);
@@ -368,7 +368,8 @@ s.SatelliteGame = new Class( {
         s.game.HUD.ctx.font= '250px Futura';
         s.game.HUD.ctx.fillStyle = '#5DFC0A';
         s.game.HUD.ctx.fillText("YOU DIED",0,(s.game.HUD.canvas.height/2) + 125);
-        s.game.comm.died(s.game.pilot.name);
+        s.game.comm.died(you, killer);
+
     }
 
 
