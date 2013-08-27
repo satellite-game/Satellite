@@ -2,7 +2,6 @@ s.Explosion = new Class({
 	extend: s.GameObject,
 
 	construct: function(options){
-        console.log('Explosion', options);
 		var pGeometry = new THREE.Geometry();
 			for(var i = 0; i < 10; i++){
 				var vertex = new THREE.Vector3();
