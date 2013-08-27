@@ -2,11 +2,6 @@ module.exports = (grunt) ->
 
   # Order of concatonation/minification
   includeOrder = [
-    "client/lib/jquery.js"
-    "client/lib/Class.js"
-    "client/lib/three.js"
-    "client/lib/physi.js"
-    "client/lib/Stats.js"
     "client/game/s.js"
     "client/game/s.util.js"
     "client/game/classes/s.EventEmitter.js"
