@@ -349,7 +349,7 @@ s.SatelliteGame = new Class( {
     handleHit: function(message) {
         debugger;
         // Decrement HP
-        var rechargeShields = s.util.debounce(s.game.shieldBoost,10000);
+        var rechargeShields = s.util.debounce(s.game.shieldBoost,5000);
         var you = message.otherPlayerName;
         var killer = message.yourName;
         if (you === s.game.pilot.name){
@@ -387,20 +387,8 @@ s.SatelliteGame = new Class( {
 
     },
     shieldBoost: function(){
-        window.shieldBooster = setInterval(s.game.shieldAnimate,20);
-    },
-    shieldAnimate: function(){
-        if (s.game.player.shields < s.game.player.oldShields){
-            clearInterval(window.shieldBooster);
-        }
-        if (s.game.player.shields < 400){
-            s.game.player.shields += 1;
-        } else {
-            clearInterval(window.shieldBooster);
-        }
-        s.game.player.oldShields = s.game.player.shields;
+        s.game.player.shields = 400;
     }
-
 
 
 } );
