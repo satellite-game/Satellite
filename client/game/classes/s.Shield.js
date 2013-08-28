@@ -9,7 +9,7 @@ s.Shield = new Class({
             ambient: 0x00F2FF,
             transparent: true,
             blending: THREE.AdditiveBlending,
-            opacity: 0.7
+            opacity: 0.5
         });
         this.mesh = new THREE.Mesh(geometry, material);
         this.ship.add(this.mesh);
