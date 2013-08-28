@@ -6,9 +6,16 @@ Copyright (C) 2013 Larry Davis
 var s = {
     config: {
         ship: {
-			hull: 100,
-			shields: 200
-        }
+			hull: 160,
+			shields: 120
+        },
+    sound: {
+		enabled: true,
+		silentDistance: 10000,
+		sounds: {
+			laser: "Sounds/laser.mp3"
+			}
+		}
     },
 
 	init: function() {

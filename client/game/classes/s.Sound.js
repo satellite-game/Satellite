@@ -74,11 +74,11 @@ s.Sound = new Class({
 			return false;
 		
 		var soundObj = this.getInstance(name);
-		
 		soundObj.volume = volume || 1;
 
 		// Play the sound
 		if (soundObj)
+			console.log(soundObj);
 			soundObj.play();
 	}
 });

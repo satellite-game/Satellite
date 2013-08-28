@@ -130,10 +130,6 @@ s.Controls = new Class({
 			roll = -1*this.options.rotationSpeed;
 		}
 
-		if(this.keyboard.pressed('space')){
-			this.player.fire('missile');
-		}
-
 		if (this.firing){
 			this.player.fire('turret');
 		}

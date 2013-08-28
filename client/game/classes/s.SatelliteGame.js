@@ -34,6 +34,10 @@ s.SatelliteGame = new Class( {
         this.light = new THREE.DirectionalLight( 0xEEEEEE, 2 );
         this.light.position.set( -100000, 0, 0 );
         this.scene.add( this.light );
+        this.sound = new s.Sound({
+            enabled: s.config.sound.enabled,
+            sounds: s.config.sound.sounds
+        });
 
         // Add moon
         this.moon = new s.Moon( {
@@ -390,7 +394,7 @@ s.SatelliteGame = new Class( {
         s.game.IDs.push(setInterval(s.game.shieldAnimate,20));
     },
     shieldAnimate: function(){
-        if (s.game.player.shields < 400){
+        if (s.game.player.shields < s.config.ship.shields){
             s.game.player.shields += 1;
         } else {
             s.game.stopShields();

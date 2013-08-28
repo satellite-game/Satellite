@@ -97,6 +97,7 @@ s.Ship = new Class({
                 this.lastMissileFire = now;
             }
         }
+        this.game.sound.play("laser", 1);
     },
 
     setPosition: function (position, rotation, aVeloc, lVeloc, interpolate) {

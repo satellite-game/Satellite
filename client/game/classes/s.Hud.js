@@ -68,7 +68,7 @@ s.HUD = new Class({
 
         this.ctx.fillStyle = '#FF0000';
         this.ctx.font = '20px Futura';
-        this.ctx.fillRect(100, 170, this.game.player.hull/4, 10);
+        this.ctx.fillRect(100, 170, (this.game.player.hull/s.config.ship.hull) * 200, 10);
         this.ctx.fillRect(100,170,200,1);
         this.ctx.fillText("HULL",100,160);
 
@@ -76,7 +76,7 @@ s.HUD = new Class({
         this.ctx.fillStyle = '#00FFFF';
 
         this.ctx.font= '20px Futura';
-        this.ctx.fillRect(100, 110, this.game.player.shields/2, 10);
+        this.ctx.fillRect(100, 110, (this.game.player.shields/s.config.ship.shields) * 200, 10);
         this.ctx.fillRect(100,110,200,1);
         this.ctx.fillText("SHIELDS",100,100);
 
