@@ -36,6 +36,12 @@ s.HUD = new Class({
 		this.update = this.update.bind(this);
 		this.game.hook(this.update);
 		document.body.appendChild(this.canvas);
+        this.menu = new s.Color({
+            red: 0,
+            green: 256,
+            blue: 0,
+            alpha: 0.9
+        });
 
 	},
 	update: function(){
@@ -61,7 +67,7 @@ s.HUD = new Class({
 
 		var borderHeight = height/8;
 
-		this.ctx.fillStyle = '#5DFC0A';
+		this.ctx.fillStyle = this.menu.color;
 		this.ctx.font = '20px Futura';
 		this.ctx.fillRect(100, 50, velocity, 10);
         this.ctx.fillRect(100,50,200,1);
@@ -87,7 +93,7 @@ s.HUD = new Class({
         this.ctx.beginPath();
         this.ctx.arc( centerX, centerY, this.subreticleBound.radius, 0, 2*Math.PI, false);
         this.ctx.lineWidth = 1;
-        this.ctx.strokeStyle = '#5DFC0A';
+        this.ctx.strokeStyle = this.menu.color;
         this.ctx.stroke();
 
 
@@ -98,7 +104,7 @@ s.HUD = new Class({
         }
 
         this.ctx.beginPath();
-        this.ctx.fillStyle = '#5DFC0A';
+        this.ctx.fillStyle = this.menu.color;
         this.ctx.arc(this.targetX, this.targetY, 5, 0, 2 * Math.PI, false);
 
         this.ctx.fill();
@@ -172,7 +178,7 @@ s.HUD = new Class({
 
                 this.ctx.strokeRect( v2D.x-size, v2D.y-size, size*2, size*2 );
                 this.ctx.lineWidth = 1;
-                this.ctx.strokeStyle = '#5DFC0A';
+                this.ctx.strokeStyle = this.menu.color;
 
                 // Radial direction marker
             } else {
@@ -236,17 +242,17 @@ s.HUD = new Class({
 
                         var enemyV2D = s.projector.projectVector(this.target.position.clone().add(eV.multiplyScalar(t)), s.game.camera);
 
-                        enemyV2D.x =  ( width  + enemyV2D.x*width  )/2;
-                        enemyV2D.y = -(-height + enemyV2D.y*height )/2;
-
-                        this.ctx.beginPath();
-                        this.ctx.arc(enemyV2D.x, enemyV2D.y, 10, 0, 2*Math.PI, false);
-                        this.ctx.fillStyle = "black";
-                        this.ctx.fill();
-                        this.ctx.lineWidth = 2;
-                        this.ctx.strokeStyle = '#5DFC0A';
-                        this.ctx.stroke();
-
+                            var enemyV2D = s.projector.projectVector(this.target.position.clone().add(eV.multiplyScalar(t)), s.game.camera);
+                            enemyV2D.x =  ( width  + enemyV2D.x*width  )/2;
+                            enemyV2D.y = -(-height + enemyV2D.y*height )/2;
+                            this.ctx.beginPath();
+                            this.ctx.arc(enemyV2D.x, enemyV2D.y, 10, 0, 2*Math.PI, false);
+                            this.ctx.fillStyle = "black";
+                            this.ctx.fill();
+                            this.ctx.lineWidth = 5;
+                            this.ctx.strokeStyle = '#5DFC0A';
+                            this.ctx.stroke();
+                        }
                     }
                 }
             }

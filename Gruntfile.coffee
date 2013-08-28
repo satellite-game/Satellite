@@ -15,6 +15,7 @@ module.exports = (grunt) ->
     "client/game/classes/s.Ship.js"
     "client/game/classes/s.Player.js"
     "client/game/classes/s.Moon.js"
+    "client/game/classes/s.Color.js"
     "client/game/classes/s.Keyboard.js"
     "client/game/classes/s.Controls.js"
     "client/game/classes/s.Hud.js"
