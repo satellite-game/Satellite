@@ -103,8 +103,7 @@ s.Radar = new Class({
         ///////////////////
         // ENEMY MARKERS //
         ///////////////////
-
-        that.enemies.add( { name: 'blah', pos: [Math.random()*100000-50000,Math.random()*100000-50000,Math.random()*100000-50000], rot: [0,0,0], aVeloc: [0,0,0], lVeloc: [0,0,0] } );
+        that.enemies.add( { name: 'blah', pos: [Math.random()*1000000-5000,Math.random()*1000000-5000,Math.random()*1000000-5000], rot: [0,0,0], aVeloc: [0,0,0], lVeloc: [100,100,100] } );
 
         var enemyGeo = [], enemyMarker = [];
         for (var i = 0, len = that.enemies.list().length; i < len; i++){
