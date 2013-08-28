@@ -73,7 +73,8 @@ s.Controls = new Class({
             yaw = 0;
         } else {
             // X scales yaw
-            var yawDivisor = this.HUD.targetX < centerX ? (centerX-radius)/((centerX-this.HUD.targetX)*4) : -(centerX+radius)/((-centerX+this.HUD.targetX)*4);
+            var yawDivisor = this.HUD.targetX < centerX ?
+                (centerX-radius)/((centerX-this.HUD.targetX)*4) : -(centerX+radius)/((-centerX+this.HUD.targetX)*4);
             yaw = yawSpeed/yawDivisor/thrustScalar;
         }
 
@@ -82,7 +83,8 @@ s.Controls = new Class({
             pitch = 0;
         } else {
             // Y scales pitch
-            var pitchDivisor = this.HUD.targetY < centerY ? (centerY+radius)/((centerY-this.HUD.targetY)*4) : -(centerY+radius)/((-centerY+this.HUD.targetY)*4);
+            var pitchDivisor = this.HUD.targetY < centerY ?
+                (centerY+radius)/((centerY-this.HUD.targetY)*4) : -(centerY+radius)/((-centerY+this.HUD.targetY)*4);
             pitch = pitchSpeed/pitchDivisor/thrustScalar;
         }
 

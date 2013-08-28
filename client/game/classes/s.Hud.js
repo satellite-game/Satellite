@@ -151,103 +151,107 @@ s.HUD = new Class({
         var i = 1 || enemyLockIndex;
         this.target = this.lockedOn ? s.game.enemies.list()[i].root : null;
 
-        var vTarget3D = this.target ? this.target.position.clone() : null;
-        var vTarget2D = this.target ?  s.projector.projectVector(vTarget3D, s.game.camera) : null;
+        var targetInSight = false;
 
-        var targetInSight = !this.target ? false : Math.abs(vTarget2D.x) <= 0.95 && Math.abs(vTarget2D.y) <= 0.95 && vTarget2D.z < 1 ? true : false;
-        var v2D;
+        if ( this.target ) {
 
-        // Targeting box
-        if ( this.target && targetInSight ){
-            v2D = vTarget2D.clone();
-            v2D.x =  ( width  + v2D.x*width  )/2;
-            v2D.y = -(-height + v2D.y*height )/2;
+            var vTarget3D =this.target.position.clone();
+            var vTarget2D = s.projector.projectVector(vTarget3D, s.game.camera);
 
-            var size = 50;
+            if ( Math.abs(vTarget2D.x) <= 0.95 && Math.abs(vTarget2D.y) <= 0.95 && vTarget2D.z < 1)
+                targetInSight = true;
 
-            this.ctx.strokeRect( v2D.x-size, v2D.y-size, size*2, size*2 );
-            this.ctx.lineWidth = 1;
-            this.ctx.strokeStyle = '#5DFC0A';
+            var v2D;
+            // Targeting box
+            if ( targetInSight ){
+                v2D = vTarget2D.clone();
+                v2D.x =  ( width  + v2D.x*width  )/2;
+                v2D.y = -(-height + v2D.y*height )/2;
 
-        // Radial direction marker
-        } else if ( this.target ) {
+                var size = 50;
 
-            v2D = new THREE.Vector2(vTarget2D.x, vTarget2D.y);
-            v2D.multiplyScalar(1/v2D.length()).multiplyScalar(this.subreticleBound.radius+12);
+                this.ctx.strokeRect( v2D.x-size, v2D.y-size, size*2, size*2 );
+                this.ctx.lineWidth = 1;
+                this.ctx.strokeStyle = '#5DFC0A';
 
-            this.ctx.beginPath();
-            if (vTarget2D.z > 1)
-                this.ctx.arc( -v2D.x+centerX, (-v2D.y+centerY), 10, 0, 2*Math.PI, false);
-            else
-                this.ctx.arc( v2D.x+centerX, -(v2D.y-centerY), 10, 0, 2*Math.PI, false);
+                // Radial direction marker
+            } else {
 
-            this.ctx.fillStyle = "black";
-            this.ctx.fill();
-            this.ctx.lineWidth = 2;
-            this.ctx.strokeStyle = '#5DFC0A';
-            this.ctx.stroke();
+                v2D = new THREE.Vector2(vTarget2D.x, vTarget2D.y);
+                v2D.multiplyScalar(1/v2D.length()).multiplyScalar(this.subreticleBound.radius+12);
 
-        }
+                this.ctx.beginPath();
+                if (vTarget2D.z > 1)
+                    this.ctx.arc( -v2D.x+centerX, (-v2D.y+centerY), 10, 0, 2*Math.PI, false);
+                else
+                    this.ctx.arc( v2D.x+centerX, -(v2D.y-centerY), 10, 0, 2*Math.PI, false);
 
+                this.ctx.fillStyle = "black";
+                this.ctx.fill();
+                this.ctx.lineWidth = 2;
+                this.ctx.strokeStyle = '#5DFC0A';
+                this.ctx.stroke();
 
-        /////////////////////////////////
-        // PREDICTIVE TARGETING SYSTEM //
-        /////////////////////////////////
+            }
 
-     // t = ( (a ev cos[beta]) + sqrt[(a ev cos[beta])^2 + (bv^2-ev^2)(a^2)] )  / (bv^2 - ev^2)
+            /////////////////////////////////
+            // PREDICTIVE TARGETING SYSTEM //
+            /////////////////////////////////
 
-        // PARAMETERS
-        // a    = distance between self and target
-        // eV   = magnitude of enemy's current velocity vector
-        // bV   = magnitude of bullet's velocity vector
-        // beta = angle between a and eV, via dot product
-        // angD = angular differential; scales down with increased beta
-        // velD = velocity
-        // top  = upper quotient for quadratic solution
-        // bot  = lower quotient for quadratic solution
-        // t    = time at which player bullet and enemy ship will simultaneously reach a given location
-        if ( s.game.enemies.list()[1] && targetInSight ){
+         // t = ( (a ev cos[beta]) + sqrt[(a ev cos[beta])^2 + (bv^2-ev^2)(a^2)] )  / (bv^2 - ev^2)
 
-            var self = s.game.player.root;
-            var aV = vTarget3D.add( self.position.clone().multiplyScalar(-1) );
-            var a  = aV.length();
-            var eV = this.target.getLinearVelocity();
-            var e  = eV.length();
-            var pV = self.getLinearVelocity();
-            var b = 5000+pV.length();
+            // PARAMETERS
+            // a    = distance between self and target
+            // eV   = magnitude of enemy's current velocity vector
+            // bV   = magnitude of bullet's velocity vector
+            // beta = angle between a and eV, via dot product
+            // angD = angular differential; scales down with increased beta
+            // velD = velocity
+            // top  = upper quotient for quadratic solution
+            // bot  = lower quotient for quadratic solution
+            // t    = time at which player bullet and enemy ship will simultaneously reach a given location
+            if ( s.game.enemies.list()[1] && targetInSight ){
 
-            //if (Math.abs(beta) > Math.PI/2)
-            //    debugger;
+                var self = s.game.player.root;
+                var aV = vTarget3D.add( self.position.clone().multiplyScalar(-1) );
+                var a  = aV.length();
+                var eV = this.target.getLinearVelocity();
+                var e  = eV.length();
+                var pV = self.getLinearVelocity();
+                var b = 5000+pV.length();
 
-            if (eV && b && aV){
+                //if (Math.abs(beta) > Math.PI/2)
+                //    debugger;
 
-                //var beta = Math.acos(aV.dot(eV)/(a*e));
-                //var angD1 = a*e*Math.cos(beta);
-                var angD = aV.dot(eV);
-                var velD = (b*b - e*e);
+                if (eV && b && aV){
 
-                var t = angD/velD + Math.sqrt( angD*angD + velD*a*a )/velD;
+                    //var beta = Math.acos(aV.dot(eV)/(a*e));
+                    //var angD1 = a*e*Math.cos(beta);
+                    var angD = aV.dot(eV);
+                    var velD = (b*b - e*e);
 
-                if (t < 4){
+                    var t = angD/velD + Math.sqrt( angD*angD + velD*a*a )/velD;
 
-                    var enemyV2D = s.projector.projectVector(this.target.position.clone().add(eV.multiplyScalar(t)), s.game.camera);
+                    if (t < 5){
 
-                    enemyV2D.x =  ( width  + enemyV2D.x*width  )/2;
-                    enemyV2D.y = -(-height + enemyV2D.y*height )/2;
+                        var enemyV2D = s.projector.projectVector(this.target.position.clone().add(eV.multiplyScalar(t)), s.game.camera);
 
-                    this.ctx.beginPath();
-                    this.ctx.arc(enemyV2D.x, enemyV2D.y, 10, 0, 2*Math.PI, false);
-                    this.ctx.fillStyle = "black";
-                    this.ctx.fill();
-                    this.ctx.lineWidth = 5;
-                    this.ctx.strokeStyle = '#5DFC0A';
-                    this.ctx.stroke();
+                        enemyV2D.x =  ( width  + enemyV2D.x*width  )/2;
+                        enemyV2D.y = -(-height + enemyV2D.y*height )/2;
 
+                        this.ctx.beginPath();
+                        this.ctx.arc(enemyV2D.x, enemyV2D.y, 10, 0, 2*Math.PI, false);
+                        this.ctx.fillStyle = "black";
+                        this.ctx.fill();
+                        this.ctx.lineWidth = 2;
+                        this.ctx.strokeStyle = '#5DFC0A';
+                        this.ctx.stroke();
+
+                    }
                 }
             }
+
         }
-
-
 	}
 
 });
