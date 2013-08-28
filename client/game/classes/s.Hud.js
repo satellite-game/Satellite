@@ -103,126 +103,150 @@ s.HUD = new Class({
 
         this.ctx.fill();
 
-
 		this.ctx.drawImage(this.crosshairs,centerX - this.crosshairs.width/2,centerY - this.crosshairs.height/2);
 
 
-
-
-        //////////////////////////////
-        ///  ENEMY-LOCK INDICATOR  ///
-        //////////////////////////////
-
-        /**
-         Get 2D coordinates from a Vector3
-
-         @param {THREE.Vector3} objVector  Vector representing the object position
-         @param {Number} width  Width of canvas
-         @param {Number} height  Height of canvas
-         */
+        //////////////////////////////////
+        /////  ENEMY-LOCK INDICATOR  /////
+        //////////////////////////////////
         // TODO: Fix the z-axis messing up the result
 
-        this.lockedOn = true;
-        if ( this.lockedOn ){
+        ///////////////////////////
+        // MOON TARGETING SYSTEM //
+        ///////////////////////////
 
-            this.target = s.game.enemies.list()[1] || s.game.moon;
-            this.target = this.target.root;
-            var vector3D = this.target.position.clone();
-            var vector2D = s.projector.projectVector(vector3D, s.game.camera);
+        this.moon = s.game.moon.root;
 
-            // Targeting box
-            if ( Math.abs(vector2D.x) <= 0.95 && Math.abs(vector2D.y) <= 0.95 && vector2D.z < 1 ){
-                v2D = vector2D.clone();
-                v2D.x =  ( width  + v2D.x*width  )/2;
-                v2D.y = -(-height + v2D.y*height )/2;
+        var vMoon3D = this.moon.position.clone();
+        var vMoon2D = s.projector.projectVector( vMoon3D, s.game.camera );
+        var moonInSight = Math.abs(vMoon2D.x) <= 0.95 && Math.abs(vMoon2D.y) <= 0.95 && vMoon2D.z < 1 ? true : false;
 
-                var size = 50;
+        // Moon targeting reticule
+        if ( !moonInSight ) {
 
-                this.ctx.strokeRect( v2D.x-size, v2D.y-size, size*2, size*2 );
-                this.ctx.lineWidth = 1;
-                this.ctx.strokeStyle = '#5DFC0A';
+            var moon2D = new THREE.Vector2(vMoon2D.x, vMoon2D.y);
+            moon2D.multiplyScalar(1/moon2D.length()).multiplyScalar(this.subreticleBound.radius+34);
 
-            // Radial direction marker
-            } else {
+            this.ctx.beginPath();
+            if (vMoon2D.z > 1)
+                this.ctx.arc( -moon2D.x+centerX, (-moon2D.y+centerY), 10, 0, 2*Math.PI, false);
+            else
+                this.ctx.arc( moon2D.x+centerX, -(moon2D.y-centerY), 10, 0, 2*Math.PI, false);
 
-                var v2D = new THREE.Vector2(vector2D.x, vector2D.y);
-                v2D.multiplyScalar(1/v2D.length()).multiplyScalar(this.subreticleBound.radius+12);
-
-                this.ctx.beginPath();
-                if (vector2D.z > 1)
-                    this.ctx.arc( -v2D.x+centerX, (-v2D.y+centerY), 10, 0, 2*Math.PI, false);
-                else
-                    this.ctx.arc( v2D.x+centerX, -(v2D.y-centerY), 10, 0, 2*Math.PI, false);
-
-                this.ctx.fillStyle = "black";
-                this.ctx.fill();
-                this.ctx.lineWidth = 2;
-                this.ctx.strokeStyle = '#5DFC0A';
-                this.ctx.stroke();
-
-            }
+            this.ctx.fillStyle = "red";
+            this.ctx.fill();
+            this.ctx.lineWidth = 2;
+            this.ctx.strokeStyle = 0xffffff;
+            this.ctx.stroke();
+        }
 
 
-            /////////////////////////////////
-            // PREDICTIVE TARGETING SYSTEM //
-            /////////////////////////////////
+        ////////////////////////////
+        // ENEMY TARGETING SYSTEM //
+        ////////////////////////////
 
-         // t = ( (a ev cos[beta]) + sqrt[(a ev cos[beta])^2 + (bv^2-ev^2)(a^2)] )  / (bv^2 - ev^2)
+        if (s.game.enemies.list()[1])
+            this.lockedOn = true;
 
-            // PARAMETERS
-            // a    = distance between self and target
-            // eV   = magnitude of enemy's current velocity vector
-            // bV   = magnitude of bullet's velocity vector
-            // beta = angle between a and eV, via dot product
-            // angD = angular differential; scales down with increased beta
-            // velD = velocity
-            // top  = upper quotient for quadratic solution
-            // bot  = lower quotient for quadratic solution
-            // t    = time at which player bullet and enemy ship will simultaneously reach a given location
-            if ( s.game.enemies.list()[1] && this.target == s.game.enemies.list()[1].root && Math.abs(vector2D.x) <= 0.95 && Math.abs(vector2D.y) <= 0.95 ){
+        var i = 1 || enemyLockIndex;
+        this.target = this.lockedOn ? s.game.enemies.list()[i].root : null;
 
-                var enemyV3D = this.target.position.clone();
-                if (enemyV3D){
+        var vTarget3D = this.target ? this.target.position.clone() : null;
+        var vTarget2D = this.target ?  s.projector.projectVector(vTarget3D, s.game.camera) : null;
 
-                    var aV = enemyV3D.add( s.game.player.root.position.clone().multiplyScalar(-1) );
-                    var a  = aV.length();
-                    var eV = this.target.getLinearVelocity();
-                    var e  = eV.length();
-                    var pV = s.game.player.root.getLinearVelocity();
-                    var b = 5000+pV.length();
+        var targetInSight = !this.target ? false : Math.abs(vTarget2D.x) <= 0.95 && Math.abs(vTarget2D.y) <= 0.95 && vTarget2D.z < 1 ? true : false;
+        var v2D;
 
-                    //if (Math.abs(beta) > Math.PI/2)
-                    //    debugger;
+        // Targeting box
+        if ( this.target && targetInSight ){
+            v2D = vTarget2D.clone();
+            v2D.x =  ( width  + v2D.x*width  )/2;
+            v2D.y = -(-height + v2D.y*height )/2;
 
-                    if (eV && b && aV){
+            var size = 50;
 
-                        //var beta = Math.acos(aV.dot(eV)/(a*e));
-                        //var angD1 = a*e*Math.cos(beta);
+            this.ctx.strokeRect( v2D.x-size, v2D.y-size, size*2, size*2 );
+            this.ctx.lineWidth = 1;
+            this.ctx.strokeStyle = '#5DFC0A';
 
-                        var angD = aV.dot(eV);
-                        var velD = (b*b - e*e);
-                        var t = angD/velD + Math.sqrt( angD*angD + velD*a*a )/velD;
+        // Radial direction marker
+        } else if ( this.target ) {
 
-                        if (t < 4){
+            v2D = new THREE.Vector2(vTarget2D.x, vTarget2D.y);
+            v2D.multiplyScalar(1/v2D.length()).multiplyScalar(this.subreticleBound.radius+12);
 
-                            var enemyV2D = s.projector.projectVector(this.target.position.clone().add(eV.multiplyScalar(t)), s.game.camera);
-                            enemyV2D.x =  ( width  + enemyV2D.x*width  )/2;
-                            enemyV2D.y = -(-height + enemyV2D.y*height )/2;
-                            this.ctx.beginPath();
-                            this.ctx.arc(enemyV2D.x, enemyV2D.y, 10, 0, 2*Math.PI, false);
-                            this.ctx.fillStyle = "black";
-                            this.ctx.fill();
-                            this.ctx.lineWidth = 5;
-                            this.ctx.strokeStyle = '#5DFC0A';
-                            this.ctx.stroke();
-                        }
-                    }
-                }
-            }
+            this.ctx.beginPath();
+            if (vTarget2D.z > 1)
+                this.ctx.arc( -v2D.x+centerX, (-v2D.y+centerY), 10, 0, 2*Math.PI, false);
+            else
+                this.ctx.arc( v2D.x+centerX, -(v2D.y-centerY), 10, 0, 2*Math.PI, false);
 
-        } else {
+            this.ctx.fillStyle = "black";
+            this.ctx.fill();
+            this.ctx.lineWidth = 2;
+            this.ctx.strokeStyle = '#5DFC0A';
+            this.ctx.stroke();
 
         }
+
+
+        /////////////////////////////////
+        // PREDICTIVE TARGETING SYSTEM //
+        /////////////////////////////////
+
+     // t = ( (a ev cos[beta]) + sqrt[(a ev cos[beta])^2 + (bv^2-ev^2)(a^2)] )  / (bv^2 - ev^2)
+
+        // PARAMETERS
+        // a    = distance between self and target
+        // eV   = magnitude of enemy's current velocity vector
+        // bV   = magnitude of bullet's velocity vector
+        // beta = angle between a and eV, via dot product
+        // angD = angular differential; scales down with increased beta
+        // velD = velocity
+        // top  = upper quotient for quadratic solution
+        // bot  = lower quotient for quadratic solution
+        // t    = time at which player bullet and enemy ship will simultaneously reach a given location
+        if ( s.game.enemies.list()[1] && targetInSight ){
+
+            var self = s.game.player.root;
+            var aV = vTarget3D.add( self.position.clone().multiplyScalar(-1) );
+            var a  = aV.length();
+            var eV = this.target.getLinearVelocity();
+            var e  = eV.length();
+            var pV = self.getLinearVelocity();
+            var b = 5000+pV.length();
+
+            //if (Math.abs(beta) > Math.PI/2)
+            //    debugger;
+
+            if (eV && b && aV){
+
+                //var beta = Math.acos(aV.dot(eV)/(a*e));
+                //var angD1 = a*e*Math.cos(beta);
+                var angD = aV.dot(eV);
+                var velD = (b*b - e*e);
+
+                var t = angD/velD + Math.sqrt( angD*angD + velD*a*a )/velD;
+
+                if (t < 4){
+
+                    var enemyV2D = s.projector.projectVector(this.target.position.clone().add(eV.multiplyScalar(t)), s.game.camera);
+
+                    enemyV2D.x =  ( width  + enemyV2D.x*width  )/2;
+                    enemyV2D.y = -(-height + enemyV2D.y*height )/2;
+
+                    this.ctx.beginPath();
+                    this.ctx.arc(enemyV2D.x, enemyV2D.y, 10, 0, 2*Math.PI, false);
+                    this.ctx.fillStyle = "black";
+                    this.ctx.fill();
+                    this.ctx.lineWidth = 5;
+                    this.ctx.strokeStyle = '#5DFC0A';
+                    this.ctx.stroke();
+
+                }
+            }
+        }
+
 
 	}
 
