@@ -6,8 +6,8 @@ Copyright (C) 2013 Larry Davis
 var s = {
     config: {
         ship: {
-			hull: 800,
-			shields: 400
+			hull: 100,
+			shields: 200
         }
     },
 

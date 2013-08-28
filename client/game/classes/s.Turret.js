@@ -1,13 +1,13 @@
 s.Turret = new Class({
     toString: 'Turret',
-    
+
 	extend: s.Projectile,
 
     options: {
         mass: 1,
         size: 16,
         velocity: 10000,
-        damage: 10,
+        damage: 1000,
         scale: new THREE.Vector3(50, 50, 1.0),
         color: {
             alliance: 0x00F2FF,
