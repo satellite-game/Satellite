@@ -3,6 +3,9 @@ s.HUD = new Class({
 
 	construct: function(options){
 
+        // DELETE ME!!! //////////////////////////
+        this.dummyData = [];
+        // DELETE THAT! //////////////////////////
 
 		this.game = options.game;
 		this.controls = options.controls;
@@ -143,7 +146,7 @@ s.HUD = new Class({
             } else {
 
                 var v2D = new THREE.Vector2(vector2D.x, vector2D.y);
-                v2D.multiplyScalar(1/v2D.length()).multiplyScalar(this.subreticleBound.radius+15);
+                v2D.multiplyScalar(1/v2D.length()).multiplyScalar(this.subreticleBound.radius+12);
 
                 this.ctx.beginPath();
                 if (vector2D.z > 1)
@@ -176,47 +179,44 @@ s.HUD = new Class({
             // top  = upper quotient for quadratic solution
             // bot  = lower quotient for quadratic solution
             // t    = time at which player bullet and enemy ship will simultaneously reach a given location
-            this.dummyData = this.dummyData || [];
-            if ( s.game.enemies.list()[1] && this.target == s.game.enemies.list()[1] && Math.abs(vector2D.x) <= 0.95 && Math.abs(vector2D.y) <= 0.95 ){
+            if ( s.game.enemies.list()[1] && this.target == s.game.enemies.list()[1].root && Math.abs(vector2D.x) <= 0.95 && Math.abs(vector2D.y) <= 0.95 ){
 
-                var enemyV3D = this.target.root.position.clone();
+                var enemyV3D = this.target.position.clone();
                 if (enemyV3D){
 
-                    var a = enemyV3D.clone().length();
-                    var aV = enemyV3D.add(s.game.player.root.position.clone().multiplyScalar(-1));
-                    console.log(aV);
-                    var eV = this.target.root.getLinearVelocity();
-                    var bV = 2500;
-                    var beta = aV.dot(eV)/(a*eV.length());
-                    if (Math.abs(beta) > Math.PI/2)
-                        debugger;
+                    var aV = enemyV3D.add( s.game.player.root.position.clone().multiplyScalar(-1) );
+                    var a  = aV.length();
+                    var eV = this.target.getLinearVelocity();
+                    var e  = eV.length();
+                    //var bV = bulletVelocity;
+                    var b = 2500;
 
-                    if (beta && eV && bV && aV){
+                    var beta = Math.acos(aV.dot(eV)/(a*e));
 
-                        var angD = a*eV.length()*Math.cos(beta);
-                        var velD   = (bV*bV - eV.length()*eV.length());
+                    //if (Math.abs(beta) > Math.PI/2)
+                    //    debugger;
+
+                    if (beta && eV && b && aV){
+
+                        //var angD = a*e*Math.cos(beta);
+                        var angD = aV.dot(eV);
+                        var velD = (b*b - e*e);
 
                         var t = angD/velD + Math.sqrt( angD*angD + velD*a*a )/velD;
 
-                        this.dummyData.push(t);
-                        //if (!this.dummyData.length%50)
-                            //console.log(t);
+                        if (t < 4){
 
-                        var enemyV2D = s.projector.projectVector(eV.multiplyScalar(t), s.game.camera);
-                        enemyV2D.x =  ( width  + enemyV2D.x*width  )/2;
-                        enemyV2D.y = -(-height + enemyV2D.y*height )/2;
-
-                        //if (!this.dummyData.length%50)
-                            //console.log(enemyV2D);
-
-                        this.ctx.beginPath();
-                        this.ctx.arc(enemyV2D.x, enemyV2D.y, 10, 0, 2*Math.PI, false);
-                        this.ctx.fillStyle = "black";
-                        this.ctx.fill();
-                        this.ctx.lineWidth = 5;
-                        this.ctx.strokeStyle = '#5DFC0A';
-                        this.ctx.stroke();
-
+                            var enemyV2D = s.projector.projectVector(this.target.position.clone().add(eV.multiplyScalar(t)), s.game.camera);
+                            enemyV2D.x =  ( width  + enemyV2D.x*width  )/2;
+                            enemyV2D.y = -(-height + enemyV2D.y*height )/2;
+                            this.ctx.beginPath();
+                            this.ctx.arc(enemyV2D.x, enemyV2D.y, 10, 0, 2*Math.PI, false);
+                            this.ctx.fillStyle = "black";
+                            this.ctx.fill();
+                            this.ctx.lineWidth = 5;
+                            this.ctx.strokeStyle = '#5DFC0A';
+                            this.ctx.stroke();
+                        }
                     }
                 }
             }
