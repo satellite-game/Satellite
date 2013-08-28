@@ -2,10 +2,10 @@ s.Ship = new Class({
 	extend: s.GameObject,
 
     options: {
-        leftTurretOffset: new THREE.Vector3(25, 0, -250),
-        rightTurretOffset: new THREE.Vector3(-25, 0, -250),
+        leftTurretOffset: new THREE.Vector3(35, 0, -200),
+        rightTurretOffset: new THREE.Vector3(-35, 0, -200),
         missileOffset: new THREE.Vector3(0, 0, -120),
-        turretFireTime: 150,
+        turretFireTime: 120,
         missileFireTime: 1000
     },
 
