@@ -188,20 +188,19 @@ s.HUD = new Class({
                     var a  = aV.length();
                     var eV = this.target.getLinearVelocity();
                     var e  = eV.length();
-                    //var bV = bulletVelocity;
-                    var b = 2500;
-
-                    var beta = Math.acos(aV.dot(eV)/(a*e));
+                    var pV = s.game.player.root.getLinearVelocity();
+                    var b = 5000+pV.length();
 
                     //if (Math.abs(beta) > Math.PI/2)
                     //    debugger;
 
-                    if (beta && eV && b && aV){
+                    if (eV && b && aV){
 
-                        //var angD = a*e*Math.cos(beta);
+                        //var beta = Math.acos(aV.dot(eV)/(a*e));
+                        //var angD1 = a*e*Math.cos(beta);
+
                         var angD = aV.dot(eV);
                         var velD = (b*b - e*e);
-
                         var t = angD/velD + Math.sqrt( angD*angD + velD*a*a )/velD;
 
                         if (t < 4){
