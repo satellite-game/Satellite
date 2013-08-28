@@ -118,6 +118,19 @@ s.Game = new Class({
 				self.tryInitialize(this);
 			}
 		});
+
+		s.util.loadTextures({
+			textures: this.textures,
+			complete: function(textures) {
+				self.texturesLoaded = true;
+
+				// Store loaded textures
+				s.textures = textures;
+
+				// Attempt to start the game
+				self.tryInitialize(this);
+			}
+		});
 	},
 
 	// Attempt to start the game (if models and physics have begun)

@@ -9,6 +9,48 @@ Math.toRadians = function(degrees) {
 };
 
 /**
+	Load textures
+	
+	@param {Object} options  Options object
+	@param {Array} models  Array of texture names to load
+	@param {Function} complete  Function to call when loading is complete
+	@param {Function} progress  Function to call when model is loaded
+*/
+s.util.loadTextures = function(options) {
+	var toLoad = options.textures.length;
+
+	// Hold textures
+	var textures = {};
+
+	var loaded = function(name, texture) {
+		// Store texture
+		textures[name] = texture;
+		
+		// Track progress
+		toLoad--;
+		if (toLoad === 0) {
+			console.log('Textures loaded!');
+			if (typeof options.complete === 'function')
+				options.complete(textures);
+		}
+		else {
+			var pct = (options.textures.length-toLoad)/options.textures.length*100;
+
+			console.log('Loading textures: '+pct.toFixed(0)+'%');
+			if (typeof options.progress === 'function')
+				options.progress(pct, textures[name]);
+		}
+	};
+	
+	options.textures.forEach(function(name, index) {
+		// Strip file extension
+		var shortName = name.split('.')[0];
+
+		new THREE.ImageUtils.loadTexture('game/textures/'+name, {}, loaded.bind(null, shortName));
+	});
+};
+
+/**
 	Load models
 	
 	@param {Object} options  Options object

@@ -14,7 +14,7 @@ s.Explosion = new Class({
 		var pMaterial = new THREE.ParticleBasicMaterial({
 			color: 0xFFFFFF,
 			size: 300,
-			map: THREE.ImageUtils.loadTexture("game/textures/explosion.png"),
+			map: s.textures.explosion,
 			blending: THREE.AdditiveBlending,
 			transparent: true
 		});

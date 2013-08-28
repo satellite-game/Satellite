@@ -10,6 +10,11 @@ s.SatelliteGame = new Class( {
 		'human_ship_light'
 	],
 
+    textures: [
+        'particle.png',
+        'explosion.png'
+    ],
+
     getRandomCoordinate: function(){
         var coefficient = 1;
         if (Math.random() > 0.5){
@@ -223,22 +228,23 @@ s.SatelliteGame = new Class( {
             urlPrefix + "front5.png", urlPrefix + "back6.png"
         ];
 
-        var textureCube = THREE.ImageUtils.loadTextureCube( urls );
-        textureCube.format = THREE.RGBFormat;
-        var shader = THREE.ShaderLib.cube;
+        THREE.ImageUtils.loadTextureCube(urls, {}, function(textureCube) {
+            textureCube.format = THREE.RGBFormat;
+            var shader = THREE.ShaderLib.cube;
 
-        var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-        uniforms.tCube.value = textureCube;
+            var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+            uniforms.tCube.value = textureCube;
 
-        var material = new THREE.ShaderMaterial( {
-            fragmentShader: shader.fragmentShader,
-            vertexShader: shader.vertexShader,
-            uniforms: uniforms,
-            side: THREE.BackSide
-        } );
+            var material = new THREE.ShaderMaterial( {
+                fragmentShader: shader.fragmentShader,
+                vertexShader: shader.vertexShader,
+                uniforms: uniforms,
+                side: THREE.BackSide
+            } );
 
-        this.skyboxMesh = new THREE.Mesh( new THREE.CubeGeometry( 200000, 200000, 200000, 1, 1, 1, null, true ), material );
-        this.scene.add( this.skyboxMesh );
+            this.skyboxMesh = new THREE.Mesh( new THREE.CubeGeometry( 200000, 200000, 200000, 1, 1, 1, null, true ), material );
+            this.scene.add( this.skyboxMesh );
+        }.bind(this));
     },
 
     addDust: function ( ) {

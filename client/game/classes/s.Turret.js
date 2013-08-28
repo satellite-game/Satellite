@@ -25,9 +25,8 @@ s.Turret = new Class({
         this.root.addEventListener('collision', this.handleCollision.bind(this));
 
         // Draw the projectile to the screen
-        var spriteImg = new THREE.ImageUtils.loadTexture("game/textures/particle.png");
         var sprite = new THREE.Sprite(new THREE.SpriteMaterial({
-            map: spriteImg,
+            map: s.textures.particle,
             useScreenCoordinates: false,
             blending: THREE.AdditiveBlending,
             color: this.color

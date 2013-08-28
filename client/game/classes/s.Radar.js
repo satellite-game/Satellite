@@ -128,9 +128,7 @@ s.Radar = new Class({
 
         // moon instantiation
         var moonGeo = s.models.phobos_lofi.geometry;
-        var moonMats = s.models.phobos_lofi.materials;
-        moonMats[0].color.setHex(0x704030);
-        var moonMarker = new THREE.Mesh( moonGeo, new THREE.MeshNormalMaterial(moonMats) );
+        var moonMarker = new THREE.Mesh( moonGeo, new THREE.MeshNormalMaterial() );
 
         // Moon marker size scaling
         /* TODO: scale in a more meaningful way */
