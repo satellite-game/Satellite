@@ -78,7 +78,6 @@ s.Sound = new Class({
 
 		// Play the sound
 		if (soundObj)
-			console.log(soundObj);
 			soundObj.play();
 	}
 });
