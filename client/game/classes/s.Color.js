@@ -35,10 +35,6 @@ s.Color = new Class({
 
 		};
 
-		//this stores the ongoing  animations
-
-		this.intervalIDs = [];
-
 		//pseudo-global memory of how many frames the animation has been playing for
 
 		this.timesCounted = 0;
@@ -98,7 +94,9 @@ s.Color = new Class({
 
 		this.alphaStep = Math.abs(~~((endColor.alpha - this.alpha)/frames));
 
+
 		this.changeColor = this.changeColor.bind(this);
+
         this.game.hook(this.changeColor);
 
 	},

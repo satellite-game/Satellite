@@ -375,7 +375,7 @@ s.SatelliteGame = new Class( {
                 });
                 s.game.HUD.shieldsFull.animate({
                     color: s.game.HUD.shieldsDamaged,
-                    frames: 30
+                    frames: 60
                 });
                 s.game.player.shields -= 20;
             } else {
