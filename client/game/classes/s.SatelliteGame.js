@@ -211,8 +211,11 @@ s.SatelliteGame = new Class( {
 
         this.HUD.controls = this.controls;
 
-        this.comm.connected( );
-        this.start();
+        this.player.root.addEventListener('ready', function(){
+            console.log('physijs: loaded!!!');
+            that.comm.connected( );
+            s.game.start();
+        });
     },
 
     render: function ( _super, time ) {
@@ -317,12 +320,13 @@ s.SatelliteGame = new Class( {
     },
 
     handlePlayerList: function(message) {
+        console.log('handlePlayerList', message);
         for (var otherPlayerName in message) {
             // don't add self
             if (otherPlayerName == this.player.name) continue;
 
             var otherPlayer = message[otherPlayerName];
-            this.enemies.add(otherPlayer);
+            this.game.enemies.add(otherPlayer);
         }
     },
 

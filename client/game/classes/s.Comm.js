@@ -1,5 +1,5 @@
 /**
-* 
+*
 * s.Comm ---
 * allows us to compartmentalize all interactions
 * with the server to this class (s.Comm) --this class
@@ -10,7 +10,7 @@
 
 s.Comm = new Class( {
     extend: s.EventEmitter,
-    
+
     // makeTrigger is responsible for broadcasting all events
     // receieved from the server to the rest of the game.
     makeTrigger: function ( evt ) {
@@ -52,9 +52,9 @@ s.Comm = new Class( {
         this.socket.on( 'move', this.makeTrigger( 'move' ) );
 
         this.socket.on('killed', this.makeTrigger('killed'));
-        
+
         this.socket.on('fire', this.makeTrigger('fire'));
-        
+
         this.socket.on('hit', this.makeTrigger('hit'));
 
         this.game.hook(this.position);
@@ -62,6 +62,7 @@ s.Comm = new Class( {
     },
 
     connected: function ( ) {
+        console.log('connected function called');
         var time = new Date( ).getTime( );
         var shipPosition = this.game.player.getPositionPacket( );
 
@@ -111,7 +112,7 @@ s.Comm = new Class( {
         });
     },
     died: function(you, killer) {
-        this.socket.emit('killed',{ 
+        this.socket.emit('killed',{
             you: you,
             killer: killer
              });
