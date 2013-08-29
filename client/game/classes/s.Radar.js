@@ -131,7 +131,7 @@ s.Radar = new Class({
 
         // Moon marker size scaling
         /* TODO: scale in a more meaningful way */
-        moonMarker.scale.multiplyScalar(0.005);
+        moonMarker.scale.multiplyScalar(3/1000);
         moonMarker.name = "moon";
 
         // Moon radar positioning

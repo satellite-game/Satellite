@@ -46,8 +46,8 @@ s.Controls = new Class({
 		var centerX = this.HUD.canvas.width/2;
 
 		if (this.keyboard.pressed('backtick')) {
-			root.position.set(10000, 2000, 10000);
-			root.rotation.set(0, Math.PI/4, 0);
+			root.position.set(-20000, 2000, -20000);
+			root.rotation.set(0, -3*Math.PI/4, 0);
 			root.setAngularVelocity(new THREE.Vector3());
 			root.setLinearVelocity(new THREE.Vector3());
 
