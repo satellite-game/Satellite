@@ -12,7 +12,13 @@ s.Color = new Class({
 
 		this.color = "rgba(" + this.red + "," + this.green + "," + this.blue + "," + this.alpha+ ")";
 
-		this.startingColor = this.color;
+		this.startingColor = {
+			red: this.red,
+			green: this.green,
+			blue: this.blue,
+			alpha: this.alpha,
+			color: "rgba(" + this.red + "," + this.green + "," + this.blue + "," + this.alpha+ ")"
+		};
 
 
 		this.intervalIDs = [];
@@ -21,10 +27,19 @@ s.Color = new Class({
 	},
 
 	animate: function( options ){
+		for (var i = 0; i < this.intervalIDs.length; i++){
+			clearInterval(this.intervalIDs[i]);
+		}
+
 		this.timesCounted = 0;
 
-		this.color = this.startingColor;
-
+		if (!options.fading){
+			this.red = this.startingColor.red;
+			this.green = this.startingColor.green;
+			this.blue = this.startingColor.blue;
+			this.alpha = this.startingColor.alpha;
+			this.color = this.startingColor.color;
+		}
 		var self = this,
 
 		endColor = options.color,
@@ -46,15 +61,36 @@ s.Color = new Class({
 	},
 
 	changeColor: function( options ){
+
+		var endColor = options.color;
+
 		if (this.timesCounted === options.frames){
-			for (var i = 0; i < this.intervalIDs; i++){
+			for (var i = 0; i < this.intervalIDs.length; i++){
 				clearInterval(this.intervalIDs[i]);
 			}
-			this.color = this.startingColor;
-		} else {
-		var endColor = options.color,
 
-		frames = options.frames,
+			this.red = endColor.red;
+			this.green = endColor.green;
+			this.blue = endColor.blue;
+			this.alpha = endColor.alpha;
+			this.color = "rgba(" + this.red + "," + this.green + "," + this.blue + "," + this.alpha+ ")";
+
+			if (this.color !== this.startingColor.color){
+				this.animate({
+					color:{
+						red: this.startingColor.red,
+						green: this.startingColor.green,
+						blue: this.startingColor.blue,
+						alpha: this.startingColor.alpha
+					},
+					frames: options.frames,
+					fading: true
+				});
+			}
+		} else {
+
+
+		var frames = options.frames,
 
 		redStep = options.redStep,
 
@@ -67,25 +103,30 @@ s.Color = new Class({
 
 		if(this.red < endColor.red){
 			this.red += redStep;	
-		} else {
+		} 
+		else if (this.red > endColor.red) {
 			this.red -= redStep;
 		}
 
 		if(this.green < endColor.green){
 			this.green += greenStep;	
-		} else {
+		} 
+		else if (this.green > endColor.green) {
 			this.green -= greenStep;
 		}
 
+
 		if(this.blue < endColor.blue){
 			this.blue += blueStep;	
-		} else {
+		} 
+		else if (this.blue > endColor.blue) {
 			this.blue -= blueStep;
 		}
 
 		if(this.alpha < endColor.alpha){
 			this.alpha += alphaStep;	
-		} else {
+		} 
+		else if (this.alpha > endColor.alpha) {
 			this.alpha -= alphaStep;
 		}
 
