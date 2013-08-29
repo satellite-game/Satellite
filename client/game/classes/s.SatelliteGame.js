@@ -26,7 +26,6 @@ s.SatelliteGame = new Class( {
 
 	initialize: function() {
 		var that = this;
-
         this.IDs = [];
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
 		// No gravity
@@ -66,6 +65,7 @@ s.SatelliteGame = new Class( {
             rotation: new THREE.Vector3( 0, Math.PI/2, 0 ),
             alliance: 'alliance'
         } );
+
         this.HUD.hp = this.player.hull;
         // Moon facing initilization
         this.player.root.lookAt(this.moon.root.position);
@@ -87,8 +87,6 @@ s.SatelliteGame = new Class( {
 
         // lazd: Dust is kinda lame. But I want some sort of thing that shows you're moving
         this.addDust( );
-
-
 
         // Fly controls
         this.controls = new s.Controls( {
@@ -216,6 +214,7 @@ s.SatelliteGame = new Class( {
 
         this.HUD.controls = this.controls;
 
+        this.handleLoadMessages('initializing physics');
         this.player.root.addEventListener('ready', function(){
             that.comm.connected( );
             s.game.start();
@@ -295,9 +294,9 @@ s.SatelliteGame = new Class( {
             transparent: true
         } );
 
-        var particles = new THREE.ParticleSystem( geometry, material );
+        this.dust = new THREE.ParticleSystem( geometry, material );
 
-        this.scene.add( particles );
+        this.scene.add( this.dust );
     },
 
     handleJoin: function ( message ) {
@@ -428,7 +427,9 @@ s.SatelliteGame = new Class( {
         for (var i = 0; i < s.game.IDs.length; i++){
             clearInterval(s.game.IDs[i]);
         }
+    },
+
+    handleLoadMessages: function(message){
+        s.game.loadScreen.setMessage(message);
     }
-
-
 } );
