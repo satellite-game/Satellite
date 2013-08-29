@@ -53,7 +53,12 @@ s.SatelliteGame = new Class( {
         this.pilot = {};
         this.pilot.name = navigator.platform + ' ' + ~~( new Date( ).getTime( ) / 100 % 1000 ) + Math.floor( Math.random( ) * 100 );
         // Add a ship
+        this.HUD = new s.HUD( {
+            game: this
+        } );
+
         this.player = new s.Player( {
+            HUD: this.HUD,
             game: this,
             shipClass: 'human_ship_light',
             position: new THREE.Vector3(this.getRandomCoordinate(),this.getRandomCoordinate(),this.getRandomCoordinate()),
@@ -82,9 +87,7 @@ s.SatelliteGame = new Class( {
         // lazd: Dust is kinda lame. But I want some sort of thing that shows you're moving
         this.addDust( );
 
-        this.HUD = new s.HUD( {
-            game: this
-        } );
+
 
         // Fly controls
         this.controls = new s.Controls( {
@@ -320,13 +323,12 @@ s.SatelliteGame = new Class( {
     },
 
     handlePlayerList: function(message) {
-        console.log('handlePlayerList', message);
         for (var otherPlayerName in message) {
             // don't add self
             if (otherPlayerName == this.player.name) continue;
 
             var otherPlayer = message[otherPlayerName];
-            this.game.enemies.add(otherPlayer);
+            s.game.enemies.add(otherPlayer);
         }
     },
 

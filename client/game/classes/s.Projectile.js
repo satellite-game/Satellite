@@ -2,6 +2,7 @@ s.Projectile = new Class({
 	extend: s.GameObject,
 
     construct: function(options){
+        this.HUD = options.HUD;
         this.game = options.game;
         this.comm = this.game.comm;
         this.game = options.game;
@@ -21,6 +22,10 @@ s.Projectile = new Class({
     handleCollision: function(mesh, position){
         if (this.pilot === this.game.pilot.name){
             if (mesh.instance.alliance && mesh.instance.alliance === "enemy"){
+                this.HUD.menu.animate({
+                color: this.HUD.hit,
+                frames: 10
+                });
                 new s.Shield({
                     game: this.game,
                     ship: mesh

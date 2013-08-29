@@ -42,6 +42,12 @@ s.HUD = new Class({
             blue: 0,
             alpha: 0.9
         });
+        this.hit = new s.Color({
+            red: 256,
+            green: 256,
+            blue: 256,
+            alpha: 1
+        });
 
 	},
 	update: function(){
@@ -195,7 +201,7 @@ s.HUD = new Class({
                 this.ctx.fillStyle = "black";
                 this.ctx.fill();
                 this.ctx.lineWidth = 2;
-                this.ctx.strokeStyle = '#5DFC0A';
+                this.ctx.strokeStyle = this.menu.color;
                 this.ctx.stroke();
 
             }
@@ -239,9 +245,6 @@ s.HUD = new Class({
                     var t = angD/velD + Math.sqrt( angD*angD + velD*a*a )/velD;
 
                     if (t < 5){
-
-                        var enemyV2D = s.projector.projectVector(this.target.position.clone().add(eV.multiplyScalar(t)), s.game.camera);
-
                             var enemyV2D = s.projector.projectVector(this.target.position.clone().add(eV.multiplyScalar(t)), s.game.camera);
                             enemyV2D.x =  ( width  + enemyV2D.x*width  )/2;
                             enemyV2D.y = -(-height + enemyV2D.y*height )/2;
@@ -250,7 +253,7 @@ s.HUD = new Class({
                             this.ctx.fillStyle = "black";
                             this.ctx.fill();
                             this.ctx.lineWidth = 5;
-                            this.ctx.strokeStyle = '#5DFC0A';
+                            this.ctx.strokeStyle = this.menu.color;
                             this.ctx.stroke();
                         }
                     }
@@ -258,6 +261,5 @@ s.HUD = new Class({
             }
 
         }
-	}
 
 });

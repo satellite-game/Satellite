@@ -10,6 +10,7 @@ s.Ship = new Class({
     },
 
 	construct: function(options) {
+        this.HUD = options.HUD;
 		var geometry = s.models[options.shipClass].geometry;
 		var materials = s.models[options.shipClass].materials;
 
@@ -48,6 +49,7 @@ s.Ship = new Class({
                 // Left bullet
                 position = this.getOffset(this.options.leftTurretOffset);
                 new s.Turret({
+                    HUD: this.HUD,
                     game: this.game,
                     pilot: this.game.pilot.name,
                     position: position,
@@ -64,6 +66,7 @@ s.Ship = new Class({
                 // Right bullet
                 position = this.getOffset(this.options.rightTurretOffset);
                 new s.Turret({
+                    HUD: this.HUD,
                     game: this.game,
                     pilot: this.game.pilot.name,
                     position: position,
