@@ -60,6 +60,18 @@ s.HUD = new Class({
             blue: 256,
             alpha: 1
         });
+        this.shieldsFull = new s.Color({
+            red: 0,
+            green: 200,
+            blue: 256,
+            alpha: 0
+        });
+        this.shieldsDamaged = new s.Color({
+            red: 0,
+            green: 200,
+            blue: 256,
+            alpha: 0.75
+        });
 
 
 	},
@@ -74,10 +86,13 @@ s.HUD = new Class({
             width = window.innerWidth,
             centerX = width/ 2,
             centerY = height/2;
-
-        this.canvas.height = height;
-        this.canvas.width = width;
-        this.ctx.clearRect(0, 0, height, width);
+        if (this.canvas.height !== height){
+            this.canvas.height = height;
+        }
+        if (this.canvas.width !== width){
+            this.canvas.width = width; 
+        }
+        this.ctx.clearRect(0, 0, width, height);
 
         // Vector for cursor location centered around the center of the screen
         this.cursorVector = new THREE.Vector2(this.targetX - centerX, this.targetY - centerY);
@@ -100,14 +115,14 @@ s.HUD = new Class({
         this.ctx.font = '10px Futura';
         this.ctx.fillText("SET",95 + velocity,75);
 
-        this.ctx.fillStyle = '#FF0000';
+        this.ctx.fillStyle = this.hull.color;
         this.ctx.font = '20px Futura';
         this.ctx.fillRect(100, 170, (this.game.player.hull/s.config.ship.hull) * 200, 10);
         this.ctx.fillRect(100,170,200,1);
         this.ctx.fillText("HULL",100,160);
 
 
-        this.ctx.fillStyle = '#00FFFF';
+        this.ctx.fillStyle = this.shields.color;
 
         this.ctx.font= '20px Futura';
         this.ctx.fillRect(100, 110, (this.game.player.shields/s.config.ship.shields) * 200, 10);
@@ -164,10 +179,10 @@ s.HUD = new Class({
             else
                 this.ctx.arc( moon2D.x+centerX, -(moon2D.y-centerY), 10, 0, 2*Math.PI, false);
 
-            this.ctx.fillStyle = "red";
+            this.ctx.fillStyle = "black";
             this.ctx.fill();
             this.ctx.lineWidth = 2;
-            this.ctx.strokeStyle = 0xffffff;
+            this.ctx.strokeStyle = this.menu.color;
             this.ctx.stroke();
         }
 
@@ -279,15 +294,21 @@ s.HUD = new Class({
                 }
             }
         if (this.hp !== s.config.ship.hull){
-            var grd=this.ctx.createRadialGradient(centerX,centerY,width/12,centerX,centerY,this.health);
+            var grd = this.ctx.createRadialGradient(centerX,centerY,width/12,centerX,centerY,this.health);
             grd.addColorStop(0,"rgba(0,0,0,0)");
             grd.addColorStop(1,"rgba(256,0,0,0.75)");
 
             // Fill with gradient
-            this.ctx.fillStyle=grd;
+            this.ctx.fillStyle = grd;
             this.ctx.fillRect(0,0,width,height);
         }
-
+        if (this.shieldsFull.alpha !== 0){
+            var grade = this.ctx.createRadialGradient(centerX,centerY,width/12,centerX,centerY,width * 0.85);
+            grade.addColorStop(0,"rgba(0,0,0,0)");
+            grade.addColorStop(1,this.shieldsFull.color);
+            this.ctx.fillStyle = grade;
+            this.ctx.fillRect(0,0,width,height);
         }
+    }   
 
 });

@@ -6,8 +6,8 @@ Copyright (C) 2013 Larry Davis
 var s = {
     config: {
         ship: {
-            hull: 160,
-            shields: 120
+            hull: 120,
+            shields: 80
         },
         sound: {
             enabled: true,

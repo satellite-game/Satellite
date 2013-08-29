@@ -371,14 +371,18 @@ s.SatelliteGame = new Class( {
             s.game.rechargeShields();
             if (s.game.player.shields > 0){
                 s.game.HUD.menu.animate({
-                color: s.game.HUD.shields,
-                frames: 10
+                    color: s.game.HUD.shields,
+                    frames: 10
+                });
+                s.game.HUD.shieldsFull.animate({
+                    color: s.game.HUD.shieldsDamaged,
+                    frames: 15
                 });
                 s.game.player.shields -= 20;
             } else {
                 s.game.HUD.menu.animate({
-                color: s.game.HUD.hull,
-                frames: 10
+                    color: s.game.HUD.hull,
+                    frames: 10
                 });
                 s.game.player.hull -= 20;
             }
@@ -406,7 +410,7 @@ s.SatelliteGame = new Class( {
         s.game.HUD.ctx.fill();
         s.game.HUD.ctx.font= String(s.game.HUD.canvas.width/10) + 'px Futura';
         s.game.HUD.ctx.fillStyle = '#5DFC0A';
-        s.game.HUD.ctx.fillText("YOU DIED",0,s.game.HUD.canvas.height/2);
+        s.game.HUD.ctx.fillText("YOU DIED",s.game.HUD.canvas.width/3,s.game.HUD.canvas.height/2);
         s.game.comm.died(you, killer);
 
     },
