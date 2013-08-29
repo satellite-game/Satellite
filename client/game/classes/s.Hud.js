@@ -61,6 +61,7 @@ s.HUD = new Class({
             alpha: 1
         });
 
+
 	},
 	update: function(){
 
@@ -84,6 +85,12 @@ s.HUD = new Class({
 		var borderWidth = width/8;
 
 		var borderHeight = height/8;
+
+        this.hp = this.game.player.hull;
+
+        this.health = width * (this.hp/s.config.ship.hull + 0.5);
+
+
 
 		this.ctx.fillStyle = this.menu.color;
 		this.ctx.font = '20px Futura';
@@ -271,6 +278,15 @@ s.HUD = new Class({
                     }
                 }
             }
+        if (this.hp !== s.config.ship.hull){
+            var grd=this.ctx.createRadialGradient(centerX,centerY,width/12,centerX,centerY,this.health);
+            grd.addColorStop(0,"rgba(0,0,0,0)");
+            grd.addColorStop(1,"rgba(256,0,0,0.75)");
+
+            // Fill with gradient
+            this.ctx.fillStyle=grd;
+            this.ctx.fillRect(0,0,width,height);
+        }
 
         }
 

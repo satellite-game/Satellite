@@ -82,7 +82,7 @@ s.Ship = new Class({
 
                 this.lastTurretFire = now;
 
-                this.game.sound.play('laser', 1);
+                this.game.sound.play('laser', 0.5);
             }
         }
 

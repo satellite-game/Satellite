@@ -66,6 +66,7 @@ s.SatelliteGame = new Class( {
             rotation: new THREE.Vector3( 0, Math.PI/2, 0 ),
             alliance: 'alliance'
         } );
+        this.HUD.hp = this.player.hull;
         // Moon facing initilization
         this.player.root.lookAt(this.moon.root.position);
 
