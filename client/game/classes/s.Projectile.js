@@ -24,7 +24,7 @@ s.Projectile = new Class({
             if (mesh.instance.alliance && mesh.instance.alliance === "enemy"){
                 this.HUD.menu.animate({
                 color: this.HUD.hit,
-                frames: 10
+                frames: 30
                 });
                 new s.Shield({
                     game: this.game,

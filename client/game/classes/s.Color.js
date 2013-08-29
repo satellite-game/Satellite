@@ -5,6 +5,7 @@ s.Color = new Class({
 	construct: function( options ){
 
 		//upon construction we set the color's properties to the passed in options'
+		this.game = options.game;
 
 		this.red = options.red;
 
@@ -46,17 +47,17 @@ s.Color = new Class({
 
 	animate: function( options ){
 
+
 		//animate starts up an asynchronous loop for changeColor and passes in some custom options
 
 
 		//clears all ongoing animations
 
-		for ( var i = 0; i < this.intervalIDs.length; i++ ){
-
-			clearInterval(this.intervalIDs[i]);
-
+		if (this.color !== this.startingColor.color){
+			this.game.unhook(this.changeColor);
 		}
 
+		
 		//reinitializes the frame count
 
 		this.timesCounted = 0;
@@ -81,48 +82,40 @@ s.Color = new Class({
 
 		//initializing the options we intend to pass into change color
 
-		var self = this,
+		var self = this;
 
-		endColor = options.color,
+		this.endColor = options.color;
 
-		frames = options.frames;
+		this.frames = options.frames;
 
-		options.redStep = Math.abs(~~((endColor.red - this.red)/frames));
+		var endColor = this.endColor;
 
-		options.greenStep = Math.abs(~~((endColor.green - this.green)/frames));
+		this.redStep = Math.abs(~~((endColor.red - this.red)/frames));
 
-		options.blueStep = Math.abs(~~((endColor.blue - this.blue)/frames));
+		this.greenStep = Math.abs(~~((endColor.green - this.green)/frames));
 
-		options.alphaStep = Math.abs(~~((endColor.alpha - this.alpha)/frames));
+		this.blueStep = Math.abs(~~((endColor.blue - this.blue)/frames));
 
+		this.alphaStep = Math.abs(~~((endColor.alpha - this.alpha)/frames));
 
-		this.intervalIDs.push(setInterval(function(){
-
-			self.changeColor( options );
-
-		}, 20)
-
-		);
-
+		this.changeColor = this.changeColor.bind(this);
+        this.game.hook(this.changeColor);
 
 	},
 
-	changeColor: function( options ){
+	changeColor: function(){
+
 
 		//changeColor is repetitively called by animate and changes this classes color to a target one in steps
 
-		var endColor = options.color;
+		var endColor = this.endColor;
+
 
 		//if we've reached the target amount of frames we clear animatons and then recursively call animate to change the color back to it's initial state
 
-		if ( this.timesCounted === options.frames ){
+		if ( this.timesCounted === this.frames ){
 
-			for (var i = 0; i < this.intervalIDs.length; i++){
-
-				clearInterval(this.intervalIDs[i]);
-
-			}
-
+			this.game.unhook(this.changeColor);
 
 			this.red = endColor.red;
 
@@ -151,7 +144,7 @@ s.Color = new Class({
 
 					},
 
-					frames: options.frames,
+					frames: this.frames,
 
 					fading: true
 
@@ -160,15 +153,15 @@ s.Color = new Class({
 
 		} else {
 
-		var frames = options.frames,
+		var frames = this.frames,
 
-		redStep = options.redStep,
+		redStep = this.redStep,
 
-		greenStep = options.greenStep,
+		greenStep = this.greenStep,
 
-		blueStep = options.blueStep,
+		blueStep = this.blueStep,
 
-		alphaStep = options.alphaStep;
+		alphaStep = this.alphaStep;
 
 
 		if( this.red < endColor.red ){

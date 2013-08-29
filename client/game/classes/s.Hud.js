@@ -32,36 +32,42 @@ s.HUD = new Class({
 		this.game.hook(this.update);
 		document.body.appendChild(this.canvas);
         this.menu = new s.Color({
+            game: this.game,
             red: 0,
             green: 256,
             blue: 0,
             alpha: 0.9
         });
         this.hit = new s.Color({
+            game: this.game,
             red: 256,
             green: 256,
             blue: 256,
             alpha: 1
         });
         this.hull = new s.Color({
+            game: this.game,
             red: 256,
             green: 0,
             blue: 0,
             alpha: 1
         });
         this.shields = new s.Color({
+            game: this.game,
             red: 0,
             green: 200,
             blue: 256,
             alpha: 1
         });
         this.shieldsFull = new s.Color({
+            game: this.game,
             red: 0,
             green: 200,
             blue: 256,
             alpha: 0
         });
         this.shieldsDamaged = new s.Color({
+            game: this.game,
             red: 0,
             green: 200,
             blue: 256,
