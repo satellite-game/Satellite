@@ -1,11 +1,7 @@
 s.HUD = new Class({
 	toString: "HUD",
 
-	construct: function(options){
-
-        // DELETE ME!!! //////////////////////////
-        this.dummyData = [];
-        // DELETE THAT! //////////////////////////
+	construct: function( options ){
 
 		this.game = options.game;
 		this.controls = options.controls;
