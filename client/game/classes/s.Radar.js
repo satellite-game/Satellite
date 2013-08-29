@@ -103,9 +103,8 @@ s.Radar = new Class({
         ///////////////////
         // ENEMY MARKERS //
         ///////////////////
-        that.enemies.add( { name: 'blah', pos: [Math.random()*1000000-5000,Math.random()*1000000-5000,Math.random()*1000000-5000], rot: [0,0,0], aVeloc: [0,0,0], lVeloc: [100,100,100] } );
-
         var enemyGeo = [], enemyMarker = [];
+        radar.enemyCount = 0;
         for (var i = 0, len = that.enemies.list().length; i < len; i++){
 
             enemyGeo[i] = new THREE.TetrahedronGeometry(5);
