@@ -2,6 +2,9 @@ s.Game = new Class({
 	extend: s.EventEmitter,
 
 	construct: function(options) {
+        // Display load screen
+        this.loadScreen = new s.LoadScreen();
+
 		var self = this;
 
 		/*===============================================
@@ -229,6 +232,7 @@ s.Game = new Class({
 
 	// Start rendering
 	start: function() {
+        this.loadScreen.remove();
 		this.doRender = true;
 		requestAnimationFrame(this.render);
 	},

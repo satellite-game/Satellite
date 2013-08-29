@@ -26,6 +26,7 @@ s.SatelliteGame = new Class( {
 
 	initialize: function() {
 		var that = this;
+
         this.IDs = [];
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
 		// No gravity
@@ -212,7 +213,6 @@ s.SatelliteGame = new Class( {
         this.HUD.controls = this.controls;
 
         this.player.root.addEventListener('ready', function(){
-            console.log('physijs: loaded!!!');
             that.comm.connected( );
             s.game.start();
         });
