@@ -48,6 +48,18 @@ s.HUD = new Class({
             blue: 256,
             alpha: 1
         });
+        this.hull = new s.Color({
+            red: 256,
+            green: 0,
+            blue: 0,
+            alpha: 1
+        });
+        this.shields = new s.Color({
+            red: 0,
+            green: 200,
+            blue: 256,
+            alpha: 1
+        });
 
 	},
 	update: function(){

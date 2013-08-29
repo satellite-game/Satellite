@@ -369,8 +369,16 @@ s.SatelliteGame = new Class( {
             s.game.stopShields();
             s.game.rechargeShields();
             if (s.game.player.shields > 0){
+                s.game.HUD.menu.animate({
+                color: s.game.HUD.shields,
+                frames: 10
+                });
                 s.game.player.shields -= 20;
             } else {
+                s.game.HUD.menu.animate({
+                color: s.game.HUD.hull,
+                frames: 10
+                });
                 s.game.player.hull -= 20;
             }
             console.log('You were hit with a laser by %s! Your HP: %d', killer, s.game.player.hull);
