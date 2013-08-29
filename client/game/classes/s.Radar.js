@@ -115,6 +115,7 @@ s.Radar = new Class({
                 new THREE.MeshBasicMaterial( { color: 0xff0000, shading: THREE.FlatShading } ) );
 
             enemyMarker[i].name = "enemy"+i;
+            enemyMarker[i].hash = that.enemies.list()[i].name;
             radar.add( enemyMarker[i] );
 
             radar.enemyCount = i+1;
@@ -228,9 +229,10 @@ s.Radar = new Class({
 
         var enemyLength = [], enemyPosition = [];
 
+        // ENEMY RADAR ADDITION
         // Search for new enemies and add them to the map
         if (enemies.length > radar.enemyCount){
-            for (var j = 0, lenj = that.enemies.list().length; j < lenj; j++){
+            for (var j = 0, lenj = enemies.length; j < lenj; j++){
                 if (!radar.getChildByName('enemy'+j)){
                     var enemyGeo = new THREE.TetrahedronGeometry(5);
 
@@ -245,9 +247,30 @@ s.Radar = new Class({
                     radar.enemyCount = j+1;
                 }
             }
+
+        // ENEMY RADAR REMOVAL
+        // Iterate through the radar population, if a radar marker's associated enemy object is not found,
+        // remove the marker, reassign radar marker names, decrement enemy count
+        } else if ( enemies.length < radar.enemyCount ) {
+            for ( var k = 0, lenk = radar.enemyCount; k < lenk; k++ ) {
+                var target = radar.getChildByName('enemy'+k);
+
+                // if the the enemy object no longer exists
+                if ( !s.game.enemies.get(target.hash) ){
+                    radar.remove( target );
+                    radar.enemyCount--; //decrement enemy count. safe to do here since lenk is limit
+                    if (lenk === radar.enemyCount) // REMOVE THIS; possibly need to increment lenk
+                        console.log(lenk, " ", radar.enemyCount);
+                    continue;
+                }
+                // if the list index of the enemy is not the list index of the radar marker, realign enemy names
+                if ( s.game.enemies.list().indexOf(target.hash) !== k ){
+                    target.name = 'enemy'+(k-1);
+                }
+            }
         }
 
-        // Update positions of enemies
+        // ENEMY RADAR POSITION UPDATE
         for (var i = 0, len = enemies.length; i < len; i++){
 
             enemyPosition[i] = enemies[i].root.position.clone();
