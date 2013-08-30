@@ -402,6 +402,10 @@ s.SatelliteGame = new Class( {
         } else {
             var enemy = s.game.enemies.get(you);
             enemy.shields -= 20;
+            setTimeout(function(){
+                console.log('recharged');
+                enemy.shields = 800;
+            }, 7000);
             console.log('hit: ', enemy);
         }
 
@@ -442,4 +446,5 @@ s.SatelliteGame = new Class( {
     handleLoadMessages: function(message){
         s.game.loadScreen.setMessage(message);
     }
+
 } );
