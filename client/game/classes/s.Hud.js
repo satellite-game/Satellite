@@ -345,6 +345,7 @@ s.HUD = new Class({
             this.ctx.fillRect(0,0,width,height);
         }
         if (this.shieldsFull.alpha !== 0){
+            
             var grade = this.ctx.createRadialGradient(centerX,centerY,width/12,centerX,centerY,width * (1.5 - this.shieldsFull.alpha));
             grade.addColorStop(0,"rgba(0,0,0,0)");
             grade.addColorStop(1,this.shieldsFull.color);

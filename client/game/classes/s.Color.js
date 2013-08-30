@@ -78,7 +78,6 @@ s.Color = new Class({
 
 		//initializing the options we intend to pass into change color
 
-		var self = this;
 
 		this.endColor = options.color;
 
@@ -92,8 +91,7 @@ s.Color = new Class({
 
 		this.blueStep = Math.abs(~~((endColor.blue - this.blue)/frames));
 
-		this.alphaStep = Math.abs(~~((endColor.alpha - this.alpha)/frames));
-
+		this.alphaStep = ~~(Math.abs(~~((endColor.alpha - this.alpha)*100)/frames))/100;
 
 		this.changeColor = this.changeColor.bind(this);
 
