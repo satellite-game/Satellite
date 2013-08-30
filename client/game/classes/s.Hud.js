@@ -36,7 +36,7 @@ s.HUD = new Class({
             red: 0,
             green: 256,
             blue: 0,
-            alpha: 0.9
+            alpha: 0.66
         });
         this.hit = new s.Color({
             game: this.game,
@@ -228,7 +228,7 @@ s.HUD = new Class({
                 else
                     this.ctx.arc( v2D.x+centerX, -(v2D.y-centerY), 10, 0, 2*Math.PI, false);
 
-                this.ctx.fillStyle = "black";
+                this.ctx.fillStyle = "rgba(256,0,0,0.5)";
                 this.ctx.fill();
                 this.ctx.lineWidth = 2;
                 this.ctx.strokeStyle = this.menu.color;
@@ -304,9 +304,9 @@ s.HUD = new Class({
                             // Draw the prediction marker
                             this.ctx.beginPath();
                             this.ctx.arc(enemyV2D.x, enemyV2D.y, 10, 0, 2*Math.PI, false);
-                            this.ctx.fillStyle = "black";
+                            this.ctx.fillStyle = "rgba(256,0,0,0.5)";
                             this.ctx.fill();
-                            this.ctx.lineWidth = 4;
+                            this.ctx.lineWidth = 2;
                             this.ctx.strokeStyle = this.menu.color;
                             this.ctx.stroke();
 
