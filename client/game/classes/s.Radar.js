@@ -189,7 +189,7 @@ s.Radar = new Class({
         var now  = this.selfPosition.clone();
         var last = this.lastPosition || now;
 
-        // xz dot product parameters
+        // xz dot product parameters; partial dot product
         var top  = last.x*now.x + last.z*now.z;
         var bot1 = Math.sqrt( last.x*last.x + last.z*last.z );
         var bot2 = Math.sqrt(  now.x*now.x  +  now.z*now.z );
@@ -202,9 +202,9 @@ s.Radar = new Class({
         this.lastPosition = this.selfPosition.clone();
 
 
-        ////////////////////////////////
-        // SELF POSITION AND ROTATION //
-        ////////////////////////////////
+        ///////////////////////
+        // SELF RADAR MARKER //
+        ///////////////////////
 
         // Distance from center of the map, scaled logarithmically
         var selfLength   = this.player.root.position.length();
@@ -223,9 +223,9 @@ s.Radar = new Class({
         trajectory.geometry.verticesNeedUpdate = true;
 
 
-        /////////////////////////////////
-        // ENEMY POSITION AND ROTATION //
-        /////////////////////////////////
+        /////////////////////////
+        // ENEMY RADAR MARKERS //
+        /////////////////////////
 
         var enemyLength = [], enemyPosition = [];
 

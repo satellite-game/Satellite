@@ -77,6 +77,10 @@ s.HUD = new Class({
         // array containing trailing predictive targets
         this.trailingPredictions = [];
 
+        // changeTarget modified by key commands to cycle through targets; currentTarget represents index of targeted enemy
+        this.changeTarget = 0;
+        this.currentTarget = 0;
+
 	},
 	update: function(){
 
@@ -87,8 +91,9 @@ s.HUD = new Class({
         var velocity = this.controls.options.thrustImpulse/10,
             height = window.innerHeight,
             width = window.innerWidth,
-            centerX = width/ 2,
+            centerX = width/2,
             centerY = height/2;
+
         if (this.canvas.height !== height){
             this.canvas.height = height;
         }
@@ -190,8 +195,19 @@ s.HUD = new Class({
         // ENEMY TARGETING SYSTEM //
         ////////////////////////////
 
-        var i = 0;
-        this.target = s.game.enemies.list() ? s.game.enemies.list()[i] : null;
+        var enemies = s.game.enemies.list(),
+            self = s.game.player.root;
+
+
+        // TARGET CYCLING
+        // changeTarget changes current tracked enemy in the enemy array by +/- 1
+        var i = this.currentTarget + this.changeTarget;
+        // cycle i through the list of enemies
+        i = ( i === -1 ? enemies.length : i > enemies.length-1 ? 0 : i);
+        this.currentTarget = i;
+        this.changeTarget = 0;
+
+        this.target = enemies ? enemies[i] : null;
         var targetInSight = false;
 
         if ( this.target ) {
@@ -200,12 +216,17 @@ s.HUD = new Class({
             var vTarget3D = this.target.position.clone();
             var vTarget2D = s.projector.projectVector(vTarget3D, s.game.camera);
 
-            if ( Math.abs(vTarget2D.x) <= 0.95 && Math.abs(vTarget2D.y) <= 0.95 && vTarget2D.z < 1 )
-                targetInSight = true;
+            var distanceToTarget, v2D, size;
 
-            var v2D;
+            if ( Math.abs(vTarget2D.x) <= 0.95 && Math.abs(vTarget2D.y) <= 0.95 && vTarget2D.z < 1 ){
+                targetInSight = true;
+                distanceToTarget = self.position.clone().distanceTo(vTarget3D);
+                size = Math.round((width - distanceToTarget/100)/30);
+            }
+
             // Targeting box
             if ( targetInSight ){
+
                 v2D = vTarget2D.clone();
                 v2D.x =  ( width  + v2D.x*width  )/2;
                 v2D.y = -(-height + v2D.y*height )/2;
@@ -239,98 +260,76 @@ s.HUD = new Class({
             /////////////////////////////////
             // PREDICTIVE TARGETING SYSTEM //
             /////////////////////////////////
-
-            // t = ( (a ev cos[beta]) + sqrt[(a ev cos[beta])^2 + (bv^2-ev^2)(a^2)] )  / (bv^2 - ev^2)
-
             // PARAMETERS
             // a    = distance between self and target
-            // eV   = magnitude of enemy's current velocity vector
-            // bV   = magnitude of bullet's velocity vector
-            // beta = angle between a and eV, via dot product
-            // angD = angular differential; scales down with increased beta
-            // velD = velocity
-            // top  = upper quotient for quadratic solution
-            // bot  = lower quotient for quadratic solution
-            // t    = time at which player bullet and enemy ship will simultaneously reach a given location
-            if ( s.game.enemies.list()[i] && targetInSight ){
+            // aV   = vector from target to self
+            // eV   = enemy's current velocity vector
+            // e    = magnitude of eV
+            // pV   = players's velocity vector
+            // b    = magnitude of bV plus initial bullet speed
+            // angD = angular differential
+            // velD = velocity differential
+            // t    = quadratic solution for time at which player bullet and enemy ship will simultaneously reach a given location
+            if ( enemies[i] && targetInSight ){
 
-                var self = s.game.player.root;
-                var aV = s.game.enemies.list()[i].root.position.clone().add( self.position.clone().multiplyScalar(-1) );
+                var aV = enemies[i].root.position.clone().add( self.position.clone().multiplyScalar(-1) );
                 var a  = aV.length();
                 var eV = this.target.getLinearVelocity();
                 var e  = eV.length();
                 var pV = self.getLinearVelocity();
                 var b = 5000+pV.length();
 
-                //if (Math.abs(beta) > Math.PI/2)
-                //    debugger;
-
                 if (eV && b && aV){
-                    //var beta = Math.acos(aV.dot(eV)/(a*e));
-                    //var angD1 = a*e*Math.cos(beta);
                     var angD = aV.dot(eV);
                     var velD = (b*b - e*e);
 
-//                    var beta = Math.acos( aV.dot(eV)/(a*e) );
-//                    var theta = Math.asin( (e/b)*Math.sin(beta) );
-//                    var eVt = aV.multiplyScalar(-1).multiplyScalar( Math.sin(theta)/Math.sin(Math.PI-beta-theta) );
-
                     var t = angD/velD + Math.sqrt( angD*angD + velD*a*a )/velD;
 
-                    // 4 = persistence time of bullets
+                    // Don't show the marker if the enemy is more than 4 seconds away
                     if (t < 4){
 
-                        // Project 3D coords onto 2D plane in perspective of the camera
-                        var enemyV2D = s.projector.projectVector(
-                            this.target.position.clone().add( eV.multiplyScalar(t) ), s.game.camera );
-
                         this.trailingPredictions.push(eV.multiplyScalar(t));
+                        var pLen = this.trailingPredictions.length;
 
                         // If the previous frames had a prediction, tween the midpoint of all predictions and plot that
-                        var pLen = this.trailingPredictions.length;
                         if (pLen > 3){
                             var pX = 0, pY = 0;
-                            for (var p = 0; p < this.trailingPredictions.length; p++){
-                                // scale predictions with current height/width/camera perspective
+                            for (var p = 0; p < pLen; p++){
+
+                                // Project 3D coords onto 2D plane in perspective of the camera;
+                                // Scale predictions with current camera perspective
                                 var current = s.projector.projectVector(
                                     this.target.position.clone().add( this.trailingPredictions[p] ), s.game.camera );
                                 pX += (width + current.x*width)/2;
                                 pY += -(-height + current.y*height)/2;
+
                             }
-                            enemyV2D.x = pX/pLen;
-                            enemyV2D.y = pY/pLen;
+                            var enemyV2D = new THREE.Vector2(pX/pLen, pY/pLen);
+//                            vTarget2D.x = pX/pLen;
+//                            vTarget2D.y = pY/pLen;
 
-
-                            // Draw the prediction marker
-                            this.ctx.beginPath();
-                            this.ctx.arc(enemyV2D.x, enemyV2D.y, 10, 0, 2*Math.PI, false);
-                            this.ctx.fillStyle = "rgba(256,0,0,0.5)";
-                            this.ctx.fill();
-                            this.ctx.lineWidth = 2;
-                            this.ctx.strokeStyle = this.menu.color;
-                            this.ctx.stroke();
+                            if (enemyV2D.distanceTo(v2D) > size/3) {
+                                // Draw the prediction marker
+                                this.ctx.beginPath();
+                                this.ctx.arc(enemyV2D.x, enemyV2D.y, size/3, 0, 2*Math.PI, false);
+                                this.ctx.fillStyle = "rgba(256,0,0,0.5)";
+                                this.ctx.fill();
+                                this.ctx.lineWidth = 2;
+                                this.ctx.strokeStyle = this.menu.color;
+                                this.ctx.stroke();
+                            }
 
                             // remove the earliest trailing prediction
                             this.trailingPredictions.shift();
-                        }
-//                            var enemyV2D2 = s.projector.projectVector(this.target.position.clone().add(eVt), s.game.camera);
-//                            enemyV2D2.x =  ( width  + enemyV2D2.x*width  )/2;
-//                            enemyV2D2.y = -(-height + enemyV2D2.y*height )/2;
-//                            this.ctx.beginPath();
-//                            this.ctx.arc(enemyV2D2.x, enemyV2D2.y, 10, 0, 2*Math.PI, false);
-//                            this.ctx.fillStyle = "black";
-//                            this.ctx.fill();
-//                            this.ctx.lineWidth = 6;
-//                            this.ctx.strokeStyle = this.menu.color;
-//                            this.ctx.stroke();
+
                         }
                     }
-                // If the target is no longer on screen, but lastV2D is still assigned, set to null
-                } else if ( this.trailingPredictions.length ) {
-                    this.trailingPredictions = [];
                 }
+            // If the target is no longer on screen, but lastV2D is still assigned, set to null
+            } else if ( this.trailingPredictions.length ) {
+                this.trailingPredictions = [];
             }
-
+        }
         /////////////////////////////////
         // PLAYER SHIELD/HEALTH STATUS //
         /////////////////////////////////
@@ -345,9 +344,6 @@ s.HUD = new Class({
             this.ctx.fillRect(0,0,width,height);
         }
         if (this.shieldsFull.alpha !== 0){
-
-            console.log(this.shieldsFull.alpha);
-            
             var grade = this.ctx.createRadialGradient(centerX,centerY,width/12,centerX,centerY,width * (1.5 - this.shieldsFull.alpha));
             grade.addColorStop(0,"rgba(0,0,0,0)");
             grade.addColorStop(1,this.shieldsFull.color);

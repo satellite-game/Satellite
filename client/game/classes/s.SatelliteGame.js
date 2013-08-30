@@ -188,6 +188,15 @@ s.SatelliteGame = new Class( {
         window.addEventListener( 'mouseup', function ( ) {
             that.controls.firing = false;
         } );
+        window.addEventListener( 'keydown', function(e) {
+            // Cycle through targets; extra logic guarding to prevent rapid cycling while the key is pressed
+//            if (s.game.HUD.changeTarget)
+//                s.game.HUD.changeTarget = 0;
+//            else
+            e = e.which;
+            s.game.HUD.changeTarget = (e === 69 ? 1 : e === 81 ? -1 : 0);
+            console.log(e, s.game.HUD.changeTarget);
+        } );
 
 
 
