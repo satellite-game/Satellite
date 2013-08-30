@@ -61,7 +61,7 @@ io.sockets.on('connection', function (socket) {
     console.log("New connection from " + address.address + ":" + address.port);
 
 
-    
+
     // Setup message handlers
     socket.on('join', function(message) {
         console.dir(message);
@@ -161,21 +161,25 @@ io.sockets.on('connection', function (socket) {
             }
         });
     });
+
     socket.on('hit', function(message) {
             socket.broadcast.emit('hit', {
                 otherPlayerName: message.otherPlayerName,
                 yourName: message.yourName
             });
+            socket.emit('hit', {
+                otherPlayerName: message.otherPlayerName,
+                yourName: message.yourName
+            });
     });
 
-    
     socket.on('killed', function(message) {
             socket.broadcast.emit('killed', {
                 killed: message.you,
                 killer: message.killer
         });
     });
-    
+
     socket.on('fire', function(message) {
         socket.get('name', function (err, name) {
             socket.broadcast.emit('fire', {
@@ -189,4 +193,4 @@ io.sockets.on('connection', function (socket) {
 });
 
 
-    
+

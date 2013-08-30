@@ -26,10 +26,12 @@ s.Projectile = new Class({
                 color: this.HUD.hit,
                 frames: 30
                 });
-                new s.Shield({
-                    game: this.game,
-                    ship: mesh
-                });
+                if(mesh.instance.shields > 0){
+                    new s.Shield({
+                        game: this.game,
+                        ship: mesh
+                    });
+                }
                 this.comm.hit(mesh.name,this.game.pilot.name);
             }
         }

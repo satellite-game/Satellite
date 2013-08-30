@@ -401,6 +401,7 @@ s.SatelliteGame = new Class( {
             }
         } else {
             var enemy = s.game.enemies.get(you);
+            enemy.shields -= 20;
             console.log('hit: ', enemy);
         }
 
