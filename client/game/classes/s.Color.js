@@ -83,6 +83,8 @@ s.Color = new Class({
 
 		this.frames = options.frames;
 
+		var frames = this.frames;
+
 		var endColor = this.endColor;
 
 		this.redStep = Math.abs(~~((endColor.red - this.red)/frames));
@@ -91,7 +93,7 @@ s.Color = new Class({
 
 		this.blueStep = Math.abs(~~((endColor.blue - this.blue)/frames));
 
-		this.alphaStep = ~~(Math.abs(~~((endColor.alpha - this.alpha)*100)/frames))/100;
+		this.alphaStep = Math.abs(~~(((endColor.alpha * 100) - (this.alpha * 100))/frames))/100;
 
 		this.changeColor = this.changeColor.bind(this);
 
