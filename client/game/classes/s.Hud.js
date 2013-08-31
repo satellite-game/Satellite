@@ -108,27 +108,7 @@ s.HUD = new Class({
         this.hp = this.game.player.hull;
         this.health = width * (this.hp/s.config.ship.hull + 0.5);
 
-		this.ctx.fillStyle = this.menu.color;
-		this.ctx.font = '20px Futura';
-		this.ctx.fillRect(100, 50, velocity/s.config.ship.maxSpeed * 200, 10);
-        this.ctx.fillRect(100,50,200,1);
-        this.ctx.fillText("THROTTLE",100,40);
-        this.ctx.font = '10px Futura';
-        this.ctx.fillText("SET",95 + velocity/s.config.ship.maxSpeed * 200,75);
-
-        this.ctx.fillStyle = this.hull.color;
-        this.ctx.font = '20px Futura';
-        this.ctx.fillRect(100, 170, (this.game.player.hull/s.config.ship.hull) * 200, 10);
-        this.ctx.fillRect(100,170,200,1);
-        this.ctx.fillText("HULL",100,160);
-
-
-        this.ctx.fillStyle = this.shields.color;
-
-        this.ctx.font= '20px Futura';
-        this.ctx.fillRect(100, 110, (this.game.player.shields/s.config.ship.shields) * 200, 10);
-        this.ctx.fillRect(100,110,200,1);
-        this.ctx.fillText("SHIELDS",100,100);
+        this.ctx.fillStyle = this.menu.color;
 
         this.subreticleBound.radius = width/8;
         this.ctx.beginPath();
@@ -196,7 +176,7 @@ s.HUD = new Class({
 
         this.ctx.closePath();
 
-        grd = this.ctx.createLinearGradient(0, throttleEndY, 0, throttleEndY - (throttleStartY * (velocity * 2/s.config.ship.maxSpeed) ) - 5);
+        grd = this.ctx.createLinearGradient(0, throttleEndY, 0, throttleEndY - (throttleStartY * (velocity * 2/s.config.ship.maxSpeed) ) - 1);
         grd.addColorStop(0, this.menu.color);   
         grd.addColorStop(0.99, this.menu.color);
         grd.addColorStop(1, ("rgba(0,0,0,0)"));
@@ -206,6 +186,64 @@ s.HUD = new Class({
         this.ctx.fill();
 
         this.ctx.stroke();
+
+        this.ctx.strokeStyle = this.menu.color;
+
+        throttleStartX = centerX + this.subreticleBound.radius;
+        throttleStartY = centerY - this.subreticleBound.radius;
+
+        throttleCP1X = throttleStartX + this.subreticleBound.radius/2;
+        throttleCP1Y = throttleStartY + this.subreticleBound.radius/3;
+
+        throttleCP2X = throttleCP1X;
+        throttleCP2Y =  centerY + this.subreticleBound.radius - this.subreticleBound.radius/3;
+
+        throttleEndX = throttleStartX;
+        throttleEndY = centerY + this.subreticleBound.radius;
+
+        throttle2CP1X = throttleCP2X + this.canvas.width/50;
+        throttle2CP1Y = throttleCP2Y;
+
+        throttle2CP2X = throttle2CP1X;
+        throttle2CP2Y =  throttleCP1Y;
+
+        throttle2EndX = throttleStartX;
+        throttle2EndY = throttleStartY;
+
+        this.ctx.beginPath( );
+        this.ctx.moveTo(throttleStartX,throttleStartY);
+
+        this.ctx.bezierCurveTo(
+            throttleCP1X,
+            throttleCP1Y,
+            throttleCP2X,
+            throttleCP2Y,
+            throttleEndX,
+            throttleEndY
+        );
+
+        this.ctx.bezierCurveTo(
+            throttle2CP1X,
+            throttle2CP1Y,
+            throttle2CP2X,
+            throttle2CP2Y,
+            throttle2EndX,
+            throttle2EndY
+        );
+
+        this.ctx.closePath();
+
+        grd = this.ctx.createLinearGradient(0, throttleEndY, 0, throttleEndY - (throttleStartY * (this.game.player.shields * 2/s.config.ship.shields)) - 1);
+        grd.addColorStop(0, this.shields.color);   
+        grd.addColorStop(0.99, this.shields.color);
+        grd.addColorStop(1, ("rgba(0,0,0,0)"));
+
+        this.ctx.fillStyle = grd;
+
+        this.ctx.fill();
+
+        this.ctx.stroke();
+
         this.ctx.beginPath();
 
         this.ctx.fillStyle = this.menu.color;
