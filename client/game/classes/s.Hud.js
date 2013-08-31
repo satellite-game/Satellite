@@ -6,6 +6,8 @@ s.HUD = new Class({
 		this.game = options.game;
 		this.controls = options.controls;
 
+        this.PI = Math.PI;
+
 		this.canvas = document.createElement('canvas');
 
 		this.canvas.height = window.innerHeight;
@@ -112,8 +114,8 @@ s.HUD = new Class({
 
         this.subreticleBound.radius = Math.min(width/8,height/4);
         this.ctx.beginPath();
-        this.ctx.arc( centerX, centerY, this.subreticleBound.radius, 0, 2*Math.PI, false);
-        this.ctx.lineWidth = 2;
+        this.ctx.arc( centerX, centerY, this.subreticleBound.radius, 0, 2*this.PI, false);
+        this.ctx.lineWidth = 1;
         this.ctx.strokeStyle = this.menu.color;
         this.ctx.stroke();
 
@@ -177,7 +179,7 @@ s.HUD = new Class({
         this.ctx.closePath();
 
         grd = this.ctx.createLinearGradient(0, throttleEndY, 0, throttleEndY - (throttleStartY * (velocity * 2/s.config.ship.maxSpeed)) - 4);
-        grd.addColorStop(0, this.menu.color);   
+        grd.addColorStop(0, this.menu.color);
         grd.addColorStop(0.99, this.menu.color);
         grd.addColorStop(1, ("rgba(0,0,0,0)"));
 
@@ -234,7 +236,7 @@ s.HUD = new Class({
         this.ctx.closePath();
 
         grd = this.ctx.createLinearGradient(0, throttleEndY, 0, throttleEndY - (throttleStartY * (this.game.player.shields * 2/s.config.ship.shields)) - 5);
-        grd.addColorStop(0, this.shields.color);   
+        grd.addColorStop(0, this.shields.color);
         grd.addColorStop(0.99, this.shields.color);
         grd.addColorStop(1, ("rgba(0,0,0,0)"));
 
@@ -248,7 +250,7 @@ s.HUD = new Class({
 
         this.ctx.fillStyle = this.menu.color;
 
-        this.ctx.arc(this.targetX, this.targetY, 5, 0, 2 * Math.PI, false);
+        this.ctx.arc(this.targetX, this.targetY, 5, 0, 2 * this.PI, false);
         this.ctx.fill();
 
         //////////////////////////////////
@@ -274,9 +276,9 @@ s.HUD = new Class({
 
             this.ctx.beginPath();
             if (vMoon2D.z > 1)
-                this.ctx.arc( -moon2D.x+centerX, (-moon2D.y+centerY), 10, 0, 2*Math.PI, false );
+                this.ctx.arc( -moon2D.x+centerX, (-moon2D.y+centerY), 10, 0, 2*this.PI, false );
             else
-                this.ctx.arc( moon2D.x+centerX, -(moon2D.y-centerY), 10, 0, 2*Math.PI, false );
+                this.ctx.arc( moon2D.x+centerX, -(moon2D.y-centerY), 10, 0, 2*this.PI, false );
 
             this.ctx.fillStyle = "black";
             this.ctx.fill();
@@ -340,9 +342,9 @@ s.HUD = new Class({
 
                 this.ctx.beginPath();
                 if (vTarget2D.z > 1)
-                    this.ctx.arc( -v2D.x+centerX, (-v2D.y+centerY), 10, 0, 2*Math.PI, false);
+                    this.ctx.arc( -v2D.x+centerX, (-v2D.y+centerY), 10, 0, 2*this.PI, false);
                 else
-                    this.ctx.arc( v2D.x+centerX, -(v2D.y-centerY), 10, 0, 2*Math.PI, false);
+                    this.ctx.arc( v2D.x+centerX, -(v2D.y-centerY), 10, 0, 2*this.PI, false);
 
                 this.ctx.fillStyle = "rgba(256,0,0,0.5)";
                 this.ctx.fill();
@@ -377,7 +379,7 @@ s.HUD = new Class({
                 var b = 5000+pV.length();
 
                 if (eV && b && aV){
-                    var angD = aV.dot(eV);
+                    retY var angD = aV.dot(eV);
                     var velD = (b*b - e*e);
 
                     var t = angD/velD + Math.sqrt( angD*angD + velD*a*a )/velD;
@@ -408,7 +410,7 @@ s.HUD = new Class({
                             if (enemyV2D.distanceTo(v2D) > size/3) {
                                 // Draw the prediction marker
                                 this.ctx.beginPath();
-                                this.ctx.arc(enemyV2D.x, enemyV2D.y, size/3, 0, 2*Math.PI, false);
+                                this.ctx.arc(enemyV2D.x, enemyV2D.y, size/5, 0, 2*this.PI, false);
                                 this.ctx.fillStyle = "rgba(256,0,0,0.5)";
                                 this.ctx.fill();
                                 this.ctx.lineWidth = 2;
@@ -453,10 +455,10 @@ s.HUD = new Class({
         this.ctx.lineWidth = 1;
         this.ctx.fillStyle = this.menu.color;
         this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, 3, 0, 2 * Math.PI, false);
+        this.ctx.arc(centerX, centerY, 3, 0, 2 * this.PI, false);
         this.ctx.fill();
         this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, 15, 0, 2 * Math.PI, false);
+        this.ctx.arc(centerX, centerY, 15, 0, 2 * this.PI, false);
         this.ctx.stroke();
     }
 
