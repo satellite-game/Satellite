@@ -49,8 +49,10 @@ s.Color = new Class({
 
 		//clears all ongoing animations
 
-		if (this.color !== this.startingColor.color){
+		if ( this.color !== this.startingColor.color ){
+
 			this.game.unhook(this.changeColor);
+
 		}
 
 		
@@ -87,21 +89,24 @@ s.Color = new Class({
 
 		var endColor = this.endColor;
 
-		this.redStep = Math.abs(~~((endColor.red - this.red)/frames));
+		this.redStep = Math.abs( ~~ ( ( endColor.red - this.red ) / frames ) );
 
-		this.greenStep = Math.abs(~~((endColor.green - this.green)/frames));
+		this.greenStep = Math.abs( ~~ ( ( endColor.green - this.green ) / frames ) );
 
-		this.blueStep = Math.abs(~~((endColor.blue - this.blue)/frames));
+		this.blueStep = Math.abs( ~~ ( ( endColor.blue - this.blue ) / frames ) );
 
-		this.alphaStep = Math.abs(~~(((endColor.alpha * 100) - (this.alpha * 100))/frames))/100;
+		this.alphaStep = Math.abs( ~~ ( ( ( endColor.alpha * 100 ) - ( this.alpha * 100 ) ) / frames ) ) / 100;
 
-		this.changeColor = this.changeColor.bind(this);
+		this.changeColor = this.changeColor.bind( this );
 
-        this.game.hook(this.changeColor);
+
+		//calls changeColor every frame for the set number of frames;
+
+        this.game.hook( this.changeColor );
 
 	},
 
-	changeColor: function(){
+	changeColor: function( ){
 
 
 		//changeColor is repetitively called by animate and changes this classes color to a target one in steps
@@ -113,7 +118,7 @@ s.Color = new Class({
 
 		if ( this.timesCounted === this.frames ){
 
-			this.game.unhook(this.changeColor);
+			this.game.unhook( this.changeColor) ;
 
 			this.red = endColor.red;
 

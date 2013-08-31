@@ -20,8 +20,8 @@ s.HUD = new Class({
 		this.crosshairs = new Image();
 		this.crosshairs.src = 'game/textures/crosshairs.png';
 
-		this.subreticle = new Image();
-		this.subreticle.src = 'game/textures/Subreticle.png';
+		this.gameOver = new Image();
+        this.gameOver.src = 'game/textures/Game-Over-1.png';
 
 		this.targetX = 0;
 		this.targetY = 0;
@@ -88,7 +88,7 @@ s.HUD = new Class({
         // RADIAL SUBRETICLE //
         ///////////////////////
 
-        var velocity = this.controls.options.thrustImpulse/10,
+        var velocity = this.controls.options.thrustImpulse,
             height = window.innerHeight,
             width = window.innerWidth,
             centerX = width/2,
@@ -113,11 +113,11 @@ s.HUD = new Class({
 
 		this.ctx.fillStyle = this.menu.color;
 		this.ctx.font = '20px Futura';
-		this.ctx.fillRect(100, 50, velocity, 10);
+		this.ctx.fillRect(100, 50, velocity/s.config.ship.maxSpeed * 200, 10);
         this.ctx.fillRect(100,50,200,1);
         this.ctx.fillText("THROTTLE",100,40);
         this.ctx.font = '10px Futura';
-        this.ctx.fillText("SET",95 + velocity,75);
+        this.ctx.fillText("SET",95 + velocity/s.config.ship.maxSpeed * 200,75);
 
         this.ctx.fillStyle = this.hull.color;
         this.ctx.font = '20px Futura';
@@ -147,8 +147,126 @@ s.HUD = new Class({
             this.targetY = this.cursorVector.y+centerY;
         }
 
-        this.ctx.beginPath();
+
         this.ctx.fillStyle = this.menu.color;
+
+        this.ctx.strokeStyle = this.menu.color;
+
+        var throttleStartX = centerX - this.subreticleBound.radius;
+
+        var throttleStartY = centerY - this.subreticleBound.radius;
+
+        var throttleCP1X = throttleStartX - this.subreticleBound.radius/2;
+
+        var throttleCP1Y = throttleStartY + this.subreticleBound.radius/3;
+
+        var throttleCP2X = throttleCP1X;
+
+        var throttleCP2Y =  centerY + this.subreticleBound.radius - this.subreticleBound.radius/3;
+
+        var throttleEndX = throttleStartX;
+
+        var throttleEndY = centerY + this.subreticleBound.radius;
+
+        var throttle2CP1X = throttleCP2X - this.canvas.width/50;
+
+        var throttle2CP1Y = throttleCP2Y;
+
+        var throttle2CP2X = throttle2CP1X;
+
+        var throttle2CP2Y =  throttleCP1Y;
+
+        var throttle2EndX = throttleStartX;
+
+        var throttle2EndY = throttleStartY;
+
+        this.ctx.beginPath( );
+
+        this.ctx.moveTo(throttleStartX,throttleStartY);
+
+        this.ctx.bezierCurveTo( 
+            throttleCP1X, 
+            throttleCP1Y, 
+            throttleCP2X, 
+            throttleCP2Y, 
+            throttleEndX, 
+            throttleEndY 
+            );
+
+        this.ctx.bezierCurveTo( 
+            throttle2CP1X, 
+            throttle2CP1Y, 
+            throttle2CP2X, 
+            throttle2CP2Y, 
+            throttle2EndX, 
+            throttle2EndY 
+        );
+
+        this.ctx.closePath();
+
+        this.ctx.stroke();
+
+        throttleStartX = centerX + this.subreticleBound.radius;
+
+        throttleStartY = centerY + this.subreticleBound.radius;
+
+        throttleEndX = 
+
+        throttleEndY = ( centerY - this.subreticleBound.radius ) * ( this.controls.options.thrustImpulse / s.config.ship.maxSpeed );
+
+        throttleCP1Y = 
+
+        throttleCP1X = 
+
+
+
+        throttleCP2X = 
+
+        throttleCP2Y =  
+
+
+
+        throttle2CP1X = 
+
+        throttle2CP1Y = 
+
+        throttle2CP2X = 
+
+        throttle2CP2Y =  
+
+        throttle2EndX = 
+
+        throttle2EndY = 
+
+        this.ctx.beginPath( );
+
+        this.ctx.moveTo(throttleStartX,throttleStartY);
+
+        this.ctx.bezierCurveTo( 
+            throttleCP1X, 
+            throttleCP1Y, 
+            throttleCP2X, 
+            throttleCP2Y, 
+            throttleEndX, 
+            throttleEndY 
+            );
+
+        this.ctx.bezierCurveTo( 
+            throttle2CP1X, 
+            throttle2CP1Y, 
+            throttle2CP2X, 
+            throttle2CP2Y, 
+            throttle2EndX, 
+            throttle2EndY 
+        );
+
+        this.ctx.closePath();
+
+        this.ctx.fill();
+
+
+        this.ctx.beginPath();
+
         this.ctx.arc(this.targetX, this.targetY, 5, 0, 2 * Math.PI, false);
 
         this.ctx.fill();

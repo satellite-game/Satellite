@@ -42,10 +42,12 @@ s.Comm = new Class( {
 
 
     construct: function ( options ) {
+        
+        //binding the game's context
 
         this.game = options.game;
 
-        // Prepend http
+        // Prepend http. Doing this so that you can customize the server before finalizing the string.
 
         options.server = 'http://' + options.server;
 
@@ -79,14 +81,14 @@ s.Comm = new Class( {
 
         this.socket.on( 'move', this.makeTrigger( 'move' ) );
 
-        this.socket.on('killed', this.makeTrigger('killed'));
+        this.socket.on('killed', this.makeTrigger( 'killed' ));
 
-        this.socket.on('fire', this.makeTrigger('fire'));
+        this.socket.on('fire', this.makeTrigger( 'fire' ));
 
-        this.socket.on('hit', this.makeTrigger('hit'));
+        this.socket.on('hit', this.makeTrigger( 'hit' ));
 
 
-        this.game.hook(this.position);
+        this.game.hook( this.position );
 
     },
 
@@ -122,6 +124,8 @@ s.Comm = new Class( {
         this.socket.emit( 'join', packet );
 
     },
+
+
     position: function ( ) {
 
         var time = new Date( ).getTime( );
@@ -138,38 +142,72 @@ s.Comm = new Class( {
             var shipMoved = true;
 
             // If ship moved, send packet
+            
             if ( shipMoved ) {
+
                 // Build packet
+
                 var packet = {
+
                     time: time,
+
                     pos: shipPosition.pos,
+
                     rot: shipPosition.rot,
+
                     aVeloc: shipPosition.aVeloc,
+
                     lVeloc: shipPosition.lVeloc
+
                 };
+
                 // Broadcast position
+
+
                 s.game.comm.socket.emit( 'move', packet );
+
                 s.game.comm.lastMessageTime = time;
+
             }
         }
     },
-    fire: function(pos, rot, velocity) {
-        this.socket.emit('fire', {
+
+
+    fire: function( pos, rot, velocity ) {
+
+        this.socket.emit( 'fire', {
+
             position: pos,
+
             rotation: rot,
+
             initialVelocity: velocity
+
         });
     },
-    died: function(you, killer) {
-        this.socket.emit('killed',{
+
+
+    died: function( you, killer ) {
+
+        this.socket.emit( 'killed',{
+
             you: you,
+
             killer: killer
+
              });
+
     },
-    hit: function(otherPlayerName, yourName) {
-        this.socket.emit('hit', {
+
+
+    hit: function( otherPlayerName, yourName ) {
+
+        this.socket.emit( 'hit', {
+
             otherPlayerName: otherPlayerName,
+
             yourName: yourName
+
         });
     }
 } );

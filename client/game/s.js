@@ -7,7 +7,8 @@ var s = {
     config: {
         ship: {
             hull: 120,
-            shields: 80
+            shields: 80,
+            maxSpeed: 1500
         },
         sound: {
             enabled: true,

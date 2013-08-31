@@ -1,49 +1,91 @@
 s.Controls = new Class({
+
 	toString: 'Controls',
 
+
 	options: {
+
 		rotationSpeed: Math.PI/2,
-		pitchSpeed: Math.PI/6,
-		yawSpeed: Math.PI/6,
+
+		pitchSpeed: Math.PI/4,
+
+		yawSpeed: Math.PI/4,
+
 		thrustImpulse: 0,
+
 		brakePower: 0.85,
+
 		velocityFadeFactor: 16,
+
 		rotationFadeFactor: 4
+
 	},
 
-	construct: function(options) {
+	construct: function( options ) {
+
 		// Store references to game objects
+
 		this.HUD = options.HUD;
+
 		this.game = options.game;
+
 		this.player = options.player;
+
 		this.camera = options.camera;
 
+
 		// Create interpreters for controllers
-		this.keyboard = new s.Keyboard();
+
+		this.keyboard = new s.Keyboard( );
+
+
 		// Hook to the gameloop
+
 		this.update = this.update.bind(this);
+
 		this.game.hook(this.update);
 
+
 		this.firing = false;
-		this.lastTime = new Date().getTime();
+
+
+		this.lastTime = new Date( ).getTime( );
+
 	},
 
-	destruct: function() {
-		game.unhook(this.update);
+	destruct: function( ) {
+
+		game.unhook( this.update );
+
 	},
 
-	update: function(time, delta) {
-		var now = new Date().getTime();
+	update: function( time, delta ) {
+
+		var now = new Date( ).getTime( );
+
 		var difference = now - this.lastTime;
+
+
 		var root = this.player.root;
+
+
 		var pitch = 0;
+
 		var roll = 0;
+
 		var yaw = 0;
+
 		var thrust = 0;
+
 		var brakes = 0;
-		var thrustScalar = this.options.thrustImpulse/1000 + 1;
+
+		var thrustScalar = this.options.thrustImpulse/s.config.ship.maxSpeed + 1;
+
+
 		var centerY = this.HUD.canvas.height/2;
+
 		var centerX = this.HUD.canvas.width/2;
+
 
 		if (this.keyboard.pressed('backtick')) {
 			root.position.set(-20000, 2000, -20000);
@@ -161,7 +203,7 @@ s.Controls = new Class({
 		// Fractionally apply the opposite impulse
 		// Then apply forward impulse
 		if (thrust){
-			if (this.options.thrustImpulse < 2000){
+			if (this.options.thrustImpulse < s.config.ship.maxSpeed){
 				this.options.thrustImpulse += difference;
 			}
 		}

@@ -417,13 +417,10 @@ s.SatelliteGame = new Class( {
 
     handleDie: function(you, killer) {
         s.game.stop();
-        s.game.HUD.ctx.clearRect(0,0,s.game.HUD.canvas.width,s.game.HUD.canvas.height);
-        s.game.HUD.ctx.rect(0,0,s.game.HUD.canvas.width,s.game.HUD.canvas.height);
-        s.game.HUD.ctx.fillStyle = 'black';
-        s.game.HUD.ctx.fill();
-        s.game.HUD.ctx.font= String(s.game.HUD.canvas.width/10) + 'px Futura';
-        s.game.HUD.ctx.fillStyle = '#5DFC0A';
-        s.game.HUD.ctx.fillText("YOU DIED",s.game.HUD.canvas.width/3,s.game.HUD.canvas.height/2);
+        var HUD = s.game.HUD;
+        HUD.ctx.fillStyle = "rgba(0,0,0,0.5)";
+        HUD.ctx.fillRect(0,0,HUD.canvas.width,HUD.canvas.height);
+        HUD.ctx.drawImage(HUD.gameOver,HUD.canvas.width/2 - HUD.gameOver.width/2,HUD.canvas.height/2 - HUD.gameOver.height/2);
         s.game.comm.died(you, killer);
 
     },
