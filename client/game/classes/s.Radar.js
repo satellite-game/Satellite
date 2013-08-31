@@ -227,7 +227,7 @@ s.Radar = new Class({
 
         // Distance from center of the map, scaled logarithmically
         var selfLength   = this.player.root.position.length();
-        selfLength = Math.log( selfLength ) - 7 || 0.1;
+        selfLength = Math.log( selfLength ) - 4 || 0.1;
 
         // Apply normalization and multiplier to cover full sphere coordinates and set the position
         self.position = this.selfPosition.normalize().multiplyScalar(selfLength*(radarRadius));
@@ -296,7 +296,7 @@ s.Radar = new Class({
 
             // Distance from center of the map, scaled logarithmically
             enemyLength[i] = enemyPosition[i].clone().length();
-            enemyLength[i] = Math.log( enemyLength[i] ) - 7 || 0.1;
+            enemyLength[i] = Math.log( enemyLength[i] ) - 4 || 0.1;
 
             // Apply normalization and multiplier to cover full sphere coordinates and set the position
             if ( radar.getChildByName('enemy'+i) )

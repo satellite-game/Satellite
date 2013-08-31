@@ -6,17 +6,11 @@ s.Controls = new Class({
 	options: {
 
 		rotationSpeed: Math.PI/2,
-
 		pitchSpeed: Math.PI/4,
-
 		yawSpeed: Math.PI/4,
-
 		thrustImpulse: 0,
-
 		brakePower: 0.85,
-
 		velocityFadeFactor: 16,
-
 		rotationFadeFactor: 4
 
 	},
@@ -24,30 +18,19 @@ s.Controls = new Class({
 	construct: function( options ) {
 
 		// Store references to game objects
-
 		this.HUD = options.HUD;
-
 		this.game = options.game;
-
 		this.player = options.player;
-
 		this.camera = options.camera;
 
-
 		// Create interpreters for controllers
-
 		this.keyboard = new s.Keyboard( );
 
-
 		// Hook to the gameloop
-
 		this.update = this.update.bind(this);
-
 		this.game.hook(this.update);
 
-
 		this.firing = false;
-
 
 		this.lastTime = new Date( ).getTime( );
 
@@ -62,30 +45,20 @@ s.Controls = new Class({
 	update: function( time, delta ) {
 
 		var now = new Date( ).getTime( );
-
 		var difference = now - this.lastTime;
-
 
 		var root = this.player.root;
 
-
 		var pitch = 0;
-
 		var roll = 0;
-
 		var yaw = 0;
 
 		var thrust = 0;
-
 		var brakes = 0;
-
 		var thrustScalar = this.options.thrustImpulse/s.config.ship.maxSpeed + 1;
 
-
 		var centerY = this.HUD.canvas.height/2;
-
 		var centerX = this.HUD.canvas.width/2;
-
 
 		if (this.keyboard.pressed('backtick')) {
 			root.position.set(-20000, 2000, -20000);
@@ -207,15 +180,18 @@ s.Controls = new Class({
 				this.options.thrustImpulse += difference;
 			}
 		}
+
 		if (brakes) {
 			if (this.options.thrustImpulse > 0){
 				this.options.thrustImpulse -= difference;
 			}
 		}
+
         var impulse;
 		impulse = linearVelocity.clone().negate();
 		root.applyCentralImpulse(impulse);
-		var forceVector = new THREE.Vector3(0, 0, -1*this.options.thrustImpulse).applyMatrix4(rotationMatrix);
+
+        var forceVector = new THREE.Vector3(0, 0, -1*this.options.thrustImpulse).applyMatrix4(rotationMatrix);
 		root.applyCentralImpulse(forceVector);
 		this.lastTime = now;
 	}

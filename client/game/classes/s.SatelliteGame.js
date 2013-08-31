@@ -83,8 +83,6 @@ s.SatelliteGame = new Class( {
 
         // Add skybox
         this.addSkybox( );
-
-        // lazd: Dust is kinda lame. But I want some sort of thing that shows you're moving
         this.addDust( );
 
         // Fly controls
@@ -252,7 +250,7 @@ s.SatelliteGame = new Class( {
                 side: THREE.BackSide
             } );
 
-            this.skyboxMesh = new THREE.Mesh( new THREE.CubeGeometry( 200000, 200000, 200000, 1, 1, 1, null, true ), material );
+            this.skyboxMesh = new THREE.Mesh( new THREE.CubeGeometry( 100000, 100000, 100000, 1, 1, 1, null, true ), material );
             this.scene.add( this.skyboxMesh );
         }.bind(this));
     },

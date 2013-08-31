@@ -144,9 +144,13 @@ s.HUD = new Class({
             this.targetY = this.cursorVector.y+centerY;
         }
 
-
         this.ctx.fillStyle = this.menu.color;
         this.ctx.strokeStyle = this.menu.color;
+
+
+        ///////////////////
+        // BEZIER CURVES //
+        ///////////////////
 
         var throttleStartX = centerX - this.subreticleBound.radius;
         var throttleStartY = centerY - this.subreticleBound.radius;
@@ -179,7 +183,7 @@ s.HUD = new Class({
             throttleCP2Y,
             throttleEndX,
             throttleEndY
-            );
+        );
 
         this.ctx.bezierCurveTo(
             throttle2CP1X,
@@ -273,13 +277,11 @@ s.HUD = new Class({
                 v2D.x =  ( width  + v2D.x*width  )/2;
                 v2D.y = -(-height + v2D.y*height )/2;
 
-                size = 50;
-
                 this.ctx.strokeRect( v2D.x-size, v2D.y-size, size*2, size*2 );
                 this.ctx.lineWidth = 1;
                 this.ctx.strokeStyle = this.menu.color;
 
-            // Radial direction marker
+                // Radial direction marker
             } else {
 
                 v2D = new THREE.Vector2(vTarget2D.x, vTarget2D.y);
