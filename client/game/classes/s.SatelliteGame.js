@@ -20,8 +20,7 @@ s.SatelliteGame = new Class( {
         if (Math.random() > 0.5){
             coefficient = -1;
         }
-        var coord = Math.floor(Math.random()* 30000 + 15000) * coefficient;
-        return coord;
+        return Math.floor(Math.random()* 30000 + 15000) * coefficient;
     },
 
 	initialize: function() {
@@ -196,11 +195,8 @@ s.SatelliteGame = new Class( {
         } );
         window.addEventListener( 'keydown', function(e) {
             // Cycle through targets; extra logic guarding to prevent rapid cycling while the key is pressed
-//            if (s.game.HUD.changeTarget)
-//                s.game.HUD.changeTarget = 0;
-//            else
             e = e.which;
-            s.game.HUD.changeTarget = (e === 69 ? 1 : e === 81 ? -1 : 0);
+            that.HUD.changeTarget = (e === 69 ? 1 : e === 81 ? -1 : 0);
         } );
 
 
@@ -213,17 +209,11 @@ s.SatelliteGame = new Class( {
         } );
 
         this.comm.on('fire', that.handleEnemyFire);
-
         this.comm.on('hit', that.handleHit);
-
         this.comm.on('player list', that.handlePlayerList);
-
         this.comm.on('killed', that.handleKill);
-
         this.comm.on( 'join', that.handleJoin );
-
         this.comm.on( 'leave', that.handleLeave );
-
         this.comm.on( 'move', that.handleMove );
 
         this.HUD.controls = this.controls;

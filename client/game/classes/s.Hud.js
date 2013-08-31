@@ -146,69 +146,55 @@ s.HUD = new Class({
 
 
         this.ctx.fillStyle = this.menu.color;
-
         this.ctx.strokeStyle = this.menu.color;
 
         var throttleStartX = centerX - this.subreticleBound.radius;
-
         var throttleStartY = centerY - this.subreticleBound.radius;
 
         var throttleCP1X = throttleStartX - this.subreticleBound.radius/2;
-
         var throttleCP1Y = throttleStartY + this.subreticleBound.radius/3;
 
         var throttleCP2X = throttleCP1X;
-
         var throttleCP2Y =  centerY + this.subreticleBound.radius - this.subreticleBound.radius/3;
 
         var throttleEndX = throttleStartX;
-
         var throttleEndY = centerY + this.subreticleBound.radius;
 
         var throttle2CP1X = throttleCP2X - this.canvas.width/50;
-
         var throttle2CP1Y = throttleCP2Y;
 
         var throttle2CP2X = throttle2CP1X;
-
         var throttle2CP2Y =  throttleCP1Y;
 
         var throttle2EndX = throttleStartX;
-
         var throttle2EndY = throttleStartY;
 
         this.ctx.beginPath( );
-
         this.ctx.moveTo(throttleStartX,throttleStartY);
 
-        this.ctx.bezierCurveTo( 
-            throttleCP1X, 
-            throttleCP1Y, 
-            throttleCP2X, 
-            throttleCP2Y, 
-            throttleEndX, 
-            throttleEndY 
+        this.ctx.bezierCurveTo(
+            throttleCP1X,
+            throttleCP1Y,
+            throttleCP2X,
+            throttleCP2Y,
+            throttleEndX,
+            throttleEndY
             );
 
-        this.ctx.bezierCurveTo( 
-            throttle2CP1X, 
-            throttle2CP1Y, 
-            throttle2CP2X, 
-            throttle2CP2Y, 
-            throttle2EndX, 
-            throttle2EndY 
+        this.ctx.bezierCurveTo(
+            throttle2CP1X,
+            throttle2CP1Y,
+            throttle2CP2X,
+            throttle2CP2Y,
+            throttle2EndX,
+            throttle2EndY
         );
 
         this.ctx.closePath();
-
         this.ctx.stroke();
-
         this.ctx.beginPath();
-
         this.ctx.arc(this.targetX, this.targetY, 5, 0, 2 * Math.PI, false);
-
         this.ctx.fill();
-
 
         //////////////////////////////////
         /////  ENEMY-LOCK INDICATOR  /////
@@ -257,13 +243,15 @@ s.HUD = new Class({
         // changeTarget changes current tracked enemy in the enemy array by +/- 1
         var i = this.currentTarget + this.changeTarget;
         // cycle i through the list of enemies
-        i = ( i === -1 ? enemies.length : i > enemies.length-1 ? 0 : i);
+        i = ( i === -1 ? enemies.length-1 : i > enemies.length-1 ? 0 : i);
         this.currentTarget = i;
         this.changeTarget = 0;
 
         this.target = enemies ? enemies[i] : null;
         var targetInSight = false;
 
+
+        // TARGET HUD MARKING
         if ( this.target ) {
             this.target = this.target.root;
 
@@ -274,8 +262,8 @@ s.HUD = new Class({
 
             if ( Math.abs(vTarget2D.x) <= 0.95 && Math.abs(vTarget2D.y) <= 0.95 && vTarget2D.z < 1 ){
                 targetInSight = true;
-                distanceToTarget = self.position.clone().distanceTo(vTarget3D);
-                size = Math.round((width - distanceToTarget/100)/30);
+                distanceToTarget = self.position.distanceTo(this.target.position);
+                size = Math.round((width - distanceToTarget/100)/26);
             }
 
             // Targeting box
@@ -291,7 +279,7 @@ s.HUD = new Class({
                 this.ctx.lineWidth = 1;
                 this.ctx.strokeStyle = this.menu.color;
 
-                // Radial direction marker
+            // Radial direction marker
             } else {
 
                 v2D = new THREE.Vector2(vTarget2D.x, vTarget2D.y);
@@ -311,9 +299,11 @@ s.HUD = new Class({
 
             }
 
+
             /////////////////////////////////
             // PREDICTIVE TARGETING SYSTEM //
             /////////////////////////////////
+
             // PARAMETERS
             // a    = distance between self and target
             // aV   = vector from target to self
@@ -407,19 +397,12 @@ s.HUD = new Class({
         }
 
         this.ctx.lineWidth = 1;
-
         this.ctx.fillStyle = this.menu.color;
-
         this.ctx.beginPath();
-
         this.ctx.arc(centerX, centerY, 3, 0, 2 * Math.PI, false);
-
         this.ctx.fill();
-
         this.ctx.beginPath();
-
         this.ctx.arc(centerX, centerY, 15, 0, 2 * Math.PI, false);
-
         this.ctx.stroke();
     }
 

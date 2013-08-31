@@ -299,7 +299,8 @@ s.Radar = new Class({
             enemyLength[i] = Math.log( enemyLength[i] ) - 7 || 0.1;
 
             // Apply normalization and multiplier to cover full sphere coordinates and set the position
-            radar.getChildByName('enemy'+i).position = enemyPosition[i].normalize().multiplyScalar(enemyLength[i]*(radarRadius));
+            if ( radar.getChildByName('enemy'+i) )
+                radar.getChildByName('enemy'+i).position = enemyPosition[i].normalize().multiplyScalar(enemyLength[i]*(radarRadius));
 
 
         }
