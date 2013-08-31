@@ -108,7 +108,7 @@ s.Controls = new Class({
             pitchSpeed = this.options.pitchSpeed,
             cursor = this.HUD.cursorVector,
             radius = this.HUD.subreticleBound.radius,
-            crosshairs = this.HUD.crosshairs;
+            crosshairs = {width: 30, height: 30};
 
         // Set yaw to zero if cursor is inside the crosshair region
         if (this.HUD.targetX > centerX - crosshairs.width/2 && this.HUD.targetX < centerX + crosshairs.width/2){

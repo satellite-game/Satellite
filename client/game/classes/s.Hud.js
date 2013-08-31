@@ -17,9 +17,6 @@ s.HUD = new Class({
 
 		this.ctx = this.canvas.getContext('2d');
 
-		this.crosshairs = new Image();
-		this.crosshairs.src = 'game/textures/crosshairs.png';
-
 		this.gameOver = new Image();
         this.gameOver.src = 'game/textures/Game-Over-1.png';
 
@@ -34,20 +31,20 @@ s.HUD = new Class({
         this.menu = new s.Color({
             game: this.game,
             red: 0,
-            green: 256,
+            green: 255,
             blue: 0,
             alpha: 0.66
         });
         this.hit = new s.Color({
             game: this.game,
-            red: 256,
-            green: 256,
-            blue: 256,
+            red: 255,
+            green: 255,
+            blue: 255,
             alpha: 1
         });
         this.hull = new s.Color({
             game: this.game,
-            red: 256,
+            red: 255,
             green: 0,
             blue: 0,
             alpha: 1
@@ -56,21 +53,21 @@ s.HUD = new Class({
             game: this.game,
             red: 0,
             green: 200,
-            blue: 256,
+            blue: 255,
             alpha: 1
         });
         this.shieldsFull = new s.Color({
             game: this.game,
             red: 0,
             green: 200,
-            blue: 256,
+            blue: 255,
             alpha: 0
         });
         this.shieldsDamaged = new s.Color({
             game: this.game,
             red: 0,
             green: 200,
-            blue: 256,
+            blue: 255,
             alpha: 0.75
         });
 
@@ -206,72 +203,11 @@ s.HUD = new Class({
 
         this.ctx.stroke();
 
-        throttleStartX = centerX + this.subreticleBound.radius;
-
-        throttleStartY = centerY + this.subreticleBound.radius;
-
-        throttleEndX = 
-
-        throttleEndY = ( centerY - this.subreticleBound.radius ) * ( this.controls.options.thrustImpulse / s.config.ship.maxSpeed );
-
-        throttleCP1Y = 
-
-        throttleCP1X = 
-
-
-
-        throttleCP2X = 
-
-        throttleCP2Y =  
-
-
-
-        throttle2CP1X = 
-
-        throttle2CP1Y = 
-
-        throttle2CP2X = 
-
-        throttle2CP2Y =  
-
-        throttle2EndX = 
-
-        throttle2EndY = 
-
-        this.ctx.beginPath( );
-
-        this.ctx.moveTo(throttleStartX,throttleStartY);
-
-        this.ctx.bezierCurveTo( 
-            throttleCP1X, 
-            throttleCP1Y, 
-            throttleCP2X, 
-            throttleCP2Y, 
-            throttleEndX, 
-            throttleEndY 
-            );
-
-        this.ctx.bezierCurveTo( 
-            throttle2CP1X, 
-            throttle2CP1Y, 
-            throttle2CP2X, 
-            throttle2CP2Y, 
-            throttle2EndX, 
-            throttle2EndY 
-        );
-
-        this.ctx.closePath();
-
-        this.ctx.fill();
-
-
         this.ctx.beginPath();
 
         this.ctx.arc(this.targetX, this.targetY, 5, 0, 2 * Math.PI, false);
 
         this.ctx.fill();
-
-		this.ctx.drawImage(this.crosshairs,centerX - this.crosshairs.width/2,centerY - this.crosshairs.height/2);
 
 
         //////////////////////////////////
@@ -349,7 +285,7 @@ s.HUD = new Class({
                 v2D.x =  ( width  + v2D.x*width  )/2;
                 v2D.y = -(-height + v2D.y*height )/2;
 
-                var size = 50;
+                size = 50;
 
                 this.ctx.strokeRect( v2D.x-size, v2D.y-size, size*2, size*2 );
                 this.ctx.lineWidth = 1;
@@ -469,6 +405,22 @@ s.HUD = new Class({
             this.ctx.fillStyle = grade;
             this.ctx.fillRect(0,0,width,height);
         }
+
+        this.ctx.lineWidth = 1;
+
+        this.ctx.fillStyle = this.menu.color;
+
+        this.ctx.beginPath();
+
+        this.ctx.arc(centerX, centerY, 3, 0, 2 * Math.PI, false);
+
+        this.ctx.fill();
+
+        this.ctx.beginPath();
+
+        this.ctx.arc(centerX, centerY, 15, 0, 2 * Math.PI, false);
+
+        this.ctx.stroke();
     }
 
 });

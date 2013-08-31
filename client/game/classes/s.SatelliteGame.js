@@ -174,7 +174,13 @@ s.SatelliteGame = new Class( {
 
         // Dependent on controls; needs to be below s.Controls
         this.radar = new s.Radar( {
-            game: this
+            game: this,
+            color: {
+                r: this.HUD.menu.red,
+                g: this.HUD.menu.green,
+                b: this.HUD.menu.blue,
+                a: this.HUD.menu.alpha
+            }
             //controls: this.controls
         } );
 
@@ -195,7 +201,6 @@ s.SatelliteGame = new Class( {
 //            else
             e = e.which;
             s.game.HUD.changeTarget = (e === 69 ? 1 : e === 81 ? -1 : 0);
-            console.log(e, s.game.HUD.changeTarget);
         } );
 
 

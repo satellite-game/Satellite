@@ -3,10 +3,29 @@ s.Radar = new Class({
     extend: s.Game,
 
     construct: function(options){
+        var color = options.color;
+
+        var colorR = color.r.toString(16);
+        var colorG = color.g.toString(16);
+        var colorB = color.b.toString(16);
+
+        if (colorR === "0"){
+            colorR = "00";
+        }
+        if (colorG === "0"){
+            colorG = "00";
+        }
+        if (colorB === "0"){
+            colorB = "00";
+        }
+
+
+        var colorVector = "0x" + colorR + colorG + colorB;
+
+        var colorHex = parseInt(colorVector, 16);
 
         this.game = options.game;
         var that = this.game;
-
 
         /////////////////////
         // SCENE AND INIT  //
@@ -52,7 +71,7 @@ s.Radar = new Class({
 
         var materials = [
             //new THREE.MeshLambertMaterial( { color: 0xcccccc, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
-            new THREE.MeshBasicMaterial( { color:0x5dfc0a, shading: THREE.FlatShading, wireframe: true, transparent: true } )
+            new THREE.MeshBasicMaterial( { color: colorHex, shading: THREE.FlatShading, wireframe: true, transparent: true } )
         ];
 
         var radar = THREE.SceneUtils.createMultiMaterialObject( sphere, materials );
