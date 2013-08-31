@@ -176,7 +176,7 @@ s.HUD = new Class({
 
         this.ctx.closePath();
 
-        grd = this.ctx.createLinearGradient(0, throttleEndY, 0, throttleEndY - (throttleStartY * (velocity * 2/s.config.ship.maxSpeed) ) - 1);
+        grd = this.ctx.createLinearGradient(0, throttleEndY, 0, throttleEndY - (throttleStartY * (velocity * 2/s.config.ship.maxSpeed)) - 2);
         grd.addColorStop(0, this.menu.color);   
         grd.addColorStop(0.99, this.menu.color);
         grd.addColorStop(1, ("rgba(0,0,0,0)"));
@@ -233,7 +233,7 @@ s.HUD = new Class({
 
         this.ctx.closePath();
 
-        grd = this.ctx.createLinearGradient(0, throttleEndY, 0, throttleEndY - (throttleStartY * (this.game.player.shields * 2/s.config.ship.shields) - 1));
+        grd = this.ctx.createLinearGradient(0, throttleEndY, 0, throttleEndY - (throttleStartY * (this.game.player.shields * 2/s.config.ship.shields)) - 5);
         grd.addColorStop(0, this.shields.color);   
         grd.addColorStop(0.99, this.shields.color);
         grd.addColorStop(1, ("rgba(0,0,0,0)"));
