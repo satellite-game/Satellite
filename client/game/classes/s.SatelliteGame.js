@@ -171,13 +171,7 @@ s.SatelliteGame = new Class( {
 
         // Dependent on controls; needs to be below s.Controls
         this.radar = new s.Radar( {
-            game: this,
-            color: {
-                r: this.HUD.menu.red,
-                g: this.HUD.menu.green,
-                b: this.HUD.menu.blue,
-                a: this.HUD.menu.alpha
-            }
+            game: this
             //controls: this.controls
         } );
 
@@ -250,7 +244,7 @@ s.SatelliteGame = new Class( {
                 side: THREE.BackSide
             } );
 
-            this.skyboxMesh = new THREE.Mesh( new THREE.CubeGeometry( 100000, 100000, 100000, 1, 1, 1, null, true ), material );
+            this.skyboxMesh = new THREE.Mesh( new THREE.CubeGeometry( 200000, 200000, 200000, 1, 1, 1, null, true ), material );
             this.scene.add( this.skyboxMesh );
         }.bind(this));
     },

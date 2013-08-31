@@ -3,11 +3,16 @@ s.Radar = new Class({
     extend: s.Game,
 
     construct: function(options){
-        var color = options.color;
 
-        var colorR = color.r.toString(16);
-        var colorG = color.g.toString(16);
-        var colorB = color.b.toString(16);
+
+        this.game = options.game;
+        var that = this.game;
+
+        var color = that.HUD.menu;
+
+        var colorR = color.red.toString(16);
+        var colorG = color.green.toString(16);
+        var colorB = color.blue.toString(16);
 
         if (colorR === "0"){
             colorR = "00";
@@ -23,9 +28,6 @@ s.Radar = new Class({
         var colorVector = "0x" + colorR + colorG + colorB;
 
         var colorHex = parseInt(colorVector, 16);
-
-        this.game = options.game;
-        var that = this.game;
 
         /////////////////////
         // SCENE AND INIT  //
@@ -179,10 +181,10 @@ s.Radar = new Class({
     },
 
     update: function(options){
-
         /////////////////////////
         // 3JS SCENE SELECTORS //
         /////////////////////////
+        var color = s.game.HUD.menu;
 
         var radar       = this.radarScene.getChildByName( 'radar' ),
             self        = radar.getChildByName( 'self' ),
@@ -193,6 +195,9 @@ s.Radar = new Class({
             radarRadius = this.radius/ 5,
             that        = s.game;
 
+        radar.children[0].material.color.r =  color.red/256; 
+        radar.children[0].material.color.g =  color.green/256; 
+        radar.children[0].material.color.b =  color.blue/256; 
 
         ////////////////////
         // RADAR ROTATION //
