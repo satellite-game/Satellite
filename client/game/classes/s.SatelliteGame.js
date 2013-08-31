@@ -58,7 +58,7 @@ s.SatelliteGame = new Class( {
         this.player = new s.Player( {
             HUD: this.HUD,
             game: this,
-            shipClass: 'human_ship_light',
+            shipClass: 'human_ship_heavy',
             position: new THREE.Vector3(this.getRandomCoordinate(),this.getRandomCoordinate(),this.getRandomCoordinate()),
             name: this.pilot.name,
             rotation: new THREE.Vector3( 0, Math.PI/2, 0 ),
@@ -157,7 +157,7 @@ s.SatelliteGame = new Class( {
                 // TODO: include velocities?
                 var enemyShip = new s.Player( {
                     game: that,
-                    shipClass: 'human_ship_light',
+                    shipClass: 'human_ship_heavy',
                     name: enemyInfo.name,
                     position: new THREE.Vector3( enemyInfo.pos[ 0 ], enemyInfo.pos[ 1 ], enemyInfo.pos[ 2 ] ),
                     rotation: new THREE.Vector3( enemyInfo.rot[ 0 ], enemyInfo.rot[ 1 ], enemyInfo.rot[ 2 ] ),
