@@ -12,9 +12,10 @@ s.Ship = new Class({
 	construct: function(options) {
         this.HUD = options.HUD;
 		var geometry = s.models[options.shipClass].geometry;
-		var materials = s.models[options.shipClass].materials;
+		this.materials = s.models[options.shipClass].materials[0];
+        this.materials.emissive = new THREE.Color('rgb(255,255,255)');
 
-        var physiMaterial = Physijs.createMaterial(new THREE.MeshFaceMaterial(materials));
+        var physiMaterial = Physijs.createMaterial(this.materials);
 		this.root = new Physijs.ConvexMesh(geometry, physiMaterial, 100);
 		this.root.position.copy(options.position);
 		this.root.rotation.copy(options.rotation);
