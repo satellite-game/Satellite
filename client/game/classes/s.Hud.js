@@ -33,7 +33,7 @@ s.HUD = new Class({
             red: 0,
             green: 255,
             blue: 0,
-            alpha: 0.66
+            alpha: 0.5
         });
         this.hit = new s.Color({
             game: this.game,
@@ -54,7 +54,7 @@ s.HUD = new Class({
             red: 0,
             green: 200,
             blue: 255,
-            alpha: 1
+            alpha: 0.5
         });
         this.shieldsFull = new s.Color({
             game: this.game,
@@ -233,7 +233,7 @@ s.HUD = new Class({
 
         this.ctx.closePath();
 
-        grd = this.ctx.createLinearGradient(0, throttleEndY, 0, throttleEndY - (throttleStartY * (this.game.player.shields * 2/s.config.ship.shields)) - 1);
+        grd = this.ctx.createLinearGradient(0, throttleEndY, 0, throttleEndY - (throttleStartY * (this.game.player.shields * 2/s.config.ship.shields) - 1));
         grd.addColorStop(0, this.shields.color);   
         grd.addColorStop(0.99, this.shields.color);
         grd.addColorStop(1, ("rgba(0,0,0,0)"));
