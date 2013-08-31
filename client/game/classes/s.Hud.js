@@ -196,9 +196,10 @@ s.HUD = new Class({
 
         this.ctx.closePath();
 
-        grd = this.ctx.createLinearGradient(0, 0, width, height);
-        grd.addColorStop(0, '#8ED6FF');   
-        grd.addColorStop(1, '#004CB3');
+        grd = this.ctx.createLinearGradient(0, throttleEndY, 0, throttleEndY - (throttleStartY * (velocity * 2/s.config.ship.maxSpeed) ) - 5);
+        grd.addColorStop(0, this.menu.color);   
+        grd.addColorStop(0.99, this.menu.color);
+        grd.addColorStop(1, ("rgba(0,0,0,0)"));
 
         this.ctx.fillStyle = grd;
 
