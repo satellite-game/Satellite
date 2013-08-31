@@ -195,8 +195,20 @@ s.HUD = new Class({
         );
 
         this.ctx.closePath();
+
+        grd = this.ctx.createLinearGradient(0, 0, width, height);
+        grd.addColorStop(0, '#8ED6FF');   
+        grd.addColorStop(1, '#004CB3');
+
+        this.ctx.fillStyle = grd;
+
+        this.ctx.fill();
+
         this.ctx.stroke();
         this.ctx.beginPath();
+
+        this.ctx.fillStyle = this.menu.color;
+
         this.ctx.arc(this.targetX, this.targetY, 5, 0, 2 * Math.PI, false);
         this.ctx.fill();
 
@@ -397,6 +409,7 @@ s.HUD = new Class({
             this.ctx.fillStyle = grade;
             this.ctx.fillRect(0,0,width,height);
         }
+
 
         this.ctx.lineWidth = 1;
         this.ctx.fillStyle = this.menu.color;
