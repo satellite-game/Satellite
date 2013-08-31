@@ -110,10 +110,10 @@ s.HUD = new Class({
 
         this.ctx.fillStyle = this.menu.color;
 
-        this.subreticleBound.radius = width/8;
+        this.subreticleBound.radius = Math.min(width/8,height/4);
         this.ctx.beginPath();
         this.ctx.arc( centerX, centerY, this.subreticleBound.radius, 0, 2*Math.PI, false);
-        this.ctx.lineWidth = 1;
+        this.ctx.lineWidth = 2;
         this.ctx.strokeStyle = this.menu.color;
         this.ctx.stroke();
 
