@@ -133,18 +133,18 @@ s.HUD = new Class({
         ///////////////////
 
         var throttleStartX = centerX - this.subreticleBound.radius;
-        var throttleStartY = centerY - this.subreticleBound.radius;
+        var throttleStartY = centerY - height/4;
 
         var throttleCP1X = throttleStartX - this.subreticleBound.radius/2;
-        var throttleCP1Y = throttleStartY + this.subreticleBound.radius/3;
+        var throttleCP1Y = throttleStartY + height/12;
 
         var throttleCP2X = throttleCP1X;
-        var throttleCP2Y =  centerY + this.subreticleBound.radius - this.subreticleBound.radius/3;
+        var throttleCP2Y =  centerY + height/4 - height/12;
 
         var throttleEndX = throttleStartX;
-        var throttleEndY = centerY + this.subreticleBound.radius;
+        var throttleEndY = centerY + height/4;
 
-        var throttle2CP1X = throttleCP2X - this.canvas.width/50;
+        var throttle2CP1X = throttleCP2X - width/50;
         var throttle2CP1Y = throttleCP2Y;
 
         var throttle2CP2X = throttle2CP1X;
@@ -190,16 +190,16 @@ s.HUD = new Class({
         this.ctx.strokeStyle = this.menu.color;
 
         throttleStartX = centerX + this.subreticleBound.radius;
-        throttleStartY = centerY - this.subreticleBound.radius;
+        throttleStartY = centerY - height/4;
 
         throttleCP1X = throttleStartX + this.subreticleBound.radius/2;
-        throttleCP1Y = throttleStartY + this.subreticleBound.radius/3;
+        throttleCP1Y = throttleStartY + height/12;
 
         throttleCP2X = throttleCP1X;
-        throttleCP2Y =  centerY + this.subreticleBound.radius - this.subreticleBound.radius/3;
+        throttleCP2Y =  centerY + height/4 - height/14;
 
         throttleEndX = throttleStartX;
-        throttleEndY = centerY + this.subreticleBound.radius;
+        throttleEndY = centerY + height/4;
 
         throttle2CP1X = throttleCP2X + this.canvas.width/50;
         throttle2CP1Y = throttleCP2Y;
