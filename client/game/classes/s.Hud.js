@@ -379,7 +379,7 @@ s.HUD = new Class({
                 var b = 5000+pV.length();
 
                 if (eV && b && aV){
-                    retY var angD = aV.dot(eV);
+                    var angD = aV.dot(eV);
                     var velD = (b*b - e*e);
 
                     var t = angD/velD + Math.sqrt( angD*angD + velD*a*a )/velD;
