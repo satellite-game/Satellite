@@ -1,22 +1,22 @@
 // creating global parameters and start
-// listening to 'port', we are creating an express
+// listening to 'process.env.PORT', we are creating an express
 // server and then we are binding it with socket.io
-var express     = require('express');
-var app         = express();
-var server      = require('http').createServer(app);
-var io          = require('socket.io').listen(server);
-var port        = 1337;
-var path        = require('path');
-var url         = 'http://localhost:' + port + '/';
+var express      = require('express');
+var app          = express();
+var server       = require('http').createServer(app);
+var io           = require('socket.io').listen(server);
+process.env.PORT = process.env.PORT || 1337;
+var path         = require('path');
+var url          = 'http://localhost:' + process.env.PORT + '/';
 /* We can access nodejitsu enviroment variables from process.env */
 /* Note: the SUBDOMAIN variable will always be defined for a nodejitsu app */
 if(process.env.SUBDOMAIN){
   url = 'http://' + process.env.SUBDOMAIN + '.jit.su/';
 }
 
-// listening to port...
-server.listen(port);
-console.log("Express server listening on port " + port);
+// listening to process.env.PORT...
+server.listen(process.env.PORT);
+console.log("Express server listening on port " + process.env.PORT);
 console.log(url);
 
 // log it all
@@ -58,7 +58,7 @@ function getTime() {
 io.sockets.on('connection', function (socket) {
     var address = socket.handshake.address;
     var ip = socket.handshake.address.address;
-    console.log("New connection from " + address.address + ":" + address.port);
+    console.log("New connection from " + address.address + ":" + process.env.PORT);
 
 
 

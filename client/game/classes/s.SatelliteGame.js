@@ -197,7 +197,7 @@ s.SatelliteGame = new Class( {
             game: that,
             pilot: that.pilot,
             player: this.player,
-            server: window.location.hostname + ':1337'
+            server: window.location.hostname + ':' + window.location.port
         } );
 
         this.comm.on('fire', that.handleEnemyFire);
