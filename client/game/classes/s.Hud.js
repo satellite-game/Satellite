@@ -189,6 +189,9 @@ s.HUD = new Class({
 
         this.ctx.stroke();
 
+        this.ctx.font="15px Futura";
+        this.ctx.fillText("Throttle",throttleStartX,throttleEndY + 30);
+
         this.ctx.strokeStyle = this.menu.color;
 
         throttleStartX = centerX + this.subreticleBound.radius;
@@ -245,6 +248,8 @@ s.HUD = new Class({
         this.ctx.fill();
 
         this.ctx.stroke();
+
+        this.ctx.fillText("Shields",throttleEndX - 45,throttleEndY + 30);
 
         this.ctx.beginPath();
 
