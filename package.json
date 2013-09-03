@@ -42,7 +42,7 @@
     "path": "~0.4.9"
   },
   "scripts": {
-    "start": "app.js"
+    "start": "node app.js"
   },
   "subdomain": "lockon",
   "engines": {
