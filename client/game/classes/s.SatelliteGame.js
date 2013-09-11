@@ -20,7 +20,7 @@ s.SatelliteGame = new Class( {
         if (Math.random() > 0.5){
             coefficient = -1;
         }
-        return Math.floor(Math.random()* 30000 + 15000) * coefficient;
+        return Math.floor(Math.random()* 15000 + 15000) * coefficient;
     },
 
 	initialize: function() {
