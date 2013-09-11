@@ -198,4 +198,9 @@ s.util.debounce = function(func, wait, immediate) {
       if (callNow) result = func.apply(context, args);
       return result;
     };
-  };
+};
+
+s.util.largerThen = function(vector, value){
+	if(Math.abs(vector.x) > value || Math.abs(vector.y) > value || Math.abs(vector.z) > value) return true;
+	return false;
+};
