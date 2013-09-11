@@ -152,12 +152,11 @@ s.Controls = new Class({
 		}
 
 
-        //////////////////////////////
-        // MOTION AND PHYSICS LOGIC //
+    //////////////////////////////
+    // MOTION AND PHYSICS LOGIC //
 		//////////////////////////////
 
-
-        var linearVelocity = root.getLinearVelocity().clone();
+    var linearVelocity = root.getLinearVelocity().clone();
 		var angularVelocity = root.getAngularVelocity().clone();
 		var rotationMatrix = new THREE.Matrix4();
 		rotationMatrix.extractRotation(root.matrix);
@@ -175,7 +174,16 @@ s.Controls = new Class({
 		// Invert existing linear velocity
 		// Fractionally apply the opposite impulse
 		// Then apply forward impulse
+
+    // If ship position is greater then x apply thrust in opposite direction
+    // If ship position is not greater then x allow to apply thrust
+    var playerPosition = this.player.root.position;
+    var boundryLimit = 30000;
+    if(s.util.largerThen(playerPosition, boundryLimit)){
+      console.log('--Outside Boundry Limit--');
+    }
 		if (thrust){
+
 			if (this.options.thrustImpulse < s.config.ship.maxSpeed){
 				this.options.thrustImpulse += difference;
 			}
