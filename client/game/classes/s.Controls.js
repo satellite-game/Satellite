@@ -179,11 +179,13 @@ s.Controls = new Class({
     // If ship position is not greater then x allow to apply thrust
     var playerPosition = this.player.root.position;
     var boundryLimit = 30000;
-    if(s.util.largerThen(playerPosition, boundryLimit)){
-      console.log('--Outside Boundry Limit--');
-    }
-		if (thrust){
 
+    // If the ship is beyound the boundary limit push it back into the map
+    if(s.util.largerThen(playerPosition, boundryLimit)){
+      var boundryPush = new THREE.Vector3(0, 0, 200*this.options.thrustImpulse).applyMatrix4(rotationMatrix);
+      root.applyCentralImpulse(boundryPush);
+      console.log('--Outside Boundry Limit--');
+    } else if (thrust){
 			if (this.options.thrustImpulse < s.config.ship.maxSpeed){
 				this.options.thrustImpulse += difference;
 			}
@@ -195,11 +197,11 @@ s.Controls = new Class({
 			}
 		}
 
-        var impulse;
+    var impulse;
 		impulse = linearVelocity.clone().negate();
 		root.applyCentralImpulse(impulse);
 
-        var forceVector = new THREE.Vector3(0, 0, -1*this.options.thrustImpulse).applyMatrix4(rotationMatrix);
+    var forceVector = new THREE.Vector3(0, 0, -1*this.options.thrustImpulse).applyMatrix4(rotationMatrix);
 		root.applyCentralImpulse(forceVector);
 		this.lastTime = now;
 	}
