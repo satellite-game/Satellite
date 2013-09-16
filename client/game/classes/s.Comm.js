@@ -90,6 +90,13 @@ s.Comm = new Class( {
 
         this.game.hook( this.position );
 
+        this.clockTick = this.clockTick.bind(this);
+
+        this.timer = setInterval(this.clockTick,1000);
+
+        this.time = 0;
+
+
     },
 
     connected: function ( ) {
@@ -139,13 +146,14 @@ s.Comm = new Class( {
 
             // TODO: Figure out if ship or turret actually moved
             
-            var shipMoved = true;
 
             // If ship moved, send packet
             
-            if ( shipMoved ) {
+            if ( this.lastPosition !== shipPosition.pos ) {
 
                 // Build packet
+
+                this.time = 0;
 
                 var packet = {
 
@@ -168,12 +176,16 @@ s.Comm = new Class( {
 
                 s.game.comm.lastMessageTime = time;
 
+                this.lastPosition = shipPosition.pos;
+
             }
         }
     },
 
 
     fire: function( pos, rot, velocity ) {
+
+        this.time = 0;
 
         this.socket.emit( 'fire', {
 
@@ -202,6 +214,8 @@ s.Comm = new Class( {
 
     hit: function( otherPlayerName, yourName ) {
 
+        this.time = 0;
+
         this.socket.emit( 'hit', {
 
             otherPlayerName: otherPlayerName,
@@ -209,5 +223,12 @@ s.Comm = new Class( {
             yourName: yourName
 
         });
+    },
+
+    clockTick: function( ){
+        this.time += 1;
+        if ( this.time >= 60 ){
+            this.socket.emit('disconnect');
+        }
     }
 } );
