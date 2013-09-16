@@ -60,19 +60,6 @@ s.Controls = new Class({
 		var centerY = this.HUD.canvas.height/2;
 		var centerX = this.HUD.canvas.width/2;
 
-		if (this.keyboard.pressed('backtick')) {
-			root.position.set(-20000, 2000, -20000);
-			root.rotation.set(0, -3*Math.PI/4, 0);
-			root.setAngularVelocity(new THREE.Vector3());
-			root.setLinearVelocity(new THREE.Vector3());
-
-			// Tell the physics engine to update our position
-			root.__dirtyPosition = true;
-			root.__dirtyRotation = true;
-			return;
-		}
-
-
         ///////////////////////
         // RADIAL SUBRETICLE //
         ///////////////////////
