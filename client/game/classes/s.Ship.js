@@ -107,10 +107,10 @@ s.Ship = new Class({
 
     setPosition: function (position, rotation, aVeloc, lVeloc, interpolate) {
         var posInterpolation = 0.05;
-        var rotInerpolation = 0.50;
+        var rotInterpolation = 0.50;
 
         if (interpolate) {
-            // Interpolate position by adding the difference of the calulcated position and the position sent by the authoritative client
+            // Interpolate position by adding the difference of the calculated position and the position sent by the authoritative client
             var newPositionVec = new THREE.Vector3(position[0], position[1], position[2]);
             var posErrorVec = newPositionVec.sub(this.root.position).multiply(new THREE.Vector3(posInterpolation, posInterpolation, posInterpolation));
             this.root.position.add(posErrorVec);
