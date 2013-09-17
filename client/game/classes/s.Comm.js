@@ -228,7 +228,7 @@ s.Comm = new Class( {
     clockTick: function( ){
         this.time += 1;
         if ( this.time >= 60 ){
-            this.socket.emit('disconnect');
+            window.location.href = "http://satellite-game.com";
         }
     }
 } );
