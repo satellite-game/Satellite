@@ -200,7 +200,7 @@ s.util.debounce = function(func, wait, immediate) {
     };
 };
 
-s.util.largerThen = function(vector, value){
+s.util.largerThan = function(vector, value){
 	if(Math.abs(vector.x) > value || Math.abs(vector.y) > value || Math.abs(vector.z) > value) return true;
 	return false;
 };
