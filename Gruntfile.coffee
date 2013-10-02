@@ -7,6 +7,7 @@ module.exports = (grunt) ->
     "client/lib/three.js"
     "client/lib/physi.js"
     "client/lib/Stats.js"
+    "client/lib/gamepad.js"
     "client/lib/socketio/socket.io.js"
     "client/game/s.js"
     "client/game/s.util.js"
