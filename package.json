@@ -25,7 +25,12 @@
     "grunt-contrib-stylus": "0.7.x",
     "grunt-nodemon": "~0.1.0",
     "grunt-concurrent": "~0.3.0",
-    "grunt-open": "~0.2.2"
+    "grunt-open": "~0.2.2",
+    "grunt-karma": "~0.6.2",
+    "karma": "~0.10.9",
+    "karma-mocha": "~0.1.1",
+    "karma-sinon-chai": "~0.1.4",
+    "frisby": "~0.7.5"
   },
   "engines": {
     "node": "0.10.15",
@@ -44,11 +49,5 @@
   "scripts": {
     "start": "node app.js"
   },
-  "subdomain": "lockon",
-  "engines": {
-    "node": "0.10.15",
-    "npm": "1.1.x"
-  }
+  "subdomain": "lockon"
 }
-
-
