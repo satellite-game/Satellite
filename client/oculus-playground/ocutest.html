@@ -1,7 +1,15 @@
+<!--
+  This demo requires dowloading the Oculus
+  Bridge socket utility from:
+  https://github.com/Instrument/oculus-bridge
+-->
+
 <html>
   <head>
-    <title>My first Three.js app</title>
+    <title>Three.js+Oculus Tech Demo</title>
     <style>
+      /* Inline styles and script!
+         It's just a tech demo. */
       body {
         padding: 0;
         margin: 0;
@@ -33,11 +41,20 @@
       scene.add(cube);
 
       point = new THREE.DirectionalLight( 0xffffff, 1, 0, Math.PI, 1 );
-      point.position.set( -250, 250, 150 );
+      point.position.set( -20, 20, 10 );
       
       scene.add(point);
 
       camera.position.z = 2;
+
+      var render = function () {
+        requestAnimationFrame(render);
+        riftCam.render(scene, camera);
+      };
+
+      render();
+
+      // Oculus Bridge socket event handlers
 
       var updateOrientetion = function (quat) {
         cube.quaternion.set(quat.x, quat.y, quat.z, quat.w);
@@ -46,13 +63,6 @@
       var bridgeConnected = function () {
         console.log('Oculus Bridge connected.');
       }
-
-      var render = function () {
-        requestAnimationFrame(render);
-        riftCam.render(scene, camera);
-      };
-
-      render();
 
       oculusBridge = new OculusBridge({
         onOrientationUpdate : updateOrientetion,
