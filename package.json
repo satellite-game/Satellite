@@ -41,7 +41,9 @@
     "socket.io": "~0.9.16",
     "should": "~2.1.1",
     "socket.io-client": "~0.9.16",
-    "grunt-simple-mocha": "~0.4.0"
+    "grunt-mocha-test": "~0.8.1",
+    "expect": "0.0.2",
+    "expect.js": "~0.2.0"
   },
   "engines": {
     "node": "0.10.15",
