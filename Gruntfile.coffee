@@ -6,6 +6,10 @@ module.exports = (grunt) ->
   grunt.initConfig
     pkg: grunt.file.readJSON('package.json')
 
+    # TESTING
+    # ================
+    # client-side:
+    # ----------------
     karma:
       unit:
         options:
@@ -18,6 +22,16 @@ module.exports = (grunt) ->
       single:
         singleRun: true
 
+    # server-side:
+    # ----------------
+    mochaTest:
+      test:
+        options:
+          reporter: 'spec'
+        src: ['tests/server/**/*.js']
+
+    # INITIALIZING & PROD-READY
+    # ==========================
     open:
       client:
         path: 'http://localhost:1337'
@@ -46,6 +60,9 @@ module.exports = (grunt) ->
         src: [includeOrder]
         dest: 'build/client/game/s.js'
 
+    # LINTING & COMPILE
+    # =================
+
     jshint:
       options:
         jshintrc: '.jshintrc'
@@ -63,6 +80,9 @@ module.exports = (grunt) ->
 
         files:
           'build/client/game/s.css': 'client/game/styl/s.styl'
+
+    # WATCH
+    # =================
 
     watch:
       gruntfile:
@@ -84,6 +104,9 @@ module.exports = (grunt) ->
       #   files: [ 'test/**/*.js' ]
       #   tasks: [ 'jshint:unitTests', 'karma:watch:run' ]
 
+    # RUN CONCURRENTS
+    # =================
+
     concurrent:
       target:
         tasks: ['nodemon', 'watch', 'delayed-open'],
@@ -91,11 +114,18 @@ module.exports = (grunt) ->
         options:
           logConcurrentOutput: true
 
+    # INIT SERVER
+    # =================
+
     nodemon:
       dev: {}
 
     grunt.registerTask 'delayed-open', 'open the local host after the server has spun up.', ->
       setInterval grunt.task.run('open'), 3000
+
+
+  # DEPENDENCIES
+  # =================
 
   grunt.loadNpmTasks 'grunt-contrib-clean'
   grunt.loadNpmTasks 'grunt-contrib-concat'
@@ -107,12 +137,15 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-open'
   grunt.loadNpmTasks 'grunt-nodemon'
   grunt.loadNpmTasks 'grunt-concurrent'
-  grunt.loadNpmTasks 'grunt-simple-mocha'
+  grunt.loadNpmTasks 'grunt-mocha-test'
   # grunt.loadNpmTasks 'grunt-karma'
   # grunt.loadNpmTasks 'grunt-vows-runner'
+
+  # REGISTER
+  # =================
 
   grunt.registerTask 'server', ['jshint:server']
   grunt.registerTask 'client', ['jshint:client', 'copy:client', 'concat', 'stylus']
   grunt.registerTask 'client-prod', ['client', 'uglify']
-  grunt.registerTask 'dev', ['karma:unit:start'] #, 'watch:unitTests']
+  grunt.registerTask 'karma', ['karma:unit:start'] #, 'watch:unitTests']
   grunt.registerTask 'default', ['server', 'client','concurrent']

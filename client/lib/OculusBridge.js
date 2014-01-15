@@ -68,21 +68,21 @@ var OculusBridge = function(config) {
         }
 
         var updateConfig = function(data) {
-                displayMetrics.hScreenSize                                = data["screenSize"][0];
-                displayMetrics.vScreenSize                                = data["screenSize"][1];
-                displayMetrics.vScreenCenter                        = data["screenSize"][1] / 2;
+                displayMetrics.hScreenSize            = data["screenSize"][0];
+                displayMetrics.vScreenSize            = data["screenSize"][1];
+                displayMetrics.vScreenCenter          = data["screenSize"][1] / 2;
 
-                displayMetrics.eyeToScreenDistance                = data["eyeToScreen"];
+                displayMetrics.eyeToScreenDistance    = data["eyeToScreen"];
 
-                displayMetrics.lensSeparationDistance        = data["lensDistance"];
-                displayMetrics.interpupillaryDistance        = data["interpupillaryDistance"];
+                displayMetrics.lensSeparationDistance = data["lensDistance"];
+                displayMetrics.interpupillaryDistance = data["interpupillaryDistance"];
 
-                displayMetrics.hResolution                                = data["screenResolution"][0];
-                displayMetrics.vResolution                                = data["screenResolution"][1];
+                displayMetrics.hResolution            = data["screenResolution"][0];
+                displayMetrics.vResolution            = data["screenResolution"][1];
 
-                displayMetrics.distortionK                                = [ data["distortion"][0], data["distortion"][1], data["distortion"][2], data["distortion"][3] ];
+                displayMetrics.distortionK            = [ data["distortion"][0], data["distortion"][1], data["distortion"][2], data["distortion"][3] ];
 
-                displayMetrics.FOV                                                = data["fov"];
+                displayMetrics.FOV                    = data["fov"];
 
                 if(callbacks["onConfigUpdate"]) {
                         callbacks["onConfigUpdate"]( displayMetrics );
