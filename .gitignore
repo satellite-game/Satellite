@@ -50,3 +50,4 @@ Thumbs.db
 *.sublime-workspace
 
 /build/
+coverage
