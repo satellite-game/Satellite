@@ -18,18 +18,6 @@ module.exports = (grunt) ->
       single:
         singleRun: true
 
-  vows:
-    all:
-      src: "<%= allTests %>"
-      options:
-        reporter: "spec"
-    allXunit:
-      src: "<%= allTests %>"
-      dest: "testResults.xml"
-      options:
-        reporter: "Xunit"
-  allTests: "tests/*"
-
     open:
       client:
         path: 'http://localhost:1337'
@@ -119,6 +107,7 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-open'
   grunt.loadNpmTasks 'grunt-nodemon'
   grunt.loadNpmTasks 'grunt-concurrent'
+  grunt.loadNpmTasks 'grunt-simple-mocha'
   # grunt.loadNpmTasks 'grunt-karma'
   # grunt.loadNpmTasks 'grunt-vows-runner'
 
