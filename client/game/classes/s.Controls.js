@@ -1,5 +1,9 @@
 var quat = {x: 0, y: 0, z: 0};
 
+var oculusCompensationX = 0;
+var oculusCompensationY = 0;
+var oculusCompensationZ = 0;
+
 s.Controls = new Class({
 
   toString: 'Controls',
@@ -150,9 +154,9 @@ s.Controls = new Class({
     // disable mouse input
 
     if (quat) {
-      yaw = quat.x;
-      pitch = quat.y;
-      roll = quat.z;
+      pitch = quat.x - oculusCompensationX;
+      yaw = quat.y - oculusCompensationY;
+      roll = quat.z - oculusCompensationZ;
       console.log(yaw);
     }
 
@@ -221,6 +225,12 @@ s.Controls = new Class({
 
     if (this.keyboard.pressed('space') || this.firing){
       this.player.fire('turret');
+    }
+
+    if (this.keyboard.pressed('tilde')) {
+      oculusCompensationX = quat.x;
+      oculusCompensationY = quat.y;
+      oculusCompensationZ = quat.z;
     }
 
 
