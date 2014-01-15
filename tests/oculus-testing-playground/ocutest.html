@@ -6,10 +6,8 @@
 
 <html>
   <head>
-    <title>Three.js+Oculus Tech Demo</title>
+    <title>Three.js+Oculus Testing Grounds</title>
     <style>
-      /* Inline styles and script!
-         It's just a tech demo. */
       body {
         padding: 0;
         margin: 0;
@@ -32,6 +30,13 @@
       renderer.setSize(window.innerWidth, window.innerHeight);
       document.body.appendChild(renderer.domElement);
       renderer.setClearColor(0x161616);
+
+      var ctx = renderer.domElement.getContext('2d');
+
+      var height = window.innerHeight,
+          width = window.innerWidth,
+          centerX = width/2,
+          centerY = height/2;
 
       var riftCam = new THREE.OculusRiftEffect(renderer);
 
@@ -57,19 +62,20 @@
       // Oculus Bridge socket event handlers
 
       var updateOrientetion = function (quat) {
-        cube.quaternion.set(quat.x, quat.y, quat.z, quat.w);
+        camera.quaternion.set(quat.x, quat.y, quat.z, quat.w);
       }
 
       var bridgeConnected = function () {
         console.log('Oculus Bridge connected.');
       }
 
-      oculusBridge = new OculusBridge({
+      var oculusBridge = new OculusBridge({
         onOrientationUpdate : updateOrientetion,
         onConnect           : bridgeConnected
       });
 
       oculusBridge.connect();
     </script>
+    <h3></h3>
   </body>
 </html>
