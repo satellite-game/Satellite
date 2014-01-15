@@ -6,7 +6,7 @@ module.exports = function(config) {
     frameworks: ['jasmine'],
 
     // list of files / patterns to load in the browser
-    files: require('./include.conf').concat(['tests/**/*.js']),
+    files: require('./include.conf').concat(['tests/client/**/*.js']),
 
     // list of files to exclude
     exclude: [

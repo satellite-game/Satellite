@@ -40,7 +40,8 @@
     "grunt-vows-runner": "~0.6.0",
     "socket.io": "~0.9.16",
     "should": "~2.1.1",
-    "socket.io-client": "~0.9.16"
+    "socket.io-client": "~0.9.16",
+    "grunt-simple-mocha": "~0.4.0"
   },
   "engines": {
     "node": "0.10.15",
