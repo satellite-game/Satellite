@@ -410,7 +410,9 @@ s.SatelliteGame = new Class( {
             if (enemyBot.hull <= 0) {
                 console.log('bot has died');
                 s.game.handleKill.call(s, { killed: you, killer: killer });
-                s.game.makeNewBot();
+                s.game.makeNewBot({
+                    position: [ 23498, -25902, 24976 ]
+                });
             }
         } else {
             var enemy = s.game.enemies.get(you);
@@ -441,13 +443,19 @@ s.SatelliteGame = new Class( {
 
     },
 
-    makeNewBot: function() {
+    makeNewBot: function(options) {
         // Generating a new bot name with a random number from 1 to 100
         var botName = 'bot ' + Math.floor(Math.random() * (100 - 1) + 1);
+
+        // If no options passed, set options to empty object and default values for position and rotation
+        options = options || {};
+        var position = options.position || [22498, -25902, 24976];
+        var rotation = options.rotation || [0, Math.PI / 2, 0];
+
         this[botName] = new s.Bot( {
             name: botName,
-            position: [ 22498, -25902, 24976 ],
-            rotation: [ 0, Math.PI/2, 0 ],
+            position: [ position[0], position[1], position[2] ],
+            rotation: [ rotation[0], rotation[1], rotation[2] ],
         } );
 
         // Create bot and add it to enemies list
