@@ -173,20 +173,8 @@ s.SatelliteGame = new Class( {
             }
         };
 
-        this.bot = new s.Bot( {
-            name: "bot1",
-            position: [ 23498, -25902, 24976 ],
-            rotation: [ 0, Math.PI/2, 0 ],
-        } );
-
-        this.enemies.add( {
-            aVeloc: this.bot.aVeloc,
-            lVeloc: this.bot.lVeloc,
-            interp: this.bot.interp,
-            name: this.bot.name,
-            pos: this.bot.pos,
-            rot: this.bot.rot
-        });
+        // Create a new bot
+        this.makeNewBot();
 
         // Dependent on controls; needs to be below s.Controls
         this.radar = new s.Radar( {
@@ -422,7 +410,7 @@ s.SatelliteGame = new Class( {
             if (enemyBot.hull <= 0) {
                 console.log('bot has died');
                 s.game.handleKill.call(s, { killed: you, killer: killer });
-                s.game.makeNewEnemy();
+                s.game.makeNewBot();
             }
         } else {
             var enemy = s.game.enemies.get(you);
@@ -453,20 +441,23 @@ s.SatelliteGame = new Class( {
 
     },
 
-    makeNewEnemy: function() {
-        this.bot2 = new s.Bot( {
-            name: "bot2",
+    makeNewBot: function() {
+        // Generating a new bot name with a random number from 1 to 100
+        var botName = 'bot ' + Math.floor(Math.random() * (100 - 1) + 1);
+        this[botName] = new s.Bot( {
+            name: botName,
             position: [ 22498, -25902, 24976 ],
             rotation: [ 0, Math.PI/2, 0 ],
         } );
 
+        // Create bot and add it to enemies list
         this.enemies.add( {
-            aVeloc: this.bot2.aVeloc,
-            lVeloc: this.bot2.lVeloc,
-            interp: this.bot2.interp,
-            name: this.bot2.name,
-            pos: this.bot2.pos,
-            rot: this.bot2.rot
+            aVeloc: this[botName].aVeloc,
+            lVeloc: this[botName].lVeloc,
+            interp: this[botName].interp,
+            name: this[botName].name,
+            pos: this[botName].pos,
+            rot: this[botName].rot
         });
     },
 
