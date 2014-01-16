@@ -82,7 +82,7 @@ s.HUD = new Class({
 
 	},
 	update: function(){
-
+            
         ////////////////////////
         // TURNING SUBRETICLE //
         ////////////////////////
