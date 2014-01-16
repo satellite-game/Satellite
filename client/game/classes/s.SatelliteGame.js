@@ -417,6 +417,7 @@ s.SatelliteGame = new Class( {
             }
             if (enemyBot.hull <= 0) {
                 console.log('bot has died');
+                s.game.handleKill.call(s, {killed: you, killer: killer});
             }
         } else {
             var enemy = s.game.enemies.get(you);
