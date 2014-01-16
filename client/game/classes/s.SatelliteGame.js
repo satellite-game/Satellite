@@ -405,12 +405,25 @@ s.SatelliteGame = new Class( {
             if (s.game.player.hull <= 0) {
                 s.game.handleDie(you, killer);
             }
+        } else if (you === 'bot1') {
+            var enemyBot = s.game.enemies.get(you);
+            if (enemyBot.shields > 0){
+                enemyBot.shields -= 20;
+                console.log('bot shield is now: ', enemyBot.shields);
+                setTimeout(function() { s.game.replenishEnemyShield(enemyBot); }, 7000);
+            } else {
+                enemyBot.hull -=20;
+                console.log('bot hull is now: ', enemyBot.hull);
+            }
+            if (enemyBot.hull <= 0) {
+                console.log('bot has died');
+            }
         } else {
             var enemy = s.game.enemies.get(you);
             enemy.shields -= 20;
             setTimeout(function(){
                 console.log('recharged');
-                enemy.shields = 800;
+                enemy.shields = 80;
             }, 7000);
             console.log('hit: ', enemy);
         }
@@ -422,6 +435,7 @@ s.SatelliteGame = new Class( {
     },
 
     handleDie: function(you, killer) {
+        if (!you) { return; }
         s.game.stop();
         var HUD = s.game.HUD;
         HUD.ctx.fillStyle = "rgba(0,0,0,0.5)";
@@ -443,6 +457,25 @@ s.SatelliteGame = new Class( {
     stopShields: function(){
         for (var i = 0; i < s.game.IDs.length; i++){
             clearInterval(s.game.IDs[i]);
+        }
+    },
+
+    replenishEnemyShield: function (enemyBot) {
+        var replenish = function() {
+            if (enemyBot.shields < s.config.ship.shields) {
+                enemyBot.shields++;
+            } else {
+                this.stopEnemyShieldReplenish(enemyBot);
+            }
+        };
+        var that = this;
+        enemyBot.IDs = enemyBot.IDs || [];
+        enemyBot.IDs.push(setInterval(function() { replenish.call(that); }, 20));
+    },
+
+    stopEnemyShieldReplenish: function (enemyBot) {
+        for (var i = 0; i < enemyBot.IDs.length; i++){
+            clearInterval(enemyBot.IDs[i]);
         }
     },
 
