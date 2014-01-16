@@ -185,7 +185,7 @@ s.Controls = new Class({
             this.player.fire('turret');
         }
 
-
+  
         //////////////////////////////
         // MOTION AND PHYSICS LOGIC //
         //////////////////////////////
@@ -222,7 +222,7 @@ s.Controls = new Class({
             console.log('--Outside Boundry Limit--');
         }
         */
-
+        
         if (thrust && this.options.thrustImpulse < s.config.ship.maxSpeed){
             this.options.thrustImpulse += difference;
         }

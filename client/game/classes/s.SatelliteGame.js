@@ -173,6 +173,21 @@ s.SatelliteGame = new Class( {
             }
         };
 
+        this.bot = new s.Bot( {
+            name: "bot1",
+            position: [ 23498, -25902, 24976 ],
+            rotation: [ 0, Math.PI/2, 0 ],
+        } );
+
+        this.enemies.add( {
+            aVeloc: this.bot.aVeloc,
+            lVeloc: this.bot.lVeloc,
+            interp: this.bot.interp,
+            name: this.bot.name,
+            pos: this.bot.pos,
+            rot: this.bot.rot
+        });
+
         // Dependent on controls; needs to be below s.Controls
         this.radar = new s.Radar( {
             game: this

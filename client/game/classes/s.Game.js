@@ -264,7 +264,7 @@ s.Game = new Class({
 			this.renderer.render( this.scene, this.camera );
 
             this.render_stats.update();
-
+            
 			// Request the next frame to be rendered
 			requestAnimationFrame(this.render);
 		}
