@@ -210,8 +210,6 @@ s.SatelliteGame = new Class( {
             that.HUD.changeTarget = (e === 69 ? 1 : e === 81 ? -1 : 0);
         } );
 
-
-
         this.comm = new s.Comm( {
             game: that,
             pilot: that.pilot,
@@ -409,17 +407,21 @@ s.SatelliteGame = new Class( {
             }
         } else if (you.slice(0,3) === 'bot') {
             var enemyBot = s.game.enemies.get(you);
+
             if (enemyBot.shields > 0){
                 enemyBot.shields -= 20;
                 console.log('bot shield is now: ', enemyBot.shields);
-                setTimeout(function() { s.game.replenishEnemyShield(enemyBot); }, 7000);
+                setTimeout(function() {
+                    s.game.replenishEnemyShield(enemyBot);
+                }, 7000);
             } else {
-                enemyBot.hull -=20;
+                enemyBot.hull -= 20;
                 console.log('bot hull is now: ', enemyBot.hull);
             }
+
             if (enemyBot.hull <= 0) {
                 console.log('bot has died');
-                s.game.handleKill.call(s, {killed: you, killer: killer});
+                s.game.handleKill.call(s, { killed: you, killer: killer });
                 s.game.makeNewEnemy();
             }
         } else {
@@ -439,7 +441,9 @@ s.SatelliteGame = new Class( {
     },
 
     handleDie: function(you, killer) {
-        if (!you) { return; }
+        if (!you) {
+            return;
+        }
         s.game.stop();
         var HUD = s.game.HUD;
         HUD.ctx.fillStyle = "rgba(0,0,0,0.5)";
@@ -492,7 +496,9 @@ s.SatelliteGame = new Class( {
         };
         var that = this;
         enemyBot.IDs = enemyBot.IDs || [];
-        enemyBot.IDs.push(setInterval(function() { replenish.call(that); }, 20));
+        enemyBot.IDs.push(setInterval(function() {
+            replenish.call(that);
+        }, 20));
     },
 
     stopEnemyShieldReplenish: function (enemyBot) {
