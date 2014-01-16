@@ -355,10 +355,12 @@ s.SatelliteGame = new Class( {
             position: position
         });
         s.game.enemies.delete(message.killed);
-        if (message.killer == s.game.pilot.name)
+        if (message.killer == s.game.pilot.name) {
             console.warn('You killed %s!', message.killed);
-        else
+        }
+        else {
             console.log('%s was killed by %s', message.killed, message.killer);
+        }
     },
 
     handleEnemyFire: function(message) {
@@ -405,7 +407,7 @@ s.SatelliteGame = new Class( {
             if (s.game.player.hull <= 0) {
                 s.game.handleDie(you, killer);
             }
-        } else if (you === 'bot1') {
+        } else if (you.slice(0,3) === 'bot') {
             var enemyBot = s.game.enemies.get(you);
             if (enemyBot.shields > 0){
                 enemyBot.shields -= 20;
@@ -418,6 +420,7 @@ s.SatelliteGame = new Class( {
             if (enemyBot.hull <= 0) {
                 console.log('bot has died');
                 s.game.handleKill.call(s, {killed: you, killer: killer});
+                s.game.makeNewEnemy();
             }
         } else {
             var enemy = s.game.enemies.get(you);
@@ -445,6 +448,24 @@ s.SatelliteGame = new Class( {
         s.game.comm.died(you, killer);
 
     },
+
+    makeNewEnemy: function() {
+        this.bot2 = new s.Bot( {
+            name: "bot2",
+            position: [ 22498, -25902, 24976 ],
+            rotation: [ 0, Math.PI/2, 0 ],
+        } );
+
+        this.enemies.add( {
+            aVeloc: this.bot2.aVeloc,
+            lVeloc: this.bot2.lVeloc,
+            interp: this.bot2.interp,
+            name: this.bot2.name,
+            pos: this.bot2.pos,
+            rot: this.bot2.rot
+        });
+    },
+
     shieldBoost: function(){
         s.game.IDs.push(setInterval(s.game.shieldAnimate,20));
     },
