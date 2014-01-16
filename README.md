@@ -1,4 +1,4 @@
-# Satellite
+# Satellite [![Build Status](https://travis-ci.org/satellite-game/Satellite.png?branch=master)](https://travis-ci.org/satellite-game/Satellite)
 
 > A 3D multiplayer space warfare game centered around moon bases and space stations
 
