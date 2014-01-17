@@ -235,7 +235,7 @@ s.Game = new Class({
 
   // Start rendering
   start: function() {
-        this.loadScreen.remove();
+    this.loadScreen.remove();
     this.doRender = true;
     requestAnimationFrame(this.render);
   },
