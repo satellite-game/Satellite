@@ -22,13 +22,22 @@ module.exports = (grunt) ->
       single:
         singleRun: true
 
-    # server-side:
+    # server-side: #name matters for the 'mocha-chai-sinon' module
     # ----------------
-    mocha:
-      options:
-        reporter: 'spec'
-        run: true
-      src: ['tests/server/**/*.js']
+    'mocha-chai-sinon':
+      build:
+        src: ['./tests/server/**/*.js']
+        options:
+          ui: 'bdd'
+          reporter: 'spec'
+      coverage:
+        src: ['./tests/server/**/*.js']
+        options:
+          ui: 'bdd'
+          reporter: 'html-cov'
+          quiet: true
+          # filter: '/foo/foo1/' # which files are you testing for coverage?
+          captureFile: './coverage/MCS_server_coverage.html'
 
 
     # INITIALIZING & PROD-READY
@@ -102,8 +111,8 @@ module.exports = (grunt) ->
         options:
           livereload: true
       test:
-        files: [ 'test/**/*.js' ]
-        tasks: [ 'karma:watch:run', 'mocha:run' ]
+        files: [ 'tests/**/*.js' ]
+        tasks: [ 'mocha:run', 'karma:unit:start' ]
 
     # RUN CONCURRENTS
     # =================
@@ -139,6 +148,7 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-nodemon'
   grunt.loadNpmTasks 'grunt-concurrent'
   grunt.loadNpmTasks 'grunt-karma'
+  grunt.loadNpmTasks 'grunt-mocha-chai-sinon'
 
   # REGISTER
   # =================
@@ -146,7 +156,7 @@ module.exports = (grunt) ->
   grunt.registerTask 'server', ['jshint:server']
   grunt.registerTask 'client', ['jshint:client', 'copy:client', 'concat', 'stylus']
   grunt.registerTask 'client-prod', ['client', 'uglify']
-  grunt.registerTask 'karma', ['karma:unit:start'] #, 'watch:unitTests']
-  grunt.registerTask 'test1', ['karma:unit:start', 'mocha']
-  grunt.registerTask 'wtest', ['watch:test']
+  grunt.registerTask 'karma', ['karma:unit:start']
+  grunt.registerTask 'mocha', ['mocha-chai-sinon']
+  grunt.registerTask 'test', ['watch:test']
   grunt.registerTask 'default', ['server', 'client','concurrent']

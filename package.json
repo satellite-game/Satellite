@@ -35,7 +35,10 @@
     "karma-chrome-launcher": "~0.1.0",
     "karma-coverage": "~0.1.2",
     "socket.io": "~0.9.16",
-    "socket.io-client": "~0.9.16"
+    "socket.io-client": "~0.9.16",
+    "grunt-mocha-chai-sinon": "0.0.7",
+    "chai": "~1.8.1",
+    "sinon": "~1.7.3"
   },
   "engines": {
     "node": "0.10.15",
