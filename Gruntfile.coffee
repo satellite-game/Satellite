@@ -24,11 +24,12 @@ module.exports = (grunt) ->
 
     # server-side:
     # ----------------
-    mochaTest:
-      test:
-        options:
-          reporter: 'spec'
-        src: ['tests/server/**/*.js']
+    mocha:
+      options:
+        reporter: 'spec'
+        run: true
+      src: ['tests/server/**/*.js']
+
 
     # INITIALIZING & PROD-READY
     # ==========================
@@ -100,9 +101,9 @@ module.exports = (grunt) ->
         tasks: ['client']
         options:
           livereload: true
-      # unitTests:
-      #   files: [ 'test/**/*.js' ]
-      #   tasks: [ 'jshint:unitTests', 'karma:watch:run' ]
+      test:
+        files: [ 'test/**/*.js' ]
+        tasks: [ 'karma:watch:run', 'mocha:run' ]
 
     # RUN CONCURRENTS
     # =================
@@ -137,9 +138,7 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-open'
   grunt.loadNpmTasks 'grunt-nodemon'
   grunt.loadNpmTasks 'grunt-concurrent'
-  grunt.loadNpmTasks 'grunt-mocha-test'
-  # grunt.loadNpmTasks 'grunt-karma'
-  # grunt.loadNpmTasks 'grunt-vows-runner'
+  grunt.loadNpmTasks 'grunt-karma'
 
   # REGISTER
   # =================
@@ -148,4 +147,6 @@ module.exports = (grunt) ->
   grunt.registerTask 'client', ['jshint:client', 'copy:client', 'concat', 'stylus']
   grunt.registerTask 'client-prod', ['client', 'uglify']
   grunt.registerTask 'karma', ['karma:unit:start'] #, 'watch:unitTests']
+  grunt.registerTask 'test1', ['karma:unit:start', 'mocha']
+  grunt.registerTask 'wtest', ['watch:test']
   grunt.registerTask 'default', ['server', 'client','concurrent']
