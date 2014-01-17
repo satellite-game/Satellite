@@ -151,7 +151,6 @@ s.Controls = new Class({
       pitch = quat.x - oculusCompensationX;
       yaw = quat.y - oculusCompensationY;
       roll = quat.z - oculusCompensationZ;
-      console.log(yaw);
     }
 
     ///////////////////////
