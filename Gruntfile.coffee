@@ -12,18 +12,13 @@ module.exports = (grunt) ->
     # ----------------
     karma:
       unit:
-        options:
-          configFile: 'karma.conf.js'
-          autoWatch: true
-          reporters: ['progress', 'coverage']
-      watch:
+        configFile: 'karma.conf.js'
+        autoWatch: false
         background: true
-        reporters: ['progress']
-      single:
-        singleRun: true
 
-    # server-side: #name matters for the 'mocha-chai-sinon' module
+    # server-side:
     # ----------------
+    # name matters for the 'mocha-chai-sinon' module
     'mocha-chai-sinon':
       build:
         src: ['./tests/server/**/*.js']
@@ -111,8 +106,8 @@ module.exports = (grunt) ->
         options:
           livereload: true
       test:
-        files: [ 'tests/**/*.js' ]
-        tasks: [ 'mocha:run', 'karma:unit:start' ]
+        files: [ 'client/**', 'tests/**/*.js' ]
+        tasks: [ 'mocha-chai-sinon', 'karma:unit:run' ]
 
     # RUN CONCURRENTS
     # =================
@@ -120,7 +115,6 @@ module.exports = (grunt) ->
     concurrent:
       target:
         tasks: ['nodemon', 'watch', 'delayed-open'],
-        # tasks: ['karma', 'watch', 'delayed-open'],
         options:
           logConcurrentOutput: true
 
@@ -156,7 +150,5 @@ module.exports = (grunt) ->
   grunt.registerTask 'server', ['jshint:server']
   grunt.registerTask 'client', ['jshint:client', 'copy:client', 'concat', 'stylus']
   grunt.registerTask 'client-prod', ['client', 'uglify']
-  grunt.registerTask 'karma', ['karma:unit:start']
-  grunt.registerTask 'mocha', ['mocha-chai-sinon']
-  grunt.registerTask 'test', ['watch:test']
-  grunt.registerTask 'default', ['server', 'client','concurrent']
+  grunt.registerTask 'test', ['karma:unit:start', 'watch:test']
+  grunt.registerTask 'default', ['server', 'client','concurrent', 'test']
