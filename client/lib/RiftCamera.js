@@ -26,13 +26,14 @@ THREE.OculusRiftEffect = function ( renderer ) {
   var theCamera;
 
   this.render = function ( scene, camera ) {
+    camera.fov = 120;
     var autoClear = renderer.autoClear;
 
     renderer.autoClear = false;
     renderer.clear();
 
     // left eye
-    camera.setViewOffset( width*0.9, height, 0, 0, width-(width*0.12), height );
+    camera.setViewOffset( width, height, width*-0.08, 0, width, height );
     renderer.setViewport( 0, 0, winWid, height );
 
     camera.updateProjectionMatrix();
@@ -41,7 +42,7 @@ THREE.OculusRiftEffect = function ( renderer ) {
     requestAnimationFrame(this.render);
 
     // right eye
-    camera.setViewOffset( width*0.9, height, 0, 0, width+(width*0.12), height );
+    camera.setViewOffset( width, height, width*0.08, 0, width, height );
     renderer.setViewport( winWid, 0, winWid, height );
 
     camera.updateProjectionMatrix();
