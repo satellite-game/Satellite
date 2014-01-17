@@ -27,6 +27,7 @@ s.SatelliteGame = new Class( {
 		var that = this;
 
         this.IDs = [];
+        this.botCount = 0;
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
 		// No gravity
 		this.scene.setGravity(new THREE.Vector3(0, 0, 0));
@@ -167,14 +168,10 @@ s.SatelliteGame = new Class( {
                     alliance: 'enemy'
                 } );
 
-
                 this._list.push( enemyShip );
                 this._map[ enemyInfo.name ] = enemyShip; // this._map.set(enemyInfo.name, otherShip);
             }
         };
-
-        // Create a new bot
-        this.makeNewBot();
 
         // Dependent on controls; needs to be below s.Controls
         this.radar = new s.Radar( {
@@ -212,6 +209,8 @@ s.SatelliteGame = new Class( {
         this.comm.on( 'join', that.handleJoin );
         this.comm.on( 'leave', that.handleLeave );
         this.comm.on( 'move', that.handleMove );
+        this.comm.on( 'bot retrieval', that.handleBotInfo );
+        this.comm.on( 'bot positions', that.handleBotPositions );
 
         this.HUD.controls = this.controls;
 
@@ -444,20 +443,27 @@ s.SatelliteGame = new Class( {
     },
 
     makeNewBot: function(options) {
-        // Generating a new bot name with a random number from 1 to 100
-        var botName = 'bot ' + Math.floor(Math.random() * (100 - 1) + 1);
-
+        
         // If no options passed, set options to empty object and default values for position and rotation
         options = options || {};
+
+        this.botCount = options.botCount || ++this.botCount;
+
+        // Generating a new bot with properties
+        var botName = options.name || 'bot ' + this.botCount;
         var position = options.position || [22498, -25902, 24976];
         var rotation = options.rotation || [0, Math.PI / 2, 0];
+        var lVeloc = options.lVeloc || [0, 0, 0];
+        var aVeloc = options.aVeloc || [0, 0, 0];
 
         this[botName] = new s.Bot( {
             name: botName,
             position: [ position[0], position[1], position[2] ],
             rotation: [ rotation[0], rotation[1], rotation[2] ],
+            lVeloc: lVeloc,
+            aVeloc: aVeloc
         } );
-
+        
         // Create bot and add it to enemies list
         this.enemies.add( {
             aVeloc: this[botName].aVeloc,
@@ -508,6 +514,62 @@ s.SatelliteGame = new Class( {
 
     handleLoadMessages: function(message){
         s.game.loadScreen.setMessage(message);
+    },
+
+    handleBotInfo: function() {
+        if (this.game.botCount === 0) {
+            // Create a new bot
+            this.game.makeNewBot();
+        }
+        var makeArray = function (obj) {
+            var result = [];
+            result[0] = obj.x;
+            result[1] = obj.y;
+            result[2] = obj.z;
+            return result;
+        };
+        enemiesSocketInfo = {};
+        var enemiesList = this.game.enemies._list;  
+        for (var i = 0; i < enemiesList.length; i++) {
+            if (enemiesList[i].name.slice(0,3) === 'bot'){
+                var physics = enemiesList[i].root;
+                var position = makeArray(physics.position);
+                var rotation = makeArray(physics.rotation);
+                var angularVeloc = (physics.getAngularVelocity && physics.getAngularVelocity()) || new THREE.Vector3();
+                var linearVeloc = (physics.getLinearVelocity && physics.getLinearVelocity()) || new THREE.Vector3();
+                var aVeloc = makeArray(angularVeloc);
+                var lVeloc = makeArray(linearVeloc);
+                var name = physics.name;
+                enemiesSocketInfo[name] = {
+                    position: position,
+                    rotation: rotation,
+                    aVeloc: aVeloc,
+                    lVeloc: lVeloc,
+                    name: name,
+                    botCount: this.game.botCount
+                };
+            }
+        }
+        // console.log('sending position info: ', enemiesSocketInfo['bot 1'].position);
+        this.game.comm.botInfo(enemiesSocketInfo);
+    },
+
+    handleBotPositions: function(message) {
+
+        //if the bot exists...update positions
+        //else make new bot with position
+        this.game.botCount = 0;
+        for (var bot in message) {
+            this.game.makeNewBot(message[bot]);
+        // console.log('get message info from other player: ', message[bot].position);
+        }
     }
+
+    // handleHook: function () {
+    //     var that = this;
+    //     this.game.hook(function() {
+    //         that.game.handleBotInfo();
+    //     });
+    // }
 
 } );
