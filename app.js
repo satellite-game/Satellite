@@ -8,6 +8,8 @@ var io           = require('socket.io').listen(server);
 process.env.PORT = process.env.PORT || 1337;
 var path         = require('path');
 var url          = 'http://localhost:' + process.env.PORT + '/';
+var logic        = require('./lib/manager.js');
+
 /* We can access nodejitsu enviroment variables from process.env */
 /* Note: the SUBDOMAIN variable will always be defined for a nodejitsu app */
 if(process.env.SUBDOMAIN){
@@ -54,12 +56,8 @@ function getRandomPosition() {
 function getTime() {
     return (new Date()).getTime();
 }
-
-io.sockets.on('connection', function (socket) {
-    var address = socket.handshake.address;
-    var ip = socket.handshake.address.address;
-    console.log("New connection from " + address.address + ":" + process.env.PORT);
-
+logic = logic(mapItems, io);
+io.sockets.on('connection', logic);
 
 
     // // Setup message handlers
@@ -190,7 +188,7 @@ io.sockets.on('connection', function (socket) {
     //         });
     //     });
     // });
-});
+
 
 
 
