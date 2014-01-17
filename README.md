@@ -10,3 +10,8 @@ Go to [satellite-game.com](http://satellite-game.com)
 ## How to play locally.
 
 Just run the default grunt task from the root directory by issuing `grunt`
+
+## Testing
+
+Running `grunt test` will initiate mocha/chai/sinon testing on both client side and server side. Running `grunt` will initiate the same testing suite. Both `grunt test` and `grunt` will not execute all tests until changes to a file are made to files.
+
