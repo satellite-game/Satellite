@@ -1,9 +1,3 @@
-var quat = {x: 0, y: 0, z: 0};
-
-var oculusCompensationX = 0;
-var oculusCompensationY = 0;
-var oculusCompensationZ = 0;
-
 s.Controls = new Class({
 
   toString: 'Controls',
@@ -35,6 +29,13 @@ s.Controls = new Class({
     // Gamepad interface
     this.gamepad = new Gamepad();
 
+    // Oculus Rift interface
+    this.oculus = new s.Oculus();
+
+    this.oculusCompensationX = 0;
+    this.oculusCompensationY = 0;
+    this.oculusCompensationZ = 0;
+
     console.log('Initialized gamepad...');
     
     this.gamepad.bind(Gamepad.Event.CONNECTED, function(device) {
@@ -60,13 +61,6 @@ s.Controls = new Class({
     this.firing = false;
 
     this.lastTime = new Date( ).getTime( );
-
-    var oculusBridge = new OculusBridge({
-      onOrientationUpdate : this.getNewOrientetion,
-      onConnect           : this.bridgeConnected
-    });
-
-    oculusBridge.connect();
   },
 
   destruct: function( ) {
@@ -75,23 +69,10 @@ s.Controls = new Class({
 
   },
 
-  bridgeConnected: function () {
-    console.log('Oculus Rift detected...');
-  },
-
-  getNewOrientetion: function (data) {
-    if (quat) {
-      quat.x = data.x;
-      quat.y = data.y;
-      quat.z = data.z;
-    }
-  },
-
   update: function( time, delta ) {
     var mouseControls = true;
     var gamepadYaw = false;
     var hasGamepad = !!this.gamepad.gamepads.length;
-    var hasOculus = false;
 
     var now = new Date( ).getTime( );
     var difference = now - this.lastTime;
@@ -150,14 +131,13 @@ s.Controls = new Class({
     //  OCULUS CONTROLS  //
     ///////////////////////
 
-    // mimic mouse movement based on head tilt.
-    // disable mouse input
 
-    if (quat) {
-      pitch = quat.x - oculusCompensationX;
-      yaw = quat.y - oculusCompensationY;
-      roll = quat.z - oculusCompensationZ;
-      console.log(yaw);
+
+    if (this.oculus.detected) {
+      // mouseControls = false;
+      pitch = this.oculus.quat.x - this.oculusCompensationX;
+      yaw = this.oculus.quat.y - this.oculusCompensationY;
+      roll = this.oculus.quat.z - this.oculusCompensationZ;
     }
 
     ///////////////////////
@@ -228,9 +208,9 @@ s.Controls = new Class({
     }
 
     if (this.keyboard.pressed('tilde')) {
-      oculusCompensationX = quat.x;
-      oculusCompensationY = quat.y;
-      oculusCompensationZ = quat.z;
+      this.oculusCompensationX = this.oculus.quat.x;
+      this.oculusCompensationY = this.oculus.quat.y;
+      this.oculusCompensationZ = this.oculus.quat.z;
     }
 
 
