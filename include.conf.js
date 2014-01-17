@@ -31,4 +31,4 @@ module.exports = [
   "./client/game/classes/s.LoadScreen.js",
   "./client/game/classes/s.Game.js",
   "./client/game/classes/s.SatelliteGame.js"
-  ];
+];
