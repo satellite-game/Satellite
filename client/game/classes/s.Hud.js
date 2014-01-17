@@ -268,30 +268,30 @@ s.HUD = new Class({
         // MOON TARGETING SYSTEM //
         ///////////////////////////
 
-        // this.moon = s.game.moon.root;
+        this.moon = s.game.moon.root;
 
-        // var vMoon3D = this.moon.position.clone();
-        // var vMoon2D = s.projector.projectVector( vMoon3D, s.game.camera );
-        // var moonInSight = !!( Math.abs(vMoon2D.x) <= 0.95 && Math.abs(vMoon2D.y) <= 0.95 && vMoon2D.z < 1 );
+        var vMoon3D = this.moon.position.clone();
+        var vMoon2D = s.projector.projectVector( vMoon3D, s.game.camera );
+        var moonInSight = !!( Math.abs(vMoon2D.x) <= 0.95 && Math.abs(vMoon2D.y) <= 0.95 && vMoon2D.z < 1 );
 
-        // // Moon targeting reticule
-        // if ( !moonInSight ) {
+        // Moon targeting reticule
+        if ( !moonInSight ) {
 
-        //     var moon2D = new THREE.Vector2(vMoon2D.x, vMoon2D.y);
-        //     moon2D.multiplyScalar(1/moon2D.length()).multiplyScalar(this.subreticleBound.radius+34);
+            var moon2D = new THREE.Vector2(vMoon2D.x, vMoon2D.y);
+            moon2D.multiplyScalar(1/moon2D.length()).multiplyScalar(this.subreticleBound.radius+34);
 
-        //     this.ctx.beginPath();
-        //     if (vMoon2D.z > 1)
-        //         this.ctx.arc( -moon2D.x+centerX, (-moon2D.y+centerY), 10, 0, 2*this.PI, false );
-        //     else
-        //         this.ctx.arc( moon2D.x+centerX, -(moon2D.y-centerY), 10, 0, 2*this.PI, false );
+            this.ctx.beginPath();
+            if (vMoon2D.z > 1)
+                this.ctx.arc( -moon2D.x+centerX, (-moon2D.y+centerY), 10, 0, 2*this.PI, false );
+            else
+                this.ctx.arc( moon2D.x+centerX, -(moon2D.y-centerY), 10, 0, 2*this.PI, false );
 
-        //     this.ctx.fillStyle = "black";
-        //     this.ctx.fill();
-        //     this.ctx.lineWidth = 2;
-        //     this.ctx.strokeStyle = this.menu.color;
-        //     this.ctx.stroke();
-        // }
+            this.ctx.fillStyle = "black";
+            this.ctx.fill();
+            this.ctx.lineWidth = 2;
+            this.ctx.strokeStyle = this.menu.color;
+            this.ctx.stroke();
+        }
 
 
         //////////////////////////////////////////

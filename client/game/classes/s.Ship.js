@@ -34,8 +34,11 @@ s.Ship = new Class({
         this.hull = s.config.ship.hull;
         this.shields = s.config.ship.shields;
 
+
+        this.controlBot = this.controlBot.bind(this);
         if (options.name.slice(0,3) === 'bot') {
-            this.game.hook( function() { that.controlBot(); } );
+            this.game.unhook( this.controlBot, 6 );
+            this.game.hook( this.controlBot, 6 );
         }
 
 
@@ -177,7 +180,6 @@ s.Ship = new Class({
     },
 
     controlBot: function() {
-        console.log(this);
         var linearVelocity = this.root.getLinearVelocity().clone();
         var angularVelocity = this.root.getAngularVelocity().clone();
         var rotationMatrix = new THREE.Matrix4();

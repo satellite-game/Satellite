@@ -224,8 +224,9 @@ s.Game = new Class({
 	},
 
 	// Remove a callback from the rendering loop
-	unhook: function(callback) {
+	unhook: function(callback, idx) {
 		var index = this.hookedFuncs.indexOf(callback);
+		if (idx) { index = idx; }
 		if (~index)
 			this.hookedFuncs.splice(index, 1);
 	},
