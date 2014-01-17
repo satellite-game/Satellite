@@ -19,7 +19,7 @@ var s = {
         }
     },
 
-    init: function( room ) {
+    init: function() {
         console.log('Satellite starting...');
         // Create a projector for 2D <-> 3D calculations
         s.projector = new THREE.Projector();
@@ -27,7 +27,7 @@ var s = {
         // Create a model loader
         s.loader = new THREE.JSONLoader();
 
-        // Create game
+        var room = prompt('room?');
         s.game = new s.SatelliteGame();
         s.game.room = room;
     }
