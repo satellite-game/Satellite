@@ -55,7 +55,8 @@
     "path": "~0.4.9"
   },
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "test": "grunt travisCI"
   },
   "subdomain": "lockon"
 }
