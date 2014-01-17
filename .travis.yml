@@ -8,3 +8,5 @@ notifications:
       - joaosteing@gmail.com
       - steinernein@gmail.com
       - cooperjbrandon@gmail.com
+before_script:
+  - 'npm install -g grunt-cli'

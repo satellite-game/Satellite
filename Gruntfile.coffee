@@ -15,6 +15,10 @@ module.exports = (grunt) ->
         configFile: 'karma.conf.js'
         autoWatch: false
         background: true
+      travis:
+        configFile: 'karma.conf.js'
+        autoWatch: false
+        singleRun: true
 
     # server-side:
     # ----------------
@@ -149,5 +153,5 @@ module.exports = (grunt) ->
   grunt.registerTask 'client', ['jshint:client', 'copy:client', 'concat', 'stylus']
   grunt.registerTask 'client-prod', ['client', 'uglify']
   grunt.registerTask 'test', ['karma:unit:start', 'watch:test']
-  grunt.registerTask "travisCI", ["jshint:server", "jshint:client", "jshint:tests"]
+  grunt.registerTask 'travisCI', ['jshint:server', 'jshint:client', 'jshint:tests', 'karma:travis']
   grunt.registerTask 'default', ['server', 'client', 'karma:unit:start', 'concurrent']
