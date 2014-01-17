@@ -1,8 +1,4 @@
 describe('Satellite game', function () {
-  beforeEach(function () {
-
-  });
-
   it('should exists', function () {
       expect(s).to.be.an('object');
       expect(s).to.have.property('config');
