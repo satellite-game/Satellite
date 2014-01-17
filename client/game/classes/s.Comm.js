@@ -1,7 +1,10 @@
 /**
 *
-* s.Comm is responsible for alerting the server things that happen to a player (via emit events that the server is lisenting for)
-*
+* s.Comm ---
+* allows us to compartmentalize all interactions
+* with the server to this class (s.Comm) --this class
+* is the only place that holds the logic that allows
+* the client to communicate with the server.
 *
 **/
 
@@ -39,15 +42,17 @@ s.Comm = new Class( {
 
 
     construct: function ( options ) {
-        this.options = options;        
-        options = jQuery.extend( {
-            server: 'localhost:1935'
-        }, options );
 
-        // Prepend http
-        this.options.server = 'http://' + this.options.server;
+        //binding the game's context
 
-        this.player = this.options.player;
+        this.game = options.game;
+
+        // Prepend http. Doing this so that you can customize the server before finalizing the string.
+
+        options.server = 'http://' + options.server;
+
+        this.player = options.player;
+
         this.ship = options.ship;
 
         this.pilot = options.pilot;
@@ -92,10 +97,6 @@ s.Comm = new Class( {
         this.time = 0;
 
 
-        // this.bind( this.position );
-        // this.bind( this.fire );
-        // this.bind( this.died );
-        // this.bind( this.hit );
     },
 
     connected: function ( ) {
