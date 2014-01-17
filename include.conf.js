@@ -2,6 +2,8 @@ module.exports = [
   'client/lib/jquery.js',
   'client/lib/Class.js',
   'client/lib/three.js',
+  'client/lib/OculusBridge.min.js',
+  'client/lib/RiftCamera.js',
   'client/lib/physi.js',
   'client/lib/Stats.js',
   'client/lib/gamepad.js',
@@ -28,4 +30,32 @@ module.exports = [
   'client/game/classes/s.LoadScreen.js',
   'client/game/classes/s.Game.js',
   'client/game/classes/s.SatelliteGame.js'
+  ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+>>>>>>> travisCI for karma
 ];
