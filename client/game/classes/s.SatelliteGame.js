@@ -26,6 +26,9 @@ s.SatelliteGame = new Class( {
 	initialize: function() {
 		var that = this;
 
+        //initally set lastBotCallback to null. updated in s.Ship
+
+        this.lastBotCallback = null;
         this.IDs = [];
         this.botCount = 0;
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
