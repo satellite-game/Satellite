@@ -15,7 +15,7 @@ module.exports = function(config) {
     // use dots reporter, as travis terminal does not support escaping sequences
     // possible values: 'dots', 'progress'
     // CLI --reporters progress
-    reporters: ['progress'],
+    reporters: ['progress', 'coverage'],
 
     // web server port
     // CLI --port 9876
@@ -32,8 +32,21 @@ module.exports = function(config) {
 
     // enable / disable watching file and executing tests whenever any file changes
     // CLI --auto-watch --no-auto-watch
-    autoWatch: true,
+    autoWatch: false,
 
+    preprocessors: {
+      // Source files you want to generate coverage reports for
+      // This should not include tests or libraries
+      // These files will be instrumented by Istanbu
+      'client/game/**/*.js': ['coverage'],
+      'client/game/*.js': ['coverage'],
+    },
+
+    // Configure the reporter
+    coverageReporter: {
+      type: 'html',
+      dir: 'coverage/client/'
+    },
     // Start these browsers, currently available:
     // - Chrome
     // - ChromeCanary
