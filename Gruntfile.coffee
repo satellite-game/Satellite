@@ -15,6 +15,10 @@ module.exports = (grunt) ->
         configFile: 'karma.conf.js'
         autoWatch: false
         background: true
+      travis:
+        configFile: 'karma.conf.js'
+        autoWatch: false
+        singleRun: true
 
     # server-side:
     # ----------------
@@ -71,11 +75,10 @@ module.exports = (grunt) ->
     jshint:
       options:
         jshintrc: '.jshintrc'
-
       gruntfile: ['Gruntfile.js']
       server: ['app.js']
       client: ['client/**/*.js', '!**/models/**', '!**/lib/**']
-      unitTests: ['tests/**/*.js']
+      tests: ['tests/**/*.js', '!tests/oculus-testing-playground/**/*.js']
 
     stylus:
       compile:
@@ -127,7 +130,6 @@ module.exports = (grunt) ->
     grunt.registerTask 'delayed-open', 'open the local host after the server has spun up.', ->
       setInterval grunt.task.run('open'), 3000
 
-
   # DEPENDENCIES
   # =================
 
@@ -147,8 +149,13 @@ module.exports = (grunt) ->
   # REGISTER
   # =================
 
+  grunt.registerTask 'travisCI', ['jshint:server',
+                                  'jshint:client',
+                                  'jshint:tests',
+                                  'karma:travis',
+                                  'mocha-chai-sinon']
+  grunt.registerTask 'test', ['karma:unit:start', 'watch:test']
   grunt.registerTask 'server', ['jshint:server']
   grunt.registerTask 'client', ['jshint:client', 'copy:client', 'concat', 'stylus']
   grunt.registerTask 'client-prod', ['client', 'uglify']
-  grunt.registerTask 'test', ['karma:unit:start', 'watch:test']
   grunt.registerTask 'default', ['server', 'client', 'karma:unit:start', 'concurrent']

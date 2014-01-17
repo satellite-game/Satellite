@@ -42,7 +42,7 @@ s.Comm = new Class( {
 
 
     construct: function ( options ) {
-        
+
         //binding the game's context
 
         this.game = options.game;
