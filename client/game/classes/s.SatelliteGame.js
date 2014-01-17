@@ -220,21 +220,6 @@ s.SatelliteGame = new Class( {
             that.comm.connected( );
             s.game.start();
         });
-
-		window.addEventListener('mousemove', function(e){
-			that.HUD.targetX = e.pageX;
-			that.HUD.targetY = e.pageY;
-		});
-		window.addEventListener('mousedown',function(){
-			that.controls.firing = true;
-		});
-		window.addEventListener('mouseup',function(){
-			that.controls.firing = false;
-		});
-
-
-		this.HUD.controls = this.controls;
-
 	},
 
 	render: function(_super, time) {
@@ -250,22 +235,23 @@ s.SatelliteGame = new Class( {
 			urlPrefix + "front5.png", urlPrefix + "back6.png"
 		];
 
-		var textureCube = THREE.ImageUtils.loadTextureCube(urls);
-		textureCube.format = THREE.RGBFormat;
-		var shader = THREE.ShaderLib.cube;
+		THREE.ImageUtils.loadTextureCube(urls, {}, function(textureCube) {
+            textureCube.format = THREE.RGBFormat;
+            var shader = THREE.ShaderLib.cube;
 
-		var uniforms = THREE.UniformsUtils.clone(shader.uniforms);
-		uniforms.tCube.value = textureCube;
+            var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+            uniforms.tCube.value = textureCube;
 
-		var material = new THREE.ShaderMaterial({
-			fragmentShader: shader.fragmentShader,
-			vertexShader: shader.vertexShader,
-			uniforms: uniforms,
-			side: THREE.BackSide
-		});
+            var material = new THREE.ShaderMaterial( {
+                fragmentShader: shader.fragmentShader,
+                vertexShader: shader.vertexShader,
+                uniforms: uniforms,
+                side: THREE.BackSide
+            } );
 
-		this.skyboxMesh = new THREE.Mesh(new THREE.CubeGeometry(200000, 200000, 200000, 1, 1, 1, null, true ), material);
-		this.scene.add(this.skyboxMesh);
+            this.skyboxMesh = new THREE.Mesh( new THREE.CubeGeometry( 200000, 200000, 200000, 1, 1, 1, null, true ), material );
+            this.scene.add( this.skyboxMesh );
+        }.bind(this));
 	},
 
 	addDust: function() {
@@ -282,36 +268,172 @@ s.SatelliteGame = new Class( {
 
 		for (var i = 0; i < count; i ++ ) {
 
-			var vertex = new THREE.Vector3();
+			var vertex = new THREE.Vector3( );
 
-			if (outer) {
-				// Distribute "stars" on the outer bounds of far space
-				vertex.x = Math.random() * 2 - 1;
-				vertex.y = Math.random() * 2 - 1;
-				vertex.z = Math.random() * 2 - 1;
-				vertex.multiplyScalar(radius);
-			}
-			else {
-				// Distribute "dust" throughout near space
-				vertex.x = Math.random() * radius - radius/2;
-				vertex.y = Math.random() * radius - radius/2;
-				vertex.z = Math.random() * radius - radius/2;
-			}
+            if ( outer ) {
+                // Distribute "stars" on the outer bounds of far space
+                vertex.x = Math.random( ) * 2 - 1;
+                vertex.y = Math.random( ) * 2 - 1;
+                vertex.z = Math.random( ) * 2 - 1;
+                vertex.multiplyScalar( radius );
+            } else {
+                // Distribute "dust" throughout near space
+                vertex.x = Math.random( ) * radius - radius / 2;
+                vertex.y = Math.random( ) * radius - radius / 2;
+                vertex.z = Math.random( ) * radius - radius / 2;
+            }
 
-			geometry.vertices.push( vertex );
+            geometry.vertices.push( vertex );
 
 		}
 
-		var material = new THREE.ParticleBasicMaterial({
-			size: size,
-			map: starSprite,
-			blending: THREE.AdditiveBlending,
-			depthTest: true,
-			transparent: true
-		});
+		var material = new THREE.ParticleBasicMaterial( {
+            size: size,
+            map: starSprite,
+            blending: THREE.AdditiveBlending,
+            depthTest: true,
+            transparent: true
+        } );
 
-		var particles = new THREE.ParticleSystem(geometry, material);
+        this.dust = new THREE.ParticleSystem( geometry, material );
 
-		this.scene.add(particles);
-	}
-});
+        this.scene.add( this.dust );
+    },
+
+    handleJoin: function ( message ) {
+           s.game.enemies.add( message );
+    },
+    handleLeave: function ( message ) {
+        if ( s.game.enemies.delete( message.name ) ) {
+            console.log( '%s has left', message.name );
+        }
+    },
+    handleMove: function ( message ) {
+        if ( message.name == this.pilot.name ) {
+            // server told us to move
+            console.log( 'Server reset position' );
+
+            // Return to center
+            s.game.player.setPosition( message.pos, message.rot, message.aVeloc, message.lVeloc, false ); // Never interpolate our own movement
+        } else {
+            // Enemy moved
+            if ( !s.game.enemies.execute( message.name, 'setPosition', [ message.pos, message.rot, message.aVeloc, message.lVeloc, message.interp ] ) ) {
+                s.game.enemies.add( message );
+            }
+        }
+    },
+
+    handlePlayerList: function(message) {
+        for (var otherPlayerName in message) {
+            // don't add self
+            if (otherPlayerName == this.player.name) continue;
+
+            var otherPlayer = message[otherPlayerName];
+            s.game.enemies.add(otherPlayer);
+        }
+    },
+
+    handleKill: function(message) {
+        // get enemy position
+        var position = s.game.enemies.get(message.killed).root.position;
+        new s.Explosion({
+            game: this.game,
+            position: position
+        });
+        s.game.enemies.delete(message.killed);
+        if (message.killer == s.game.pilot.name)
+            console.warn('You killed %s!', message.killed);
+        else
+            console.log('%s was killed by %s', message.killed, message.killer);
+    },
+
+    handleEnemyFire: function(message) {
+        var bulletPosition = message.position;
+        var bulletRotation = message.rotation;
+        var initialVelocity = message.initialVelocity;
+
+            new s.Turret({
+                pilot: message.name,
+                game: s.game,
+                position: bulletPosition,
+                rotation: bulletRotation,
+                initialVelocity: initialVelocity,
+                team: 'rebels'
+            });
+
+    },
+
+    handleHit: function(message) {
+        var you = message.otherPlayerName;
+        var killer = message.yourName;
+        if (you === s.game.pilot.name){
+            s.game.stopShields();
+            s.game.rechargeShields();
+            if (s.game.player.shields > 0){
+                s.game.HUD.menu.animate({
+                    color: s.game.HUD.shields,
+                    frames: 30
+                });
+                s.game.HUD.shieldsFull.animate({
+                    color: s.game.HUD.shieldsDamaged,
+                    frames: 30
+                });
+                s.game.player.shields -= 20;
+            } else {
+                s.game.HUD.menu.animate({
+                    color: s.game.HUD.hull,
+                    frames: 30
+                });
+                s.game.player.hull -= 20;
+            }
+            console.log('You were hit with a laser by %s! Your HP: %d', killer, s.game.player.hull);
+
+            if (s.game.player.hull <= 0) {
+                s.game.handleDie(you, killer);
+            }
+        } else {
+            var enemy = s.game.enemies.get(you);
+            enemy.shields -= 20;
+            setTimeout(function(){
+                console.log('recharged');
+                enemy.shields = 800;
+            }, 7000);
+            console.log('hit: ', enemy);
+        }
+
+    },
+
+    handleFire: function(props) {
+        s.game.comm.fire(props.position, props.rotation, props.initialVelocity);
+    },
+
+    handleDie: function(you, killer) {
+        s.game.stop();
+        var HUD = s.game.HUD;
+        HUD.ctx.fillStyle = "rgba(0,0,0,0.5)";
+        HUD.ctx.fillRect(0,0,HUD.canvas.width,HUD.canvas.height);
+        HUD.ctx.drawImage(HUD.gameOver,HUD.canvas.width/2 - HUD.gameOver.width/2,HUD.canvas.height/2 - HUD.gameOver.height/2);
+        s.game.comm.died(you, killer);
+
+    },
+    shieldBoost: function(){
+        s.game.IDs.push(setInterval(s.game.shieldAnimate,20));
+    },
+    shieldAnimate: function(){
+        if (s.game.player.shields < s.config.ship.shields){
+            s.game.player.shields += 1;
+        } else {
+            s.game.stopShields();
+        }
+    },
+    stopShields: function(){
+        for (var i = 0; i < s.game.IDs.length; i++){
+            clearInterval(s.game.IDs[i]);
+        }
+    },
+
+    handleLoadMessages: function(message){
+        s.game.loadScreen.setMessage(message);
+    }
+
+} );
