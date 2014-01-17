@@ -70,7 +70,7 @@ s.SatelliteGame = new Class( {
 
         this.HUD.hp = this.player.hull;
         // Moon facing initilization
-        this.player.root.lookAt(this.moon.root.position);
+        //this.player.root.lookAt(this.moon.root.position);
 
         // Root camera to the player's position
         this.player.root.add( this.camera );

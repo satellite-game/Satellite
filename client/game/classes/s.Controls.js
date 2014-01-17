@@ -32,10 +32,6 @@ s.Controls = new Class({
     // Oculus Rift interface
     this.oculus = new s.Oculus();
 
-    this.oculusCompensationX = 0;
-    this.oculusCompensationY = 0;
-    this.oculusCompensationZ = 0;
-
     console.log('Initialized gamepad...');
     
     this.gamepad.bind(Gamepad.Event.CONNECTED, function(device) {
@@ -131,13 +127,11 @@ s.Controls = new Class({
     //  OCULUS CONTROLS  //
     ///////////////////////
 
-
-
     if (this.oculus.detected) {
       // mouseControls = false;
-      pitch = this.oculus.quat.x - this.oculusCompensationX;
-      yaw = this.oculus.quat.y - this.oculusCompensationY;
-      roll = this.oculus.quat.z - this.oculusCompensationZ;
+      pitch = this.oculus.quat.x - this.oculus.compensationX;
+      yaw = this.oculus.quat.y - this.oculus.compensationY;
+      roll = this.oculus.quat.z - this.oculus.compensationZ;
     }
 
     ///////////////////////
@@ -208,9 +202,9 @@ s.Controls = new Class({
     }
 
     if (this.keyboard.pressed('tilde')) {
-      this.oculusCompensationX = this.oculus.quat.x;
-      this.oculusCompensationY = this.oculus.quat.y;
-      this.oculusCompensationZ = this.oculus.quat.z;
+      this.oculus.compensationX = this.oculus.quat.x;
+      this.oculus.compensationY = this.oculus.quat.y;
+      this.oculus.compensationZ = this.oculus.quat.z;
     }
 
 
