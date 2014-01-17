@@ -10,8 +10,6 @@ s.Ship = new Class({
     },
 
 	construct: function(options) {
-        var that = this;
-
 
         this.HUD = options.HUD;
 		var geometry = s.models[options.shipClass].geometry;
@@ -37,8 +35,9 @@ s.Ship = new Class({
 
         this.controlBot = this.controlBot.bind(this);
         if (options.name.slice(0,3) === 'bot') {
-            this.game.unhook( this.controlBot, 6 );
-            this.game.hook( this.controlBot, 6 );
+            if (this.game.lastBotCallback) { this.game.unhook( this.game.lastBotCallback ); }
+            this.game.hook( this.controlBot );
+            this.game.lastBotCallback = this.controlBot;
         }
 
 
