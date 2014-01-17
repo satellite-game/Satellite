@@ -14,6 +14,21 @@ s.Game = new Class({
 		// Communication
 
 
+		// Communication
+		this.comm = new s.Comm({
+			player: this.player,
+			ship: this.ship,
+			server: window.location.hostname + ':1935'
+		});
+		
+        this.comm.on('fire', self.handleEnemyFire);
+        this.comm.on('hit', self.handleHit);
+        this.comm.on('player list', self.handlePlayerList);
+        this.comm.on('killed', self.handleKill);
+        this.comm.on('join', self.handleJoin);
+        this.comm.on('leave', self.handleLeave);
+        this.comm.on('move', self.handleMove);
+		
 		/*-----  End of  Comms Handler Binding  ------*/
 
 		this.doRender = false;
@@ -257,16 +272,137 @@ s.Game = new Class({
 				func(now, delta);
 			});
 
-            // Render radar loop
-            this.radarRenderer.render( this.radarScene, this.radarCamera );
 
-			// Render main scene
-			this.renderer.render( this.scene, this.camera );
+            //////////////////////////
+            // RADAR RENDER SEGMENT //
+            //////////////////////////
 
-            this.render_stats.update();
+            // Radar sphere rotation with respect to player's current rotation
+            this.radarScene.children[3].rotation = s.game.player.root.rotation;
 
-			// Request the next frame to be rendered
-			requestAnimationFrame(this.render);
+            // Clone of the current player's position
+            var selfPosition = s.game.player.root.position.clone();
+
+            // Apply negative scaling to position to compensate for moon size
+            selfPosition.addScalar(-200);
+
 		}
+	},
+
+	/*======================================
+	=            Comms Handlers            =
+	======================================*/
+
+	handleJoin: function(message) {
+		this.enemies.add(message);
+	},
+	handleLeave: function(message) {
+		if (this.enemies.delete(message.name)) {
+			console.log('%s has left', message.name);
+		}
+	},
+	handleMove: function(message) {
+		if (message.name == this.player.name) {
+			// server told us to move
+			console.log('Server reset position');
+			
+			// Return to center
+			this.ship.setPosition(message.pos, message.rot, message.tRot, message.aVeloc, message.lVeloc, false); // Never interpolate our own movement
+		}
+		else {
+			// Enemy moved
+			if (!this.enemies.do(message.name, 'setPosition', [message.pos, message.rot, message.tRot, message.aVeloc, message.lVeloc, message.interp])) {
+				this.enemies.add(message);
+			}
+		}
+	},
+	handleKill: function(message) {
+		var enemy = this.enemies.get(message.name);
+		
+		new s.Explosion({
+			game: this,
+			position: enemy.getPosition().pos
+		});
+		
+		if (message.killer == this.player.name)
+			console.warn('You killed %s!', message.name);
+		else
+			console.log('%s was killed by %s', message.name, message.killer);
+	},
+	handlePlayerList: function(message) {
+		for (var otherPlayerName in message) {
+			// don't add self
+			if (otherPlayerName == this.player.name) continue;
+			
+			var otherPlayer = message[otherPlayerName];
+			this.enemies.add(otherPlayer);
+		}
+	},
+	handleEnemyFire: function(message) {
+		var time = new Date().getTime();
+		
+		var bulletPosition = new THREE.Vector3(message.pos[0], message.pos[1], message.pos[2]);
+		var bulletRotation = new THREE.Vector3(message.rot[0], message.rot[1], message.rot[2]);
+		
+		var bulletModel;
+		if (message.type == 'missile') {
+			bulletModel = new s.Missile({
+				game: this,
+				position: bulletPosition,
+				rotation: bulletRotation,
+				alliance: 'enemy'
+			});
+		}
+		else {
+			bulletModel = new s.Bullet({
+				game: this,
+				position: bulletPosition,
+				rotation: bulletRotation,
+				alliance: 'enemy'
+			});
+		}
+		
+		// Calculated volume based on distance
+		var volume = this.getVolumeAt(bulletPosition);
+		
+		// Play sound
+		var soundInfo = this.options.weapons[message.type].sound;
+		this.sound.play(soundInfo.file, soundInfo.volume*volume);
+		
+		this.enemyBullets.push({
+			instance: bulletModel,
+			alliance: 'enemy',
+			time: time
+		});
+	},
+	handleHit: function(message) {
+		// Decrement HP
+		this.player.hp -= this.options.weapons[message.type].damage;
+		
+		this.sound.play('hit_ship_self');
+		console.log('You were hit with a %s by %s! Your HP: %d', message.type, message.name, this.player.hp);
+		
+		if (this.player.hp <= 0) {
+			// Player is dead
+			this.handleDie(message.name);
+		}
+	},
+	handleFire: function(props) {
+		this.comm.fire(props.pos, props.rot, this.currentWeapon);
+	},
+	handleDie: function(otherPlayerName) {
+		new s.Explosion({
+			game: this,
+			position: this.ship.getRoot().position
+		});
+		
+		this.comm.died(otherPlayerName);
+		
+		// Restore health
+		this.player.hp = 100;
+		
+		console.warn('You were killed by %s', otherPlayerName);
 	}
+
+	/*-----  End of Comms Handlers  ------*/
 });
