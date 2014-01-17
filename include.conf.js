@@ -23,6 +23,7 @@ module.exports = [
   "./client/game/classes/s.Moon.js",
   "./client/game/classes/s.Color.js",
   "./client/game/classes/s.Keyboard.js",
+  "./client/game/classes/s.Mouse.js",
   "./client/game/classes/s.Oculus.js",
   "./client/game/classes/s.Controls.js",
   "./client/game/classes/s.Hud.js",
