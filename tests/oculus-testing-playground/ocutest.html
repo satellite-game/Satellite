@@ -1,0 +1,81 @@
+<!--
+  This demo requires dowloading the Oculus
+  Bridge socket utility from:
+  https://github.com/Instrument/oculus-bridge
+-->
+
+<html>
+  <head>
+    <title>Three.js+Oculus Testing Grounds</title>
+    <style>
+      body {
+        padding: 0;
+        margin: 0;
+      }
+      canvas {
+        width: 100%;
+        height: 100%
+      }
+    </style>
+  </head>
+  <body>
+    <script src="OculusBridge.min.js"></script>
+    <script src="https://rawgithub.com/mrdoob/three.js/master/build/three.js"></script>
+    <script src="RiftCamera.js"></script>
+    <script>
+      var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+
+      var renderer = new THREE.WebGLRenderer({antialias: true});
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+      renderer.setClearColor(0x161616);
+
+      var ctx = renderer.domElement.getContext('2d');
+
+      var height = window.innerHeight,
+          width = window.innerWidth,
+          centerX = width/2,
+          centerY = height/2;
+
+      var riftCam = new THREE.OculusRiftEffect(renderer);
+
+      var geometry = new THREE.CubeGeometry(1,1,1);
+      var material = new THREE.MeshLambertMaterial({color: 0x00ff00, emissive: 0x337766});
+      var cube = new THREE.Mesh(geometry, material);
+      scene.add(cube);
+
+      point = new THREE.DirectionalLight( 0xffffff, 1, 0, Math.PI, 1 );
+      point.position.set( -20, 20, 10 );
+      
+      scene.add(point);
+
+      camera.position.z = 2;
+
+      var render = function () {
+        requestAnimationFrame(render);
+        riftCam.render(scene, camera);
+      };
+
+      render();
+
+      // Oculus Bridge socket event handlers
+
+      var updateOrientetion = function (quat) {
+        camera.quaternion.set(quat.x, quat.y, quat.z, quat.w);
+      }
+
+      var bridgeConnected = function () {
+        console.log('Oculus Bridge connected.');
+      }
+
+      var oculusBridge = new OculusBridge({
+        onOrientationUpdate : updateOrientetion,
+        onConnect           : bridgeConnected
+      });
+
+      oculusBridge.connect();
+    </script>
+    <h3></h3>
+  </body>
+</html>
