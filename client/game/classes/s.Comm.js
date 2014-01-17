@@ -108,6 +108,7 @@ s.Comm = new Class( {
         var shipPosition = this.game.player.getPositionPacket( );
 
         var packet = {
+            room: this.room,
 
             evt: 'joined',
 
@@ -121,7 +122,7 @@ s.Comm = new Class( {
 
             aVeloc: shipPosition.aVeloc,
 
-            lVeloc: shipPosition.lVeloc
+            lVeloc: shipPosition.lVeloc,
 
         };
 
