@@ -1,0 +1,16 @@
+var io = require('socket.io').listen(server);
+var Rooms = require('../rooms.js')
+	Rooms = new Rooms(); 
+var game = require('../game_server.js')
+var manager = require('../lib/manager.js')
+    manager = new Manager(io, Rooms);
+    
+io.sockets.on('connection', manager 
+    
+
+
+);
+
+// manager[type]
+// has access to io, Rooms, data, socket 
+
