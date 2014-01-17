@@ -3,7 +3,7 @@ module.exports = function(config) {
     // base path, that will be used to resolve files and exclude
     basePath: './',
 
-    frameworks: ['jasmine'],
+    frameworks: ['mocha','sinon-chai'],
 
     // list of files / patterns to load in the browser
     files: require('./include.conf').concat(['tests/client/**/*.js']),
@@ -45,8 +45,7 @@ module.exports = function(config) {
     // CLI --browsers Chrome,Firefox,Safari
     browsers: process.env.TRAVIS ? [ 'ChromeCanary' ] : [
       'Firefox',
-      'Chrome',
-      'ChromeCanary'
+      'Chrome'
     ],
 
     // If browser does not capture in given timeout [ms], kill it
@@ -63,7 +62,8 @@ module.exports = function(config) {
 
     plugins: [
       'karma-coverage',
-      'karma-jasmine',
+      'karma-mocha',
+      'karma-sinon-chai',
       'karma-chrome-launcher',
       'karma-firefox-launcher'
     ]
