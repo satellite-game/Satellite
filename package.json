@@ -25,7 +25,25 @@
     "grunt-contrib-stylus": "0.7.x",
     "grunt-nodemon": "~0.1.0",
     "grunt-concurrent": "~0.3.0",
-    "grunt-open": "~0.2.2"
+    "grunt-open": "~0.2.2",
+    "grunt-karma": "~0.6.2",
+    "karma": "~0.10.9",
+    "karma-firefox-launcher": "~0.1.0",
+    "karma-chrome-launcher": "~0.1.0",
+    "karma-coverage": "~0.1.2",
+    "karma-jasmine": "~0.1.3",
+    "karma-mocha": "~0.1.1",
+    "karma-sinon-chai": "~0.1.4",
+    "frisby": "~0.7.5",
+    "vows": "~0.7.0",
+    "assert": "~1.1.0",
+    "grunt-vows-runner": "~0.6.0",
+    "socket.io": "~0.9.16",
+    "should": "~2.1.1",
+    "socket.io-client": "~0.9.16",
+    "grunt-mocha-test": "~0.8.1",
+    "expect": "0.0.2",
+    "expect.js": "~0.2.0"
   },
   "engines": {
     "node": "0.10.15",
@@ -44,11 +62,5 @@
   "scripts": {
     "start": "node app.js"
   },
-  "subdomain": "lockon",
-  "engines": {
-    "node": "0.10.15",
-    "npm": "1.1.x"
-  }
+  "subdomain": "lockon"
 }
-
-
