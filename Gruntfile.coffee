@@ -78,7 +78,7 @@ module.exports = (grunt) ->
       gruntfile: ['Gruntfile.js']
       server: ['app.js']
       client: ['client/**/*.js', '!**/models/**', '!**/lib/**']
-      tests: ['tests/**/*.js']
+      tests: ['tests/**/*.js', '!tests/oculus-testing-playground/**/*.js']
 
     stylus:
       compile:
@@ -149,9 +149,13 @@ module.exports = (grunt) ->
   # REGISTER
   # =================
 
+  grunt.registerTask 'travisCI', ['jshint:server',
+                                  'jshint:client',
+                                  'jshint:tests',
+                                  'karma:travis',
+                                  'mocha-chai-sinon']
+  grunt.registerTask 'test', ['karma:unit:start', 'watch:test']
   grunt.registerTask 'server', ['jshint:server']
   grunt.registerTask 'client', ['jshint:client', 'copy:client', 'concat', 'stylus']
   grunt.registerTask 'client-prod', ['client', 'uglify']
-  grunt.registerTask 'test', ['karma:unit:start', 'watch:test']
-  grunt.registerTask 'travisCI', ['jshint:server', 'jshint:client', 'jshint:tests', 'karma:travis']
   grunt.registerTask 'default', ['server', 'client', 'karma:unit:start', 'concurrent']
