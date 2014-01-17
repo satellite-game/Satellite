@@ -10,6 +10,9 @@ s.Ship = new Class({
     },
 
 	construct: function(options) {
+        var that = this;
+
+
         this.HUD = options.HUD;
 		var geometry = s.models[options.shipClass].geometry;
 		this.materials = s.models[options.shipClass].materials[0];
@@ -30,6 +33,10 @@ s.Ship = new Class({
         this.root.name = this.name;
         this.hull = s.config.ship.hull;
         this.shields = s.config.ship.shields;
+
+        if (options.name.slice(0,3) === 'bot') {
+            this.game.hook( function() { that.controlBot(); } );
+        }
 
 
 	},
@@ -167,5 +174,25 @@ s.Ship = new Class({
 
     handleDie: function(){
         this.destruct();
+    },
+
+    controlBot: function() {
+        console.log(this);
+        var linearVelocity = this.root.getLinearVelocity().clone();
+        var angularVelocity = this.root.getAngularVelocity().clone();
+        var rotationMatrix = new THREE.Matrix4();
+        rotationMatrix.extractRotation(this.root.matrix);
+
+        angularVelocity = angularVelocity.clone().divideScalar(4);
+        this.root.setAngularVelocity(angularVelocity);
+
+        var newAngularVelocity = new THREE.Vector3(0, 0, 0).applyMatrix4(rotationMatrix).add(angularVelocity);
+        this.root.setAngularVelocity(newAngularVelocity);
+
+        var impulse = linearVelocity.clone().negate();
+        this.root.applyCentralImpulse(impulse);
+
+        var getForceVector = new THREE.Vector3(0,0, -1*500).applyMatrix4(rotationMatrix);
+        this.root.applyCentralImpulse(getForceVector);
     }
 });

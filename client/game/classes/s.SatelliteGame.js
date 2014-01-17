@@ -46,9 +46,9 @@ s.SatelliteGame = new Class( {
         });
 
         // Add moon
-        this.moon = new s.Moon( {
-            game: this
-        } );
+        // this.moon = new s.Moon( {
+        //     game: this
+        // } );
 
         this.pilot = {};
         this.callsigns = this.callsigns || ["Apollo","Strobe","Sage","Polkadot","Moonglow","Steel","Vanguard","Prong","Uptight","Blackpony","Hawk","Ramrod","Dice","Falcon","Rap","Buckshot","Cobra","Magpie","Warhawk","Boxer","Devil","Hammer","Phantom","Sharkbait","Dusty","Icon","Blade","Pedro","Stinger","Yellow Jacket","Limit","Sabre","Misty","Whiskey","Dice","Antic","Arrow","Auto","Avalon","Bandit","Banshee","Blackjack","Bulldog","Caesar","Cajun","Challenger","Chuggs","Cindy","Cracker","Dagger","Dino","Esso","Express","Fangs","Fighting Freddie","Freight Train","Freemason","Fury","Gamma","Gear","Ghost","Ginger","Greasy","Havoc","Hornet","Husky","Jackal","Jaguar","Jedi","Jazz","Jester","Knife","Kitty Hawk","Knight","Knightrider","Koala","Komono","Lancer","Lexus","Lion","Levi","Lucid","Malty","Mail Truck","Magma","Magnet","Malibu","Medusa","Maul","Monster","Misfit","Moss","Moose","Mustang","Nail","Nasa","Nacho","Nighthawk","Ninja","Neptune","Odin","Occult","Nukem","Ozark","Pagan","Pageboy","Panther","Peachtree","Phenom","Polestar","Punisher","Ram","Rambo","Raider","Raven","Razor","Rupee","Sabre","Rust","Ruin","Sultan","Savor","Scandal","Scorpion","Shooter","Smokey","Sniper","Spartan","Thunder","Titus","Titan","Timber Wolf","Totem","Trump","Venom","Veil","Viper","Weasel","Warthog","Winter","Wiki","Wild","Yonder","Yogi","Yucca","Zeppelin","Zeus","Zesty"];
@@ -71,7 +71,7 @@ s.SatelliteGame = new Class( {
 
         this.HUD.hp = this.player.hull;
         // Moon facing initilization
-        this.player.root.lookAt(this.moon.root.position);
+        // this.player.root.lookAt(this.moon.root.position);
 
         // Root camera to the player's position
         this.player.root.add( this.camera );
@@ -219,6 +219,23 @@ s.SatelliteGame = new Class( {
             that.comm.connected( );
             s.game.start();
         });
+
+        // this.hook(function() {
+        //     if (that.enemies._list.length === 0) { return; }
+        //     var meX = that.player.root.position.x;
+        //     var meY = that.player.root.position.y;
+        //     var meZ = that.player.root.position.z;
+        //     var botX = that.enemies._list[0].root.position.x;
+        //     var botY = that.enemies._list[0].root.position.y;
+        //     var botZ = that.enemies._list[0].root.position.z;
+        //     var diffX = meX - botX;
+        //     var diffY = meY - botY;
+        //     var diffZ = meZ - botZ;
+        //     var nextX = botX + diffX/300;
+        //     var nextY = botY + diffY/300;
+        //     var nextZ = botZ + diffZ/300;
+        //     that.enemies.execute( 'bot 1', 'setPosition', [ [nextX, nextY, nextZ], [0,0,0], [0,0,0], [0,0,0], false ] );
+        // });
     },
 
     render: function ( _super, time ) {
@@ -426,6 +443,8 @@ s.SatelliteGame = new Class( {
     },
 
     handleFire: function(props) {
+        // s.game.enemies.execute( 'bot 1', 'setPosition', [ [-20000,-20000,-20000], [0,0,0], [0,0,0], [0,0,0], true ] );
+        // this.enemies._list[0].root.position.set(0,0,0);
         s.game.comm.fire(props.position, props.rotation, props.initialVelocity);
     },
 

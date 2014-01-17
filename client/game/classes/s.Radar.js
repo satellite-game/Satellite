@@ -149,19 +149,19 @@ s.Radar = new Class({
         /////////////////
 
         // moon instantiation
-        var moonGeo = s.models.phobos_lofi.geometry;
-        var moonMarker = new THREE.Mesh( moonGeo, new THREE.MeshNormalMaterial() );
+        // var moonGeo = s.models.phobos_lofi.geometry;
+        // var moonMarker = new THREE.Mesh( moonGeo, new THREE.MeshNormalMaterial() );
 
-        // Moon marker size scaling
-        /* TODO: scale in a more meaningful way */
-        moonMarker.scale.multiplyScalar(3/1000);
-        moonMarker.name = "moon";
+        // // Moon marker size scaling
+        // /* TODO: scale in a more meaningful way */
+        // moonMarker.scale.multiplyScalar(3/1000);
+        // moonMarker.name = "moon";
 
-        // Moon radar positioning
-        var moonPosition = that.scene.getChildByName( 'moon' ).position.clone();
-        moonMarker.position = moonPosition.normalize().multiplyScalar(that.radius);
+        // // Moon radar positioning
+        // var moonPosition = that.scene.getChildByName( 'moon' ).position.clone();
+        // moonMarker.position = moonPosition.normalize().multiplyScalar(that.radius);
 
-        radar.add( moonMarker );
+        // radar.add( moonMarker );
 
 
 
