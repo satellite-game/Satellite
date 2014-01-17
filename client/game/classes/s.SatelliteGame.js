@@ -77,7 +77,7 @@ s.SatelliteGame = new Class( {
 
         //// Setup camera: Cockpit view; COMMENT OUT FOR CHASE CAM
         // this.camera.position.set( 0, 0, 0 );
-        
+
         //// Setup camera: Chase view
         this.camera.position.set(0,35,250);
 
