@@ -190,52 +190,52 @@ s.Controls = new Class({
         // MOTION AND PHYSICS LOGIC //
         //////////////////////////////
 
-        var linearVelocity = root.getLinearVelocity().clone();
-        var angularVelocity = root.getAngularVelocity().clone();
-        var rotationMatrix = new THREE.Matrix4();
-        rotationMatrix.extractRotation(root.matrix);
+        // var linearVelocity = root.getLinearVelocity().clone();
+        // var angularVelocity = root.getAngularVelocity().clone();
+        // var rotationMatrix = new THREE.Matrix4();
+        // rotationMatrix.extractRotation(root.matrix);
 
-        // Apply rotation
-        // Bleed off angular velocity towards zero
-        angularVelocity = angularVelocity.clone().divideScalar(this.options.rotationFadeFactor);
-        root.setAngularVelocity(angularVelocity);
+        // // Apply rotation
+        // // Bleed off angular velocity towards zero
+        // angularVelocity = angularVelocity.clone().divideScalar(this.options.rotationFadeFactor);
+        // root.setAngularVelocity(angularVelocity);
 
-        // Add to the existing angular velocity,
-        var newAngularVelocity = new THREE.Vector3(pitch, yaw, roll).applyMatrix4(rotationMatrix).add(angularVelocity);
-        root.setAngularVelocity(newAngularVelocity);
+        // // Add to the existing angular velocity,
+        // var newAngularVelocity = new THREE.Vector3(pitch, yaw, roll).applyMatrix4(rotationMatrix).add(angularVelocity);
+        // root.setAngularVelocity(newAngularVelocity);
 
-        // Apply thrust
-        // Invert existing linear velocity
-        // Fractionally apply the opposite impulse
-        // Then apply forward impulse
+        // // Apply thrust
+        // // Invert existing linear velocity
+        // // Fractionally apply the opposite impulse
+        // // Then apply forward impulse
 
-        // If ship position is greater then x apply thrust in opposite direction
-        // If ship position is not greater then x allow to apply thrust
-        var playerPosition = this.player.root.position;
-        var boundryLimit = 30000;
+        // // If ship position is greater then x apply thrust in opposite direction
+        // // If ship position is not greater then x allow to apply thrust
+        // var playerPosition = this.player.root.position;
+        // var boundryLimit = 30000;
 
-        // If the ship is beyound the boundary limit push it back into the map
-        /*
-        if(s.util.largerThan(playerPosition, boundryLimit)){
-            var boundryPush = new THREE.Vector3(0, 0, 200*this.options.thrustImpulse).applyMatrix4(rotationMatrix);
-            root.applyCentralImpulse(boundryPush);
-            console.log('--Outside Boundry Limit--');
-        }
-        */
+        // // If the ship is beyound the boundary limit push it back into the map
+        // /*
+        // if(s.util.largerThan(playerPosition, boundryLimit)){
+        //     var boundryPush = new THREE.Vector3(0, 0, 200*this.options.thrustImpulse).applyMatrix4(rotationMatrix);
+        //     root.applyCentralImpulse(boundryPush);
+        //     console.log('--Outside Boundry Limit--');
+        // }
+        // */
         
-        if (thrust && this.options.thrustImpulse < s.config.ship.maxSpeed){
-            this.options.thrustImpulse += difference;
-        }
+        // if (thrust && this.options.thrustImpulse < s.config.ship.maxSpeed){
+        //     this.options.thrustImpulse += difference;
+        // }
 
-        if (brakes && this.options.thrustImpulse > 0){
-            this.options.thrustImpulse -= difference;
-        }
+        // if (brakes && this.options.thrustImpulse > 0){
+        //     this.options.thrustImpulse -= difference;
+        // }
 
-        var impulse = linearVelocity.clone().negate();
-        root.applyCentralImpulse(impulse);
+        // var impulse = linearVelocity.clone().negate();
+        // root.applyCentralImpulse(impulse);
 
-        var forceVector = new THREE.Vector3(0, 0, -1*this.options.thrustImpulse).applyMatrix4(rotationMatrix);
-        root.applyCentralImpulse(forceVector);
-        this.lastTime = now;
+        // var forceVector = new THREE.Vector3(0, 0, -1*this.options.thrustImpulse).applyMatrix4(rotationMatrix);
+        // root.applyCentralImpulse(forceVector);
+        // this.lastTime = now;
     }
 });

@@ -546,7 +546,9 @@ public_functions.updateMass = function( details ) {
 };
 
 public_functions.applyCentralImpulse = function ( details ) {
-  
+    for (var key in details) {
+      console.log(key + ': ' + details[key]);
+    }
   _vec3_1.setX(details.x);
   _vec3_1.setY(details.y);
   _vec3_1.setZ(details.z);
