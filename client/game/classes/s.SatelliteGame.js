@@ -25,7 +25,6 @@ s.SatelliteGame = new Class( {
 
 	initialize: function() {
 		var that = this;
-
         this.IDs = [];
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
 		// No gravity
