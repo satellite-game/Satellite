@@ -2,8 +2,8 @@ s.Bot = new Class( {
 	toString: 'Bot',
 
 	construct: function( options ) {
-		this.aVeloc = [0, 0, 0];
-		this.lVeloc = [0, 0, 0];
+		this.aVeloc = options.aVeloc;
+		this.lVeloc = options.lVeloc;
 		this.interp = true;
 		this.name = options.name;
 		this.pos = options.position;

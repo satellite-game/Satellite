@@ -86,6 +86,12 @@ s.Comm = new Class( {
         this.socket.on('fire', this.makeTrigger( 'fire' ));
 
         this.socket.on('hit', this.makeTrigger( 'hit' ));
+        
+        this.socket.on('bot retrieval', this.makeTrigger( 'bot retrieval' ));
+        
+        this.socket.on('bot positions', this.makeTrigger( 'bot positions' ));
+
+
 
 
         this.game.hook( this.position );
@@ -230,5 +236,9 @@ s.Comm = new Class( {
         if ( this.time >= 60 ){
             window.location.href = "http://satellite-game.com";
         }
+    },
+
+    botInfo: function(message) {
+        this.socket.emit('botInfo', message);
     }
 } );

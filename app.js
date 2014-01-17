@@ -34,6 +34,7 @@ app.get('/', function (req, res) {
 
 // Holds players
 var players = {};
+var clients = [];
 
 var mapItems = [
     { type: 'Alien Space Station', pos: [0, 1000], rot: 0, hp: 100 },
@@ -60,7 +61,7 @@ io.sockets.on('connection', function (socket) {
     var ip = socket.handshake.address.address;
     console.log("New connection from " + address.address + ":" + process.env.PORT);
 
-
+    clients.push(socket.id);
 
     // Setup message handlers
     socket.on('join', function(message) {
@@ -98,6 +99,7 @@ io.sockets.on('connection', function (socket) {
                 ip: ip
             };
 
+
             var packet = {
                 name: message.name,
                 pos: message.pos,
@@ -117,12 +119,21 @@ io.sockets.on('connection', function (socket) {
                 aVeloc: message.aVeloc,
                 lVeloc: message.lVeloc
             });
+
+            io.sockets.socket(clients[0]).emit("bot retrieval");
         });
     });
 
     socket.on('disconnect', function() {
         socket.get('name', function (err, name) {
             console.log(name+' dropped');
+
+            console.log('socket.id: ',socket.id);
+            // console.log('clients: ', clients);
+            var idx = clients.indexOf(socket.id);
+            console.log('index: ', idx);
+            clients.splice(idx, 1);
+            console.log(clients);
 
             // Remove from client list
             delete players[name];
@@ -190,6 +201,12 @@ io.sockets.on('connection', function (socket) {
             });
         });
     });
+
+    socket.on('botInfo', function(message) {
+        var lastClient = clients[clients.length - 1];
+        io.sockets.socket(lastClient).emit('bot positions', message);
+    });
+
 });
 
 
