@@ -1,14 +1,20 @@
 s.Mouse = new Class({
   toString: 'Mouse',
 
-  mice: {
-    'oculus'  : function(){ this.oculusMouse(); },
-    'keyboard': function(){ this.keyboardMouse(); },
-    'none'    : function(){ this.noMouse(); }
-  },
-
   construct: function (mouseType, options) {
+    // ensure that s.Mouse.update always runs in the context of the mouse
+    this.update = this.update.bind(this);
+    this.oculusMouse = this.oculusMouse.bind(this);
+    this.keyboardMouse = this.keyboardMouse.bind(this);
+    this.noMouse = this.noMouse.bind(this);
+
     this.mouseType = mouseType;
+    this.mice = {
+      'oculus'  : this.oculusMouse,
+      'keyboard': this.keyboardMouse,
+      'none'    : this.noMouse
+    };
+
     // Store references to game objects from s.Controls
     this.HUD = options.HUD;
     this.game = options.game;
@@ -16,42 +22,43 @@ s.Mouse = new Class({
     this.camera = options.camera;
   },
 
-  update: function (movables) {
-    this.mice[this.mouseType].call(this, moveables);
+  update: function () {
+    return this.mice[this.mouseType].apply(this, arguments);
   },
 
-  keyboardMouse: function (moveables) {
+  keyboardMouse: function (movables) {
     // Set yaw to zero if cursor is inside the crosshair region
-    if (this.HUD.targetX > moveables.centerX - moveables.crosshairs.width/2 &&
-        this.HUD.targetX < moveables.centerX + moveables.crosshairs.width/2){
-      moveables.yaw = 0;
+    if (this.HUD.targetX > movables.centerX - movables.crosshairs.width/2 &&
+        this.HUD.targetX < movables.centerX + movables.crosshairs.width/2){
+      movables.yaw = 0;
     } else {
       // X scales yaw
-      var yawDivisor = this.HUD.targetX < moveables.centerX ?
-        (moveables.centerX-moveables.radius)/((moveables.centerX-this.HUD.targetX)*4) :
-        -(moveables.centerX+moveables.radius)/((-moveables.centerX+this.HUD.targetX)*4);
-      moveables.yaw = moveables.yawSpeed/moveables.yawDivisor/moveables.thrustScalar;
-      console.log(yaw);
+      var yawDivisor = this.HUD.targetX < movables.centerX ?
+        (movables.centerX-movables.radius)/((movables.centerX-this.HUD.targetX)*4) :
+        -(movables.centerX+movables.radius)/((-movables.centerX+this.HUD.targetX)*4);
+      movables.yaw = movables.yawSpeed/yawDivisor/movables.thrustScalar;
     }
 
     // Set pitch to zero if cursor is inside the crosshair region
-    if (this.HUD.targetY > moveables.centerY - crosshairs.height/2 && this.HUD.targetY < moveables.centerY + moveables.crosshairs.height/2){
-      moveables.pitch = 0;
+    if (this.HUD.targetY > movables.centerY - movables.crosshairs.height/2 && this.HUD.targetY < movables.centerY + movables.crosshairs.height/2){
+      movables.pitch = 0;
     } else {
       // Y scales pitch
-      var pitchDivisor = this.HUD.targetY < moveables.centerY ?
-        (moveables.centerY+moveables.radius)/((moveables.centerY-this.HUD.targetY)*4) : -(moveables.centerY+moveables.radius)/((-moveables.centerY+this.HUD.targetY)*4);
-      moveables.pitch = moveables.pitchSpeed/moveables.pitchDivisor/moveables.thrustScalar;
+      var pitchDivisor = this.HUD.targetY < movables.centerY ?
+        (movables.centerY+movables.radius)/((movables.centerY-this.HUD.targetY)*4) : -(movables.centerY+movables.radius)/((-movables.centerY+this.HUD.targetY)*4);
+      movables.pitch = movables.pitchSpeed/pitchDivisor/movables.thrustScalar;
     }
+    return {yaw: movables.yaw, pitch: movables.pitch};
   },
 
   oculusMouse: function () {
 
   },
 
-  noMouse: function () {
-    this.HUD.targetX = centerX;
-    this.HUD.targetY = centerY;
+  noMouse: function (movables) {
+    this.HUD.targetX = movables.centerX;
+    this.HUD.targetY = movables.centerY;
+    return {}; // for s.Control Ln:120 and 121;
   },
 
 });
