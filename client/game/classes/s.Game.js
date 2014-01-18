@@ -19,6 +19,7 @@ s.Game = new Class({
     this.doRender = false;
     this.lastRender = 0;
 
+    // Oculus Rift setup
     this.oculus = new s.Oculus();
 
     // Store functions that should be called before render
@@ -274,10 +275,10 @@ s.Game = new Class({
         this.radarRenderer.render( this.radarScene, this.radarCamera );
       }
 
-      this.render_stats.update();
-
       // Request the next frame to be rendered
       requestAnimationFrame(this.render);
+
+      this.render_stats.update();
     }
   }
 });
