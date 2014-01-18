@@ -14,12 +14,24 @@ THREE.OculusRiftEffect = function ( renderer ) {
   var width = 640;
 
   var winWid = window.innerWidth/2;
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.domElement.style.position = 'absolute';
-  renderer.domElement.style.top = '0px';
-  renderer.domElement.style.left = '0px';
 
   this.render = function ( scene, camera ) {
+    // radar renderer. Either too small and too dense or
+    // too big and... just too big. Don't think this is
+    // goint to work in a Rift.
+    
+    // renderer.setSize(window.innerWidth, window.innerHeight);
+    // renderer.domElement.style.position = 'absolute';
+    // if (scene.name === 'radarScene') {
+    //   renderer.domElement.style.top = '-110px';
+    //   renderer.domElement.style.left = '160px';
+    //   camera.fov = 150;
+    // } else {
+    //   renderer.domElement.style.top = '0px';
+    //   renderer.domElement.style.left = '0px';
+    //   camera.fov = 120;
+    // }
+
     camera.fov = 120;
     var autoClear = renderer.autoClear;
 
