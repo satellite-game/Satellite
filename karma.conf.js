@@ -6,7 +6,7 @@ module.exports = function(config) {
     frameworks: ['mocha','sinon-chai'],
 
     // list of files / patterns to load in the browser
-    files: require('./include.conf').concat(['tests/client/**/*.js']),
+    files: require('./include.conf').concat(['tests/Function.prototype.bind_polyfill.js','tests/client/**/*.js']),
 
     // list of files to exclude
     exclude: [
@@ -78,6 +78,7 @@ module.exports = function(config) {
       'karma-mocha',
       'karma-sinon-chai',
       'karma-phantomjs-launcher',
+      'karma-slimerjs-launcher',
       'karma-chrome-launcher',
       'karma-firefox-launcher'
     ]

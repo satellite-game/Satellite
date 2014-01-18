@@ -16,7 +16,7 @@ describe('Mouse Controls', function () {
     centerY: '',
     pitch: '',
     pitchSpeed: ''
-  }
+  };
   var keyboardMouse;
   var oculusMouse;
   var noMouse;

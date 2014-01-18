@@ -39,7 +39,8 @@
     "grunt-mocha-chai-sinon": "0.0.7",
     "chai": "~1.8.1",
     "sinon": "~1.7.3",
-    "karma-phantomjs-launcher": "~0.1.1"
+    "karma-phantomjs-launcher": "~0.1.1",
+    "karma-slimerjs-launcher": "~0.1.2"
   },
   "engines": {
     "node": "0.10.15",
