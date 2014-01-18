@@ -320,4 +320,3 @@ s.Radar = new Class({
         }
     }
 });
-
