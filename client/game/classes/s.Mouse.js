@@ -54,9 +54,8 @@ s.Mouse = new Class({
   oculusMouse: function (movables) {
     var brakes;
     var thrust;
-    // X makes the oculus view look left or right, leaving the ship fixed
+    // TODO: X makes the oculus view look left or right, leaving the ship fixed
 
-    // Also:
     // Y makes the ship throttle or break;
     if (this.HUD.targetY > movables.centerY){
       // mouse is below center
