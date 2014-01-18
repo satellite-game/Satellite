@@ -66,15 +66,28 @@ s.SatelliteGame = new Class( {
             HUD: this.HUD,
             game: this,
             shipClass: 'human_ship_heavy',
-            position: new THREE.Vector3(this.getRandomCoordinate(),this.getRandomCoordinate(),this.getRandomCoordinate()),
+            // position: new THREE.Vector3(this.getRandomCoordinate(),this.getRandomCoordinate(),this.getRandomCoordinate()),
+            position: new THREE.Vector3(23498, -25902, 24976),
             name: this.pilot.name,
             rotation: new THREE.Vector3( 0, Math.PI/2, 0 ),
             alliance: 'alliance'
         } );
 
         this.HUD.hp = this.player.hull;
+
         // Moon facing initilization
+
+        // geometry.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
         this.player.root.lookAt(this.moon.root.position);
+        this.player.root.rotation.x = 0.8;
+        this.player.root.rotation.y = 0.58;
+        this.player.root.rotation.z = -1.55;
+        // this.player.root.lookAt(new THREE.Vector3(0,0,0));
+        // this.player.root.lookAt(new THREE.Vector3(0,0,0));
+        // this.player.root.lookAt(new THREE.Vector3(0,0,0));
+        // this.player.root.rotation.x = 0;
+        // setInterval(function(){that.player.root.rotation.x += 0.02; }, 16.67);
+        // this.player.root.rotation.z = 0;
 
         // Root camera to the player's position
         this.player.root.add( this.camera );
