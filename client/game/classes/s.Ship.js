@@ -9,6 +9,16 @@ s.Ship = new Class({
         missileFireTime: 1000
     },
 
+    botOptions: {
+        rotationSpeed: Math.PI/2,
+        pitchSpeed: Math.PI/4,
+        yawSpeed: Math.PI/4,
+        thrustImpulse: 0,
+        brakePower: 0.85,
+        velocityFadeFactor: 16,
+        rotationFadeFactor: 4
+    },
+
 	construct: function(options) {
 
         this.HUD = options.HUD;
@@ -40,6 +50,7 @@ s.Ship = new Class({
             this.game.lastBotCallback = this.controlBot;
         }
 
+        this.lastTime = new Date( ).getTime( );
 
 	},
 
@@ -178,22 +189,94 @@ s.Ship = new Class({
         this.destruct();
     },
 
-    controlBot: function() {
+    controlBot: function( ) {
+
+        var now = new Date( ).getTime( );
+        var difference = now - this.lastTime;
+
+        var pitch = 0;
+        var roll = 0;
+        var yaw = 0;
+
+        var thrust = 0;
+        var brakes = 0;
+
+        var thrustScalar = this.botOptions.thrustImpulse/s.config.ship.maxSpeed + 1;
+        
+
+        var yawSpeed    = this.botOptions.yawSpeed,
+            pitchSpeed  = this.botOptions.pitchSpeed;
+
+
+        //if need left
+        yaw = yawSpeed / thrustScalar;
+        //if need right
+        yaw = -1 * yawSpeed / thrustScalar;
+        //if need down
+        pitch = -1*pitchSpeed / thrustScalar;
+        //if need up
+        pitch  = pitchSpeed / thrustScalar;
+
+        //////////////////////////////
+        // SPEED/DISTANCE LOG //
+        //////////////////////////////
+
+        
+         var botX          = this.root.position.x,
+             botY          = this.root.position.y,
+             botZ          = this.root.position.z,
+             humanX        = this.game.player.root.position.x,
+             humanY        = this.game.player.root.position.y,
+             humanZ        = this.game.player.root.position.z,
+             xDistance     = botX - humanX,
+             yDistance     = botY - humanY,
+             zDistance     = botZ - humanZ,
+             totalDistance = Math.sqrt( Math.pow(xDistance, 2) + Math.pow(yDistance, 2) + Math.pow(yDistance, 2) ),
+             maxDistance = 4100,
+             minDistance = 1500;
+
+        if (totalDistance > maxDistance) {
+            thrust = 1;
+        }
+        else if (totalDistance < minDistance) {
+            brakes = 1;
+        } else {
+            var ratio = (totalDistance - minDistance) / (maxDistance - minDistance);
+            var optimumSpeed = s.config.ship.maxSpeed * ratio;
+            if (optimumSpeed < this.botOptions.thrustImpulse) { brakes = 1; }
+            if (optimumSpeed > this.botOptions.thrustImpulse) { thrust = 1; }
+        }
+
+        if (thrust && this.botOptions.thrustImpulse < s.config.ship.maxSpeed){
+            this.botOptions.thrustImpulse += difference;
+        }
+
+        if (brakes && this.botOptions.thrustImpulse > 0){
+            this.botOptions.thrustImpulse -= difference;
+        }       
+            
+        //////////////////////////////
+        // MOTION AND PHYSICS LOGIC //
+        //////////////////////////////
+
+
         var linearVelocity = this.root.getLinearVelocity().clone();
         var angularVelocity = this.root.getAngularVelocity().clone();
         var rotationMatrix = new THREE.Matrix4();
         rotationMatrix.extractRotation(this.root.matrix);
 
-        angularVelocity = angularVelocity.clone().divideScalar(4);
+        angularVelocity = angularVelocity.clone().divideScalar(this.botOptions.rotationFadeFactor);
         this.root.setAngularVelocity(angularVelocity);
 
-        var newAngularVelocity = new THREE.Vector3(0, 0, 0).applyMatrix4(rotationMatrix).add(angularVelocity);
+        var newAngularVelocity = new THREE.Vector3(pitch, yaw, roll).applyMatrix4(rotationMatrix).add(angularVelocity);
         this.root.setAngularVelocity(newAngularVelocity);
 
         var impulse = linearVelocity.clone().negate();
         this.root.applyCentralImpulse(impulse);
 
-        var getForceVector = new THREE.Vector3(0,0, -1*500).applyMatrix4(rotationMatrix);
+        var getForceVector = new THREE.Vector3(0,0, -1*this.botOptions.thrustImpulse).applyMatrix4(rotationMatrix);
         this.root.applyCentralImpulse(getForceVector);
+
+        this.lastTime = now;
     }
 });
