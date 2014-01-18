@@ -36,9 +36,7 @@ s.Controls = new Class({
     this.oculusCompensationY = 0;
     this.oculusCompensationZ = 0;
 
-    // Mouse interface
-    // this.mouse = new s.Mouse('keyboard', options);
-    // this.mouse = new s.Mouse('none', options);
+    // Mouse interface - mice options are: 'keyboard', 'none', 'oculus'
     this.mouse = new s.Mouse('oculus', options);
 
     console.log('Initialized gamepad...');
@@ -147,7 +145,7 @@ s.Controls = new Class({
 
     //   // TODO: Handle inverted option
     //   pitch = gamepadState.LEFT_STICK_Y;
-      
+
     //   if (gamepadYaw) {
     //     yaw = gamepadState.LEFT_STICK_X*-1;
     //   }
