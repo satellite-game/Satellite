@@ -19,6 +19,23 @@ s.HUD = new Class({
 
 		this.ctx = this.canvas.getContext('2d');
 
+        // Oculus Hud rendering
+        // Left eye
+        this.oculusCanvas = document.createElement('canvas');
+
+        this.oculusCanvas.height = window.innerHeight/2;
+        this.oculusCanvas.width = window.innerWidth;
+
+        this.oculusCanvas.style.position = 'absolute';
+        this.oculusCanvas.style.top = window.innerHeight/4 + 'px';
+        this.oculusCanvas.style.left = '0';
+
+        this.oculusCanvas.style.display = 'none';
+
+        this.oculusCtx = this.oculusCanvas.getContext('2d');
+        // end Oculus canvases
+
+
 		this.gameOver = new Image();
         this.gameOver.src = 'game/textures/Game-Over-1.png';
 
@@ -29,7 +46,8 @@ s.HUD = new Class({
 
 		this.update = this.update.bind(this);
 		this.game.hook(this.update);
-		//document.body.appendChild(this.canvas);
+        document.body.appendChild(this.canvas);
+        document.body.appendChild(this.oculusCanvas);
         this.menu = new s.Color({
             game: this.game,
             red: 0,
@@ -488,6 +506,10 @@ s.HUD = new Class({
         this.ctx.beginPath();
         this.ctx.arc(centerX, centerY, 15, 0, 2 * this.PI, false);
         this.ctx.stroke();
+
+        this.oculusCtx.clearRect(0, 0, this.oculusCanvas.width, this.oculusCanvas.height);
+        this.oculusCtx.drawImage(this.canvas, 50*1.08, -50, window.innerWidth/2, window.innerHeight/2);
+        this.oculusCtx.drawImage(this.canvas, this.oculusCanvas.width/2-50*1.08, -50, window.innerWidth/2, window.innerHeight/2);
     }
 
 });

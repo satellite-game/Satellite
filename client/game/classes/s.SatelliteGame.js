@@ -58,6 +58,12 @@ s.SatelliteGame = new Class( {
             game: this
         } );
 
+        if (this.oculus.detected) {
+            console.log('Activating oculus HUD');
+            this.HUD.canvas.style.display = 'none';
+            this.HUD.oculusCanvas.style.display = 'block';
+        }
+
         this.player = new s.Player( {
             HUD: this.HUD,
             game: this,
