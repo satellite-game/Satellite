@@ -58,11 +58,11 @@ s.Mouse = new Class({
 
     // Also:
     // Y makes the ship throttle or break;
-    if (this.HUD.targetY > movables.centerY - movables.crosshairs.height/2){
-      // mouse is below top of the crosshair
+    if (this.HUD.targetY > movables.centerY){
+      // mouse is below center
       brakes = 1;
-    } else if (this.HUD.targetY < movables.centerY + movables.crosshairs.height/2){
-      // mouse is above crosshair
+    } else if (this.HUD.targetY < movables.centerY){
+      // mouse is above center
       thrust = 1;
     }
     return {brakes: brakes, thrust: thrust};
