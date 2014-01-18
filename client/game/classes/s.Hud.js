@@ -29,7 +29,7 @@ s.HUD = new Class({
 
 		this.update = this.update.bind(this);
 		this.game.hook(this.update);
-		document.body.appendChild(this.canvas);
+		//document.body.appendChild(this.canvas);
         this.menu = new s.Color({
             game: this.game,
             red: 0,
