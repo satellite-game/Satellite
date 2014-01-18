@@ -180,6 +180,8 @@ s.SatelliteGame = new Class( {
             //controls: this.controls
         } );
 
+
+
         window.addEventListener( 'mousemove', function ( e ) {
             that.HUD.targetX = e.pageX;
             that.HUD.targetY = e.pageY;
