@@ -19,6 +19,8 @@ s.Game = new Class({
     this.doRender = false;
     this.lastRender = 0;
 
+    this.oculus = new s.Oculus();
+
     // Store functions that should be called before render
     this.hookedFuncs = [];
 
@@ -57,6 +59,8 @@ s.Game = new Class({
 
     // Oculus Rift split-screen effect
     this.riftCam = new THREE.OculusRiftEffect(this.renderer);
+    // for testing
+    // this.oculus.detected = true;
 
     // TODO: abstract key listening
     $(document).on('keydown', function(evt) {
@@ -260,13 +264,15 @@ s.Game = new Class({
         func(now, delta);
       });
 
-      // Render radar loop
-      this.radarRenderer.render( this.radarScene, this.radarCamera );
-
-      // Render main scene
-      // this.renderer.render( this.scene, this.camera );
-
-      this.riftCam.render( this.scene, this.camera );
+      // Render main scene for Oculus if one is detected
+      // otherwise render scene and radar normally.
+      if (this.oculus.detected) {
+        this.riftCam.render( this.scene, this.camera );
+        //this.riftRadar.render( this.radarScene, this.radarCamera );
+      } else {
+        this.renderer.render( this.scene, this.camera );
+      }
+      // this.radarRenderer.render( this.radarScene, this.radarCamera );
 
       this.render_stats.update();
 

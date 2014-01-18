@@ -6,7 +6,10 @@ s.Radar = new Class({
 
 
         this.game = options.game;
+
         var that = this.game;
+
+        this.oculus = that.oculus;
 
         var color = that.HUD.menu;
 
@@ -36,7 +39,7 @@ s.Radar = new Class({
         // Init THREE Environment
         that.radarScene = new THREE.Scene();
         that.radarCamera = new THREE.PerspectiveCamera( 40, 1, 1, 1000 );
-        that.radarRenderer = this.renderer || new THREE.WebGLRenderer({ antialias: true });
+        that.radarRenderer = new THREE.WebGLRenderer({ antialias: true });
         that.radar = '';
 
         // Append Renderer+Canvas
@@ -173,12 +176,16 @@ s.Radar = new Class({
         // Trigger render loop and assign bindings
         this.update = this.update.bind(that);
         that.hook(this.update);
-        that.radarRenderer.render( that.radarScene, that.radarCamera );
+        // that.radarRenderer.render( that.radarScene, that.radarCamera );
+        that.riftRadar = new THREE.OculusRiftEffect(that.radarRenderer);
+
 
     },
 
     fitWindow: function(){
-        s.game.radarCanvas.style.left = window.innerWidth-256+"px";
+        if (!this.oculus.detected) {
+            s.game.radarCanvas.style.left = window.innerWidth-256+"px";
+        }
     },
 
     update: function(options){
