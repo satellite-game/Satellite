@@ -308,7 +308,7 @@ s.SatelliteGame = new Class( {
     },
 
     handleJoin: function ( message ) {
-           console.log("Someone has joined your room");
+           console.log("Received a join");
            s.game.enemies.add( message );
     },
     handleLeave: function ( message ) {
