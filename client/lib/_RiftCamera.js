@@ -10,20 +10,10 @@
 
 THREE.OculusRiftEffect = function ( renderer ) {
 
-  var duplicatedRenderer = new THREE.WebGLRenderer();
-
-  for (var key in renderer) {
-    duplicatedRenderer[key] = renderer[key];
-  }
-
   var height = 800;
   var width = 640;
 
   var winWid = window.innerWidth/2;
-
-  var toggle = false;
-
-  var theCamera;
 
   this.render = function ( scene, camera ) {
     camera.fov = 120;
@@ -52,5 +42,4 @@ THREE.OculusRiftEffect = function ( renderer ) {
 
     renderer.autoClear = autoClear;
   };
-  toggle = !toggle;
 };
