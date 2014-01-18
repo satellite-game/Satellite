@@ -37,7 +37,7 @@ s.Controls = new Class({
     this.oculusCompensationZ = 0;
 
     // Mouse interface - mice options are: 'keyboard', 'none', 'oculus'
-    this.mouse = new s.Mouse('oculus', options);
+    this.mouse = new s.Mouse('keyboard', options);
 
     console.log('Initialized gamepad...');
 
@@ -104,6 +104,23 @@ s.Controls = new Class({
       radius = this.HUD.subreticleBound.radius,
       crosshairs = {width: 30, height: 30};
 
+    ///////////////////////
+    //  OCULUS CONTROLS  //
+    ///////////////////////
+
+    if (this.oculus.detected) {
+      this.mouse.mouseType = 'oculus';
+      pitch = this.oculus.quat.x - this.oculus.compensationX;
+      yaw = this.oculus.quat.y - this.oculus.compensationY;
+      roll = this.oculus.quat.z - this.oculus.compensationZ;
+    } else {
+      this.mouse.mouseType = 'keyboard';
+    }
+
+    ///////////////////////
+    //  MOUSE CONTROLS   //
+    ///////////////////////
+
     var mouseUpdate = this.mouse.update({
         centerX: centerX,
         crosshairs: crosshairs,
@@ -122,19 +139,6 @@ s.Controls = new Class({
 
     brakes = mouseUpdate.brakes || brakes;
     thrust = mouseUpdate.thrust || thrust;
-
-    ///////////////////////
-    //  OCULUS CONTROLS  //
-    ///////////////////////
-
-
-
-    if (this.oculus.detected) {
-      // mouseControls = false;
-      pitch = this.oculus.quat.x - this.oculusCompensationX;
-      yaw = this.oculus.quat.y - this.oculusCompensationY;
-      roll = this.oculus.quat.z - this.oculusCompensationZ;
-    }
 
     ///////////////////////
     // GAMEPAD CONTROLS  //
@@ -204,9 +208,9 @@ s.Controls = new Class({
     }
 
     if (this.keyboard.pressed('tilde')) {
-      this.oculusCompensationX = this.oculus.quat.x;
-      this.oculusCompensationY = this.oculus.quat.y;
-      this.oculusCompensationZ = this.oculus.quat.z;
+      this.oculus.compensationX = this.oculus.quat.x;
+      this.oculus.compensationY = this.oculus.quat.y;
+      this.oculus.compensationZ = this.oculus.quat.z;
     }
 
 
