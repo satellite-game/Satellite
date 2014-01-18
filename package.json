@@ -42,8 +42,8 @@
     "karma-phantomjs-launcher": "~0.1.1"
   },
   "engines": {
-    "node": "0.10.15",
-    "npm": "1.1.x"
+    "node": "*",
+    "npm": "*"
   },
   "keywords": [
     "game",
