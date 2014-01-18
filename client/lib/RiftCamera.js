@@ -16,45 +16,59 @@ THREE.OculusRiftEffect = function ( renderer ) {
   var winWid = window.innerWidth/2;
 
   this.render = function ( scene, camera ) {
-    // radar renderer. Either too small and too dense or
-    // too big and... just too big. Don't think this is
-    // goint to work in a Rift.
-    
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.domElement.style.position = 'absolute';
-    if (scene.name === 'radarScene') {
-      renderer.domElement.style.top = '-110px';
-      renderer.domElement.style.left = '160px';
-      camera.fov = 150;
-    } else {
-      renderer.domElement.style.top = '0px';
-      renderer.domElement.style.left = '0px';
-      camera.fov = 120;
-    }
-
-    // camera.fov = 120;
+    camera.fov = 120;
     var autoClear = renderer.autoClear;
 
     renderer.autoClear = false;
     renderer.clear();
 
-    // left eye
-    camera.setViewOffset( width, height, width*-0.08, 0, width, height );
-    renderer.setViewport( 0, 0, winWid, height );
+    // radar renderer. Either too small and too dense or
+    // too big and... just too big. Don't think this is
+    // goint to work in a Rift.
 
-    camera.updateProjectionMatrix();
-    renderer.render(scene, camera);
+    if (scene.name === 'radarScene') {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.domElement.style.position = 'absolute';
+      renderer.domElement.style.top = '0';
+      renderer.domElement.style.left = '0';
 
-    requestAnimationFrame(this.render);
+      // left eye
+      camera.setViewOffset( width+200, height-300, width*-0.08, 0, width, height );
+      renderer.setViewport( 0, 0, winWid, height );
 
-    // right eye
-    camera.setViewOffset( width, height, width*0.08, 0, width, height );
-    renderer.setViewport( winWid, 0, winWid, height );
+      camera.updateProjectionMatrix();
+      renderer.render(scene, camera);
 
-    camera.updateProjectionMatrix();
-    renderer.render(scene, camera);
+      requestAnimationFrame(this.render);
 
-    requestAnimationFrame(this.render);
+      // right eye
+      camera.setViewOffset( width+200, height-300, width*0.08, 0, width, height );
+      renderer.setViewport( winWid, 0, winWid, height );
+
+      camera.updateProjectionMatrix();
+      renderer.render(scene, camera);
+
+      requestAnimationFrame(this.render);
+    } else {
+
+      // left eye
+      camera.setViewOffset( width, height, width*-0.08, 0, width, height );
+      renderer.setViewport( 0, 0, winWid, height );
+
+      camera.updateProjectionMatrix();
+      renderer.render(scene, camera);
+
+      requestAnimationFrame(this.render);
+
+      // right eye
+      camera.setViewOffset( width, height, width*0.08, 0, width, height );
+      renderer.setViewport( winWid, 0, winWid, height );
+
+      camera.updateProjectionMatrix();
+      renderer.render(scene, camera);
+
+      requestAnimationFrame(this.render);
+    }
 
     renderer.autoClear = autoClear;
   };
