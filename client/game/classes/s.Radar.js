@@ -56,6 +56,7 @@ s.Radar = new Class({
         that.radarCamera.position.y = 0;
         that.radarCamera.position.z = 180;
         that.radarScene.add( that.radarCamera );
+        that.radarScene.name = 'radarScene';
 
         // Init Lights
         var light = new THREE.DirectionalLight( 0x000000 );
