@@ -9,6 +9,7 @@ process.env.PORT = process.env.PORT || 1337;
 var path         = require('path');
 var url          = 'http://localhost:' + process.env.PORT + '/';
 var logic        = require('./lib/manager.js');
+var l;
 
 /* We can access nodejitsu enviroment variables from process.env */
 /* Note: the SUBDOMAIN variable will always be defined for a nodejitsu app */
@@ -56,8 +57,8 @@ function getRandomPosition() {
 function getTime() {
     return (new Date()).getTime();
 }
-logic = logic(mapItems, io);
-io.sockets.on('connection', logic);
+l = logic(mapItems, io);
+io.sockets.on('connection', l);
 
 
     // // Setup message handlers
@@ -119,17 +120,17 @@ io.sockets.on('connection', logic);
     // });
 
     // socket.on('disconnect', function() {
-    //     socket.get('name', function (err, name) {
-    //         console.log(name+' dropped');
+    //     // socket.get('name', function (err, name) {
+    //     //     console.log(name+' dropped');
 
-    //         // Remove from client list
-    //         delete players[name];
+    //     //     // Remove from client list
+    //     //     delete players[name];
 
-    //         // Notify players
-    //         socket.broadcast.emit('leave', {
-    //             name: name
-    //         });
-    //     });
+    //     //     // Notify players
+    //     //     socket.broadcast.emit('leave', {
+    //     //         name: name
+    //     //     });
+    //     // });
     // });
 
     // socket.on('move', function(message) {
