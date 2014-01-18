@@ -268,7 +268,7 @@ s.Game = new Class({
       // otherwise render scene and radar normally.
       if (this.oculus.detected) {
         this.riftCam.render( this.scene, this.camera );
-        //this.riftRadar.render( this.radarScene, this.radarCamera );
+        this.riftRadar.render( this.radarScene, this.radarCamera );
       } else {
         this.renderer.render( this.scene, this.camera );
         this.radarRenderer.render( this.radarScene, this.radarCamera );

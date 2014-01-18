@@ -20,19 +20,19 @@ THREE.OculusRiftEffect = function ( renderer ) {
     // too big and... just too big. Don't think this is
     // goint to work in a Rift.
     
-    // renderer.setSize(window.innerWidth, window.innerHeight);
-    // renderer.domElement.style.position = 'absolute';
-    // if (scene.name === 'radarScene') {
-    //   renderer.domElement.style.top = '-110px';
-    //   renderer.domElement.style.left = '160px';
-    //   camera.fov = 150;
-    // } else {
-    //   renderer.domElement.style.top = '0px';
-    //   renderer.domElement.style.left = '0px';
-    //   camera.fov = 120;
-    // }
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.domElement.style.position = 'absolute';
+    if (scene.name === 'radarScene') {
+      renderer.domElement.style.top = '-110px';
+      renderer.domElement.style.left = '160px';
+      camera.fov = 150;
+    } else {
+      renderer.domElement.style.top = '0px';
+      renderer.domElement.style.left = '0px';
+      camera.fov = 120;
+    }
 
-    camera.fov = 120;
+    // camera.fov = 120;
     var autoClear = renderer.autoClear;
 
     renderer.autoClear = false;
