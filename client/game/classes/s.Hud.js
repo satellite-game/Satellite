@@ -508,8 +508,8 @@ s.HUD = new Class({
         this.ctx.stroke();
 
         this.oculusCtx.clearRect(0, 0, this.oculusCanvas.width, this.oculusCanvas.height);
-        this.oculusCtx.drawImage(this.canvas, 50, -50, window.innerWidth/2, window.innerHeight/2);
-        this.oculusCtx.drawImage(this.canvas, this.oculusCanvas.width/2-50, -50, window.innerWidth/2, window.innerHeight/2);
+        this.oculusCtx.drawImage(this.canvas, 50*1.08, -50, window.innerWidth/2, window.innerHeight/2);
+        this.oculusCtx.drawImage(this.canvas, this.oculusCanvas.width/2-50*1.08, -50, window.innerWidth/2, window.innerHeight/2);
     }
 
 });
