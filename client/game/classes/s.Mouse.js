@@ -51,8 +51,19 @@ s.Mouse = new Class({
     return {yaw: movables.yaw, pitch: movables.pitch};
   },
 
-  oculusMouse: function () {
+  oculusMouse: function (movables) {
+    var brakes;
+    var thrust;
+    // X makes the oculus view look left or right, leaving the ship fixed
 
+    // Also:
+    // Y makes the ship throttle or break;
+    if (this.HUD.targetY > movables.centerY - movables.crosshairs.height/2 && this.HUD.targetY < movables.centerY + movables.crosshairs.height/2){
+      brakes = 1;
+    } else {
+      thrust = 1;
+    }
+    return {brakes: brakes, thrust: thrust};
   },
 
   noMouse: function (movables) {

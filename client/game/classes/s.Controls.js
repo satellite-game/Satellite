@@ -38,7 +38,8 @@ s.Controls = new Class({
 
     // Mouse interface
     // this.mouse = new s.Mouse('keyboard', options);
-    this.mouse = new s.Mouse('none', options);
+    // this.mouse = new s.Mouse('none', options);
+    this.mouse = new s.Mouse('oculus', options);
 
     console.log('Initialized gamepad...');
 
@@ -119,6 +120,10 @@ s.Controls = new Class({
 
     pitch = mouseUpdate.pitch || pitch;
     yaw = mouseUpdate.yaw || yaw;
+    roll = mouseUpdate.roll || roll;
+
+    brakes = mouseUpdate.brakes || brakes;
+    thrust = mouseUpdate.thrust || thrust;
 
     ///////////////////////
     //  OCULUS CONTROLS  //
@@ -245,7 +250,8 @@ s.Controls = new Class({
     */
 
     if (thrust && this.options.thrustImpulse < s.config.ship.maxSpeed){
-      this.options.thrustImpulse += difference;
+      this.options.thrustImpulse += (difference > s.config.ship.maxSpeed) ?
+        s.config.ship.maxSpeed : difference;
     }
 
     if (brakes && this.options.thrustImpulse > 0){
