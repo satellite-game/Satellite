@@ -14,6 +14,10 @@ THREE.OculusRiftEffect = function ( renderer ) {
   var width = 640;
 
   var winWid = window.innerWidth/2;
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.domElement.style.position = 'absolute';
+  renderer.domElement.style.top = '0px';
+  renderer.domElement.style.left = '0px';
 
   this.render = function ( scene, camera ) {
     camera.fov = 120;
