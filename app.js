@@ -8,6 +8,9 @@ var io           = require('socket.io').listen(server);
 process.env.PORT = process.env.PORT || 1337;
 var path         = require('path');
 var url          = 'http://localhost:' + process.env.PORT + '/';
+var logic        = require('./lib/manager.js');
+var l;
+
 /* We can access nodejitsu enviroment variables from process.env */
 /* Note: the SUBDOMAIN variable will always be defined for a nodejitsu app */
 if(process.env.SUBDOMAIN){
@@ -54,143 +57,139 @@ function getRandomPosition() {
 function getTime() {
     return (new Date()).getTime();
 }
-
-io.sockets.on('connection', function (socket) {
-    var address = socket.handshake.address;
-    var ip = socket.handshake.address.address;
-    console.log("New connection from " + address.address + ":" + process.env.PORT);
+l = logic(mapItems, io);
+io.sockets.on('connection', l);
 
 
+    // // Setup message handlers
+    // socket.on('join', function(message) {
+    //     console.dir(message);
+    //     if (players[message.name] !== undefined && ip === players[message.name].ip) {
+    //         console.warn('Error: '+message.name+' tried to join twice!');
+    //         return;
+    //     }
 
-    // Setup message handlers
-    socket.on('join', function(message) {
-        console.dir(message);
-        if (players[message.name] !== undefined && ip === players[message.name].ip) {
-            console.warn('Error: '+message.name+' tried to join twice!');
-            return;
-        }
+    //     if (!message.name) {
+    //         console.error('Error: Cannot join, player name was null!');
+    //         socket.emit('failed');
+    //         return false;
+    //     }
 
-        if (!message.name) {
-            console.error('Error: Cannot join, player name was null!');
-            socket.emit('failed');
-            return false;
-        }
+    //     console.log('Player joined: '+message.name);
 
-        console.log('Player joined: '+message.name);
+    //     // Send list of players
+    //     socket.emit('player list', players);
 
-        // Send list of players
-        socket.emit('player list', players);
+    //     // Send the map to the players
+    //     socket.emit('map', mapItems);
 
-        // Send the map to the players
-        socket.emit('map', mapItems);
+    //     var pos = getRandomPosition();
 
-        var pos = getRandomPosition();
+    //     socket.set('name', message.name, function() {
+    //         // Store client info
+    //         players[message.name] = {
+    //             name: message.name,
+    //             pos: message.pos,
+    //             rot: message.rot,
+    //             aVeloc: message.aVeloc,
+    //             lVeloc: message.lVeloc,
+    //             lastMove: getTime(),
+    //             ip: ip
+    //         };
 
-        socket.set('name', message.name, function() {
-            // Store client info
-            players[message.name] = {
-                name: message.name,
-                pos: message.pos,
-                rot: message.rot,
-                aVeloc: message.aVeloc,
-                lVeloc: message.lVeloc,
-                lastMove: getTime(),
-                ip: ip
-            };
+    //         var packet = {
+    //             name: message.name,
+    //             pos: message.pos,
+    //             rot: [0, 0, 0],
+    //             aVeloc: [0, 0, 0],
+    //             lVeloc: [0, 0, 0],
+    //             interp: false // Not really necessary here, we're telling the client itself to move
+    //         };
 
-            var packet = {
-                name: message.name,
-                pos: message.pos,
-                rot: [0, 0, 0],
-                aVeloc: [0, 0, 0],
-                lVeloc: [0, 0, 0],
-                interp: false // Not really necessary here, we're telling the client itself to move
-            };
+    //         socket.emit('move', packet);
 
-            socket.emit('move', packet);
+    //         // Notify players of new challenger
+    //         socket.broadcast.emit('join', {
+    //             name: message.name,
+    //             pos: message.pos,
+    //             rot: message.rot,
+    //             aVeloc: message.aVeloc,
+    //             lVeloc: message.lVeloc
+    //         });
+    //     });
+    // });
 
-            // Notify players of new challenger
-            socket.broadcast.emit('join', {
-                name: message.name,
-                pos: message.pos,
-                rot: message.rot,
-                aVeloc: message.aVeloc,
-                lVeloc: message.lVeloc
-            });
-        });
-    });
+    // socket.on('disconnect', function() {
+    //     // socket.get('name', function (err, name) {
+    //     //     console.log(name+' dropped');
 
-    socket.on('disconnect', function() {
-        socket.get('name', function (err, name) {
-            console.log(name+' dropped');
+    //     //     // Remove from client list
+    //     //     delete players[name];
 
-            // Remove from client list
-            delete players[name];
+    //     //     // Notify players
+    //     //     socket.broadcast.emit('leave', {
+    //     //         name: name
+    //     //     });
+    //     // });
+    // });
 
-            // Notify players
-            socket.broadcast.emit('leave', {
-                name: name
-            });
-        });
-    });
+    // socket.on('move', function(message) {
+    //     socket.get('name', function (err, name) {
+    //         if (players[name]) {
+    //             var player = players[name];
 
-    socket.on('move', function(message) {
-        socket.get('name', function (err, name) {
-            if (players[name]) {
-                var player = players[name];
+    //             // Update position
+    //             player.pos = message.pos;
+    //             player.rot = message.rot;
+    //             player.aVeloc = message.aVeloc;
+    //             player.lVeloc = message.lVeloc;
+    //             player.lastMove = message.time;
 
-                // Update position
-                player.pos = message.pos;
-                player.rot = message.rot;
-                player.aVeloc = message.aVeloc;
-                player.lVeloc = message.lVeloc;
-                player.lastMove = message.time;
+    //             // Notify players
+    //             socket.broadcast.emit('move', {
+    //                 name: name,
+    //                 pos: message.pos,
+    //                 rot: message.rot,
+    //                 aVeloc: message.aVeloc,
+    //                 lVeloc: message.lVeloc,
+    //                 interp: true
+    //             });
+    //         }
+    //         else {
+    //             socket.emit('failed');
+    //         }
+    //     });
+    // });
 
-                // Notify players
-                socket.broadcast.emit('move', {
-                    name: name,
-                    pos: message.pos,
-                    rot: message.rot,
-                    aVeloc: message.aVeloc,
-                    lVeloc: message.lVeloc,
-                    interp: true
-                });
-            }
-            else {
-                socket.emit('failed');
-            }
-        });
-    });
+    // socket.on('hit', function(message) {
+    //         socket.broadcast.emit('hit', {
+    //             otherPlayerName: message.otherPlayerName,
+    //             yourName: message.yourName
+    //         });
+    //         socket.emit('hit', {
+    //             otherPlayerName: message.otherPlayerName,
+    //             yourName: message.yourName
+    //         });
+    // });
 
-    socket.on('hit', function(message) {
-            socket.broadcast.emit('hit', {
-                otherPlayerName: message.otherPlayerName,
-                yourName: message.yourName
-            });
-            socket.emit('hit', {
-                otherPlayerName: message.otherPlayerName,
-                yourName: message.yourName
-            });
-    });
+    // socket.on('killed', function(message) {
+    //         socket.broadcast.emit('killed', {
+    //             killed: message.you,
+    //             killer: message.killer
+    //     });
+    // });
 
-    socket.on('killed', function(message) {
-            socket.broadcast.emit('killed', {
-                killed: message.you,
-                killer: message.killer
-        });
-    });
+    // socket.on('fire', function(message) {
+    //     socket.get('name', function (err, name) {
+    //         socket.broadcast.emit('fire', {
+    //             name: message.name,
+    //             position: message.position,
+    //             rotation: message.rotation,
+    //             initialVelocity: message.initialVelocity
+    //         });
+    //     });
+    // });
 
-    socket.on('fire', function(message) {
-        socket.get('name', function (err, name) {
-            socket.broadcast.emit('fire', {
-                name: message.name,
-                position: message.position,
-                rotation: message.rotation,
-                initialVelocity: message.initialVelocity
-            });
-        });
-    });
-});
 
 
 
