@@ -142,15 +142,14 @@ s.Comm = new Class( {
 
         // Never send faster than server can handle
 
-        if ( time - s.game.comm.lastMessageTime >= 1000 ) {
+        if ( time - s.game.comm.lastMessageTime >= 700 ) {
 
             var shipPosition = s.game.player.getPositionPacket( );
 
             // TODO: Figure out if ship or turret actually moved
-            
 
             // If ship moved, send packet
-            
+
             if ( this.lastPosition !== shipPosition.pos ) {
 
                 // Build packet
@@ -173,7 +172,6 @@ s.Comm = new Class( {
 
                 // Broadcast position
 
-                
                 s.game.comm.socket.emit( 'combat','move', packet );
 
                 s.game.comm.lastMessageTime = time;
