@@ -142,6 +142,8 @@ s.Radar = new Class({
         ///////////////////
         // ENEMY MARKERS //
         ///////////////////
+
+        // todo: add elevation lines to enemy markers
         var enemyGeo = [], enemyMarker = [];
         radar.enemyCount = 0;
         for (var i = 0, len = that.enemies.list().length; i < len; i++){
