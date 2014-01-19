@@ -8,6 +8,15 @@ module.exports = (grunt) ->
 
     # TESTING
     # ================
+    # Selenium:
+    # ----------------
+
+    connect:
+      server:
+        options:
+          base: ""
+          port: 9999
+
     # client-side:
     # ----------------
     karma:
@@ -133,19 +142,22 @@ module.exports = (grunt) ->
 
   # DEPENDENCIES
   # =================
+  # Loading dependencies
+  for pkg of grunt.file.readJSON("package.json").devDependencies
+    grunt.loadNpmTasks pkg  if pkg isnt "grunt" and pkg.indexOf("grunt") is 0
 
-  grunt.loadNpmTasks 'grunt-contrib-clean'
-  grunt.loadNpmTasks 'grunt-contrib-concat'
-  grunt.loadNpmTasks 'grunt-contrib-copy'
-  grunt.loadNpmTasks 'grunt-contrib-jshint'
-  grunt.loadNpmTasks 'grunt-contrib-stylus'
-  grunt.loadNpmTasks 'grunt-contrib-uglify'
-  grunt.loadNpmTasks 'grunt-contrib-watch'
-  grunt.loadNpmTasks 'grunt-open'
-  grunt.loadNpmTasks 'grunt-nodemon'
-  grunt.loadNpmTasks 'grunt-concurrent'
-  grunt.loadNpmTasks 'grunt-karma'
-  grunt.loadNpmTasks 'grunt-mocha-chai-sinon'
+  # grunt.loadNpmTasks 'grunt-contrib-clean'
+  # grunt.loadNpmTasks 'grunt-contrib-concat'
+  # grunt.loadNpmTasks 'grunt-contrib-copy'
+  # grunt.loadNpmTasks 'grunt-contrib-jshint'
+  # grunt.loadNpmTasks 'grunt-contrib-stylus'
+  # grunt.loadNpmTasks 'grunt-contrib-uglify'
+  # grunt.loadNpmTasks 'grunt-contrib-watch'
+  # grunt.loadNpmTasks 'grunt-open'
+  # grunt.loadNpmTasks 'grunt-nodemon'
+  # grunt.loadNpmTasks 'grunt-concurrent'
+  # grunt.loadNpmTasks 'grunt-karma'
+  # grunt.loadNpmTasks 'grunt-mocha-chai-sinon'
 
   # REGISTER
   # =================
@@ -160,3 +172,4 @@ module.exports = (grunt) ->
   grunt.registerTask 'client', ['jshint:client', 'copy:client', 'concat', 'stylus']
   grunt.registerTask 'client-prod', ['client', 'uglify']
   grunt.registerTask 'default', ['server', 'client', 'karma:unit:start', 'concurrent']
+  grunt.registerTask 'sel', ['connect', 'watch']
