@@ -31,6 +31,13 @@ s.Ship = new Class({
         this.hull = s.config.ship.hull;
         this.shields = s.config.ship.shields;
 
+        this.trailGlow = new THREE.PointLight(0xFFFF33, 10, 30);
+
+        // Adjust this between 0 and 1 based engine thrust.
+        // Static 1.0 for testing.
+        this.trailGlow.intensity = 1.0;
+        this.trailGlow.position = new THREE.Vector3(0, 0, 120);
+        geometry.add( this.trailGlow );
 
 	},
 
