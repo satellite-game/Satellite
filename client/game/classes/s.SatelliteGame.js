@@ -143,6 +143,7 @@ s.SatelliteGame = new Class( {
                 return false;
             },
             add: function ( enemyInfo ) {
+                console.log("LOL ENEMIES");
                 if ( this.has( enemyInfo.name ) ) {
                     this.delete( enemyInfo.name );
                     console.error( 'Bug: Player %s added twice', enemyInfo.name );
@@ -308,6 +309,7 @@ s.SatelliteGame = new Class( {
         }
     },
     handleMove: function ( message ) {
+        console.log("A player moved");
         if ( message.name == this.pilot.name ) {
             // server told us to move
             console.log( 'Server reset position' );

@@ -9,7 +9,7 @@ process.env.PORT = process.env.PORT || 1337;
 var path         = require('path');
 var url          = 'http://localhost:' + process.env.PORT + '/';
 var logic        = require('./lib/manager.js');
-var l;
+
 
 /* We can access nodejitsu enviroment variables from process.env */
 /* Note: the SUBDOMAIN variable will always be defined for a nodejitsu app */
@@ -57,8 +57,8 @@ function getRandomPosition() {
 function getTime() {
     return (new Date()).getTime();
 }
-l = logic(mapItems, io);
-io.sockets.on('connection', l);
+logic = logic(mapItems, io);
+io.sockets.on('connection', logic);
 
 
     // // Setup message handlers
