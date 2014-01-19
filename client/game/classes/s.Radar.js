@@ -73,18 +73,18 @@ s.Radar = new Class({
         that.radius = 60;
 
         var mesh = new THREE.MeshNormalMaterial(),
-            sphere = new THREE.SphereGeometry( that.radius, 16, 16 );
+            sphere = new THREE.PlaneGeometry( 90, 90, 8, 8 );
 
         var materials = [
             //new THREE.MeshLambertMaterial( { color: 0xcccccc, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
-            new THREE.MeshBasicMaterial( { color: colorHex, shading: THREE.FlatShading, wireframe: true, transparent: true } )
+            new THREE.MeshBasicMaterial( { color: 0x006600, shading: THREE.FlatShading, wireframe: true, transparent: true } )
         ];
 
         var radar = THREE.SceneUtils.createMultiMaterialObject( sphere, materials );
         radar.position.x = 0;
         radar.position.y = 0;
         radar.position.z = 0;
-        //radar.rotation.y = -Math.PI/4;
+        radar.rotation.x = -Math.PI/3;
 
         radar.name = "radar";
         that.radarScene.add( radar );
@@ -95,10 +95,10 @@ s.Radar = new Class({
         ///////////////////////
 
         var selfGeo = new THREE.TetrahedronGeometry(5);
-        selfGeo.faces[0].color.setHex(0x330066);
-        selfGeo.faces[1].color.setHex(0x003366);
-        selfGeo.faces[2].color.setHex(0x336666);
-        selfGeo.faces[3].color.setHex(0x000000);
+        selfGeo.faces[0].color.setHex(0xFF0055);
+        selfGeo.faces[1].color.setHex(0xFF0055);
+        selfGeo.faces[2].color.setHex(0xFF0055);
+        selfGeo.faces[3].color.setHex(0xFF0055);
         //selfGeo.colorsNeedUpdate = true;
 
         // marker for player position
@@ -125,9 +125,25 @@ s.Radar = new Class({
 
         radar.add( selfTrajectory );
 
+        // marker for player elevation relative to grid
+        var elevationGeo = new THREE.Geometry();
+        elevationGeo.vertices.push(new THREE.Vector3(0,0,0));
+        elevationGeo.vertices.push(new THREE.Vector3(0,0,0));
+
+        var selfElevation = new THREE.Line(
+            elevationGeo,
+            new THREE.LineBasicMaterial( { color: 0xFF0055, linewidth: 2 } ),
+            THREE.LineStrip
+        );
+        selfElevation.name = "selfElevation";
+
+        radar.add( selfElevation );
+
         ///////////////////
         // ENEMY MARKERS //
         ///////////////////
+
+        // todo: add elevation lines to enemy markers
         var enemyGeo = [], enemyMarker = [];
         radar.enemyCount = 0;
         for (var i = 0, len = that.enemies.list().length; i < len; i++){
@@ -198,7 +214,8 @@ s.Radar = new Class({
         var radar       = this.radarScene.getChildByName( 'radar' ),
             self        = radar.getChildByName( 'self' ),
             moon        = radar.getChildByName( 'moon' ),
-            trajectory  = radar.getChildByName( 'selfTrajectory'),
+            trajectory  = radar.getChildByName( 'selfTrajectory' ),
+            elevation   = radar.getChildByName( 'selfElevation' ),
             allies      = radar.getChildByName( 'allies' ),
             enemies     = this.enemies.list(),
             radarRadius = this.radius/ 5,
@@ -230,7 +247,7 @@ s.Radar = new Class({
         var findTheta = top/(bot1*bot2);
 
         // Calculate angle of rotation; Javascript is a floating point failbus.
-        radar.rotation.y += findTheta>1 || findTheta<-1 ? Math.acos( Math.round( findTheta ) ) : Math.acos( findTheta );
+        radar.rotation.z += findTheta>1 || findTheta<-1 ? Math.acos( Math.round( findTheta ) ) : Math.acos( findTheta );
 
         this.lastPosition = this.selfPosition.clone();
 
@@ -247,13 +264,21 @@ s.Radar = new Class({
         self.position = this.selfPosition.normalize().multiplyScalar(selfLength*(radarRadius));
 
         // Player trajectory marker; scales with velocity, and is never shorter than length 3
-        var playerTrajectory = this.player.root.getLinearVelocity().clone().multiplyScalar(1/80);
+        var playerTrajectory = this.player.root.getLinearVelocity().clone().multiplyScalar(1/100);
         playerTrajectory = playerTrajectory.length()>3 ? playerTrajectory : playerTrajectory.normalize().multiplyScalar(3);
 
         // Set the second line vertex
         trajectory.geometry.vertices[0] = self.position.clone();
         trajectory.geometry.vertices[1] = trajectory.geometry.vertices[0].clone().add( playerTrajectory );
         trajectory.geometry.verticesNeedUpdate = true;
+
+        // Tie height line to grid and player
+        var playerXY = self.position.clone();
+        playerXY.z = 0;
+
+        elevation.geometry.vertices[0] = self.position.clone();
+        elevation.geometry.vertices[1] = playerXY;
+        elevation.geometry.verticesNeedUpdate = true;
 
 
         /////////////////////////
