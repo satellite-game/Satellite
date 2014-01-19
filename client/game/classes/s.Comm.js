@@ -22,7 +22,6 @@ s.Comm = new Class( {
 
 
     makeTrigger: function ( evt ) {
-
         var that = this;
 
         return function ( message ) {
@@ -83,11 +82,13 @@ s.Comm = new Class( {
 
         this.socket.on( 'move', this.makeTrigger( 'move' ) );
 
-        this.socket.on('killed', this.makeTrigger( 'killed' ));
+        this.socket.on(' killed', this.makeTrigger( 'killed' ));
 
-        this.socket.on('fire', this.makeTrigger( 'fire' ));
+        this.socket.on( 'fire', this.makeTrigger( 'fire' ));
 
-        this.socket.on('hit', this.makeTrigger( 'hit' ));
+        this.socket.on( 'hit', this.makeTrigger( 'hit' ));
+
+        this.socket.on( 'sync', this.makeTrigger( 'move'));
 
 
         this.game.hook( this.position );
@@ -130,7 +131,7 @@ s.Comm = new Class( {
 
         // Broadcast position
 
-        this.socket.emit( 'join', packet );
+        this.socket.emit('join', packet );
 
     },
 
@@ -142,7 +143,7 @@ s.Comm = new Class( {
 
         // Never send faster than server can handle
 
-        if ( time - s.game.comm.lastMessageTime >= 15 ) {
+        if ( time - s.game.comm.lastMessageTime >= 700 ) {
 
             var shipPosition = s.game.player.getPositionPacket( );
 
@@ -173,8 +174,8 @@ s.Comm = new Class( {
 
                 // Broadcast position
 
-
-                s.game.comm.socket.emit( 'move', packet );
+                
+                s.game.comm.socket.emit( 'combat','move', packet );
 
                 s.game.comm.lastMessageTime = time;
 
@@ -189,7 +190,7 @@ s.Comm = new Class( {
 
         this.time = 0;
 
-        this.socket.emit( 'fire', {
+        this.socket.emit( 'combat','fire', {
 
             position: pos,
 
@@ -203,7 +204,7 @@ s.Comm = new Class( {
 
     died: function( you, killer ) {
 
-        this.socket.emit( 'killed',{
+        this.socket.emit( 'player','killed',{
 
             you: you,
 
@@ -218,7 +219,7 @@ s.Comm = new Class( {
 
         this.time = 0;
 
-        this.socket.emit( 'hit', {
+        this.socket.emit( 'combat','hit', {
 
             otherPlayerName: otherPlayerName,
 
@@ -228,9 +229,9 @@ s.Comm = new Class( {
     },
 
     clockTick: function( ){
-        this.time += 1;
-        if ( this.time >= 60 ){
-            window.location.href = "http://satellite-game.com";
-        }
+         this.time += 1;
+        // if ( this.time >= 60 ){
+        //     window.location.href = "http://satellite-game.com";
+        // }
     }
 } );
