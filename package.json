@@ -14,7 +14,6 @@
     "url": "https://github.com/lazd/Satellite/issues"
   },
   "devDependencies": {
-    "grunt-cli": "0.1.x",
     "grunt": "0.4.x",
     "grunt-contrib-clean": "0.5.x",
     "grunt-contrib-concat": "0.3.x",
@@ -40,7 +39,10 @@
     "chai": "~1.8.1",
     "sinon": "~1.7.3",
     "karma-phantomjs-launcher": "~0.1.1",
-    "karma-slimerjs-launcher": "~0.1.2"
+    "karma-slimerjs-launcher": "~0.1.2",
+    "wd": "~0.2.8",
+    "grunt-saucelabs": "~4.1.2",
+    "grunt-connect": "~0.2.0"
   },
   "engines": {
     "node": "0.10.15",
