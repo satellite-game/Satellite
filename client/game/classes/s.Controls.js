@@ -56,9 +56,6 @@ s.Controls = new Class({
         this.lastTime = new Date( ).getTime( );
         this.iterations = 0;
 
-        this.lastRotationX = this.player.root.rotation.x;
-        this.lastRotationY = this.player.root.rotation.y;
-        this.lastRotationZ = this.player.root.rotation.z;
     },
 
     destruct: function( ) {
@@ -91,30 +88,6 @@ s.Controls = new Class({
         ///////////////////////
         // RADIAL SUBRETICLE //
         ///////////////////////
-
-        // if (this.lastRotationX !== root.rotation.x) {
-        //     console.log('x: ', root.rotation.x);
-        //     console.log('y: ', root.rotation.y);
-        //     console.log('z: ', root.rotation.z);
-        //     console.log('---------');
-        //     this.lastRotationX = root.rotation.x;
-        // }
-
-        // if (this.lastRotationY !== root.rotation.y) {
-        //     console.log('x: ', root.rotation.x);
-        //     console.log('y: ', root.rotation.y);
-        //     console.log('z: ', root.rotation.z);
-        //     console.log('---------');
-        //     this.lastRotationY = root.rotation.y;
-        // }
-
-        // if (this.lastRotationZ !== root.rotation.z) {
-        //     console.log('x: ', root.rotation.x);
-        //     console.log('y: ', root.rotation.y);
-        //     console.log('z: ', root.rotation.z);
-        //     console.log('---------');
-        //     this.lastRotationZ = root.rotation.z;
-        // }
 
         var yawSpeed = this.options.yawSpeed,
             pitchSpeed = this.options.pitchSpeed,
@@ -179,6 +152,9 @@ s.Controls = new Class({
         // KEYBOARD COMMANDS //
         ///////////////////////
 
+        var vTarget3D = root.position.clone();
+        var vTarget2D = s.projector.projectVector(vTarget3D, this.game.camera);
+
         if (this.keyboard.pressed('left')) {
             yaw = yawSpeed / thrustScalar;
 
@@ -213,14 +189,6 @@ s.Controls = new Class({
         if (this.keyboard.pressed('space') || this.firing){
             this.player.fire('turret');
         }
-
-        // if (this.iterations < 1000) {
-                // root.lookAt({x: 22498, y: -25902, z: 24796});
-        //     root.rotation.x = 0.8023732497086612;
-        //     root.rotation.y = 0.5379882284619658;
-        //     root.rotation.z = -0.4635625410839766;
-        //     this.iterations++;
-        // }
   
         //////////////////////////////
         // MOTION AND PHYSICS LOGIC //
