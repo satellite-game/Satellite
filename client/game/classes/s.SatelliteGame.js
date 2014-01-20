@@ -26,6 +26,9 @@ s.SatelliteGame = new Class( {
 	initialize: function() {
 		var that = this;
 
+        //initally set lastBotCallback to null. updated in s.Ship
+
+        this.lastBotCallback = null;
         this.IDs = [];
         this.botCount = 0;
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
@@ -63,13 +66,15 @@ s.SatelliteGame = new Class( {
             HUD: this.HUD,
             game: this,
             shipClass: 'human_ship_heavy',
-            position: new THREE.Vector3(this.getRandomCoordinate(),this.getRandomCoordinate(),this.getRandomCoordinate()),
+            // position: new THREE.Vector3(this.getRandomCoordinate(),this.getRandomCoordinate(),this.getRandomCoordinate()),
+            position: new THREE.Vector3(23498, -25902, 24976),
             name: this.pilot.name,
             rotation: new THREE.Vector3( 0, Math.PI/2, 0 ),
             alliance: 'alliance'
         } );
 
         this.HUD.hp = this.player.hull;
+
         // Moon facing initilization
         this.player.root.lookAt(this.moon.root.position);
 
@@ -426,6 +431,8 @@ s.SatelliteGame = new Class( {
     },
 
     handleFire: function(props) {
+        // s.game.enemies.execute( 'bot 1', 'setPosition', [ [-20000,-20000,-20000], [0,0,0], [0,0,0], [0,0,0], true ] );
+        // this.enemies._list[0].root.position.set(0,0,0);
         s.game.comm.fire(props.position, props.rotation, props.initialVelocity);
     },
 
