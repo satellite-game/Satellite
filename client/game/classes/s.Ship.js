@@ -6,6 +6,7 @@ s.Ship = new Class({
         rightTurretOffset: new THREE.Vector3(-35, 0, -200),
         missileOffset: new THREE.Vector3(0, 0, -120),
         turretFireTime: 200,
+        botTurretFireTime: 500,
         missileFireTime: 1000
     },
 
@@ -90,7 +91,7 @@ s.Ship = new Class({
                 new s.Turret({
                     HUD: this.HUD,
                     game: this.game,
-                    pilot: this.game.pilot.name,
+                    pilot: this.name,
                     position: position,
                     rotation: rotation,
                     initialVelocity: initialVelocity,
@@ -139,6 +140,58 @@ s.Ship = new Class({
                 });
 
                 this.lastMissileFire = now;
+            }
+        }
+    },
+
+    botFire: function (weapon) {
+        var now =new Date().getTime();
+        var position;
+        var rotation = this.root.rotation.clone();
+        var initialVelocity = this.root.getLinearVelocity().clone();
+
+        // Turrets
+        if (weapon === 'turret'){
+            if (now - this.lastTurretFire > this.options.botTurretFireTime){
+                // Left bullet
+                position = this.getOffset(this.options.leftTurretOffset);
+                new s.Turret({
+                    HUD: this.HUD,
+                    game: this.game,
+                    pilot: this.game.pilot.name,
+                    position: position,
+                    rotation: rotation,
+                    initialVelocity: initialVelocity,
+                    team: this.alliance
+                });
+                this.game.handleFire({
+                    position: position,
+                    rotation: rotation,
+                    initialVelocity: initialVelocity
+                });
+
+                // Right bullet
+                position = this.getOffset(this.options.rightTurretOffset);
+                new s.Turret({
+                    HUD: this.HUD,
+                    game: this.game,
+                    pilot: this.game.pilot.name,
+                    position: position,
+                    rotation: rotation,
+                    initialVelocity: initialVelocity,
+                    team: this.alliance
+                });
+                this.game.handleFire({
+                    position: position,
+                    rotation: rotation,
+                    initialVelocity: initialVelocity
+                });
+
+                this.lastTurretFire = now;
+
+                if (this.name.slice(0,3) !== 'bot') {
+                    this.game.sound.play('laser', 0.5);
+                }
             }
         }
     },
@@ -272,15 +325,15 @@ s.Ship = new Class({
 
         if (vTarget2D.z < 1) {
             //go left; else if go right
-            if (vTarget2D.x < -0.3) {
+            if (vTarget2D.x < -0.15) {
                 yaw = yawSpeed / thrustScalar;
-            } else if (vTarget2D.x > 0.3) {
+            } else if (vTarget2D.x > 0.15) {
                 yaw = -1 * yawSpeed / thrustScalar;
             }
             //do down; else if go up
-            if (vTarget2D.y < -0.3) {
+            if (vTarget2D.y < -0.15) {
                 pitch = -1*pitchSpeed / thrustScalar;
-            } else if (vTarget2D.y > 0.3) {
+            } else if (vTarget2D.y > 0.15) {
                 pitch  = pitchSpeed / thrustScalar;
             }
         } else {
@@ -297,11 +350,6 @@ s.Ship = new Class({
                 pitch  = -1 * pitchSpeed / thrustScalar;
             }
         }
-
-        // if ( Math.abs(vTarget2D.x) <= 0.95 && Math.abs(vTarget2D.y) <= 0.95 && vTarget2D.z < 1 ){
-        //     pitch = 0;
-        //     yaw = 0;
-        // }
             
         //////////////////////////////
         // MOTION AND PHYSICS LOGIC //
@@ -326,5 +374,14 @@ s.Ship = new Class({
         this.root.applyCentralImpulse(getForceVector);
 
         this.lastTime = now;
+
+        //////////////////////////////
+        ///////  FIRING LOGIC ////////
+        //////////////////////////////
+
+        if ( Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && totalDistance < maxDistance) {
+            this.fire('turret');
+        }
+
     }
 });
