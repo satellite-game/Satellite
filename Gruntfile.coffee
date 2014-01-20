@@ -14,6 +14,7 @@ module.exports = (grunt) ->
       unit:
         configFile: 'karma.conf.js'
         autoWatch: false
+        singleRun: false
         background: true
       travis:
         configFile: 'karma.conf.js'

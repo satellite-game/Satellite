@@ -78,11 +78,11 @@ module.exports = function(config) {
 
     // If browser does not capture in given timeout [ms], kill it
     // CLI --capture-timeout 5000
-    captureTimeout: 20000,
+    captureTimeout: 5000,
 
     // Auto run tests on start (when browsers are captured) and exit
     // CLI --single-run --no-single-run
-    singleRun: false,
+    singleRun: true,
 
     // report which specs are slower than 500ms
     // CLI --report-slower-than 500
