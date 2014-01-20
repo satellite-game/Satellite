@@ -48568,8 +48568,6 @@ s.Player = new Class({
   extend: s.Ship,
   construct: function(options) {
 
-    var that = this;
-    setInterval ( function () { console.log('Player Linear velocity:', that.root.getLinearVelocity()); }, 1000);
     this.camera = options.camera;
     this.game = options.game;
     this.HUD = options.HUD;
@@ -48587,7 +48585,7 @@ s.Player = new Class({
 
     // Adjust this between 0 and 30 based engine thrust.
     // Static 30.0 for testing.
-    this.trailGlow.intensity = 30.0;
+    this.trailGlow.intensity = 0;
     this.root.add( this.trailGlow );
     this.trailGlow.position.set(0, 0, 35);
 
@@ -48604,6 +48602,8 @@ s.Player = new Class({
     if (this.hull <= 0){
       this.game.handleDie();
     }
+    this.trailGlow.intensity = Math.sqrt(~~Math.abs(this.root.getLinearVelocity().x * this.root.getLinearVelocity().x) + ~~Math.abs(this.root.getLinearVelocity().y * this.root.getLinearVelocity().y) + ~~Math.abs(this.root.getLinearVelocity().z * this.root.getLinearVelocity().z))/100;
+    console.log(this.trailGlow.intensity);
   }
 
 });
