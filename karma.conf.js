@@ -94,7 +94,6 @@ module.exports = function(config) {
       'karma-sinon-chai',
       'karma-sauce-launcher',
       'karma-phantomjs-launcher',
-      'karma-slimerjs-launcher',
       'karma-chrome-launcher',
       'karma-firefox-launcher'
     ]
