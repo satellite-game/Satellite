@@ -270,18 +270,38 @@ s.Ship = new Class({
             vTarget2D = s.projector.projectVector(vTarget3D, this.camera);
         }
 
-        //go left; else if go right
-        if (vTarget2D.x < 0) {
-            yaw = yawSpeed / thrustScalar;
-        } else if (vTarget2D.x > 0) {
-            yaw = -1 * yawSpeed / thrustScalar;
+        if (vTarget2D.z < 1) {
+            //go left; else if go right
+            if (vTarget2D.x < 0) {
+                yaw = yawSpeed / thrustScalar;
+            } else if (vTarget2D.x > 0) {
+                yaw = -1 * yawSpeed / thrustScalar;
+            }
+            //do down; else if go up
+            if (vTarget2D.y < 0) {
+                pitch = -1*pitchSpeed / thrustScalar;
+            } else if (vTarget2D.y > 0) {
+                pitch  = pitchSpeed / thrustScalar;
+            }
+        } else {
+            //go right; else if go left
+            if (vTarget2D.x < 0) {
+                yaw = -1* yawSpeed / thrustScalar;
+            } else if (vTarget2D.x >= 0) {
+                yaw = yawSpeed / thrustScalar;
+            }
+            //do up; else if go down
+            if (vTarget2D.y < 0) {
+                pitch = pitchSpeed / thrustScalar;
+            } else if (vTarget2D.y > 0) {
+                pitch  = -1 * pitchSpeed / thrustScalar;
+            }
         }
-        //do down; else if go up
-        if (vTarget2D.y < 0) {
-            pitch = -1*pitchSpeed / thrustScalar;
-        } else if (vTarget2D.y > 0) {
-            pitch  = pitchSpeed / thrustScalar;
-        }
+
+        // if ( Math.abs(vTarget2D.x) <= 0.95 && Math.abs(vTarget2D.y) <= 0.95 && vTarget2D.z < 1 ){
+        //     pitch = 0;
+        //     yaw = 0;
+        // }
             
         //////////////////////////////
         // MOTION AND PHYSICS LOGIC //
