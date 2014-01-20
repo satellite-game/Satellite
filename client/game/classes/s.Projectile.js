@@ -20,6 +20,7 @@ s.Projectile = new Class({
     },
 
     handleCollision: function(mesh, position){
+        // todo: NOT THIS.
         if (this.pilot === this.game.pilot.name){
             if (mesh.instance.alliance && mesh.instance.alliance === "enemy"){
                 this.HUD.menu.animate({
