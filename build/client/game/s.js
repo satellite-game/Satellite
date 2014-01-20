@@ -48275,6 +48275,7 @@ s.Projectile = new Class({
     },
 
     handleCollision: function(mesh, position){
+        // todo: NOT THIS.
         if (this.pilot === this.game.pilot.name){
             if (mesh.instance.alliance && mesh.instance.alliance === "enemy"){
                 this.HUD.menu.animate({
@@ -48425,8 +48426,6 @@ s.Ship = new Class({
         this.root.name = this.name;
         this.hull = s.config.ship.hull;
         this.shields = s.config.ship.shields;
-
-
 	},
 
     getOffset: function(offset) {
@@ -48566,17 +48565,47 @@ s.Ship = new Class({
 });
 
 s.Player = new Class({
-	extend: s.Ship,
-	construct: function(options) {
-		// Nothing here yet...
-		// Maybe collision detection and whatnot
-	this.game.hook(this.update);
-	},
-	update: function() {
-		if (this.hull <= 0){
-			this.game.handleDie();
-		}
-	}
+  extend: s.Ship,
+  construct: function(options) {
+
+    var that = this;
+    setInterval ( function () { console.log('Player Linear velocity:', that.root.getLinearVelocity()); }, 1000);
+    this.camera = options.camera;
+    this.game = options.game;
+    this.HUD = options.HUD;
+    this.firstPerson = false;
+
+    this.root.castShadow = true;
+
+    // Moon facing initilization
+    //this.player.root.lookAt(this.moon.root.position);
+
+    // Root camera to the player's position
+    this.root.add( this.camera );
+
+    this.trailGlow = new THREE.PointLight(0x00FFFF, 5, 20);
+
+    // Adjust this between 0 and 30 based engine thrust.
+    // Static 30.0 for testing.
+    this.trailGlow.intensity = 30.0;
+    this.root.add( this.trailGlow );
+    this.trailGlow.position.set(0, 0, 35);
+
+    // this.player.root.add( new THREE.PointLightHelper(this.trailGlow, 1) );
+    this.game.hook(this.update);
+
+    // Setup camera: Cockpit view; COMMENT OUT FOR CHASE CAM
+    // this.camera.position.set( 0, 0, 0 );
+
+    // Setup camera: Chase view
+    this.game.camera.position.set(0,35,250);
+  },
+  update: function() {
+    if (this.hull <= 0){
+      this.game.handleDie();
+    }
+  }
+
 });
 
 s.Moon = new Class({
@@ -49050,10 +49079,6 @@ s.Controls = new Class({
 
     // Oculus Rift interface
     this.oculus = new s.Oculus();
-
-    this.oculusCompensationX = 0;
-    this.oculusCompensationY = 0;
-    this.oculusCompensationZ = 0;
 
     // Mouse interface - mice options are: 'keyboard', 'none', 'oculus'
     this.mouse = new s.Mouse('keyboard', options);
@@ -50420,8 +50445,8 @@ s.Game = new Class({
     var self = this;
 
     /*===============================================
-    =             Comms Handler Binding            =
-    ===================================================*/
+    =              Comms Handler Binding            =
+    =================================================*/
 
     // Communication
 
@@ -50768,21 +50793,11 @@ s.SatelliteGame = new Class( {
             position: new THREE.Vector3(this.getRandomCoordinate(),this.getRandomCoordinate(),this.getRandomCoordinate()),
             name: this.pilot.name,
             rotation: new THREE.Vector3( 0, Math.PI/2, 0 ),
-            alliance: 'alliance'
+            alliance: 'alliance',
+            camera: this.camera
         } );
-
+        
         this.HUD.hp = this.player.hull;
-        // Moon facing initilization
-        //this.player.root.lookAt(this.moon.root.position);
-
-        // Root camera to the player's position
-        this.player.root.add( this.camera );
-
-        //// Setup camera: Cockpit view; COMMENT OUT FOR CHASE CAM
-        // this.camera.position.set( 0, 0, 0 );
-
-        //// Setup camera: Chase view
-        this.camera.position.set(0,35,250);
 
         // Planet camera
         // this.scene.add(this.camera);
