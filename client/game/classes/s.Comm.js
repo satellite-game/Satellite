@@ -88,8 +88,7 @@ s.Comm = new Class( {
 
         this.socket.on( 'hit', this.makeTrigger( 'hit' ));
 
-        this.socket.on( 'sync', this.makeTrigger( 'move'));
-
+        this.socket.on( 'sync', this.makeTrigger( 'sync'));
 
         this.game.hook( this.position );
 
@@ -143,7 +142,7 @@ s.Comm = new Class( {
 
         // Never send faster than server can handle
 
-        if ( time - s.game.comm.lastMessageTime >= 700 ) {
+        if ( time - s.game.comm.lastMessageTime >= 1000 ) {
 
             var shipPosition = s.game.player.getPositionPacket( );
 
