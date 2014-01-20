@@ -233,9 +233,9 @@ s.Comm = new Class( {
 
     clockTick: function( ){
         this.time += 1;
-        if ( this.time >= 60 ){
-            window.location.href = "http://satellite-game.com";
-        }
+        // if ( this.time >= 60 ){
+        //     window.location.href = "http://satellite-game.com";
+        // }
     },
 
     botInfo: function(message) {

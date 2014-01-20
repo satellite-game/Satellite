@@ -54,6 +54,8 @@ s.Controls = new Class({
         this.firing = false;
 
         this.lastTime = new Date( ).getTime( );
+        this.iterations = 0;
+
     },
 
     destruct: function( ) {
@@ -150,6 +152,9 @@ s.Controls = new Class({
         // KEYBOARD COMMANDS //
         ///////////////////////
 
+        var vTarget3D = root.position.clone();
+        var vTarget2D = s.projector.projectVector(vTarget3D, this.game.camera);
+
         if (this.keyboard.pressed('left')) {
             yaw = yawSpeed / thrustScalar;
 
@@ -184,7 +189,6 @@ s.Controls = new Class({
         if (this.keyboard.pressed('space') || this.firing){
             this.player.fire('turret');
         }
-
   
         //////////////////////////////
         // MOTION AND PHYSICS LOGIC //
