@@ -150,7 +150,6 @@ s.SatelliteGame = new Class( {
                 return false;
             },
             add: function ( enemyInfo ) {
-                console.log("LOL ENEMIES");
                 if ( this.has( enemyInfo.name ) ) {
                     this.delete( enemyInfo.name );
                     console.error( 'Bug: Player %s added twice', enemyInfo.name );
@@ -220,6 +219,7 @@ s.SatelliteGame = new Class( {
         this.comm.on( 'join', that.handleJoin );
         this.comm.on( 'leave', that.handleLeave );
         this.comm.on( 'move', that.handleMove );
+        this.comm.on( 'sync', that.handleSync);
 
         this.HUD.controls = this.controls;
 
@@ -318,7 +318,7 @@ s.SatelliteGame = new Class( {
         }
     },
     handleMove: function ( message ) {
-        console.log("A player moved");
+        
         if ( message.name == this.pilot.name ) {
             // server told us to move
             console.log( 'Server reset position' );
@@ -331,6 +331,18 @@ s.SatelliteGame = new Class( {
                 s.game.enemies.add( message );
             }
         }
+    },
+    handleSync: function ( pak ) {
+      console.log("A sync request has been made by the server!");
+      console.log("This is enemies", s.game.enemies);
+      console.log("This is enemies trying to map...", s.game.enemies.list());
+      //if our value does not match 
+      // realign ourselves with Handlemove , take the difference add it to the velocity
+      // realign all enemies with HandleMove, take the difference add it to the velocity .
+      var moveSelf = function( self ) {};
+      var setCoords = function( entity ) {};
+      var adjustVel = function( entity ) {};
+      var checkDiff = function( client, server ) {};
     },
 
     handlePlayerList: function(message) {
