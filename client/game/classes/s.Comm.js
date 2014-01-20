@@ -42,7 +42,7 @@ s.Comm = new Class( {
 
 
     construct: function ( options ) {
-        
+
         //binding the game's context
 
         this.game = options.game;
@@ -86,9 +86,9 @@ s.Comm = new Class( {
         this.socket.on('fire', this.makeTrigger( 'fire' ));
 
         this.socket.on('hit', this.makeTrigger( 'hit' ));
-        
+
         this.socket.on('bot retrieval', this.makeTrigger( 'bot retrieval' ));
-        
+
         this.socket.on('bot positions', this.makeTrigger( 'bot positions' ));
 
 
@@ -151,10 +151,10 @@ s.Comm = new Class( {
             var shipPosition = s.game.player.getPositionPacket( );
 
             // TODO: Figure out if ship or turret actually moved
-            
+
 
             // If ship moved, send packet
-            
+
             if ( this.lastPosition !== shipPosition.pos ) {
 
                 // Build packet

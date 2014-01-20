@@ -62,6 +62,12 @@ s.SatelliteGame = new Class( {
             game: this
         } );
 
+        if (this.oculus.detected) {
+            console.log('Activating oculus HUD');
+            this.HUD.canvas.style.display = 'none';
+            this.HUD.oculusCanvas.style.display = 'block';
+        }
+
         this.player = new s.Player( {
             HUD: this.HUD,
             game: this,
@@ -76,15 +82,16 @@ s.SatelliteGame = new Class( {
         this.HUD.hp = this.player.hull;
 
         // Moon facing initilization
-        this.player.root.lookAt(this.moon.root.position);
+        //this.player.root.lookAt(this.moon.root.position);
 
         // Root camera to the player's position
         this.player.root.add( this.camera );
 
         //// Setup camera: Cockpit view; COMMENT OUT FOR CHASE CAM
-        this.camera.position.set( 0, 0, 0 );
+        // this.camera.position.set( 0, 0, 0 );
+
         //// Setup camera: Chase view
-        //this.camera.position.set(0,35,350);
+        this.camera.position.set(0,35,250);
 
         // Planet camera
         // this.scene.add(this.camera);
@@ -184,6 +191,8 @@ s.SatelliteGame = new Class( {
             //controls: this.controls
         } );
 
+
+
         window.addEventListener( 'mousemove', function ( e ) {
             that.HUD.targetX = e.pageX;
             that.HUD.targetY = e.pageY;
@@ -224,22 +233,22 @@ s.SatelliteGame = new Class( {
             that.comm.connected( );
             s.game.start();
         });
-    },
+	},
 
-    render: function ( _super, time ) {
-        _super.call( this, time );
-        this.controls.update( );
-    },
+	render: function(_super, time) {
+		_super.call(this, time);
+		this.controls.update();
+	},
 
-    addSkybox: function ( ) {
-        var urlPrefix = "game/textures/skybox/Purple_Nebula_";
-        var urls = [
-            urlPrefix + "right1.png", urlPrefix + "left2.png",
-            urlPrefix + "top3.png", urlPrefix + "bottom4.png",
-            urlPrefix + "front5.png", urlPrefix + "back6.png"
-        ];
+	addSkybox: function() {
+		var urlPrefix = "game/textures/skybox/Purple_Nebula_";
+		var urls = [
+			urlPrefix + "right1.png", urlPrefix + "left2.png",
+			urlPrefix + "top3.png", urlPrefix + "bottom4.png",
+			urlPrefix + "front5.png", urlPrefix + "back6.png"
+		];
 
-        THREE.ImageUtils.loadTextureCube(urls, {}, function(textureCube) {
+		THREE.ImageUtils.loadTextureCube(urls, {}, function(textureCube) {
             textureCube.format = THREE.RGBFormat;
             var shader = THREE.ShaderLib.cube;
 
@@ -256,23 +265,23 @@ s.SatelliteGame = new Class( {
             this.skyboxMesh = new THREE.Mesh( new THREE.CubeGeometry( 200000, 200000, 200000, 1, 1, 1, null, true ), material );
             this.scene.add( this.skyboxMesh );
         }.bind(this));
-    },
+	},
 
-    addDust: function ( ) {
-        var starSprite = THREE.ImageUtils.loadTexture( 'game/textures/particle.png' );
-        var geometry = new THREE.Geometry( );
+	addDust: function() {
+		var starSprite = THREE.ImageUtils.loadTexture('game/textures/particle.png');
+		var geometry = new THREE.Geometry();
 
-        // Set to false for "dust", true for stars
-        var outer = true;
+		// Set to false for "dust", true for stars
+		var outer = true;
 
-        // Spec size
-        var radius = 100000;
-        var size = 100;
-        var count = 10000;
+		// Spec size
+		var radius = 100000;
+		var size = 100;
+		var count = 1000;
 
-        for ( var i = 0; i < count; i++ ) {
+		for (var i = 0; i < count; i ++ ) {
 
-            var vertex = new THREE.Vector3( );
+			var vertex = new THREE.Vector3( );
 
             if ( outer ) {
                 // Distribute "stars" on the outer bounds of far space
@@ -289,9 +298,9 @@ s.SatelliteGame = new Class( {
 
             geometry.vertices.push( vertex );
 
-        }
+		}
 
-        var material = new THREE.ParticleBasicMaterial( {
+		var material = new THREE.ParticleBasicMaterial( {
             size: size,
             map: starSprite,
             blending: THREE.AdditiveBlending,
