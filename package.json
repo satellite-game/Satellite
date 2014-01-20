@@ -36,13 +36,8 @@
     "socket.io": "~0.9.16",
     "socket.io-client": "~0.9.16",
     "grunt-mocha-chai-sinon": "0.0.7",
-    "chai": "~1.8.1",
-    "sinon": "~1.7.3",
     "karma-phantomjs-launcher": "~0.1.1",
-    "karma-slimerjs-launcher": "~0.1.2",
-    "wd": "~0.2.8",
-    "grunt-saucelabs": "~4.1.2",
-    "grunt-connect": "~0.2.0"
+    "karma-sauce-launcher": "~0.1.7"
   },
   "engines": {
     "node": "0.10.15",

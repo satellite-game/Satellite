@@ -1,5 +1,6 @@
 module.exports = function(config) {
   config.set({
+
     // base path, that will be used to resolve files and exclude
     basePath: './',
 
@@ -47,6 +48,23 @@ module.exports = function(config) {
       type: 'html',
       dir: 'coverage/client/'
     },
+
+    // global config for SauceLabs
+    sauceLabs: {
+      startConnect: true,
+      testName: 'Satellite unit tests'
+    },
+
+    // define SL browsers
+    customLaunchers: {
+      sl_chrome_OSX9: {
+        base: 'SauceLabs',
+        browserName: 'chrome',
+        version: '31',
+        platform: 'OS X 10.9'
+      }
+    },
+
     // Start these browsers, currently available:
     // - Chrome
     // - ChromeCanary
@@ -56,10 +74,7 @@ module.exports = function(config) {
     // - PhantomJS
     // - IE (only Windows)
     // CLI --browsers Chrome,Firefox,Safari
-    browsers: process.env.TRAVIS ? [ 'Chrome' ] : [
-      'Firefox',
-      'Chrome'
-    ],
+    browsers: process.env.TRAVIS ? [ 'sl_chrome_7' ] : [ 'Chrome' ],
 
     // If browser does not capture in given timeout [ms], kill it
     // CLI --capture-timeout 5000
@@ -77,6 +92,7 @@ module.exports = function(config) {
       'karma-coverage',
       'karma-mocha',
       'karma-sinon-chai',
+      'karma-sauce-launcher',
       'karma-phantomjs-launcher',
       'karma-slimerjs-launcher',
       'karma-chrome-launcher',
