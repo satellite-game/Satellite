@@ -71,21 +71,11 @@ s.SatelliteGame = new Class( {
             position: new THREE.Vector3(this.getRandomCoordinate(),this.getRandomCoordinate(),this.getRandomCoordinate()),
             name: this.pilot.name,
             rotation: new THREE.Vector3( 0, Math.PI/2, 0 ),
-            alliance: 'alliance'
+            alliance: 'alliance',
+            camera: this.camera
         } );
-
+        
         this.HUD.hp = this.player.hull;
-        // Moon facing initilization
-        //this.player.root.lookAt(this.moon.root.position);
-
-        // Root camera to the player's position
-        this.player.root.add( this.camera );
-
-        //// Setup camera: Cockpit view; COMMENT OUT FOR CHASE CAM
-        // this.camera.position.set( 0, 0, 0 );
-
-        //// Setup camera: Chase view
-        this.camera.position.set(0,35,250);
 
         // Planet camera
         // this.scene.add(this.camera);

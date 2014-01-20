@@ -32,10 +32,6 @@ s.Controls = new Class({
     // Oculus Rift interface
     this.oculus = new s.Oculus();
 
-    this.oculusCompensationX = 0;
-    this.oculusCompensationY = 0;
-    this.oculusCompensationZ = 0;
-
     // Mouse interface - mice options are: 'keyboard', 'none', 'oculus'
     this.mouse = new s.Mouse('keyboard', options);
 
