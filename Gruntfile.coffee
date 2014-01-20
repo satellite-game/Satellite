@@ -3,42 +3,11 @@ module.exports = (grunt) ->
   # Order of concatonation/minification
   includeOrder = require './include.conf'
 
-  browsers = [
-    browserName: "chrome"
-    platform: "XP"
-  ,
-    browserName: "chrome"
-    platform: "linux"
-  ,
-    browserName: "chrome"
-    platform: "mac"
-  ]
-
   grunt.initConfig
     pkg: grunt.file.readJSON('package.json')
 
     # TESTING
     # ================
-    # Selenium:
-    # ----------------
-
-    connect:
-      sauceLabs:
-        options:
-          base: ""
-          port: 9999
-
-    'saucelabs-mocha':
-      all:
-        options:
-          urls: ["http://127.0.0.1:9999/test-mocha/test/browser/opts.html"]
-          tunnelTimeout: 5
-          build: process.env.TRAVIS_JOB_ID
-          concurrency: 3
-          browsers: browsers
-          testname: "mocha tests"
-          tags: ["master"]
-
     # client-side:
     # ----------------
     karma:
@@ -50,7 +19,7 @@ module.exports = (grunt) ->
         configFile: 'karma.conf.js'
         autoWatch: false
         singleRun: true
-        browsers: ['SlimerJS']
+        browsers: ['sl_chrome_OSX9']
 
     # server-side:
     # ----------------
@@ -198,5 +167,4 @@ module.exports = (grunt) ->
   grunt.registerTask 'client', ['jshint:client', 'copy:client', 'concat', 'stylus']
   grunt.registerTask 'client-prod', ['client', 'uglify']
   grunt.registerTask 'default', ['server', 'client', 'karma:unit:start', 'concurrent']
-  grunt.registerTask 'sel', ['connect', 'saucelabs-mocha']
 
