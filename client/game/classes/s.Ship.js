@@ -272,15 +272,15 @@ s.Ship = new Class({
 
         if (vTarget2D.z < 1) {
             //go left; else if go right
-            if (vTarget2D.x < 0) {
+            if (vTarget2D.x < -0.3) {
                 yaw = yawSpeed / thrustScalar;
-            } else if (vTarget2D.x > 0) {
+            } else if (vTarget2D.x > 0.3) {
                 yaw = -1 * yawSpeed / thrustScalar;
             }
             //do down; else if go up
-            if (vTarget2D.y < 0) {
+            if (vTarget2D.y < -0.3) {
                 pitch = -1*pitchSpeed / thrustScalar;
-            } else if (vTarget2D.y > 0) {
+            } else if (vTarget2D.y > 0.3) {
                 pitch  = pitchSpeed / thrustScalar;
             }
         } else {
