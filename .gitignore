@@ -52,3 +52,4 @@ Thumbs.db
 /build/
 coverage
 /tests/oculus-testing-playground
+test-mocha

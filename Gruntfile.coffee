@@ -3,6 +3,17 @@ module.exports = (grunt) ->
   # Order of concatonation/minification
   includeOrder = require './include.conf'
 
+  browsers = [
+    browserName: "chrome"
+    platform: "XP"
+  ,
+    browserName: "chrome"
+    platform: "linux"
+  ,
+    browserName: "chrome"
+    platform: "mac"
+  ]
+
   grunt.initConfig
     pkg: grunt.file.readJSON('package.json')
 
@@ -12,10 +23,21 @@ module.exports = (grunt) ->
     # ----------------
 
     connect:
-      server:
+      sauceLabs:
         options:
           base: ""
           port: 9999
+
+    'saucelabs-mocha':
+      all:
+        options:
+          urls: ["http://127.0.0.1:9999/test-mocha/test/browser/opts.html"]
+          tunnelTimeout: 5
+          build: process.env.TRAVIS_JOB_ID
+          concurrency: 3
+          browsers: browsers
+          testname: "mocha tests"
+          tags: ["master"]
 
     # client-side:
     # ----------------
@@ -143,21 +165,25 @@ module.exports = (grunt) ->
   # DEPENDENCIES
   # =================
   # Loading dependencies
-  for pkg of grunt.file.readJSON("package.json").devDependencies
-    grunt.loadNpmTasks pkg  if pkg isnt "grunt" and pkg.indexOf("grunt") is 0
+  # for pkg of grunt.file.readJSON("package.json").devDependencies
+  #   grunt.loadNpmTasks pkg  if pkg isnt "grunt" and pkg.indexOf("grunt") is 0
 
-  # grunt.loadNpmTasks 'grunt-contrib-clean'
-  # grunt.loadNpmTasks 'grunt-contrib-concat'
-  # grunt.loadNpmTasks 'grunt-contrib-copy'
-  # grunt.loadNpmTasks 'grunt-contrib-jshint'
-  # grunt.loadNpmTasks 'grunt-contrib-stylus'
-  # grunt.loadNpmTasks 'grunt-contrib-uglify'
-  # grunt.loadNpmTasks 'grunt-contrib-watch'
-  # grunt.loadNpmTasks 'grunt-open'
-  # grunt.loadNpmTasks 'grunt-nodemon'
-  # grunt.loadNpmTasks 'grunt-concurrent'
-  # grunt.loadNpmTasks 'grunt-karma'
-  # grunt.loadNpmTasks 'grunt-mocha-chai-sinon'
+  grunt.loadNpmTasks 'grunt-contrib-clean'
+  grunt.loadNpmTasks 'grunt-contrib-concat'
+  grunt.loadNpmTasks 'grunt-contrib-copy'
+  grunt.loadNpmTasks 'grunt-contrib-jshint'
+  grunt.loadNpmTasks 'grunt-contrib-stylus'
+  grunt.loadNpmTasks 'grunt-contrib-uglify'
+  grunt.loadNpmTasks "grunt-contrib-connect"
+  grunt.loadNpmTasks "grunt-contrib-watch"
+
+  grunt.loadNpmTasks 'grunt-concurrent'
+  grunt.loadNpmTasks 'grunt-nodemon'
+  grunt.loadNpmTasks 'grunt-open'
+
+  grunt.loadNpmTasks 'grunt-karma'
+  grunt.loadNpmTasks 'grunt-mocha-chai-sinon'
+  grunt.loadNpmTasks 'grunt-saucelabs'
 
   # REGISTER
   # =================
@@ -172,4 +198,5 @@ module.exports = (grunt) ->
   grunt.registerTask 'client', ['jshint:client', 'copy:client', 'concat', 'stylus']
   grunt.registerTask 'client-prod', ['client', 'uglify']
   grunt.registerTask 'default', ['server', 'client', 'karma:unit:start', 'concurrent']
-  grunt.registerTask 'sel', ['connect', 'watch']
+  grunt.registerTask 'sel', ['connect', 'saucelabs-mocha']
+
