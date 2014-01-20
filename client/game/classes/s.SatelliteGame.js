@@ -76,18 +76,7 @@ s.SatelliteGame = new Class( {
         this.HUD.hp = this.player.hull;
 
         // Moon facing initilization
-
-        // geometry.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
         this.player.root.lookAt(this.moon.root.position);
-        this.player.root.rotation.x = 0.8;
-        this.player.root.rotation.y = 0.58;
-        this.player.root.rotation.z = -1.55;
-        // this.player.root.lookAt(new THREE.Vector3(0,0,0));
-        // this.player.root.lookAt(new THREE.Vector3(0,0,0));
-        // this.player.root.lookAt(new THREE.Vector3(0,0,0));
-        // this.player.root.rotation.x = 0;
-        // setInterval(function(){that.player.root.rotation.x += 0.02; }, 16.67);
-        // this.player.root.rotation.z = 0;
 
         // Root camera to the player's position
         this.player.root.add( this.camera );
@@ -235,23 +224,6 @@ s.SatelliteGame = new Class( {
             that.comm.connected( );
             s.game.start();
         });
-
-        // this.hook(function() {
-        //     if (that.enemies._list.length === 0) { return; }
-        //     var meX = that.player.root.position.x;
-        //     var meY = that.player.root.position.y;
-        //     var meZ = that.player.root.position.z;
-        //     var botX = that.enemies._list[0].root.position.x;
-        //     var botY = that.enemies._list[0].root.position.y;
-        //     var botZ = that.enemies._list[0].root.position.z;
-        //     var diffX = meX - botX;
-        //     var diffY = meY - botY;
-        //     var diffZ = meZ - botZ;
-        //     var nextX = botX + diffX/300;
-        //     var nextY = botY + diffY/300;
-        //     var nextZ = botZ + diffZ/300;
-        //     that.enemies.execute( 'bot 1', 'setPosition', [ [nextX, nextY, nextZ], [0,0,0], [0,0,0], [0,0,0], false ] );
-        // });
     },
 
     render: function ( _super, time ) {
