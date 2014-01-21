@@ -48582,9 +48582,6 @@ s.Player = new Class({
     this.root.add( this.camera );
 
     this.trailGlow = new THREE.PointLight(0x00FFFF, 5, 20);
-
-    // Adjust this between 0 and 30 based engine thrust.
-    // Static 30.0 for testing.
     this.trailGlow.intensity = 0;
     this.root.add( this.trailGlow );
     this.trailGlow.position.set(0, 0, 35);
@@ -48602,8 +48599,9 @@ s.Player = new Class({
     if (this.hull <= 0){
       this.game.handleDie();
     }
-    this.trailGlow.intensity = Math.sqrt(~~Math.abs(this.root.getLinearVelocity().x * this.root.getLinearVelocity().x) + ~~Math.abs(this.root.getLinearVelocity().y * this.root.getLinearVelocity().y) + ~~Math.abs(this.root.getLinearVelocity().z * this.root.getLinearVelocity().z))/100;
-    console.log(this.trailGlow.intensity);
+    // Adjusts engine glow based on linear velosity
+    // this.trailGlow.intensity = Math.sqrt(~~Math.abs(this.root.getLinearVelocity().x * this.root.getLinearVelocity().x) + ~~Math.abs(this.root.getLinearVelocity().y * this.root.getLinearVelocity().y) + ~~Math.abs(this.root.getLinearVelocity().z * this.root.getLinearVelocity().z))/100;
+    this.trailGlow.intensity = this.root.getLinearVelocity().length()/100;
   }
 
 });
