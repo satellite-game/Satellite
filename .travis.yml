@@ -3,8 +3,8 @@ node_js:
 - '0.10'
 env:
   global:
-  - secure: Tn4KCvPNyYOhdTO1TdB3pAiAF/h1QaG//w/i2mF4qqQatUVsDx7N+WWuxBWybEzCUKXFUZweAN1xCMHC2+p/BeUAFYrtowLB6R8LhV+5d0L1S/UOrDD2/Bw6kvuzbW2HfkJWw0aNszs50woENKGI47cwh/VMScYUB1LOxK9kx7M=
-  - secure: BuZisZ8Kz42IlnAk/0SyW4iaE44sxNrtIgHdO7j1pkFfPQQD0j8XgGlE+54+8RwbZa3Xl2wldoPbJ55TDpjRh7qStSoZMaOFgAfSovTByVVRUyeqaAOUDTr0VRM3LnfyKZ0bsfUNPfH654GPvwmPu7Pt9qMTnEz2t1j3uo0xri4=
+  - secure: f+AWKr1CgJiHUlzBiJzn99bawb+nucq5AtzJwUQ5ulOPSX4OUesXgk/Ohw0Ibo+0oNwJyN1czFaiizyj/OMXtR+SbmE7FrLdi3BN69qgyDzvjcXFinnXFjz31ykCRvj4OlLduRegFdLyVH7nLKrd9gfiVyjmQSf/mmAs72no4LU=
+  - secure: SDggOvQ6DDqZMTGU/PSAWhX7N8DP6U5u5ZAULkXj6M0/j5kVRZCoN1BqxuuJd2qPvxNm7X2OBUD+93E1R5gcEeU0ydFOe0fjMnl9Te7wyePwj6YEEQ4u4iklzjXLNCw7Cj5llaCcaqcx703eIrZQXF6IO5NJr1YlWqEqglgataM=
 notifications:
   email:
   - stites.sr@gmail.com
