@@ -11,7 +11,10 @@ s.Projectile = new Class({
         this.initialVelocity = options.initialVelocity;
         var that = this;
         // Destory projectile after 4 secs
-        setTimeout(function(){that.destruct();}, 4000);
+        setTimeout(function(){
+            delete that.game.botBulletMap[that.root.id];
+            that.destruct();
+        }, 4000);
     },
 
 	init: function(_super){
@@ -39,6 +42,7 @@ s.Projectile = new Class({
         } else if (mesh.name === this.game.pilot.name && this.pilot.slice(0,3) === 'bot' ) {
             this.comm.botHit(mesh.name,this.game.pilot.name);
         }
+        delete this.game.botBulletMap[this.root.id];
         this.destruct();
     },
 

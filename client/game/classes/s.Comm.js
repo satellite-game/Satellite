@@ -274,8 +274,6 @@ s.Comm = new Class( {
     },
 
     botUpdate: function(enemies) {
-        this.socket.emit( 'botUpdate',{
-            enemies: enemies
-        });
+        this.socket.emit( 'botUpdate', enemies);
     }
 } );

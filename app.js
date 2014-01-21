@@ -219,12 +219,7 @@ io.sockets.on('connection', function (socket) {
     });
 
     socket.on('botFire', function(message) {
-        socket.broadcast.emit('verify botFire', {
-            name: message.name,
-            position: message.position,
-            rotation: message.rotation,
-            initialVelocity: message.initialVelocity
-        });
+        socket.broadcast.emit('verify botFire', message);
     });
 
     socket.on('botUpdate', function(message) {
