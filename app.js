@@ -227,6 +227,10 @@ io.sockets.on('connection', function (socket) {
         });
     });
 
+    socket.on('botUpdate', function(message) {
+        socket.broadcast.emit('bot positions', message);
+    });
+
 });
 
 
