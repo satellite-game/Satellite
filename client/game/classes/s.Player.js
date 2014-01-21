@@ -19,7 +19,7 @@ s.Player = new Class({
     this.trailGlow.intensity = 0;
     this.root.add( this.trailGlow );
     this.trailGlow.position.set(0, 0, 35);
-
+    
     this.game.hook(this.update);
 
     // Setup camera: Cockpit view; COMMENT OUT FOR CHASE CAM
