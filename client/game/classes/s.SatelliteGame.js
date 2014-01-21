@@ -541,10 +541,10 @@ s.SatelliteGame = new Class( {
         var updatePlayersWithBots = function() {
             var botEnemies = this.game.getBotEnemies();
             this.game.comm.botUpdate(botEnemies);
-        }
+        };
         
-        var this = that;
-        if (!this.game.firstPlayer)
+        var that = this;
+        if (!this.game.firstPlayer) {
             //this the first time this function has been called with this client
             setInterval(function() {
                 updatePlayersWithBots.call(that);
@@ -600,7 +600,7 @@ s.SatelliteGame = new Class( {
         //else make new bot with position
         // this.game.botCount = 0;
         for (var bot in message) {
-            if ( !this.game.enemies.execute( message[bot].name, 'setPosition', [ message[bot].pos, message[bot].rot, message[bot].aVeloc, message[bot].lVeloc, true ] ) ) {
+            if ( !this.game.enemies.execute( message[bot].name, 'setPosition', [ message[bot].position, message[bot].rotation, message[bot].aVeloc, message[bot].lVeloc, true ] ) ) {
                 this.game.makeNewBot(message[bot]);
             }
         }
