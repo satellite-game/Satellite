@@ -271,6 +271,31 @@ s.Ship = new Class({
 
     controlBot: function( ) {
 
+
+        //////////////////////////////
+        ////  CLOSEST ENEMY LOGIC ////
+        //////////////////////////////  
+
+        //MAKE ENEMY LIST FOR BOT
+        var botEnemyList = [];
+        botEnemyList.push(this.game.player);
+        var enemyShips = this.game.enemies._list;
+        for (var i = 0; i < enemyShips.length; i++) {
+            if (enemyShips[i].name.slice(0,3) !== 'bot') {
+                botEnemyList.push(enemyShips[i]);
+            }
+        }
+
+        //DETERMINE CLOSEST ENEMY
+        var closestDistance;
+        for (i = 0; i < botEnemyList.length; i++) {
+            var distance = this.root.position.distanceTo(botEnemyList[i].root.position);
+            if (!closestDistance || distance < closestDistance) {
+                closestDistance = distance;
+                this.target = botEnemyList[i];
+            }
+        }
+
         //////////////////////////////
         //// THRUST/BREAK LOGIC ////
         //////////////////////////////    
@@ -283,15 +308,13 @@ s.Ship = new Class({
 
         var  maxDistance = 4100, minDistance = 1500;
 
-        var totalDistance = this.root.position.distanceTo(this.game.player.root.position);
-
-        if (totalDistance > maxDistance) {
+        if (closestDistance > maxDistance) {
             thrust = 1;
         }
-        else if (totalDistance < minDistance) {
+        else if (closestDistance < minDistance) {
             brakes = 1;
         } else {
-            var ratio = (totalDistance - minDistance) / (maxDistance - minDistance);
+            var ratio = (closestDistance - minDistance) / (maxDistance - minDistance);
             var optimumSpeed = s.config.ship.maxSpeed * ratio;
             if (optimumSpeed < this.botOptions.thrustImpulse) { brakes = 1; }
             if (optimumSpeed > this.botOptions.thrustImpulse) { thrust = 1; }
@@ -321,8 +344,6 @@ s.Ship = new Class({
             pitchSpeed  = this.botOptions.pitchSpeed;
 
         var thrustScalar = this.botOptions.thrustImpulse/s.config.ship.maxSpeed + 1;
-
-        this.target = this.game.player;
 
         // TARGET HUD MARKING
         if ( this.target ) {
@@ -388,7 +409,7 @@ s.Ship = new Class({
         ///////  FIRING LOGIC ////////
         //////////////////////////////
 
-        if ( Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && totalDistance < maxDistance) {
+        if ( Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && closestDistance < maxDistance) {
             this.botFire('turret');
         }
 
