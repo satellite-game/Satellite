@@ -19,6 +19,24 @@ s.Keyboard = new Class({
     'tilde'   : 192
   },
 
+  keysInv: {
+    37  : 'left',
+    38  : 'up',
+    39  : 'right',
+    40  : 'down',
+    32  : 'space',
+    33  : 'pageup',
+    34  : 'pagedown',
+    9   : 'tab',
+    87  : 'w',
+    65  : 'a',
+    83  : 's',
+    68  : 'd',
+    192 : 'backtick',
+    16  : 'shift',
+    192 : 'tilde'
+  },
+
   modifiers: ['shift', 'ctrl', 'alt', 'meta'],
 
   construct: function(game, player) {
@@ -27,11 +45,22 @@ s.Keyboard = new Class({
     // Listen to key events
     window.addEventListener('keydown', this.handleKeyChange.bind(this, true), false);
     window.addEventListener('keyup', this.handleKeyChange.bind(this, false), false);
+    // Listen to key events ___ SYNCED
+    window.addEventListener('keydown', this.socketSendKey.bind(this));
+    window.addEventListener('keyup', this.socketSendKey.bind(this));
   },
 
   destruct: function() {
     window.removeEventListener('keydown', this.handleKeyChange, false);
     window.removeEventListener('keyup', this.handleKeyChange, false);
+  },
+
+  socketSendKey: function(e) {
+    var key = this.keysInv[e.keyCode];
+
+    if (key) {
+      s.game.comm.sendKey(e.type, key);
+    }
   },
 
   handleKeyChange: function(pressed, e) {
