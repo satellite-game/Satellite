@@ -536,12 +536,32 @@ s.SatelliteGame = new Class( {
         s.game.loadScreen.setMessage(message);
     },
 
+    //this function only gets called if client is the first player
     handleBotInfo: function() {
+        var updatePlayersWithBots = function() {
+            var botEnemies = this.game.getBotEnemies();
+            this.game.comm.botUpdate(botEnemies);
+        }
+        
+        var this = that;
+        if (!this.game.firstPlayer)
+            //this the first time this function has been called with this client
+            setInterval(function() {
+                updatePlayersWithBots.call(that);
+            }, 2500);
+        }
+
         this.game.firstPlayer = true;
         if (this.game.botCount === 0) {
             // Create a new bot
             this.game.makeNewBot();
         }
+
+        var botEnemies = this.game.getBotEnemies();
+        this.game.comm.botInfo(botEnemies);
+    },
+
+    getBotEnemies: function() {
         var makeArray = function (obj) {
             var result = [];
             result[0] = obj.x;
@@ -550,7 +570,7 @@ s.SatelliteGame = new Class( {
             return result;
         };
         enemiesSocketInfo = {};
-        var enemiesList = this.game.enemies._list;  
+        var enemiesList = this.enemies._list;  
         for (var i = 0; i < enemiesList.length; i++) {
             if (enemiesList[i].name.slice(0,3) === 'bot'){
                 var physics = enemiesList[i].root;
@@ -567,22 +587,22 @@ s.SatelliteGame = new Class( {
                     aVeloc: aVeloc,
                     lVeloc: lVeloc,
                     name: name,
-                    botCount: this.game.botCount
+                    botCount: this.botCount
                 };
             }
         }
-        // console.log('sending position info: ', enemiesSocketInfo['bot 1'].position);
-        this.game.comm.botInfo(enemiesSocketInfo);
+        return enemiesSocketInfo;
     },
 
     handleBotPositions: function(message) {
 
         //if the bot exists...update positions
         //else make new bot with position
-        this.game.botCount = 0;
+        // this.game.botCount = 0;
         for (var bot in message) {
-            this.game.makeNewBot(message[bot]);
-        // console.log('get message info from other player: ', message[bot].position);
+            if ( !this.game.enemies.execute( message[bot].name, 'setPosition', [ message[bot].pos, message[bot].rot, message[bot].aVeloc, message[bot].lVeloc, true ] ) ) {
+                this.game.makeNewBot(message[bot]);
+            }
         }
     },
 
@@ -626,12 +646,5 @@ s.SatelliteGame = new Class( {
         turrret.rotation.set(rot[0], rot[1], rot[2]);
         turret.setLinearVelocity({ x: veloc[0], y: veloc[1], z: veloc[2] });
     }
-
-    // handleHook: function () {
-    //     var that = this;
-    //     this.game.hook(function() {
-    //         that.game.handleBotInfo();
-    //     });
-    // }
 
 } );

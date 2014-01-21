@@ -63,7 +63,8 @@ s.Ship = new Class({
             // Setup camera: Cockpit view; COMMENT OUT FOR CHASE CAM
             this.camera.position.set( 0, 0, 0 );
 
-            //set a hook on the bot controls
+            //set a hook on the bot controls.
+            //necessary because first player has bot join twice
             if (this.game.lastBotCallback) { this.game.unhook( this.game.lastBotCallback ); }
             this.game.hook( this.controlBot );
             this.game.lastBotCallback = this.controlBot;
