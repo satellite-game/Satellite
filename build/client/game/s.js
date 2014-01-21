@@ -48586,7 +48586,6 @@ s.Player = new Class({
     this.root.add( this.trailGlow );
     this.trailGlow.position.set(0, 0, 35);
 
-    // this.player.root.add( new THREE.PointLightHelper(this.trailGlow, 1) );
     this.game.hook(this.update);
 
     // Setup camera: Cockpit view; COMMENT OUT FOR CHASE CAM
@@ -48594,18 +48593,41 @@ s.Player = new Class({
 
     // Setup camera: Chase view
     this.game.camera.position.set(0,35,250);
+
+    // Create particle objects for engine trail.
+    this.flames = [];
+
+    for (var i = 0; i < 5; i++) {
+      var sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: s.textures.particle,
+        useScreenCoordinates: false,
+        blending: THREE.AdditiveBlending,
+        color: 0x00FFFF
+      }));
+
+      this.flames.push(sprite);
+      sprite.position.set(0, 0, (i*10)+40);
+      this.root.add(sprite);
+    }
   },
+
   update: function() {
     if (this.hull <= 0){
       this.game.handleDie();
     }
     // Adjusts engine glow based on linear velosity
-    // this.trailGlow.intensity = Math.sqrt(~~Math.abs(this.root.getLinearVelocity().x * this.root.getLinearVelocity().x) + ~~Math.abs(this.root.getLinearVelocity().y * this.root.getLinearVelocity().y) + ~~Math.abs(this.root.getLinearVelocity().z * this.root.getLinearVelocity().z))/100;
     this.trailGlow.intensity = this.root.getLinearVelocity().length()/100;
+
+    var flameScaler = Math.random()*0.1 + 1;
+
+    this.flames[0].scale.set(2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler);
+    this.flames[1].scale.set(3*this.trailGlow.intensity*flameScaler, 3*this.trailGlow.intensity*flameScaler, 3*this.trailGlow.intensity*flameScaler);
+    this.flames[2].scale.set(2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler);
+    this.flames[3].scale.set(1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler);
+    this.flames[4].scale.set(1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler);
   }
 
 });
-
 s.Moon = new Class({
 	extend: s.GameObject,
 
