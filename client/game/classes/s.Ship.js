@@ -6,7 +6,7 @@ s.Ship = new Class({
         rightTurretOffset: new THREE.Vector3(-35, 0, -200),
         missileOffset: new THREE.Vector3(0, 0, -120),
         turretFireTime: 200,
-        botTurretFireTime: 500,
+        botTurretFireTime: 3000,
         missileFireTime: 1000
     },
 
@@ -155,37 +155,45 @@ s.Ship = new Class({
             if (now - this.lastTurretFire > this.options.botTurretFireTime){
                 // Left bullet
                 position = this.getOffset(this.options.leftTurretOffset);
-                new s.Turret({
-                    HUD: this.HUD,
+                var bulletLeft = new s.Turret({
                     game: this.game,
-                    pilot: this.game.pilot.name,
+                    pilot: this.name,
                     position: position,
                     rotation: rotation,
                     initialVelocity: initialVelocity,
                     team: this.alliance
                 });
-                this.game.handleFire({
-                    position: position,
-                    rotation: rotation,
-                    initialVelocity: initialVelocity
-                });
+                this.game.botBulletMap[bulletLeft.root.id] = bulletLeft;
+                if (this.game.firstPlayer) {
+                    this.game.handleBotFire({
+                        position: position,
+                        rotation: rotation,
+                        initialVelocity: initialVelocity,
+                        name: this.name,
+                        id: bulletLeft.root.id
+                    });
+                }
 
                 // Right bullet
                 position = this.getOffset(this.options.rightTurretOffset);
-                new s.Turret({
-                    HUD: this.HUD,
+                var bulletRight = new s.Turret({
                     game: this.game,
-                    pilot: this.game.pilot.name,
+                    pilot: this.name,
                     position: position,
                     rotation: rotation,
                     initialVelocity: initialVelocity,
                     team: this.alliance
                 });
-                this.game.handleFire({
-                    position: position,
-                    rotation: rotation,
-                    initialVelocity: initialVelocity
-                });
+                this.game.botBulletMap[bulletRight.root.id] = bulletRight;
+                if (this.game.firstPlayer) {
+                    this.game.handleBotFire({
+                        position: position,
+                        rotation: rotation,
+                        initialVelocity: initialVelocity,
+                        name: this.name,
+                        id: bulletLeft.root.id
+                    });
+                }
 
                 this.lastTurretFire = now;
 
@@ -380,7 +388,7 @@ s.Ship = new Class({
         //////////////////////////////
 
         if ( Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && totalDistance < maxDistance) {
-            this.fire('turret');
+            this.botFire('turret');
         }
 
     }

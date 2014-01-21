@@ -91,6 +91,8 @@ s.Comm = new Class( {
 
         this.socket.on('bot positions', this.makeTrigger( 'bot positions' ));
 
+        this.socket.on('verify botFire', this.makeTrigger( 'verify botFire' ));
+
 
 
 
@@ -240,5 +242,34 @@ s.Comm = new Class( {
 
     botInfo: function(message) {
         this.socket.emit('botInfo', message);
+    },
+
+    botHit: function( yourName, botName ) {
+
+        this.time = 0;
+
+        this.socket.emit( 'botHit', {
+
+            yourName: yourName,
+            
+            botName: botName
+
+        });
+    },
+
+    botFire: function(pos, rot, velocity, name, id) {
+        this.socket.emit( 'botFire', {
+            
+            position: pos,
+
+            rotation: rot,
+
+            initialVelocity: velocity,
+
+            name: name,
+
+            id: id
+
+        });
     }
 } );

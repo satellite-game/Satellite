@@ -184,6 +184,17 @@ io.sockets.on('connection', function (socket) {
             });
     });
 
+    socket.on('botHit', function(message) {
+        socket.broadcast.emit('hit', {
+            otherPlayerName: message.yourName,
+            yourName: message.botName
+        });
+        socket.emit('hit', {
+            otherPlayerName: message.yourName,
+            yourName: message.botName
+        });
+    });
+
     socket.on('killed', function(message) {
             socket.broadcast.emit('killed', {
                 killed: message.you,
@@ -205,6 +216,15 @@ io.sockets.on('connection', function (socket) {
     socket.on('botInfo', function(message) {
         var lastClient = clients[clients.length - 1];
         io.sockets.socket(lastClient).emit('bot positions', message);
+    });
+
+    socket.on('botFire', function(message) {
+        socket.broadcast.emit('verify botFire', {
+            name: message.name,
+            position: message.position,
+            rotation: message.rotation,
+            initialVelocity: message.initialVelocity
+        });
     });
 
 });
