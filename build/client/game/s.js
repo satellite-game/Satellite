@@ -47747,8 +47747,9 @@ var s = {
         // Create a model loader
         s.loader = new THREE.JSONLoader();
 
-        // Create game
+        var room = prompt('room?');
         s.game = new s.SatelliteGame();
+        s.game.room = room;
     }
 };
 
@@ -49948,6 +49949,8 @@ s.Radar = new Class({
         ///////////////////
         // ENEMY MARKERS //
         ///////////////////
+
+        // todo: add elevation lines to enemy markers
         var enemyGeo = [], enemyMarker = [];
         radar.enemyCount = 0;
         for (var i = 0, len = that.enemies.list().length; i < len; i++){
@@ -50174,7 +50177,6 @@ s.Comm = new Class( {
 
 
     makeTrigger: function ( evt ) {
-
         var that = this;
 
         return function ( message ) {
@@ -50209,6 +50211,8 @@ s.Comm = new Class( {
 
         this.pilot = options.pilot;
 
+        this.room = options.room;
+
         var that = this;
 
 
@@ -50233,12 +50237,13 @@ s.Comm = new Class( {
 
         this.socket.on( 'move', this.makeTrigger( 'move' ) );
 
-        this.socket.on('killed', this.makeTrigger( 'killed' ));
+        this.socket.on(' killed', this.makeTrigger( 'killed' ));
 
-        this.socket.on('fire', this.makeTrigger( 'fire' ));
+        this.socket.on( 'fire', this.makeTrigger( 'fire' ));
 
-        this.socket.on('hit', this.makeTrigger( 'hit' ));
+        this.socket.on( 'hit', this.makeTrigger( 'hit' ));
 
+        this.socket.on( 'sync', this.makeTrigger( 'sync'));
 
         this.game.hook( this.position );
 
@@ -50258,8 +50263,8 @@ s.Comm = new Class( {
 
 
         var shipPosition = this.game.player.getPositionPacket( );
-
         var packet = {
+            room: this.room,
 
             evt: 'joined',
 
@@ -50273,14 +50278,14 @@ s.Comm = new Class( {
 
             aVeloc: shipPosition.aVeloc,
 
-            lVeloc: shipPosition.lVeloc
+            lVeloc: shipPosition.lVeloc,
 
         };
 
 
         // Broadcast position
 
-        this.socket.emit( 'join', packet );
+        this.socket.emit('join', packet );
 
     },
 
@@ -50292,7 +50297,7 @@ s.Comm = new Class( {
 
         // Never send faster than server can handle
 
-        if ( time - s.game.comm.lastMessageTime >= 15 ) {
+        if ( time - s.game.comm.lastMessageTime >= 1000 ) {
 
             var shipPosition = s.game.player.getPositionPacket( );
 
@@ -50323,8 +50328,8 @@ s.Comm = new Class( {
 
                 // Broadcast position
 
-
-                s.game.comm.socket.emit( 'move', packet );
+                
+                s.game.comm.socket.emit( 'combat','move', packet );
 
                 s.game.comm.lastMessageTime = time;
 
@@ -50339,7 +50344,7 @@ s.Comm = new Class( {
 
         this.time = 0;
 
-        this.socket.emit( 'fire', {
+        this.socket.emit( 'combat','fire', {
 
             position: pos,
 
@@ -50353,7 +50358,7 @@ s.Comm = new Class( {
 
     died: function( you, killer ) {
 
-        this.socket.emit( 'killed',{
+        this.socket.emit( 'player','killed',{
 
             you: you,
 
@@ -50368,7 +50373,7 @@ s.Comm = new Class( {
 
         this.time = 0;
 
-        this.socket.emit( 'hit', {
+        this.socket.emit( 'combat','hit', {
 
             otherPlayerName: otherPlayerName,
 
@@ -50384,6 +50389,7 @@ s.Comm = new Class( {
         // }
     }
 } );
+
 s.LoadScreen = new Class( {
 
 	construct: function(){
@@ -50720,7 +50726,6 @@ s.SatelliteGame = new Class( {
 
 	initialize: function() {
 		var that = this;
-
         this.IDs = [];
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
 		// No gravity
@@ -50746,7 +50751,6 @@ s.SatelliteGame = new Class( {
 
         this.pilot = {};
         this.callsigns = this.callsigns || ["Apollo","Strobe","Sage","Polkadot","Moonglow","Steel","Vanguard","Prong","Uptight","Blackpony","Hawk","Ramrod","Dice","Falcon","Rap","Buckshot","Cobra","Magpie","Warhawk","Boxer","Devil","Hammer","Phantom","Sharkbait","Dusty","Icon","Blade","Pedro","Stinger","Yellow Jacket","Limit","Sabre","Misty","Whiskey","Dice","Antic","Arrow","Auto","Avalon","Bandit","Banshee","Blackjack","Bulldog","Caesar","Cajun","Challenger","Chuggs","Cindy","Cracker","Dagger","Dino","Esso","Express","Fangs","Fighting Freddie","Freight Train","Freemason","Fury","Gamma","Gear","Ghost","Ginger","Greasy","Havoc","Hornet","Husky","Jackal","Jaguar","Jedi","Jazz","Jester","Knife","Kitty Hawk","Knight","Knightrider","Koala","Komono","Lancer","Lexus","Lion","Levi","Lucid","Malty","Mail Truck","Magma","Magnet","Malibu","Medusa","Maul","Monster","Misfit","Moss","Moose","Mustang","Nail","Nasa","Nacho","Nighthawk","Ninja","Neptune","Odin","Occult","Nukem","Ozark","Pagan","Pageboy","Panther","Peachtree","Phenom","Polestar","Punisher","Ram","Rambo","Raider","Raven","Razor","Rupee","Sabre","Rust","Ruin","Sultan","Savor","Scandal","Scorpion","Shooter","Smokey","Sniper","Spartan","Thunder","Titus","Titan","Timber Wolf","Totem","Trump","Venom","Veil","Viper","Weasel","Warthog","Winter","Wiki","Wild","Yonder","Yogi","Yucca","Zeppelin","Zeus","Zesty"];
-
         this.pilot.name = this.callsigns[Math.floor(this.callsigns.length*Math.random())] + ' ' + ( new Date( ).getTime( ) % 100 );
         // Add a ship
         this.HUD = new s.HUD( {
@@ -50902,6 +50906,7 @@ s.SatelliteGame = new Class( {
 
 
         this.comm = new s.Comm( {
+            room: this.room,
             game: that,
             pilot: that.pilot,
             player: this.player,
@@ -50915,6 +50920,7 @@ s.SatelliteGame = new Class( {
         this.comm.on( 'join', that.handleJoin );
         this.comm.on( 'leave', that.handleLeave );
         this.comm.on( 'move', that.handleMove );
+        this.comm.on( 'sync', that.handleSync);
 
         this.HUD.controls = this.controls;
 
@@ -51004,6 +51010,7 @@ s.SatelliteGame = new Class( {
     },
 
     handleJoin: function ( message ) {
+           console.log("Received a join");
            s.game.enemies.add( message );
     },
     handleLeave: function ( message ) {
@@ -51012,6 +51019,7 @@ s.SatelliteGame = new Class( {
         }
     },
     handleMove: function ( message ) {
+        
         if ( message.name == this.pilot.name ) {
             // server told us to move
             console.log( 'Server reset position' );
@@ -51024,6 +51032,18 @@ s.SatelliteGame = new Class( {
                 s.game.enemies.add( message );
             }
         }
+    },
+    handleSync: function ( pak ) {
+      console.log("A sync request has been made by the server!");
+      console.log("This is enemies", s.game.enemies);
+      console.log("This is enemies trying to map...", s.game.enemies.list());
+      //if our value does not match 
+      // realign ourselves with Handlemove , take the difference add it to the velocity
+      // realign all enemies with HandleMove, take the difference add it to the velocity .
+      var moveSelf = function( self ) {};
+      var setCoords = function( entity ) {};
+      var adjustVel = function( entity ) {};
+      var checkDiff = function( client, server ) {};
     },
 
     handlePlayerList: function(message) {
