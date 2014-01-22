@@ -460,40 +460,6 @@ s.SatelliteGame = new Class( {
 
     },
 
-    makeNewBot: function(options) {
-        
-        // If no options passed, set options to empty object and default values for position and rotation
-        options = options || {};
-
-        this.botCount = options.botCount || ++this.botCount;
-        this.botBulletCount = options.botBulletCount || this.botBulletCount;
-
-        // Generating a new bot with properties
-        var botName = options.name || 'bot ' + this.botCount;
-        var position = options.position || [22498, -25902, 24976];
-        var rotation = options.rotation || [0, Math.PI / 2, 0];
-        var lVeloc = options.lVeloc || [0, 0, 0];
-        var aVeloc = options.aVeloc || [0, 0, 0];
-
-        this[botName] = new s.Bot( {
-            name: botName,
-            position: [ position[0], position[1], position[2] ],
-            rotation: [ rotation[0], rotation[1], rotation[2] ],
-            lVeloc: lVeloc,
-            aVeloc: aVeloc
-        } );
-        
-        // Create bot and add it to enemies list
-        this.enemies.add( {
-            aVeloc: this[botName].aVeloc,
-            lVeloc: this[botName].lVeloc,
-            interp: this[botName].interp,
-            name: this[botName].name,
-            pos: this[botName].pos,
-            rot: this[botName].rot
-        });
-    },
-
     shieldBoost: function(){
         s.game.IDs.push(setInterval(s.game.shieldAnimate,20));
     },
@@ -533,6 +499,40 @@ s.SatelliteGame = new Class( {
 
     handleLoadMessages: function(message){
         s.game.loadScreen.setMessage(message);
+    },
+
+    makeNewBot: function(options) {
+        
+        // If no options passed, set options to empty object and default values for position and rotation
+        options = options || {};
+
+        this.botCount = options.botCount || ++this.botCount;
+        this.botBulletCount = options.botBulletCount || this.botBulletCount;
+
+        // Generating a new bot with properties
+        var botName = options.name || 'bot ' + this.botCount;
+        var position = options.position || [22498, -25902, 24976];
+        var rotation = options.rotation || [0, Math.PI / 2, 0];
+        var lVeloc = options.lVeloc || [0, 0, 0];
+        var aVeloc = options.aVeloc || [0, 0, 0];
+
+        this[botName] = new s.Bot( {
+            name: botName,
+            position: [ position[0], position[1], position[2] ],
+            rotation: [ rotation[0], rotation[1], rotation[2] ],
+            lVeloc: lVeloc,
+            aVeloc: aVeloc
+        } );
+        
+        // Create bot and add it to enemies list
+        this.enemies.add( {
+            aVeloc: this[botName].aVeloc,
+            lVeloc: this[botName].lVeloc,
+            interp: this[botName].interp,
+            name: this[botName].name,
+            pos: this[botName].pos,
+            rot: this[botName].rot
+        });
     },
 
     //this function only gets called if client is the first player
