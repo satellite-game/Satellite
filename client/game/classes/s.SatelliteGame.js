@@ -31,6 +31,7 @@ s.SatelliteGame = new Class( {
         this.lastBotCallback = null;
         this.IDs = [];
         this.botCount = 0;
+        this.botBulletCount = 0;
         this.botBulletMap = {};
         this.firstPlayer = false;
 
@@ -468,6 +469,7 @@ s.SatelliteGame = new Class( {
         options = options || {};
 
         this.botCount = options.botCount || ++this.botCount;
+        this.botBulletCount = options.botBulletCount || this.botBulletCount;
 
         // Generating a new bot with properties
         var botName = options.name || 'bot ' + this.botCount;
@@ -587,7 +589,8 @@ s.SatelliteGame = new Class( {
                     aVeloc: aVeloc,
                     lVeloc: lVeloc,
                     name: name,
-                    botCount: this.botCount
+                    botCount: this.botCount,
+                    botBulletCount: this.botBulletCount
                 };
             }
         }
@@ -617,9 +620,11 @@ s.SatelliteGame = new Class( {
         var name = message.name;
         var id = message.id;
 
-        if (botBulletMap[id]) {
+
+        if (this.game.botBulletMap[id]) {
             this.interpolateBotBulletFire(bulletPosition, bulletRotation, initialVelocity, id);
         } else {
+            this.botBulletCount = id;
             new s.Turret({
                 pilot: name,
                 game: s.game,
