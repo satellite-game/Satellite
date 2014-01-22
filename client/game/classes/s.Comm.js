@@ -89,6 +89,9 @@ s.Comm = new Class( {
         this.socket.on( 'hit', this.makeTrigger( 'hit' ));
 
         this.socket.on( 'sync', this.makeTrigger( 'sync'));
+        //////////////////
+        this.socket.on( 'keySync', function () {console.log(arguments);});
+        //////////////////
 
         this.game.hook( this.position );
 
