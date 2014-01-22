@@ -1,6 +1,6 @@
 {
   "name": "Satellite",
-  "main": "app.js",
+  "main": "server/app.js",
   "version": "0.0.0-1",
   "private": true,
   "homepage": "https://lazd.github.com/Satellite",
@@ -54,7 +54,7 @@
     "path": "~0.4.9"
   },
   "scripts": {
-    "start": "node app.js",
+    "start": "node server/app.js",
     "test": "grunt travisCI --single-run"
   },
   "subdomain": "lockon"
