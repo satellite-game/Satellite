@@ -61,6 +61,7 @@ io.sockets.on('connection', function (socket) {
     var ip = socket.handshake.address.address;
     console.log("New connection from " + address.address + ":" + process.env.PORT);
 
+    console.log('new socket ID: ', socket.id);
     clients.push(socket.id);
 
     // Setup message handlers
@@ -119,7 +120,6 @@ io.sockets.on('connection', function (socket) {
                 aVeloc: message.aVeloc,
                 lVeloc: message.lVeloc
             });
-
             io.sockets.socket(clients[0]).emit("bot retrieval");
         });
     });
@@ -198,6 +198,7 @@ io.sockets.on('connection', function (socket) {
         });
         var idx = clients.indexOf(socket.id);
         clients.splice(idx, 1);
+        io.sockets.socket(clients[0]).emit("bot retrieval");
     });
 
     socket.on('fire', function(message) {
@@ -218,6 +219,8 @@ io.sockets.on('connection', function (socket) {
 
 
     socket.on('botUpdate', function(message) {
+        console.log('the person sending out bot updates is:', socket.id);
+        console.log('the clients array is: ', clients);
         socket.broadcast.emit('bot positions', message);
     });
 
