@@ -32,9 +32,8 @@ s.Keyboard = new Class({
     65  : 'a',
     83  : 's',
     68  : 'd',
-    192 : 'backtick',
+    192 : 'tilde',
     16  : 'shift',
-    192 : 'tilde'
   },
 
   modifiers: ['shift', 'ctrl', 'alt', 'meta'],
