@@ -192,9 +192,9 @@ io.sockets.on('connection', function (socket) {
     });
 
     socket.on('killed', function(message) {
-            socket.broadcast.emit('killed', {
-                killed: message.you,
-                killer: message.killer
+        socket.broadcast.emit('killed', {
+            killed: message.you,
+            killer: message.killer
         });
     });
 
