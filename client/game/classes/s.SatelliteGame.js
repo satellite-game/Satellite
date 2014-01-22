@@ -450,6 +450,7 @@ s.SatelliteGame = new Class( {
         if (!you) {
             return;
         }
+        if (this.firstPlayer) { clearInterval(this.botPositionInterval); }
         s.game.stop();
         var HUD = s.game.HUD;
         HUD.ctx.fillStyle = "rgba(0,0,0,0.5)";
@@ -544,7 +545,7 @@ s.SatelliteGame = new Class( {
         var that = this;
         if (!this.game.firstPlayer) {
             //this the first time this function has been called with this client
-            setInterval(function() {
+            this.game.botPositionInterval = setInterval(function() {
                 updatePlayersWithBots.call(that);
             }, 2500);
         }
