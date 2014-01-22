@@ -1,5 +1,5 @@
 todo.md
-[ ] collect players on server side by room
+[x] collect players on server side by room
 [ ] alter a player's speed to a different point in the map
 [ ] ensure that the interprolation is working correctly
 [ ] increase the players position by the controls
