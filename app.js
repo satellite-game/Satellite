@@ -218,9 +218,6 @@ io.sockets.on('connection', function (socket) {
         io.sockets.socket(lastClient).emit('bot positions', message);
     });
 
-    socket.on('botFire', function(message) {
-        socket.broadcast.emit('verify botFire', message);
-    });
 
     socket.on('botUpdate', function(message) {
         socket.broadcast.emit('bot positions', message);
