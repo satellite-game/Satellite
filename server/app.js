@@ -26,13 +26,13 @@ console.log(url);
 io.set('log level', 2);
 
 // give the client access to all client files
-app.use(express.static(path.join(__dirname, '/build/client')));
+app.use(express.static(path.join(__dirname, '../build/client')));
 
 // serving the main applicaion file (index.html)
 // when a client makes a request to the app root
 // http://localhost:1337
 app.get('/', function (req, res) {
-    res.sendfile(path.join(__dirname, '/build/client/index.html'));
+    res.sendfile(path.join(__dirname, '../build/client/index.html'));
 });
 
 // Holds players
