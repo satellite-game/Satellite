@@ -90,7 +90,7 @@ s.Comm = new Class( {
 
         this.socket.on( 'sync', this.makeTrigger( 'sync'));
         //////////////////
-        this.socket.on( 'keySync', function () {console.log(arguments);});
+        this.socket.on( 'keySync', function (data) {console.log(data.pos);});
         //////////////////
 
         this.game.hook( this.position );
