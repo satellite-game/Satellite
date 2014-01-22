@@ -48267,7 +48267,6 @@ s.Projectile = new Class({
         var that = this;
         // Destory projectile after 4 secs
         setTimeout(function(){
-            delete that.game.botBulletMap[that.root.id];
             that.destruct();
         }, 4000);
     },
@@ -48297,7 +48296,6 @@ s.Projectile = new Class({
         } else if (mesh.name === this.game.pilot.name && this.pilot.slice(0,3) === 'bot' ) {
             this.comm.botHit(mesh.name,this.game.pilot.name);
         }
-        delete this.game.botBulletMap[this.root.id];
         this.destruct();
     },
 
@@ -48567,17 +48565,6 @@ s.Ship = new Class({
                     initialVelocity: initialVelocity,
                     team: this.alliance
                 });
-                // this.game.botBulletCount++;
-                // this.game.botBulletMap[this.game.botBulletCount] = bulletLeft;
-                // if (this.game.firstPlayer) {
-                //     this.game.handleBotFire({
-                //         position: position,
-                //         rotation: rotation,
-                //         initialVelocity: initialVelocity,
-                //         name: this.name,
-                //         id: this.game.botBulletCount
-                //     });
-                // }
 
                 // Right bullet
                 position = this.getOffset(this.options.rightTurretOffset);
@@ -48589,17 +48576,6 @@ s.Ship = new Class({
                     initialVelocity: initialVelocity,
                     team: this.alliance
                 });
-                // this.game.botBulletCount++;
-                // this.game.botBulletMap[this.game.botBulletCount] = bulletRight;
-                // if (this.game.firstPlayer) {
-                //     this.game.handleBotFire({
-                //         position: position,
-                //         rotation: rotation,
-                //         initialVelocity: initialVelocity,
-                //         name: this.name,
-                //         id: this.game.botBulletCount
-                //     });
-                // }
 
                 this.lastTurretFire = now;
 
@@ -50514,8 +50490,6 @@ s.Comm = new Class( {
 
         this.socket.on('bot positions', this.makeTrigger( 'bot positions' ));
 
-        // this.socket.on('verify botFire', this.makeTrigger( 'verify botFire' ));
-
 
 
 
@@ -50679,22 +50653,6 @@ s.Comm = new Class( {
 
         });
     },
-
-    // botFire: function(pos, rot, velocity, name, id) {
-    //     this.socket.emit( 'botFire', {
-            
-    //         position: pos,
-
-    //         rotation: rot,
-
-    //         initialVelocity: velocity,
-
-    //         name: name,
-
-    //         id: id
-
-    //     });
-    // },
 
     botUpdate: function(enemies) {
         this.socket.emit( 'botUpdate', enemies);
@@ -51039,11 +50997,8 @@ s.SatelliteGame = new Class( {
 
         //initally set lastBotCallback to null. updated in s.Ship
 
-        this.lastBotCallback = null;
         this.IDs = [];
         this.botCount = 0;
-        // this.botBulletCount = 0;
-        // this.botBulletMap = {};
         this.firstPlayer = false;
 
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
@@ -51240,7 +51195,6 @@ s.SatelliteGame = new Class( {
         this.comm.on( 'move', that.handleMove );
         this.comm.on( 'bot retrieval', that.handleBotInfo );
         this.comm.on( 'bot positions', that.handleBotPositions );
-        // this.comm.on( 'verify botFire', that.verifyBotFire );
 
         this.HUD.controls = this.controls;
 
@@ -51465,6 +51419,7 @@ s.SatelliteGame = new Class( {
         if (!you) {
             return;
         }
+        if (this.firstPlayer) { clearInterval(this.botPositionInterval); }
         s.game.stop();
         var HUD = s.game.HUD;
         HUD.ctx.fillStyle = "rgba(0,0,0,0.5)";
@@ -51472,40 +51427,6 @@ s.SatelliteGame = new Class( {
         HUD.ctx.drawImage(HUD.gameOver,HUD.canvas.width/2 - HUD.gameOver.width/2,HUD.canvas.height/2 - HUD.gameOver.height/2);
         s.game.comm.died(you, killer);
 
-    },
-
-    makeNewBot: function(options) {
-        
-        // If no options passed, set options to empty object and default values for position and rotation
-        options = options || {};
-
-        this.botCount = options.botCount || ++this.botCount;
-        this.botBulletCount = options.botBulletCount || this.botBulletCount;
-
-        // Generating a new bot with properties
-        var botName = options.name || 'bot ' + this.botCount;
-        var position = options.position || [22498, -25902, 24976];
-        var rotation = options.rotation || [0, Math.PI / 2, 0];
-        var lVeloc = options.lVeloc || [0, 0, 0];
-        var aVeloc = options.aVeloc || [0, 0, 0];
-
-        this[botName] = new s.Bot( {
-            name: botName,
-            position: [ position[0], position[1], position[2] ],
-            rotation: [ rotation[0], rotation[1], rotation[2] ],
-            lVeloc: lVeloc,
-            aVeloc: aVeloc
-        } );
-        
-        // Create bot and add it to enemies list
-        this.enemies.add( {
-            aVeloc: this[botName].aVeloc,
-            lVeloc: this[botName].lVeloc,
-            interp: this[botName].interp,
-            name: this[botName].name,
-            pos: this[botName].pos,
-            rot: this[botName].rot
-        });
     },
 
     shieldBoost: function(){
@@ -51549,6 +51470,40 @@ s.SatelliteGame = new Class( {
         s.game.loadScreen.setMessage(message);
     },
 
+    makeNewBot: function(options) {
+        
+        // If no options passed, set options to empty object and default values for position and rotation
+        options = options || {};
+
+        this.botCount = options.botCount || ++this.botCount;
+        this.botBulletCount = options.botBulletCount || this.botBulletCount;
+
+        // Generating a new bot with properties
+        var botName = options.name || 'bot ' + this.botCount;
+        var position = options.position || [22498, -25902, 24976];
+        var rotation = options.rotation || [0, Math.PI / 2, 0];
+        var lVeloc = options.lVeloc || [0, 0, 0];
+        var aVeloc = options.aVeloc || [0, 0, 0];
+
+        this[botName] = new s.Bot( {
+            name: botName,
+            position: [ position[0], position[1], position[2] ],
+            rotation: [ rotation[0], rotation[1], rotation[2] ],
+            lVeloc: lVeloc,
+            aVeloc: aVeloc
+        } );
+        
+        // Create bot and add it to enemies list
+        this.enemies.add( {
+            aVeloc: this[botName].aVeloc,
+            lVeloc: this[botName].lVeloc,
+            interp: this[botName].interp,
+            name: this[botName].name,
+            pos: this[botName].pos,
+            rot: this[botName].rot
+        });
+    },
+
     //this function only gets called if client is the first player
     handleBotInfo: function() {
         var updatePlayersWithBots = function() {
@@ -51559,7 +51514,7 @@ s.SatelliteGame = new Class( {
         var that = this;
         if (!this.game.firstPlayer) {
             //this the first time this function has been called with this client
-            setInterval(function() {
+            this.game.botPositionInterval = setInterval(function() {
                 updatePlayersWithBots.call(that);
             }, 2500);
         }
@@ -51601,7 +51556,6 @@ s.SatelliteGame = new Class( {
                     lVeloc: lVeloc,
                     name: name,
                     botCount: this.botCount
-                    // botBulletCount: this.botBulletCount
                 };
             }
         }
@@ -51619,48 +51573,5 @@ s.SatelliteGame = new Class( {
             }
         }
     },
-
-    // handleBotFire: function(props) {
-    //     s.game.comm.botFire(props.position, props.rotation, props.initialVelocity, props.name, props.id);
-    // },
-
-    // verifyBotFire: function(message) {
-    //     var bulletPosition = message.position;
-    //     var bulletRotation = message.rotation;
-    //     var initialVelocity = message.initialVelocity;
-    //     var name = message.name;
-    //     var id = message.id;
-
-
-    //     if (this.game.botBulletMap[id]) {
-    //         this.interpolateBotBulletFire(bulletPosition, bulletRotation, initialVelocity, id);
-    //     } else {
-    //         this.botBulletCount = id;
-    //         new s.Turret({
-    //             pilot: name,
-    //             game: s.game,
-    //             position: bulletPosition,
-    //             rotation: bulletRotation,
-    //             initialVelocity: initialVelocity,
-    //             id: id,
-    //             team: 'enemy'
-    //         });
-    //     }
-    // },
-
-    // interpolateBotBulletFire: function(pos, rot, veloc, id) {
-    //     var posInterpolation = 0.05;
-    //     var rotInterpolation = 0.50;
-    //     var turret = botBulletMap[id].root;
-
-    //     // Interpolate position by adding the difference of the calculated position and the position sent by the authoritative client
-    //     var newPositionVec = new THREE.Vector3(pos[0], pos[1], pos[2]);
-    //     var posErrorVec = newPositionVec.sub(turret.position).multiply(new THREE.Vector3(posInterpolation, posInterpolation, posInterpolation));
-    //     turret.position.add(posErrorVec);
-
-    //     //set rotation and velocity
-    //     turrret.rotation.set(rot[0], rot[1], rot[2]);
-    //     turret.setLinearVelocity({ x: veloc[0], y: veloc[1], z: veloc[2] });
-    // }
 
 } );

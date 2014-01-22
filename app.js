@@ -196,6 +196,8 @@ io.sockets.on('connection', function (socket) {
             killed: message.you,
             killer: message.killer
         });
+        var idx = clients.indexOf(socket.id);
+        clients.splice(idx, 1);
     });
 
     socket.on('fire', function(message) {
