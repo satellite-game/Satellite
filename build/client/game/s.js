@@ -50490,8 +50490,6 @@ s.Comm = new Class( {
 
         this.socket.on('bot positions', this.makeTrigger( 'bot positions' ));
         
-        // this.socket.on('clientList', this.makeTrigger( 'clientList' ));
-
 
 
 
@@ -51001,7 +50999,7 @@ s.SatelliteGame = new Class( {
 
         this.IDs = [];
         this.botCount = 0;
-        this.firstPlayer = false;
+        this.hostPlayer = false;
 
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
 		// No gravity
@@ -51197,7 +51195,6 @@ s.SatelliteGame = new Class( {
         this.comm.on( 'move', that.handleMove );
         this.comm.on( 'bot retrieval', that.handleBotInfo );
         this.comm.on( 'bot positions', that.handleBotPositions );
-        // this.comm.on( 'clientList', that.setClientList );
 
         this.HUD.controls = this.controls;
 
@@ -51422,7 +51419,7 @@ s.SatelliteGame = new Class( {
         if (!you) {
             return;
         }
-        if (this.firstPlayer) { clearInterval(this.botPositionInterval); }
+        if (this.hostPlayer) { clearInterval(this.botPositionInterval); }
         s.game.stop();
         var HUD = s.game.HUD;
         HUD.ctx.fillStyle = "rgba(0,0,0,0.5)";
@@ -51515,14 +51512,14 @@ s.SatelliteGame = new Class( {
         };
         
         var that = this;
-        if (!this.game.firstPlayer) {
+        if (!this.game.hostPlayer) {
             //this the first time this function has been called with this client
             this.game.botPositionInterval = setInterval(function() {
                 updatePlayersWithBots.call(that);
             }, 2500);
         }
 
-        this.game.firstPlayer = true;
+        this.game.hostPlayer = true;
         if (this.game.botCount === 0) {
             // Create a new bot
             this.game.makeNewBot();
@@ -51575,10 +51572,6 @@ s.SatelliteGame = new Class( {
                 this.game.makeNewBot(message[bot]);
             }
         }
-    },
-
-    // setClientList: function(message) {
-    //     this.game.clientList = message.list;
-    // }
+    }
 
 } );

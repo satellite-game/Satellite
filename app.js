@@ -34,7 +34,9 @@ app.get('/', function (req, res) {
 
 // Holds players
 var players = {};
-var clients = [];
+var clients = {};
+var hostPlayer;
+var lastClient;
 
 var mapItems = [
     { type: 'Alien Space Station', pos: [0, 1000], rot: 0, hp: 100 },
@@ -62,7 +64,8 @@ io.sockets.on('connection', function (socket) {
     console.log("New connection from " + address.address + ":" + process.env.PORT);
 
     console.log('new socket ID: ', socket.id);
-    clients.push(socket.id);
+    clients[socket.id] = true;
+    lastClient = socket.id;
 
     // Setup message handlers
     socket.on('join', function(message) {
@@ -120,7 +123,13 @@ io.sockets.on('connection', function (socket) {
                 aVeloc: message.aVeloc,
                 lVeloc: message.lVeloc
             });
-            io.sockets.socket(clients[0]).emit("bot retrieval");
+            for (var key in clients) {
+                if (!hostPlayer) {
+                    hostPlayer = key;
+                }
+                break;
+            }
+            io.sockets.socket(hostPlayer).emit("bot retrieval");
         });
     });
 
@@ -128,8 +137,14 @@ io.sockets.on('connection', function (socket) {
         socket.get('name', function (err, name) {
             console.log(name+' dropped');
 
-            var idx = clients.indexOf(socket.id);
-            clients.splice(idx, 1);
+            delete clients[socket.id];
+            if (hostPlayer === socket.id) {
+                for (var key in clients) {
+                    hostPlayer = key;
+                    io.sockets.socket(hostPlayer).emit("bot retrieval");
+                    break;
+                }
+            }
 
             // Remove from client list
             delete players[name];
@@ -196,9 +211,14 @@ io.sockets.on('connection', function (socket) {
             killed: message.you,
             killer: message.killer
         });
-        var idx = clients.indexOf(socket.id);
-        clients.splice(idx, 1);
-        io.sockets.socket(clients[0]).emit("bot retrieval");
+        delete clients[socket.id];
+        if (hostPlayer === socket.id) {
+            for (var key in clients) {
+                hostPlayer = key;
+                break;
+            }
+        }
+        io.sockets.socket(hostPlayer).emit("bot retrieval");
     });
 
     socket.on('fire', function(message) {
@@ -213,14 +233,11 @@ io.sockets.on('connection', function (socket) {
     });
 
     socket.on('botInfo', function(message) {
-        var lastClient = clients[clients.length - 1];
         io.sockets.socket(lastClient).emit('bot positions', message);
     });
 
 
     socket.on('botUpdate', function(message) {
-        console.log('the person sending out bot updates is:', socket.id);
-        console.log('the clients array is: ', clients);
         socket.broadcast.emit('bot positions', message);
     });
 
