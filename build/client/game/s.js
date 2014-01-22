@@ -48567,17 +48567,17 @@ s.Ship = new Class({
                     initialVelocity: initialVelocity,
                     team: this.alliance
                 });
-                this.game.botBulletCount++;
-                this.game.botBulletMap[this.game.botBulletCount] = bulletLeft;
-                if (this.game.firstPlayer) {
-                    this.game.handleBotFire({
-                        position: position,
-                        rotation: rotation,
-                        initialVelocity: initialVelocity,
-                        name: this.name,
-                        id: this.game.botBulletCount
-                    });
-                }
+                // this.game.botBulletCount++;
+                // this.game.botBulletMap[this.game.botBulletCount] = bulletLeft;
+                // if (this.game.firstPlayer) {
+                //     this.game.handleBotFire({
+                //         position: position,
+                //         rotation: rotation,
+                //         initialVelocity: initialVelocity,
+                //         name: this.name,
+                //         id: this.game.botBulletCount
+                //     });
+                // }
 
                 // Right bullet
                 position = this.getOffset(this.options.rightTurretOffset);
@@ -48589,17 +48589,17 @@ s.Ship = new Class({
                     initialVelocity: initialVelocity,
                     team: this.alliance
                 });
-                this.game.botBulletCount++;
-                this.game.botBulletMap[this.game.botBulletCount] = bulletRight;
-                if (this.game.firstPlayer) {
-                    this.game.handleBotFire({
-                        position: position,
-                        rotation: rotation,
-                        initialVelocity: initialVelocity,
-                        name: this.name,
-                        id: this.game.botBulletCount
-                    });
-                }
+                // this.game.botBulletCount++;
+                // this.game.botBulletMap[this.game.botBulletCount] = bulletRight;
+                // if (this.game.firstPlayer) {
+                //     this.game.handleBotFire({
+                //         position: position,
+                //         rotation: rotation,
+                //         initialVelocity: initialVelocity,
+                //         name: this.name,
+                //         id: this.game.botBulletCount
+                //     });
+                // }
 
                 this.lastTurretFire = now;
 
@@ -50514,7 +50514,7 @@ s.Comm = new Class( {
 
         this.socket.on('bot positions', this.makeTrigger( 'bot positions' ));
 
-        this.socket.on('verify botFire', this.makeTrigger( 'verify botFire' ));
+        // this.socket.on('verify botFire', this.makeTrigger( 'verify botFire' ));
 
 
 
@@ -50680,21 +50680,21 @@ s.Comm = new Class( {
         });
     },
 
-    botFire: function(pos, rot, velocity, name, id) {
-        this.socket.emit( 'botFire', {
+    // botFire: function(pos, rot, velocity, name, id) {
+    //     this.socket.emit( 'botFire', {
             
-            position: pos,
+    //         position: pos,
 
-            rotation: rot,
+    //         rotation: rot,
 
-            initialVelocity: velocity,
+    //         initialVelocity: velocity,
 
-            name: name,
+    //         name: name,
 
-            id: id
+    //         id: id
 
-        });
-    },
+    //     });
+    // },
 
     botUpdate: function(enemies) {
         this.socket.emit( 'botUpdate', enemies);
@@ -51042,8 +51042,8 @@ s.SatelliteGame = new Class( {
         this.lastBotCallback = null;
         this.IDs = [];
         this.botCount = 0;
-        this.botBulletCount = 0;
-        this.botBulletMap = {};
+        // this.botBulletCount = 0;
+        // this.botBulletMap = {};
         this.firstPlayer = false;
 
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
@@ -51240,7 +51240,7 @@ s.SatelliteGame = new Class( {
         this.comm.on( 'move', that.handleMove );
         this.comm.on( 'bot retrieval', that.handleBotInfo );
         this.comm.on( 'bot positions', that.handleBotPositions );
-        this.comm.on( 'verify botFire', that.verifyBotFire );
+        // this.comm.on( 'verify botFire', that.verifyBotFire );
 
         this.HUD.controls = this.controls;
 
@@ -51600,8 +51600,8 @@ s.SatelliteGame = new Class( {
                     aVeloc: aVeloc,
                     lVeloc: lVeloc,
                     name: name,
-                    botCount: this.botCount,
-                    botBulletCount: this.botBulletCount
+                    botCount: this.botCount
+                    // botBulletCount: this.botBulletCount
                 };
             }
         }
@@ -51620,47 +51620,47 @@ s.SatelliteGame = new Class( {
         }
     },
 
-    handleBotFire: function(props) {
-        s.game.comm.botFire(props.position, props.rotation, props.initialVelocity, props.name, props.id);
-    },
+    // handleBotFire: function(props) {
+    //     s.game.comm.botFire(props.position, props.rotation, props.initialVelocity, props.name, props.id);
+    // },
 
-    verifyBotFire: function(message) {
-        var bulletPosition = message.position;
-        var bulletRotation = message.rotation;
-        var initialVelocity = message.initialVelocity;
-        var name = message.name;
-        var id = message.id;
+    // verifyBotFire: function(message) {
+    //     var bulletPosition = message.position;
+    //     var bulletRotation = message.rotation;
+    //     var initialVelocity = message.initialVelocity;
+    //     var name = message.name;
+    //     var id = message.id;
 
 
-        if (this.game.botBulletMap[id]) {
-            this.interpolateBotBulletFire(bulletPosition, bulletRotation, initialVelocity, id);
-        } else {
-            this.botBulletCount = id;
-            new s.Turret({
-                pilot: name,
-                game: s.game,
-                position: bulletPosition,
-                rotation: bulletRotation,
-                initialVelocity: initialVelocity,
-                id: id,
-                team: 'enemy'
-            });
-        }
-    },
+    //     if (this.game.botBulletMap[id]) {
+    //         this.interpolateBotBulletFire(bulletPosition, bulletRotation, initialVelocity, id);
+    //     } else {
+    //         this.botBulletCount = id;
+    //         new s.Turret({
+    //             pilot: name,
+    //             game: s.game,
+    //             position: bulletPosition,
+    //             rotation: bulletRotation,
+    //             initialVelocity: initialVelocity,
+    //             id: id,
+    //             team: 'enemy'
+    //         });
+    //     }
+    // },
 
-    interpolateBotBulletFire: function(pos, rot, veloc, id) {
-        var posInterpolation = 0.05;
-        var rotInterpolation = 0.50;
-        var turret = botBulletMap[id].root;
+    // interpolateBotBulletFire: function(pos, rot, veloc, id) {
+    //     var posInterpolation = 0.05;
+    //     var rotInterpolation = 0.50;
+    //     var turret = botBulletMap[id].root;
 
-        // Interpolate position by adding the difference of the calculated position and the position sent by the authoritative client
-        var newPositionVec = new THREE.Vector3(pos[0], pos[1], pos[2]);
-        var posErrorVec = newPositionVec.sub(turret.position).multiply(new THREE.Vector3(posInterpolation, posInterpolation, posInterpolation));
-        turret.position.add(posErrorVec);
+    //     // Interpolate position by adding the difference of the calculated position and the position sent by the authoritative client
+    //     var newPositionVec = new THREE.Vector3(pos[0], pos[1], pos[2]);
+    //     var posErrorVec = newPositionVec.sub(turret.position).multiply(new THREE.Vector3(posInterpolation, posInterpolation, posInterpolation));
+    //     turret.position.add(posErrorVec);
 
-        //set rotation and velocity
-        turrret.rotation.set(rot[0], rot[1], rot[2]);
-        turret.setLinearVelocity({ x: veloc[0], y: veloc[1], z: veloc[2] });
-    }
+    //     //set rotation and velocity
+    //     turrret.rotation.set(rot[0], rot[1], rot[2]);
+    //     turret.setLinearVelocity({ x: veloc[0], y: veloc[1], z: veloc[2] });
+    // }
 
 } );

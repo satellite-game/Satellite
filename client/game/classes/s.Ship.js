@@ -164,17 +164,6 @@ s.Ship = new Class({
                     initialVelocity: initialVelocity,
                     team: this.alliance
                 });
-                this.game.botBulletCount++;
-                this.game.botBulletMap[this.game.botBulletCount] = bulletLeft;
-                if (this.game.firstPlayer) {
-                    this.game.handleBotFire({
-                        position: position,
-                        rotation: rotation,
-                        initialVelocity: initialVelocity,
-                        name: this.name,
-                        id: this.game.botBulletCount
-                    });
-                }
 
                 // Right bullet
                 position = this.getOffset(this.options.rightTurretOffset);
@@ -186,17 +175,6 @@ s.Ship = new Class({
                     initialVelocity: initialVelocity,
                     team: this.alliance
                 });
-                this.game.botBulletCount++;
-                this.game.botBulletMap[this.game.botBulletCount] = bulletRight;
-                if (this.game.firstPlayer) {
-                    this.game.handleBotFire({
-                        position: position,
-                        rotation: rotation,
-                        initialVelocity: initialVelocity,
-                        name: this.name,
-                        id: this.game.botBulletCount
-                    });
-                }
 
                 this.lastTurretFire = now;
 
