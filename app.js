@@ -128,12 +128,8 @@ io.sockets.on('connection', function (socket) {
         socket.get('name', function (err, name) {
             console.log(name+' dropped');
 
-            console.log('socket.id: ',socket.id);
-            // console.log('clients: ', clients);
             var idx = clients.indexOf(socket.id);
-            console.log('index: ', idx);
             clients.splice(idx, 1);
-            console.log(clients);
 
             // Remove from client list
             delete players[name];
