@@ -90,7 +90,7 @@ s.Comm = new Class( {
         this.socket.on('bot retrieval', this.makeTrigger( 'bot retrieval' ));
 
         this.socket.on('bot positions', this.makeTrigger( 'bot positions' ));
-
+        
 
 
 

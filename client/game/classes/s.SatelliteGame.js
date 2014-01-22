@@ -603,6 +603,6 @@ s.SatelliteGame = new Class( {
                 this.game.makeNewBot(message[bot]);
             }
         }
-    },
+    }
 
 } );

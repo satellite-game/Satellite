@@ -50489,6 +50489,8 @@ s.Comm = new Class( {
         this.socket.on('bot retrieval', this.makeTrigger( 'bot retrieval' ));
 
         this.socket.on('bot positions', this.makeTrigger( 'bot positions' ));
+        
+        // this.socket.on('clientList', this.makeTrigger( 'clientList' ));
 
 
 
@@ -51195,6 +51197,7 @@ s.SatelliteGame = new Class( {
         this.comm.on( 'move', that.handleMove );
         this.comm.on( 'bot retrieval', that.handleBotInfo );
         this.comm.on( 'bot positions', that.handleBotPositions );
+        // this.comm.on( 'clientList', that.setClientList );
 
         this.HUD.controls = this.controls;
 
@@ -51573,5 +51576,9 @@ s.SatelliteGame = new Class( {
             }
         }
     },
+
+    // setClientList: function(message) {
+    //     this.game.clientList = message.list;
+    // }
 
 } );
