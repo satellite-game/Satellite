@@ -28,7 +28,6 @@ s.SatelliteGame = new Class( {
 
         //initally set lastBotCallback to null. updated in s.Ship
 
-        this.lastBotCallback = null;
         this.IDs = [];
         this.botCount = 0;
         this.firstPlayer = false;
