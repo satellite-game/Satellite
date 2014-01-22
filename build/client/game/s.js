@@ -48857,6 +48857,23 @@ s.Keyboard = new Class({
     'tilde'   : 192
   },
 
+  keysInv: {
+    37  : 'left',
+    38  : 'up',
+    39  : 'right',
+    40  : 'down',
+    32  : 'space',
+    33  : 'pageup',
+    34  : 'pagedown',
+    9   : 'tab',
+    87  : 'w',
+    65  : 'a',
+    83  : 's',
+    68  : 'd',
+    192 : 'tilde',
+    16  : 'shift',
+  },
+
   modifiers: ['shift', 'ctrl', 'alt', 'meta'],
 
   construct: function(game, player) {
@@ -48865,11 +48882,22 @@ s.Keyboard = new Class({
     // Listen to key events
     window.addEventListener('keydown', this.handleKeyChange.bind(this, true), false);
     window.addEventListener('keyup', this.handleKeyChange.bind(this, false), false);
+    // Listen to key events ___ SYNCED
+    window.addEventListener('keydown', this.socketSendKey.bind(this));
+    window.addEventListener('keyup', this.socketSendKey.bind(this));
   },
 
   destruct: function() {
     window.removeEventListener('keydown', this.handleKeyChange, false);
     window.removeEventListener('keyup', this.handleKeyChange, false);
+  },
+
+  socketSendKey: function(e) {
+    var key = this.keysInv[e.keyCode];
+
+    if (key) {
+      s.game.comm.sendKey(e.type, key);
+    }
   },
 
   handleKeyChange: function(pressed, e) {
@@ -50244,6 +50272,9 @@ s.Comm = new Class( {
         this.socket.on( 'hit', this.makeTrigger( 'hit' ));
 
         this.socket.on( 'sync', this.makeTrigger( 'sync'));
+        //////////////////
+        this.socket.on( 'keySync', function (data) {console.log(data.pos);});
+        //////////////////
 
         this.game.hook( this.position );
 
@@ -50297,15 +50328,14 @@ s.Comm = new Class( {
 
         // Never send faster than server can handle
 
-        if ( time - s.game.comm.lastMessageTime >= 1000 ) {
+        if ( time - s.game.comm.lastMessageTime >= 700 ) {
 
             var shipPosition = s.game.player.getPositionPacket( );
 
             // TODO: Figure out if ship or turret actually moved
-            
 
             // If ship moved, send packet
-            
+
             if ( this.lastPosition !== shipPosition.pos ) {
 
                 // Build packet
@@ -50328,7 +50358,6 @@ s.Comm = new Class( {
 
                 // Broadcast position
 
-                
                 s.game.comm.socket.emit( 'combat','move', packet );
 
                 s.game.comm.lastMessageTime = time;
@@ -50387,6 +50416,34 @@ s.Comm = new Class( {
         // if ( this.time >= 60 ){
         //     window.location.href = "http://satellite-game.com";
         // }
+    },
+
+    sendKey: function(direction, key){
+        var time = new Date().getTime();
+        // Never send faster than server can handle
+        if ( time - s.game.comm.lastMessageTime >= 15 ) {
+            var shipPosition = s.game.player.getPositionPacket();
+            // TODO: Figure out if ship or turret actually moved
+            // If ship moved, send packet
+            if ( this.lastPosition !== shipPosition.pos ) {
+                // Build packet
+                this.time = 0;
+
+                var packet = {
+                    time: time,
+                    room: this.room,
+                    name: this.pilot.name,
+                    pos: shipPosition.pos,
+                    rot: shipPosition.rot,
+                    aVeloc: shipPosition.aVeloc,
+                    lVeloc: shipPosition.lVeloc
+                };
+                // Broadcast position
+                this.socket.emit( 'keypress', direction, $.extend(packet, { direction: direction, key: key }) );
+                s.game.comm.lastMessageTime = time;
+                this.lastPosition = shipPosition.pos;
+            }
+        }
     }
 } );
 
@@ -50851,6 +50908,7 @@ s.SatelliteGame = new Class( {
                 return false;
             },
             add: function ( enemyInfo ) {
+                console.log("LOL ENEMIES");
                 if ( this.has( enemyInfo.name ) ) {
                     this.delete( enemyInfo.name );
                     console.error( 'Bug: Player %s added twice', enemyInfo.name );
@@ -51019,7 +51077,7 @@ s.SatelliteGame = new Class( {
         }
     },
     handleMove: function ( message ) {
-        
+        console.log("A player moved");
         if ( message.name == this.pilot.name ) {
             // server told us to move
             console.log( 'Server reset position' );
