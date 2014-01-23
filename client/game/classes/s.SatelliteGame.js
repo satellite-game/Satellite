@@ -176,11 +176,12 @@ s.SatelliteGame = new Class( {
                     game: that,
                     shipClass: 'human_ship_heavy',
                     name: enemyInfo.name,
+                    bot: enemyInfo.bot,
                     position: new THREE.Vector3( enemyInfo.pos[ 0 ], enemyInfo.pos[ 1 ], enemyInfo.pos[ 2 ] ),
                     rotation: new THREE.Vector3( enemyInfo.rot[ 0 ], enemyInfo.rot[ 1 ], enemyInfo.rot[ 2 ] ),
                     alliance: 'enemy'
                 } );
-
+                
                 this._list.push( enemyShip );
                 this._map[ enemyInfo.name ] = enemyShip; // this._map.set(enemyInfo.name, otherShip);
             }
@@ -530,6 +531,7 @@ s.SatelliteGame = new Class( {
             lVeloc: this[botName].lVeloc,
             interp: this[botName].interp,
             name: this[botName].name,
+            bot: this[botName].bot,
             pos: this[botName].pos,
             rot: this[botName].rot
         });
@@ -538,6 +540,7 @@ s.SatelliteGame = new Class( {
     //this function only gets called if client is the first player
     handleBotInfo: function() {
         var updatePlayersWithBots = function() {
+            
             var botEnemies = this.game.getBotEnemies();
             this.game.comm.botUpdate(botEnemies);
         };

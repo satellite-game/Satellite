@@ -37,6 +37,7 @@ s.Ship = new Class({
         this.alliance = options.alliance;
 
         this.game = options.game;
+        this.bot = options.bot || false;
         this.name = options.name || '';
 
         this.root.name = this.name;
@@ -47,7 +48,7 @@ s.Ship = new Class({
         //////      BOT LOGIC    /////
         //////////////////////////////
 
-        if (options.name.slice(0,3) === 'bot') {
+        if (options.bot) {
             //bot initialization
             this.controlBot = this.controlBot.bind(this);
             this.targetX = 0;
@@ -162,6 +163,7 @@ s.Ship = new Class({
                     position: position,
                     rotation: rotation,
                     initialVelocity: initialVelocity,
+                    bot: this.bot,
                     team: this.alliance
                 });
 
@@ -173,6 +175,7 @@ s.Ship = new Class({
                     position: position,
                     rotation: rotation,
                     initialVelocity: initialVelocity,
+                    bot: this.bot,
                     team: this.alliance
                 });
 

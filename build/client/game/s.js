@@ -48262,6 +48262,7 @@ s.Projectile = new Class({
         this.comm = this.game.comm;
         this.game = options.game;
         this.pilot = options.pilot;
+        this.bot = options.bot;
         // handle parameters
         this.initialVelocity = options.initialVelocity;
         var that = this;
@@ -48293,7 +48294,7 @@ s.Projectile = new Class({
                 }
                 this.comm.hit(mesh.name,this.game.pilot.name);
             }
-        } else if (mesh.name === this.game.pilot.name && this.pilot.slice(0,3) === 'bot' ) {
+        } else if (mesh.name === this.game.pilot.name && this.bot ) {
             this.comm.botHit(mesh.name,this.game.pilot.name);
         }
         this.destruct();
@@ -48438,6 +48439,7 @@ s.Ship = new Class({
         this.alliance = options.alliance;
 
         this.game = options.game;
+        this.bot = options.bot || false;
         this.name = options.name || '';
 
         this.root.name = this.name;
@@ -48448,7 +48450,7 @@ s.Ship = new Class({
         //////      BOT LOGIC    /////
         //////////////////////////////
 
-        if (options.name.slice(0,3) === 'bot') {
+        if (options.bot) {
             //bot initialization
             this.controlBot = this.controlBot.bind(this);
             this.targetX = 0;
@@ -48563,6 +48565,7 @@ s.Ship = new Class({
                     position: position,
                     rotation: rotation,
                     initialVelocity: initialVelocity,
+                    bot: this.bot,
                     team: this.alliance
                 });
 
@@ -48574,6 +48577,7 @@ s.Ship = new Class({
                     position: position,
                     rotation: rotation,
                     initialVelocity: initialVelocity,
+                    bot: this.bot,
                     team: this.alliance
                 });
 
@@ -48821,6 +48825,7 @@ s.Bot = new Class( {
 		this.name = options.name;
 		this.pos = options.position;
 		this.rot = options.rotation;
+		this.bot = true;
 	}
 
 } );
@@ -51145,11 +51150,12 @@ s.SatelliteGame = new Class( {
                     game: that,
                     shipClass: 'human_ship_heavy',
                     name: enemyInfo.name,
+                    bot: enemyInfo.bot,
                     position: new THREE.Vector3( enemyInfo.pos[ 0 ], enemyInfo.pos[ 1 ], enemyInfo.pos[ 2 ] ),
                     rotation: new THREE.Vector3( enemyInfo.rot[ 0 ], enemyInfo.rot[ 1 ], enemyInfo.rot[ 2 ] ),
                     alliance: 'enemy'
                 } );
-
+                
                 this._list.push( enemyShip );
                 this._map[ enemyInfo.name ] = enemyShip; // this._map.set(enemyInfo.name, otherShip);
             }
@@ -51499,6 +51505,7 @@ s.SatelliteGame = new Class( {
             lVeloc: this[botName].lVeloc,
             interp: this[botName].interp,
             name: this[botName].name,
+            bot: this[botName].bot,
             pos: this[botName].pos,
             rot: this[botName].rot
         });
@@ -51507,7 +51514,11 @@ s.SatelliteGame = new Class( {
     //this function only gets called if client is the first player
     handleBotInfo: function() {
         var updatePlayersWithBots = function() {
+            
             var botEnemies = this.game.getBotEnemies();
+            console.log('sending positionsX: ', botEnemies['bot 1'].position[0]);
+            console.log('sending positionsY: ', botEnemies['bot 1'].position[1]);
+            console.log('sending positionsZ: ', botEnemies['bot 1'].position[2]);
             this.game.comm.botUpdate(botEnemies);
         };
         
@@ -51568,7 +51579,10 @@ s.SatelliteGame = new Class( {
         //else make new bot with position
         // this.game.botCount = 0;
         for (var bot in message) {
-            if ( !this.game.enemies.execute( message[bot].name, 'setPosition', [ message[bot].position, message[bot].rotation, message[bot].aVeloc, message[bot].lVeloc, true ] ) ) {
+            console.log('handling positionsX: ', message[bot].position[0]);
+            console.log('handling positionsY: ', message[bot].position[1]);
+            console.log('handling positionsZ: ', message[bot].position[2]);
+            if ( !this.game.enemies.execute( message[bot].name, 'setPosition', [ message[bot].position, message[bot].rotation, message[bot].aVeloc, message[bot].lVeloc, false ] ) ) {
                 this.game.makeNewBot(message[bot]);
             }
         }
