@@ -176,7 +176,7 @@ s.SatelliteGame = new Class( {
                     game: that,
                     shipClass: 'human_ship_heavy',
                     name: enemyInfo.name,
-                    bot: enemyInfo.bot,
+                    isBot: enemyInfo.isBot,
                     position: new THREE.Vector3( enemyInfo.pos[ 0 ], enemyInfo.pos[ 1 ], enemyInfo.pos[ 2 ] ),
                     rotation: new THREE.Vector3( enemyInfo.rot[ 0 ], enemyInfo.rot[ 1 ], enemyInfo.rot[ 2 ] ),
                     alliance: 'enemy'
@@ -409,7 +409,7 @@ s.SatelliteGame = new Class( {
             if (s.game.player.hull <= 0) {
                 s.game.handleDie(zappedName, killer);
             }
-        } else if (zappedEnemy.bot) {
+        } else if (zappedEnemy.isBot) {
             
             if (zappedEnemy.shields > 0){
                 zappedEnemy.shields -= 20;
@@ -531,7 +531,7 @@ s.SatelliteGame = new Class( {
             lVeloc: this[botName].lVeloc,
             interp: this[botName].interp,
             name: this[botName].name,
-            bot: this[botName].bot,
+            isBot: this[botName].isBot,
             pos: this[botName].pos,
             rot: this[botName].rot
         });
@@ -574,7 +574,7 @@ s.SatelliteGame = new Class( {
         enemiesSocketInfo = {};
         var enemiesList = this.enemies._list;  
         for (var i = 0; i < enemiesList.length; i++) {
-            if (enemiesList[i].bot){
+            if (enemiesList[i].isBot){
                 var physics = enemiesList[i].root;
                 var position = makeArray(physics.position);
                 var rotation = makeArray(physics.rotation);
