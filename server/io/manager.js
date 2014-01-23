@@ -8,7 +8,7 @@ var Manager = function( context, io ) {
   return function( socket ) {
 
     socket.on('join', function( args ) {
-      events.flow['join'](socket, args);
+      events.flow.join(socket, args);
     });
 
     socket.on('player', function( type, args ) {
@@ -24,7 +24,7 @@ var Manager = function( context, io ) {
     });
 
     socket.on('disconnect', function( args ) {
-      events.flow['disconnect'](socket, args);
+      events.flow.disconnect(socket, args);
     });
 
     socket.on('keypress', function( type, args) {

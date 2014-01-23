@@ -55,7 +55,7 @@
   },
   "scripts": {
     "start": "node server/app.js",
-    "test": "grunt travisCI --single-run"
+    "test": "grunt travisCI --force"
   },
   "subdomain": "lockon"
 }

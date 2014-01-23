@@ -51288,7 +51288,6 @@ s.SatelliteGame = new Class( {
           }
 
         }
-        console.log(pos);
         s.game.player.setPosition( myView.pos, myView.rot, serverView.aVeloc, adjusted, false );
       };
 

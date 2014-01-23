@@ -1,7 +1,7 @@
 var Sync = require('./sync.js');
 
 // custom socket.io events
-var connectionFlow = require('../events/connections')
+var connectionFlow = require('../events/connections');
 var movement       = require('../events/movement');
 var combat         = require('../events/combat');
 var player         = require('../events/player');
