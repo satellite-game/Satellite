@@ -1,10 +1,10 @@
-var vents = require('./events.js');
+var Events = require('./events.js');
 var Host = require('./rooms.js'),
     host = new Host();
 
 
 var Manager = function( context, io ) {
-  var events = vents({context: context, host: host, io: io});
+  var events = new Events({context: context, host: host, io: io});
   return function( socket ) {
 
     socket.on('join', function( args ) {
@@ -19,9 +19,9 @@ var Manager = function( context, io ) {
       events.bot[type](socket, args);
     });
 
-    // socket.on('combat', function( type, args ) {
-    //   events.combat[type](socket, args);
-    // });
+    socket.on('combat', function( type, args ) {
+      events.combat[type](socket, args);
+    });
 
     socket.on('disconnect', function( args ) {
       events.flow['disconnect'](socket, args);
@@ -33,7 +33,7 @@ var Manager = function( context, io ) {
   };
 };
 
-module.exports = Manager; 
+module.exports = Manager;
 
 
 
