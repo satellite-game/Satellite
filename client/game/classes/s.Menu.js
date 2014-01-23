@@ -75,7 +75,7 @@ s.Menu = new Class({
       }
 
       var menuItemGeo = new THREE.TextGeometry(items[items.length-i-1].text, {font: font, size: size, height: size*2, weight: bold, bevelEnabled: bevelEnabled, bevelThickness: bevel, bevelSize: bevel});
-      var menuItemMaterial = new THREE[mat]({color: 0x00FF00});
+      var menuItemMaterial = new THREE[mat]({color: 0x00CC00, ambient: 0x00FF00, specular: 0x33FF33, shininess: 5});
       var menuItem = new THREE.Mesh(menuItemGeo, menuItemMaterial);
       menuItem.position.setY((currentHeight)-(menuHeight/2)+(size/2)); // MATH?
       menuItem.position.setX(menuItem.geometry.boundingSphere.radius*-0.5);
@@ -85,10 +85,11 @@ s.Menu = new Class({
     }
   },
   clearMenu: function () {
-    // I'm really surprised it's this easy.
-    // I wonder if the menu items are even being garbage collected.
-    // I mean, I ASSUME they are...
-    // this.menuBox.children = [];
+    // I don't think this works.
+    // I'm almost certain it's just leaving invisible ghosts of
+    // your menu screens physically floating out in space.
+    // todo: not that.
+    this.menuBox.children = [];
   },
   open: function () {
     if (this.menuScreen !== 'default') {

@@ -210,7 +210,7 @@ s.Controls = new Class({
       this.oculus.compensationZ = this.oculus.quat.z;
     }
 
-    if (this.keyboard.pressed('escape')) {
+    if (this.keyboard.pressed('q')) {
       if (!this.menu.displayed) {
         this.menu.open();
       } else {
