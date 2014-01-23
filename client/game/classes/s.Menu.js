@@ -12,13 +12,15 @@ s.Menu = new Class({
     this.oculus = options.game.oculus;
     this.menuItems = [];
     this.menuScreen = 'default';
+    this.cursorPosition = 0;
+    this.selectedItem = null;
 
     // PlaneGeometry would be better than a cube for this but harder to write because 
     // it would need to be rotated and all it's child objects would need to be rotated back.
     // Optimize at your own risk.
     this.menuBox = new THREE.Mesh( new THREE.CubeGeometry(2500, 2500, 1), new THREE.MeshBasicMaterial({color: 0x000000, transparent: true, opacity: 0.7}) );
 
-    // Adding menu item format: {text: 'displayed_text_string'(required), font: 'font_name_string'(default "helvetiker"), bold: true/false (default false), size: number(1-5)(defualt 3), flat: true/false(changes shader, depth and bevel)(default false), small: true/false(overides flat, bold, and size to make a default readable small font)(default false)};
+    // Format for adding menu items: {text: 'displayed_text_string'(required), font: 'font_name_string'(default "helvetiker"), bold: true/false (default false), size: number(1-5)(defualt 3), flat: true/false(changes shader, depth and bevel)(default false), small: true/false(overides flat, bold, and size to make a standardized readable small font)(default false)};
     
     this.menuBox.position.setZ(-150);
     this.menuBox.visible = false;
@@ -31,10 +33,13 @@ s.Menu = new Class({
 
     this.showDefaultMenu();
   },
+
   addMenuItems: function ( items ) {
+
     // procedurally center aligns text, vertically center aligns menu
     var menuHeight = 0;
     var currentHeight = 0;
+    this.menuItems = [];
     for (var j = 0; j < items.length; j++) {
       if (items[j].small) {
         menuHeight += 4;
@@ -44,7 +49,7 @@ s.Menu = new Class({
       }
     }
     for (var i = 0; i < items.length; i++) {
-      // this is currently the only font and it's only in bold
+      // this is currently the only font. Supports normal and bold.
       // google typeface.js for how to add more.
       var bevelEnabled,
           bevel,
@@ -81,16 +86,19 @@ s.Menu = new Class({
       menuItem.position.setX(menuItem.geometry.boundingSphere.radius*-0.5);
       menuItem.visible = false;
       this.menuBox.add( menuItem );
+      this.menuItems.push( menuItem );
       currentHeight += size*2;
     }
   },
+
   clearMenu: function () {
-    // I don't think this works.
-    // I'm almost certain it's just leaving invisible ghosts of
+    // Why did I think this would work?
+    // Turns out it's just leaving invisible ghosts of
     // your menu screens physically floating out in space.
     // todo: not that.
     this.menuBox.children = [];
   },
+
   open: function () {
     if (this.menuScreen !== 'default') {
       this.showDefaultMenu();
@@ -100,7 +108,9 @@ s.Menu = new Class({
     for (var i = 0; i < this.menuBox.children.length; i++) {
       this.menuBox.children[i].visible = true;
     }
+    // todo: hide HUD while open.
   },
+
   close: function () {
     this.displayed = false;
     this.menuBox.visible = false;
@@ -111,20 +121,60 @@ s.Menu = new Class({
       this.clearMenu();
     }
   },
-  updateSelection: function () {
-    if (this.displayed) {
-      // todo: the part where you interact with the menu at all.
+
+  selectItem: function ( item ) {
+    // changes appearance of selected item to make it obvious
+    // which one you have selected.
+    if (item) {
+      if (this.selectedItem !== item) {
+        this.deselectItem(this.selectedItem);
+        this.selectedItem = item;
+      }
+      item.material.color.setHex(0xCC0000);
+      if (item.material.ambient) {
+        item.material.ambient.setHex(0xFF0000);
+        item.material.specular.setHex(0xFF3333);
+      }
     }
   },
+
+  deselectItem: function ( item ) {
+    if (this.selectedItem) {
+      item.material.color.setHex(0x00CC00);
+      if (item.material.ambient) {
+        item.material.ambient.setHex(0x00FF00);
+        item.material.specular.setHex(0x33FF33);
+      }
+    }
+  },
+
+  updateSelection: function () {
+    if (this.displayed && this.menuItems.length > 0) {
+      if (this.oculus.detected) {
+        // Oculus menu navigation
+        // Divides the field of view by the number of menu
+        // items and moves selection up and down with head motion
+
+        var viewingAngle = ~~((this.menuItems.length/2 * this.oculus.quat.x - this.oculus.compensationX) * 6 + Math.round(this.menuItems.length/2));
+        console.log(viewingAngle);
+        var selection = this.menuItems[viewingAngle];
+        this.selectItem(selection);
+      } else {
+        // todo: keyboard, mouse, and controller navigation
+      }
+    }
+  },
+
   showDefaultMenu: function () {
     this.menuScreen = 'default';
     this.addMenuItems([{text: 'JOIN GAME', size: 5}, {text: 'DISCONECT', size: 5}, {text: 'LEADERBOARD', size: 5}, {text: 'SMALL TEST TEXT 1', small: true}, {text: 'SMALL TEST TEXT 2', small: true}, {text: 'SMALL TEST TEXT 3', small: true}]);
   },
+
   showRoomList: function () {
     this.clearMenu();
     this.menuScreen = 'rooms';
     var roomNames = [];
-    // some database stuff to get open rooms
+    // some database stuff to get list of open rooms
     var rooms = [];
     for (var i = 0; i < roomNames.length; i++) {
       rooms.push({text: roomNames[i], small: true});
