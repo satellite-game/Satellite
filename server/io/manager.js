@@ -23,7 +23,6 @@ var Manager = function( context, io ) {
     });
 
     socket.on('combat', function( type, args ) {
-      console.log('combat');
       events.combat[type](socket, args);
     });
 
