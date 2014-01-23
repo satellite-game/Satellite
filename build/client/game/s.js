@@ -50206,9 +50206,7 @@ s.Comm = new Class( {
 
     extend: s.EventEmitter,
 
-
     toString: "Comm",
-
 
     // makeTrigger is responsible for broadcasting all events
 
@@ -50276,7 +50274,7 @@ s.Comm = new Class( {
 
         this.socket.on( 'move', this.makeTrigger( 'move' ) );
 
-        this.socket.on(' killed', this.makeTrigger( 'killed' ));
+        this.socket.on( 'killed', this.makeTrigger( 'killed' ));
 
         this.socket.on( 'fire', this.makeTrigger( 'fire' ));
 
