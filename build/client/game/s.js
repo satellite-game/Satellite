@@ -51262,7 +51262,7 @@ s.SatelliteGame = new Class( {
         }
     },
     handleSync: function ( pak ) {
-
+      console.log("Receiving a sync request");
       var data = pak;
       var whoAmI = s.game.pilot.name,
           myData = pak[whoAmI];
@@ -51288,6 +51288,7 @@ s.SatelliteGame = new Class( {
           }
 
         }
+        console.log("Moving the player!");
         s.game.player.setPosition( myView.pos, myView.rot, serverView.aVeloc, adjusted, false );
       };
 
