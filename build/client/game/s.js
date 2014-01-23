@@ -48295,7 +48295,7 @@ s.Projectile = new Class({
                 this.comm.hit(mesh.name,this.game.pilot.name);
             }
         } else if (mesh.name === this.game.pilot.name && this.bot ) {
-            this.comm.botHit(mesh.name,this.game.pilot.name);
+            this.comm.botHit(mesh.name, this.pilot);
         }
         this.destruct();
     },
@@ -51355,10 +51355,10 @@ s.SatelliteGame = new Class( {
     },
 
     handleHit: function(message) {
-        var you = message.otherPlayerName;
+        var zappedName = message.otherPlayerName;
         var killer = message.yourName;
-        var enemyYou = s.game.enemies.get(you);
-        if (you === s.game.pilot.name){
+        var zappedEnemy = s.game.enemies.get(zappedName);
+        if (zappedName === s.game.pilot.name){
             s.game.stopShields();
             s.game.rechargeShields();
             if (s.game.player.shields > 0){
@@ -51381,31 +51381,30 @@ s.SatelliteGame = new Class( {
             console.log('You were hit with a laser by %s! Your HP: %d', killer, s.game.player.hull);
 
             if (s.game.player.hull <= 0) {
-                s.game.handleDie(you, killer);
+                s.game.handleDie(zappedName, killer);
             }
-        } else if (enemyYou.bot) {
-            var enemyBot = enemyYou;
-
-            if (enemyBot.shields > 0){
-                enemyBot.shields -= 20;
-                console.log('bot shield is now: ', enemyBot.shields);
+        } else if (zappedEnemy.bot) {
+            
+            if (zappedEnemy.shields > 0){
+                zappedEnemy.shields -= 20;
+                console.log('bot shield is now: ', zappedEnemy.shields);
                 setTimeout(function() {
-                    s.game.replenishEnemyShield(enemyBot);
+                    s.game.replenishEnemyShield(zappedEnemy);
                 }, 7000);
             } else {
-                enemyBot.hull -= 20;
-                console.log('bot hull is now: ', enemyBot.hull);
+                zappedEnemy.hull -= 20;
+                console.log('bot hull is now: ', zappedEnemy.hull);
             }
 
-            if (enemyBot.hull <= 0) {
+            if (zappedEnemy.hull <= 0) {
                 console.log('bot has died');
-                s.game.handleKill.call(s, { killed: you, killer: killer });
+                s.game.handleKill.call(s, { killed: zappedName, killer: killer });
                 s.game.makeNewBot({
                     position: [ 23498, -25902, 24976 ]
                 });
             }
         } else {
-            var enemy = s.game.enemies.get(you);
+            var enemy = s.game.enemies.get(zappedName);
             enemy.shields -= 20;
             setTimeout(function(){
                 console.log('recharged');
