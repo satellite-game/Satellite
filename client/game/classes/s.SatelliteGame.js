@@ -61,7 +61,7 @@ s.SatelliteGame = new Class( {
 
         // Add menu
         this.menu = new s.Menu({
-            camera: this.camera
+            game: this
         });
 
         if (this.oculus.detected) {
@@ -96,7 +96,8 @@ s.SatelliteGame = new Class( {
             game: this,
             player: this.player,
             camera: this.camera,
-            HUD: this.HUD
+            HUD: this.HUD,
+            menu: this.menu
         } );
 
         /******************

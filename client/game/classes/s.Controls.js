@@ -22,6 +22,7 @@ s.Controls = new Class({
     this.game = options.game;
     this.player = options.player;
     this.camera = options.camera;
+    this.menu = options.menu;
 
     // Create interpreters for controllers
     this.keyboard = new s.Keyboard( );
@@ -207,6 +208,14 @@ s.Controls = new Class({
       this.oculus.compensationX = this.oculus.quat.x;
       this.oculus.compensationY = this.oculus.quat.y;
       this.oculus.compensationZ = this.oculus.quat.z;
+    }
+
+    if (this.keyboard.pressed('escape')) {
+      if (this.menu.displayed) {
+        this.menu.close();
+      } else {
+        this.menu.open();
+      }
     }
 
 

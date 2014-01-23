@@ -48904,7 +48904,8 @@ s.Keyboard = new Class({
     'd'       : 68,
     'backtick': 192,
     'shift'   : 16,
-    'tilde'   : 192
+    'tilde'   : 192,
+    'escape'  : 27
   },
 
   modifiers: ['shift', 'ctrl', 'alt', 'meta'],
@@ -49092,6 +49093,7 @@ s.Controls = new Class({
     this.game = options.game;
     this.player = options.player;
     this.camera = options.camera;
+    this.menu = options.menu;
 
     // Create interpreters for controllers
     this.keyboard = new s.Keyboard( );
@@ -49277,6 +49279,14 @@ s.Controls = new Class({
       this.oculus.compensationX = this.oculus.quat.x;
       this.oculus.compensationY = this.oculus.quat.y;
       this.oculus.compensationZ = this.oculus.quat.z;
+    }
+
+    if (this.keyboard.pressed('escape')) {
+      if (this.menu.displayed) {
+        this.menu.close();
+      } else {
+        this.menu.open();
+      }
     }
 
 
@@ -50457,19 +50467,36 @@ s.LoadScreen = new Class( {
     }
 } );
 
+// This menu item is going to be 3D text floating in game in front of
+// the camera. It's more complicated but it'll be cool in the oculus.
+
 s.Menu = new Class({
 
   toString: 'Menu',
 
   construct: function ( options ) {
-    this.camera = options.camera;
+    this.displayed = false;
+    this.camera = options.game.camera;
+    this.HUD = options.game.HUD;
+    this.oculus = options.game.oculus;
     this.menuItems = [];
-    this.menuBox = new THREE.Mesh( new THREE.CubeGeometry(2500, 2500, 0), new THREE.MeshBasicMaterial({color: 0x000000, transparent: true, opacity: 0.7}) );
+
+    // PlaneGeometry would be better than a cube for this but harder to write because 
+    // it would need to be rotated and all it's child objects would need to be rotated back.
+    // Optimize at your own risk.
+    this.menuBox = new THREE.Mesh( new THREE.CubeGeometry(2500, 2500, 1), new THREE.MeshBasicMaterial({color: 0x000000, transparent: true, opacity: 0.7}) );
+
     // Adding menu item format: {text: 'text_string', font: 'font_name_string(optional)'};
     this.addMenuItems([{text: 'JOIN GAME'}, {text: 'DISCONECT'}, {text: 'LEADERBOARD'}]);
 
     this.menuBox.position.setZ(-150);
+    this.menuBox.visible = false;
+
     this.camera.add( this.menuBox );
+
+    if (this.oculus.detected) {
+      this.menuBox.position.setZ(-50);
+    }
   },
   addMenuItems: function ( items ) {
     // procedurally center aligns text, vertically center aligns menu
@@ -50483,20 +50510,34 @@ s.Menu = new Class({
       var menuItem = new THREE.Mesh(menuItemGeo, menuItemMaterial);
       menuItem.position.setY((10*i)-(menuHeight/2)+2.5); // MATH!
       menuItem.position.setX(menuItem.geometry.boundingSphere.radius*-0.5);
+      menuItem.visible = false;
       this.menuBox.add( menuItem );
     }
   },
   clearMenu: function () {
-    // I'm surprised it's this easy
-    // I wonder if the menu items are even being garbage collected
+    // I'm really surprised it's this easy.
+    // I wonder if the menu items are even being garbage collected.
     // I mean, I ASSUME they are...
     this.menuBox.children = [];
   },
-  show: function () {
-
+  open: function () {
+    this.displayed = true;
+    this.menuBox.visible = true;
+    for (var i = 0; i < this.menuBox.children.length; i++) {
+      this.menuBox.children[i].visible = true;
+    }
   },
-  hide: function () {
-
+  close: function () {
+    this.displayed = false;
+    this.menuBox.visible = false;
+    for (var i = 0; i < this.menuBox.children.length; i++) {
+      this.menuBox.children[i].visible = false;
+    }
+  },
+  updateSelection: function () {
+    if (this.displayed) {
+      // todo: the part where you interact with the menu at all.
+    }
   }
 });
 s.Game = new Class({
@@ -50847,7 +50888,7 @@ s.SatelliteGame = new Class( {
 
         // Add menu
         this.menu = new s.Menu({
-            camera: this.camera
+            game: this
         });
 
         if (this.oculus.detected) {
@@ -50882,7 +50923,8 @@ s.SatelliteGame = new Class( {
             game: this,
             player: this.player,
             camera: this.camera,
-            HUD: this.HUD
+            HUD: this.HUD,
+            menu: this.menu
         } );
 
         /******************
