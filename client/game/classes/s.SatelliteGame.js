@@ -324,16 +324,46 @@ s.SatelliteGame = new Class( {
         }
     },
     handleSync: function ( pak ) {
-      console.log("A sync request has been made by the server!");
-      console.log("This is enemies", s.game.enemies);
-      console.log("This is enemies trying to map...", s.game.enemies.list());
-      //if our value does not match 
-      // realign ourselves with Handlemove , take the difference add it to the velocity
-      // realign all enemies with HandleMove, take the difference add it to the velocity .
-      var moveSelf = function( self ) {};
-      var setCoords = function( entity ) {};
-      var adjustVel = function( entity ) {};
-      var checkDiff = function( client, server ) {};
+      
+      var data = pak; 
+      var whoAmI = s.game.pilot.name,
+          myData = pak[whoAmI];
+      
+      var adjustPlayer = function( serverView ) {
+        
+        var adjusted = [];
+
+        var myView = s.game.player.getPositionPacket();
+        for(var i = 0; i < serverView.lVeloc.length; i++) {
+          var pos = Math.abs(serverView.pos[i]) - Math.abs(myView.pos[i]);
+
+          if( pos >= 100 ) {
+            console.log("Experiencing whiplash!");
+            s.game.player.setPosition( serverView.pos, myView.rot, serverView.aVeloc, serverView.lVeloc, true );
+            return;
+          }
+
+          if(serverView.pos[i] >= 0) {
+            adjusted.push(serverView.lVeloc[i] + pos);
+          } else {
+            adjusted.push(serverView.lVeloc[i] - pos);
+          }
+
+        }
+        console.log(pos);
+        s.game.player.setPosition( myView.pos, myView.rot, serverView.aVeloc, adjusted, false );
+      };
+      
+      adjustPlayer(myData);
+      delete data[whoAmI];
+
+      for(var i in data ) {
+        if( !s.game.enemies.execute( data[i].name, 'setPosition', [ data[i].pos, data[i].rot, data[i].aVeloc, data[i].lVeloc, true ] ) ) {
+          s.game.enemies.add( data[i] );
+        }
+      }
+
+      
     },
 
     handlePlayerList: function(message) {
