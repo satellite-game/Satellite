@@ -48412,18 +48412,18 @@ s.Ship = new Class({
         missileFireTime: 1000
     },
 
-    botOptions: {
-        rotationSpeed: Math.PI/2,
-        pitchSpeed: Math.PI/4,
-        yawSpeed: Math.PI/4,
-        thrustImpulse: 0,
-        brakePower: 0.85,
-        velocityFadeFactor: 16,
-        rotationFadeFactor: 4
-    },
+    // botOptions: {
+    //     rotationSpeed: Math.PI/2,
+    //     pitchSpeed: Math.PI/4,
+    //     yawSpeed: Math.PI/4,
+    //     thrustImpulse: 0,
+    //     brakePower: 0.85,
+    //     velocityFadeFactor: 16,
+    //     rotationFadeFactor: 4
+    // },
 
 	construct: function(options) {
-
+        console.log('ship');
         this.HUD = options.HUD;
 		var geometry = s.models[options.shipClass].geometry;
 		this.materials = s.models[options.shipClass].materials[0];
@@ -48450,28 +48450,28 @@ s.Ship = new Class({
         //////      BOT LOGIC    /////
         //////////////////////////////
 
-        if (options.isBot) {
-            //bot initialization
-            this.controlBot = this.controlBot.bind(this);
-            this.targetX = 0;
-            this.targetY = 0;
+        // if (options.isBot) {
+        //     //bot initialization
+        //     this.controlBot = this.controlBot.bind(this);
+        //     this.targetX = 0;
+        //     this.targetY = 0;
 
             
-            //Create a camera for the bot
-            this.camera = new THREE.PerspectiveCamera(35, 1, 1, 300000);
+        //     //Create a camera for the bot
+        //     this.camera = new THREE.PerspectiveCamera(35, 1, 1, 300000);
 
-             // Root camera to the bot's position
-            this.root.add( this.camera );
+        //      // Root camera to the bot's position
+        //     this.root.add( this.camera );
 
-            // Setup camera: Cockpit view; COMMENT OUT FOR CHASE CAM
-            this.camera.position.set( 0, 0, 0 );
+        //     // Setup camera: Cockpit view; COMMENT OUT FOR CHASE CAM
+        //     this.camera.position.set( 0, 0, 0 );
 
-            //set a hook on the bot controls.
-            //necessary because first player has bot join twice
-            if (this.game.lastBotCallback) { this.game.unhook( this.game.lastBotCallback ); }
-            this.game.hook( this.controlBot );
-            this.game.lastBotCallback = this.controlBot;
-        }
+        //     //set a hook on the bot controls.
+        //     //necessary because first player has bot join twice
+        //     if (this.game.lastBotCallback) { this.game.unhook( this.game.lastBotCallback ); }
+        //     this.game.hook( this.controlBot );
+        //     this.game.lastBotCallback = this.controlBot;
+        // }
 
         this.lastTime = new Date( ).getTime( );
 
@@ -48548,47 +48548,47 @@ s.Ship = new Class({
         }
     },
 
-    botFire: function (weapon) {
-        var now =new Date().getTime();
-        var position;
-        var rotation = this.root.rotation.clone();
-        var initialVelocity = this.root.getLinearVelocity().clone();
+    // botFire: function (weapon) {
+    //     var now =new Date().getTime();
+    //     var position;
+    //     var rotation = this.root.rotation.clone();
+    //     var initialVelocity = this.root.getLinearVelocity().clone();
 
-        // Turrets
-        if (weapon === 'turret'){
-            if (now - this.lastTurretFire > this.options.botTurretFireTime){
-                // Left bullet
-                position = this.getOffset(this.options.leftTurretOffset);
-                var bulletLeft = new s.Turret({
-                    game: this.game,
-                    pilot: this.name,
-                    position: position,
-                    rotation: rotation,
-                    initialVelocity: initialVelocity,
-                    isbBot: this.isBot,
-                    team: this.alliance
-                });
+    //     // Turrets
+    //     if (weapon === 'turret'){
+    //         if (now - this.lastTurretFire > this.options.botTurretFireTime){
+    //             // Left bullet
+    //             position = this.getOffset(this.options.leftTurretOffset);
+    //             var bulletLeft = new s.Turret({
+    //                 game: this.game,
+    //                 pilot: this.name,
+    //                 position: position,
+    //                 rotation: rotation,
+    //                 initialVelocity: initialVelocity,
+    //                 isbBot: this.isBot,
+    //                 team: this.alliance
+    //             });
 
-                // Right bullet
-                position = this.getOffset(this.options.rightTurretOffset);
-                var bulletRight = new s.Turret({
-                    game: this.game,
-                    pilot: this.name,
-                    position: position,
-                    rotation: rotation,
-                    initialVelocity: initialVelocity,
-                    isBot: this.isBot,
-                    team: this.alliance
-                });
+    //             // Right bullet
+    //             position = this.getOffset(this.options.rightTurretOffset);
+    //             var bulletRight = new s.Turret({
+    //                 game: this.game,
+    //                 pilot: this.name,
+    //                 position: position,
+    //                 rotation: rotation,
+    //                 initialVelocity: initialVelocity,
+    //                 isBot: this.isBot,
+    //                 team: this.alliance
+    //             });
 
-                this.lastTurretFire = now;
+    //             this.lastTurretFire = now;
 
-                if (!this.isBot) {
-                    this.game.sound.play('laser', 0.5);
-                }
-            }
-        }
-    },
+    //             if (!this.isBot) {
+    //                 this.game.sound.play('laser', 0.5);
+    //             }
+    //         }
+    //     }
+    // },
 
     setPosition: function (position, rotation, aVeloc, lVeloc, interpolate) {
         var posInterpolation = 0.05;
@@ -48652,153 +48652,153 @@ s.Ship = new Class({
 
     handleDie: function(){
         this.destruct();
-    },
-
-    controlBot: function( ) {
-
-
-        //////////////////////////////
-        ////  CLOSEST ENEMY LOGIC ////
-        //////////////////////////////  
-
-        //MAKE ENEMY LIST FOR BOT
-        var botEnemyList = [];
-        botEnemyList.push(this.game.player);
-        var enemyShips = this.game.enemies._list;
-        for (var i = 0; i < enemyShips.length; i++) {
-            if (!enemyShips[i].isBot) {
-                botEnemyList.push(enemyShips[i]);
-            }
-        }
-
-        //DETERMINE CLOSEST ENEMY
-        var closestDistance;
-        for (i = 0; i < botEnemyList.length; i++) {
-            var distance = this.root.position.distanceTo(botEnemyList[i].root.position);
-            if (!closestDistance || distance < closestDistance) {
-                closestDistance = distance;
-                this.target = botEnemyList[i];
-            }
-        }
-
-        //////////////////////////////
-        //// THRUST/BREAK LOGIC ////
-        //////////////////////////////    
-
-        var now = new Date( ).getTime( );
-        var difference = now - this.lastTime;
-
-        var thrust = 0;
-        var brakes = 0;
-
-        var  maxDistance = 4100, minDistance = 1500;
-
-        if (closestDistance > maxDistance) {
-            thrust = 1;
-        }
-        else if (closestDistance < minDistance) {
-            brakes = 1;
-        } else {
-            var ratio = (closestDistance - minDistance) / (maxDistance - minDistance);
-            var optimumSpeed = s.config.ship.maxSpeed * ratio;
-            if (optimumSpeed < this.botOptions.thrustImpulse) { brakes = 1; }
-            if (optimumSpeed > this.botOptions.thrustImpulse) { thrust = 1; }
-        }
-
-        if (thrust && this.botOptions.thrustImpulse < s.config.ship.maxSpeed){
-            this.botOptions.thrustImpulse += difference;
-        }
-
-        if (brakes && this.botOptions.thrustImpulse > 0){
-            this.botOptions.thrustImpulse -= difference;
-        }
-
-
-        //////////////////////////////
-        // LEFT/RIGHT/UP/DOWN LOGIC //
-        //////////////////////////////       
-
-        var vTarget3D;
-        var vTarget2D;
-
-        var pitch = 0;
-        var roll = 0;
-        var yaw = 0;
-
-        var yawSpeed    = this.botOptions.yawSpeed,
-            pitchSpeed  = this.botOptions.pitchSpeed;
-
-        var thrustScalar = this.botOptions.thrustImpulse/s.config.ship.maxSpeed + 1;
-
-        // TARGET HUD MARKING
-        if ( this.target ) {
-            this.target = this.target.root;
-
-            vTarget3D = this.target.position.clone();
-            vTarget2D = s.projector.projectVector(vTarget3D, this.camera);
-        }
-
-        if (vTarget2D.z < 1) {
-            //go left; else if go right
-            if (vTarget2D.x < -0.15) {
-                yaw = yawSpeed / thrustScalar;
-            } else if (vTarget2D.x > 0.15) {
-                yaw = -1 * yawSpeed / thrustScalar;
-            }
-            //do down; else if go up
-            if (vTarget2D.y < -0.15) {
-                pitch = -1*pitchSpeed / thrustScalar;
-            } else if (vTarget2D.y > 0.15) {
-                pitch  = pitchSpeed / thrustScalar;
-            }
-        } else {
-            //go right; else if go left
-            if (vTarget2D.x < 0) {
-                yaw = -1* yawSpeed / thrustScalar;
-            } else if (vTarget2D.x >= 0) {
-                yaw = yawSpeed / thrustScalar;
-            }
-            //do up; else if go down
-            if (vTarget2D.y < 0) {
-                pitch = pitchSpeed / thrustScalar;
-            } else if (vTarget2D.y > 0) {
-                pitch  = -1 * pitchSpeed / thrustScalar;
-            }
-        }
-            
-        //////////////////////////////
-        // MOTION AND PHYSICS LOGIC //
-        //////////////////////////////
-
-
-        var linearVelocity = this.root.getLinearVelocity().clone();
-        var angularVelocity = this.root.getAngularVelocity().clone();
-        var rotationMatrix = new THREE.Matrix4();
-        rotationMatrix.extractRotation(this.root.matrix);
-
-        angularVelocity = angularVelocity.clone().divideScalar(this.botOptions.rotationFadeFactor);
-        this.root.setAngularVelocity(angularVelocity);
-
-        var newAngularVelocity = new THREE.Vector3(pitch, yaw, roll).applyMatrix4(rotationMatrix).add(angularVelocity);
-        this.root.setAngularVelocity(newAngularVelocity);
-
-        var impulse = linearVelocity.clone().negate();
-        this.root.applyCentralImpulse(impulse);
-
-        var getForceVector = new THREE.Vector3(0,0, -1*this.botOptions.thrustImpulse).applyMatrix4(rotationMatrix);
-        this.root.applyCentralImpulse(getForceVector);
-
-        this.lastTime = now;
-
-        //////////////////////////////
-        ///////  FIRING LOGIC ////////
-        //////////////////////////////
-
-        if ( Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && closestDistance < maxDistance) {
-            this.botFire('turret');
-        }
-
     }
+
+    // controlBot: function( ) {
+
+
+    //     //////////////////////////////
+    //     ////  CLOSEST ENEMY LOGIC ////
+    //     //////////////////////////////  
+
+    //     //MAKE ENEMY LIST FOR BOT
+    //     var botEnemyList = [];
+    //     botEnemyList.push(this.game.player);
+    //     var enemyShips = this.game.enemies._list;
+    //     for (var i = 0; i < enemyShips.length; i++) {
+    //         if (!enemyShips[i].isBot) {
+    //             botEnemyList.push(enemyShips[i]);
+    //         }
+    //     }
+
+    //     //DETERMINE CLOSEST ENEMY
+    //     var closestDistance;
+    //     for (i = 0; i < botEnemyList.length; i++) {
+    //         var distance = this.root.position.distanceTo(botEnemyList[i].root.position);
+    //         if (!closestDistance || distance < closestDistance) {
+    //             closestDistance = distance;
+    //             this.target = botEnemyList[i];
+    //         }
+    //     }
+
+    //     //////////////////////////////
+    //     //// THRUST/BREAK LOGIC ////
+    //     //////////////////////////////    
+
+    //     var now = new Date( ).getTime( );
+    //     var difference = now - this.lastTime;
+
+    //     var thrust = 0;
+    //     var brakes = 0;
+
+    //     var  maxDistance = 4100, minDistance = 1500;
+
+    //     if (closestDistance > maxDistance) {
+    //         thrust = 1;
+    //     }
+    //     else if (closestDistance < minDistance) {
+    //         brakes = 1;
+    //     } else {
+    //         var ratio = (closestDistance - minDistance) / (maxDistance - minDistance);
+    //         var optimumSpeed = s.config.ship.maxSpeed * ratio;
+    //         if (optimumSpeed < this.botOptions.thrustImpulse) { brakes = 1; }
+    //         if (optimumSpeed > this.botOptions.thrustImpulse) { thrust = 1; }
+    //     }
+
+    //     if (thrust && this.botOptions.thrustImpulse < s.config.ship.maxSpeed){
+    //         this.botOptions.thrustImpulse += difference;
+    //     }
+
+    //     if (brakes && this.botOptions.thrustImpulse > 0){
+    //         this.botOptions.thrustImpulse -= difference;
+    //     }
+
+
+    //     //////////////////////////////
+    //     // LEFT/RIGHT/UP/DOWN LOGIC //
+    //     //////////////////////////////       
+
+    //     var vTarget3D;
+    //     var vTarget2D;
+
+    //     var pitch = 0;
+    //     var roll = 0;
+    //     var yaw = 0;
+
+    //     var yawSpeed    = this.botOptions.yawSpeed,
+    //         pitchSpeed  = this.botOptions.pitchSpeed;
+
+    //     var thrustScalar = this.botOptions.thrustImpulse/s.config.ship.maxSpeed + 1;
+
+    //     // TARGET HUD MARKING
+    //     if ( this.target ) {
+    //         this.target = this.target.root;
+
+    //         vTarget3D = this.target.position.clone();
+    //         vTarget2D = s.projector.projectVector(vTarget3D, this.camera);
+    //     }
+
+    //     if (vTarget2D.z < 1) {
+    //         //go left; else if go right
+    //         if (vTarget2D.x < -0.15) {
+    //             yaw = yawSpeed / thrustScalar;
+    //         } else if (vTarget2D.x > 0.15) {
+    //             yaw = -1 * yawSpeed / thrustScalar;
+    //         }
+    //         //do down; else if go up
+    //         if (vTarget2D.y < -0.15) {
+    //             pitch = -1*pitchSpeed / thrustScalar;
+    //         } else if (vTarget2D.y > 0.15) {
+    //             pitch  = pitchSpeed / thrustScalar;
+    //         }
+    //     } else {
+    //         //go right; else if go left
+    //         if (vTarget2D.x < 0) {
+    //             yaw = -1* yawSpeed / thrustScalar;
+    //         } else if (vTarget2D.x >= 0) {
+    //             yaw = yawSpeed / thrustScalar;
+    //         }
+    //         //do up; else if go down
+    //         if (vTarget2D.y < 0) {
+    //             pitch = pitchSpeed / thrustScalar;
+    //         } else if (vTarget2D.y > 0) {
+    //             pitch  = -1 * pitchSpeed / thrustScalar;
+    //         }
+    //     }
+            
+    //     //////////////////////////////
+    //     // MOTION AND PHYSICS LOGIC //
+    //     //////////////////////////////
+
+
+    //     var linearVelocity = this.root.getLinearVelocity().clone();
+    //     var angularVelocity = this.root.getAngularVelocity().clone();
+    //     var rotationMatrix = new THREE.Matrix4();
+    //     rotationMatrix.extractRotation(this.root.matrix);
+
+    //     angularVelocity = angularVelocity.clone().divideScalar(this.botOptions.rotationFadeFactor);
+    //     this.root.setAngularVelocity(angularVelocity);
+
+    //     var newAngularVelocity = new THREE.Vector3(pitch, yaw, roll).applyMatrix4(rotationMatrix).add(angularVelocity);
+    //     this.root.setAngularVelocity(newAngularVelocity);
+
+    //     var impulse = linearVelocity.clone().negate();
+    //     this.root.applyCentralImpulse(impulse);
+
+    //     var getForceVector = new THREE.Vector3(0,0, -1*this.botOptions.thrustImpulse).applyMatrix4(rotationMatrix);
+    //     this.root.applyCentralImpulse(getForceVector);
+
+    //     this.lastTime = now;
+
+    //     //////////////////////////////
+    //     ///////  FIRING LOGIC ////////
+    //     //////////////////////////////
+
+    //     if ( Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && closestDistance < maxDistance) {
+    //         this.botFire('turret');
+    //     }
+
+    // }
 });
 
 s.Player = new Class({
@@ -48806,27 +48806,318 @@ s.Player = new Class({
 	construct: function(options) {
 		// Nothing here yet...
 		// Maybe collision detection and whatnot
-	// this.game.hook(this.update);
+		console.log('player');
 	}
-	// update: function() {
-		// if (this.hull <= 0){
-			// this.game.handleDie();
-		// }
-	// }
+
 });
 
 s.Bot = new Class( {
-	toString: 'Bot',
+  toString: 'Bot',
+  extend: s.GameObject,
 
-	construct: function( options ) {
-		this.aVeloc = options.aVeloc;
-		this.lVeloc = options.lVeloc;
-		this.interp = true;
-		this.name = options.name;
-		this.pos = options.position;
-		this.rot = options.rotation;
-		this.isBot = true;
-	}
+  options: {
+    leftTurretOffset: new THREE.Vector3(35, 0, -200),
+    rightTurretOffset: new THREE.Vector3(-35, 0, -200),
+    missileOffset: new THREE.Vector3(0, 0, -120),
+    turretFireTime: 200,
+    botTurretFireTime: 3000,
+    missileFireTime: 1000
+  },
+
+  construct: function( options ) {
+    var position = options.position || [22498, -25902, 24976];
+    var rotation = options.rotation || [0, Math.PI / 2, 0];
+
+    // Generating a new bot with properties
+    this.game = options.game;
+    this.name = options.name || 'bot ' + (++this.game.botCount);
+    this.isBot = true;
+    this.position = new THREE.Vector3( position[ 0 ], position[ 1 ], position[ 2 ] );
+    this.rotation = new THREE.Vector3( rotation[ 0 ], rotation[ 1 ], rotation[ 2 ] );
+    
+    this.botOptions = {
+      rotationSpeed: Math.PI/2,
+      pitchSpeed: Math.PI/4,
+      yawSpeed: Math.PI/4,
+      thrustImpulse: 0,
+      brakePower: 0.85,
+      velocityFadeFactor: 16,
+      rotationFadeFactor: 4
+    };
+
+    var geometry = s.models[options.shipClass].geometry;
+    this.materials = s.models[options.shipClass].materials[0];
+    this.materials.emissive = new THREE.Color('rgb(255,255,255)');
+
+    var physiMaterial = Physijs.createMaterial(this.materials);
+    this.root = new Physijs.ConvexMesh(geometry, physiMaterial, 100);
+    this.root.position.copy(this.position);
+    this.root.rotation.copy(this.rotation);
+
+    this.lastTurretFire = 0;
+    this.lastMissileFire = 0;
+    this.alliance = options.alliance;
+
+    this.root.name = this.name;
+    this.hull = s.config.ship.hull;
+    this.shields = s.config.ship.shields;
+
+    //////////////////////////////
+    //////      BOT LOGIC    /////
+    //////////////////////////////
+
+    //bot initialization
+    this.controlBot = this.controlBot.bind(this);
+    this.targetX = 0;
+    this.targetY = 0;
+
+
+    //Create a camera for the bot
+    this.camera = new THREE.PerspectiveCamera(35, 1, 1, 300000);
+
+     // Root camera to the bot's position
+    this.root.add( this.camera );
+
+    // Setup camera: Cockpit view; COMMENT OUT FOR CHASE CAM
+    this.camera.position.set( 0, 0, 0 );
+
+    //set a hook on the bot controls.
+    //necessary because first player has bot join twice
+    if (this.game.lastBotCallback) {
+      this.game.unhook( this.game.lastBotCallback );
+    }
+
+    this.game.hook( this.controlBot );
+    this.game.lastBotCallback = this.controlBot;
+
+    this.lastTime = new Date( ).getTime( );
+
+  },
+
+  getOffset: function(offset) {
+    return offset.clone().applyMatrix4(this.root.matrixWorld);
+  },
+
+  botFire: function (weapon) {
+    var now =new Date().getTime();
+    var position;
+    var rotation = this.root.rotation.clone();
+    var initialVelocity = this.root.getLinearVelocity().clone();
+
+    // Turrets
+    if (weapon === 'turret'){
+      if (now - this.lastTurretFire > this.options.botTurretFireTime){
+        // Left bullet
+        position = this.getOffset(this.options.leftTurretOffset);
+        var bulletLeft = new s.Turret({
+          game: this.game,
+          pilot: this.name,
+          position: position,
+          rotation: rotation,
+          initialVelocity: initialVelocity,
+          isbBot: this.isBot,
+          team: this.alliance
+        });
+
+        // Right bullet
+        position = this.getOffset(this.options.rightTurretOffset);
+        var bulletRight = new s.Turret({
+          game: this.game,
+          pilot: this.name,
+          position: position,
+          rotation: rotation,
+          initialVelocity: initialVelocity,
+          isBot: this.isBot,
+          team: this.alliance
+        });
+
+        this.lastTurretFire = now;
+
+        if (!this.isBot) {
+          this.game.sound.play('laser', 0.5);
+        }
+      }
+    }
+  },
+
+
+  controlBot: function( ) {
+
+
+    //////////////////////////////
+    ////  CLOSEST ENEMY LOGIC ////
+    //////////////////////////////  
+
+    //MAKE ENEMY LIST FOR BOT
+    var botEnemyList = [];
+    botEnemyList.push(this.game.player);
+    var enemyShips = this.game.enemies._list;
+    for (var i = 0; i < enemyShips.length; i++) {
+      if (!enemyShips[i].isBot) {
+        botEnemyList.push(enemyShips[i]);
+      }
+    }
+
+    //DETERMINE CLOSEST ENEMY
+    var closestDistance;
+    for (i = 0; i < botEnemyList.length; i++) {
+      var distance = this.root.position.distanceTo(botEnemyList[i].root.position);
+      if (!closestDistance || distance < closestDistance) {
+        closestDistance = distance;
+        this.target = botEnemyList[i];
+      }
+    }
+
+    //////////////////////////////
+    //// THRUST/BREAK LOGIC ////
+    //////////////////////////////    
+
+    var now = new Date( ).getTime( );
+    var difference = now - this.lastTime;
+
+    var thrust = 0;
+    var brakes = 0;
+
+    var  maxDistance = 4100, minDistance = 1500;
+
+    if (closestDistance > maxDistance) {
+      thrust = 1;
+    }
+    else if (closestDistance < minDistance) {
+      brakes = 1;
+    } else {
+      var ratio = (closestDistance - minDistance) / (maxDistance - minDistance);
+      var optimumSpeed = s.config.ship.maxSpeed * ratio;
+      if (optimumSpeed < this.botOptions.thrustImpulse) { brakes = 1; }
+      if (optimumSpeed > this.botOptions.thrustImpulse) { thrust = 1; }
+    }
+
+    if (thrust && this.botOptions.thrustImpulse < s.config.ship.maxSpeed){
+      this.botOptions.thrustImpulse += difference;
+    }
+
+    if (brakes && this.botOptions.thrustImpulse > 0){
+      this.botOptions.thrustImpulse -= difference;
+    }
+
+
+    //////////////////////////////
+    // LEFT/RIGHT/UP/DOWN LOGIC //
+    //////////////////////////////       
+
+    var vTarget3D;
+    var vTarget2D;
+
+    var pitch = 0;
+    var roll = 0;
+    var yaw = 0;
+
+    var yawSpeed    = this.botOptions.yawSpeed,
+    pitchSpeed  = this.botOptions.pitchSpeed;
+
+    var thrustScalar = this.botOptions.thrustImpulse/s.config.ship.maxSpeed + 1;
+
+    // TARGET HUD MARKING
+    if ( this.target ) {
+      this.target = this.target.root;
+
+      vTarget3D = this.target.position.clone();
+      vTarget2D = s.projector.projectVector(vTarget3D, this.camera);
+    }
+
+    if (vTarget2D.z < 1) {
+        //go left; else if go right
+        if (vTarget2D.x < -0.15) {
+          yaw = yawSpeed / thrustScalar;
+        } else if (vTarget2D.x > 0.15) {
+          yaw = -1 * yawSpeed / thrustScalar;
+        }
+        //do down; else if go up
+        if (vTarget2D.y < -0.15) {
+          pitch = -1*pitchSpeed / thrustScalar;
+        } else if (vTarget2D.y > 0.15) {
+          pitch  = pitchSpeed / thrustScalar;
+        }
+      } else {
+        //go right; else if go left
+        if (vTarget2D.x < 0) {
+          yaw = -1* yawSpeed / thrustScalar;
+        } else if (vTarget2D.x >= 0) {
+          yaw = yawSpeed / thrustScalar;
+        }
+        //do up; else if go down
+        if (vTarget2D.y < 0) {
+          pitch = pitchSpeed / thrustScalar;
+        } else if (vTarget2D.y > 0) {
+          pitch  = -1 * pitchSpeed / thrustScalar;
+        }
+      }
+
+    //////////////////////////////
+    // MOTION AND PHYSICS LOGIC //
+    //////////////////////////////
+
+
+    var linearVelocity = this.root.getLinearVelocity().clone();
+    var angularVelocity = this.root.getAngularVelocity().clone();
+    var rotationMatrix = new THREE.Matrix4();
+    rotationMatrix.extractRotation(this.root.matrix);
+
+    angularVelocity = angularVelocity.clone().divideScalar(this.botOptions.rotationFadeFactor);
+    this.root.setAngularVelocity(angularVelocity);
+
+    var newAngularVelocity = new THREE.Vector3(pitch, yaw, roll).applyMatrix4(rotationMatrix).add(angularVelocity);
+    this.root.setAngularVelocity(newAngularVelocity);
+
+    var impulse = linearVelocity.clone().negate();
+    this.root.applyCentralImpulse(impulse);
+
+    var getForceVector = new THREE.Vector3(0,0, -1*this.botOptions.thrustImpulse).applyMatrix4(rotationMatrix);
+    this.root.applyCentralImpulse(getForceVector);
+
+    this.lastTime = now;
+
+    //////////////////////////////
+    ///////  FIRING LOGIC ////////
+    //////////////////////////////
+
+    if ( Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && closestDistance < maxDistance) {
+      this.botFire('turret');
+    }
+
+  },
+
+  setPosition: function (position, rotation, aVeloc, lVeloc, interpolate) {
+      var posInterpolation = 0.05;
+      var rotInterpolation = 0.50;
+
+      if (interpolate) {
+          // Interpolate position by adding the difference of the calculated position and the position sent by the authoritative client
+          var newPositionVec = new THREE.Vector3(position[0], position[1], position[2]);
+          var posErrorVec = newPositionVec.sub(this.root.position).multiply(new THREE.Vector3(posInterpolation, posInterpolation, posInterpolation));
+          this.root.position.add(posErrorVec);
+      }
+      else {
+          // Directly set position
+          this.root.position.set(position[0], position[1], position[2]);
+      }
+
+      // Set rotation
+      if (rotation)
+          this.root.rotation.set(rotation[0], rotation[1], rotation[2]);
+
+      if (aVeloc !== undefined && this.root.setAngularVelocity)
+          this.root.setAngularVelocity({ x: aVeloc[0], y: aVeloc[1], z: aVeloc[2] });
+
+      if (lVeloc !== undefined && this.root.setLinearVelocity)
+          this.root.setLinearVelocity({ x: lVeloc[0], y: lVeloc[1], z: lVeloc[2] });
+
+      // Tell the physics engine to update our position
+      this.root.__dirtyPosition = true;
+      this.root.__dirtyRotation = true;
+  },
+
+
 
 } );
 s.Moon = new Class({
@@ -51000,8 +51291,6 @@ s.SatelliteGame = new Class( {
 	initialize: function() {
 		var that = this;
 
-        //initally set lastBotCallback to null. updated in s.Ship
-
         this.IDs = [];
         this.botCount = 0;
         this.hostPlayer = false;
@@ -51132,7 +51421,7 @@ s.SatelliteGame = new Class( {
                 }
                 return false;
             },
-            add: function ( enemyInfo ) {
+            add: function ( enemyInfo, isBot ) {
                 if ( this.has( enemyInfo.name ) ) {
                     this.delete( enemyInfo.name );
                     console.error( 'Bug: Player %s added twice', enemyInfo.name );
@@ -51142,22 +51431,37 @@ s.SatelliteGame = new Class( {
                         console.log( enemyInfo );
                         console.trace( );
                     }
-                    console.log( '%s has joined the fray', enemyInfo.name );
+                    if (!isBot) { console.log( '%s has joined the fray', enemyInfo.name ); }
                 }
 
                 // TODO: include velocities?
-                var enemyShip = new s.Player( {
-                    game: that,
-                    shipClass: 'human_ship_heavy',
-                    name: enemyInfo.name,
-                    isBot: enemyInfo.isBot,
-                    position: new THREE.Vector3( enemyInfo.pos[ 0 ], enemyInfo.pos[ 1 ], enemyInfo.pos[ 2 ] ),
-                    rotation: new THREE.Vector3( enemyInfo.rot[ 0 ], enemyInfo.rot[ 1 ], enemyInfo.rot[ 2 ] ),
-                    alliance: 'enemy'
-                } );
+                var enemyShip;
+                if (isBot) {
+                    // that.botCount = enemyInfo.botCount || ++that.botCount;
+                    enemyShip = new s.Bot( {
+                        game: that,
+                        shipClass: 'human_ship_heavy',
+                        name: enemyInfo.name,
+                        position: enemyInfo.position,
+                        rotation: enemyInfo.rotation,
+                        alliance: 'enemy'
+                    } );
+                        // position: new THREE.Vector3( enemyInfo.pos[ 0 ], enemyInfo.pos[ 1 ], enemyInfo.pos[ 2 ] ),
+                        // rotation: new THREE.Vector3( enemyInfo.rot[ 0 ], enemyInfo.rot[ 1 ], enemyInfo.rot[ 2 ] ),
+                } else {
+                    enemyShip = new s.Player( {
+                        game: that,
+                        shipClass: 'human_ship_heavy',
+                        name: enemyInfo.name,
+                        position: new THREE.Vector3( enemyInfo.pos[ 0 ], enemyInfo.pos[ 1 ], enemyInfo.pos[ 2 ] ),
+                        rotation: new THREE.Vector3( enemyInfo.rot[ 0 ], enemyInfo.rot[ 1 ], enemyInfo.rot[ 2 ] ),
+                        alliance: 'enemy'
+                    } );
+                }
                 
+                if (isBot) { console.log( '%s has joined the fray', enemyShip.name ); }
                 this._list.push( enemyShip );
-                this._map[ enemyInfo.name ] = enemyShip; // this._map.set(enemyInfo.name, otherShip);
+                this._map[ enemyShip.name ] = enemyShip; // this._map.set(enemyInfo.name, otherShip);
             }
         };
 
@@ -51397,9 +51701,10 @@ s.SatelliteGame = new Class( {
             if (zappedEnemy.hull <= 0 && zappedEnemy.isBot) {
                 console.log(zappedName, ' has died');
                 s.game.handleKill.call(s, { killed: zappedName, killer: killer });
-                s.game.makeNewBot({
-                    position: [ 23498, -25902, 24976 ]
-                });
+                // s.game.makeNewBot({
+                //     position: [ 23498, -25902, 24976 ]
+                // });
+                s.game.enemies.add( {position: [ 23498, -25902, 24976 ]}, 'bot' );
             }
         }
     },
@@ -51466,7 +51771,6 @@ s.SatelliteGame = new Class( {
     },
 
     makeNewBot: function(options) {
-        
         // If no options passed, set options to empty object and default values for position and rotation
         options = options || {};
 
@@ -51519,7 +51823,8 @@ s.SatelliteGame = new Class( {
         this.game.hostPlayer = true;
         if (this.game.botCount === 0) {
             // Create a new bot
-            this.game.makeNewBot();
+            // this.game.makeNewBot();
+            this.game.enemies.add( {}, 'bot');
         }
 
         var botEnemies = this.game.getBotEnemies();
@@ -51551,22 +51856,24 @@ s.SatelliteGame = new Class( {
                     rotation: rotation,
                     aVeloc: aVeloc,
                     lVeloc: lVeloc,
-                    name: name,
-                    botCount: this.botCount
+                    name: name
+                    // botCount: this.botCount
                 };
+                enemiesSocketInfo.botCount = this.botCount;
             }
         }
         return enemiesSocketInfo;
     },
 
     handleBotPositions: function(message) {
-
+        this.game.botCount = message.botCount;
         //if the bot exists...update positions
         //else make new bot with position
         // this.game.botCount = 0;
         for (var bot in message) {
-            if ( !this.game.enemies.execute( message[bot].name, 'setPosition', [ message[bot].position, message[bot].rotation, message[bot].aVeloc, message[bot].lVeloc, true ] ) ) {
-                this.game.makeNewBot(message[bot]);
+            if ( bot !== 'botCount' && !this.game.enemies.execute( message[bot].name, 'setPosition', [ message[bot].position, message[bot].rotation, message[bot].aVeloc, message[bot].lVeloc, true ] ) ) {
+                // this.game.makeNewBot(message[bot]);
+                this.game.enemies.add(message[bot], 'bot');
             }
         }
     }

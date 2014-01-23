@@ -3,7 +3,6 @@ s.Player = new Class({
 	construct: function(options) {
 		// Nothing here yet...
 		// Maybe collision detection and whatnot
-		
 	}
 
 });
