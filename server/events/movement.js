@@ -1,12 +1,12 @@
 module.exports = function(host, Sync) {
   return {
     keySync: function (socket, packet) {
-      // console.log('\n===============\n',host.sockets[socket.id],'\n===============\n');
+      // console.log('\n====== ',host.sockets[socket.id],' ========\n');
       var room = host.sockets[socket.id].room;
       var shipName = host.sockets[socket.id].name;
       var playerState = host.rooms[room].gamestate[shipName];
 
-      // console.log('packet:\n',packet, 'playerState:\n',playerState, 'room:\n',room, 'shipName:\n',shipName);
+      // console.log('\npacket:\n',packet,'\nroom:\n',room, '\nshipName:\n',shipName);
 
       var isLegalMove = Sync.setMove(packet, playerState);
 
