@@ -50504,6 +50504,7 @@ s.Menu = new Class({
   addMenuItems: function ( items ) {
     // procedurally center aligns text, vertically center aligns menu
     var menuHeight = 0;
+    var currentHeight = 0;
     for (var j = 0; j < items.length; j++) {
       if (items[j].small) {
         menuHeight += 4;
@@ -50546,10 +50547,11 @@ s.Menu = new Class({
       var menuItemGeo = new THREE.TextGeometry(items[items.length-i-1].text, {font: font, size: size, height: size*2, weight: bold, bevelEnabled: bevelEnabled, bevelThickness: bevel, bevelSize: bevel});
       var menuItemMaterial = new THREE[mat]({color: 0x00FF00});
       var menuItem = new THREE.Mesh(menuItemGeo, menuItemMaterial);
-      menuItem.position.setY((i*(size*2))-(menuHeight/2)+(size/2)); // MATH!
+      menuItem.position.setY((currentHeight)-(menuHeight/2)+(size/2)); // MATH?
       menuItem.position.setX(menuItem.geometry.boundingSphere.radius*-0.5);
       menuItem.visible = false;
       this.menuBox.add( menuItem );
+      currentHeight += size*2;
     }
   },
   clearMenu: function () {
@@ -50585,7 +50587,7 @@ s.Menu = new Class({
   },
   showDefaultMenu: function () {
     this.menuScreen = 'default';
-    this.addMenuItems([{text: 'JOIN GAME', size: 5}, {text: 'DISCONECT', size: 5}, {text: 'LEADERBOARD', size: 5}]);//, {text: 'SMALL TEST TEXT 1', small: true}, {text: 'SMALL TEST TEXT 2', small: true}, {text: 'SMALL TEST TEXT 3', small: true}]);
+    this.addMenuItems([{text: 'JOIN GAME', size: 5}, {text: 'DISCONECT', size: 5}, {text: 'LEADERBOARD', size: 5}, {text: 'SMALL TEST TEXT 1', small: true}, {text: 'SMALL TEST TEXT 2', small: true}, {text: 'SMALL TEST TEXT 3', small: true}]);
   },
   showRoomList: function () {
     this.clearMenu();
