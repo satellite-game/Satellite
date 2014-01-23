@@ -55,8 +55,12 @@ util_methods.disconnect = function( socket ) {
 };
 
 c_methods.move = function( socket, packet ) {
-  var player_state = host.rooms[host.sockets[socket.id].room]
-                         .gamestate[host.sockets[socket.id].name];
+  var room = host.sockets[socket.id].room;
+  var shipName = host.sockets[socket.id].name;
+  // console.log(room, shipName);
+  // console.log('=====================');
+  // console.log(host.rooms[room], host.rooms[room].gamestate);
+  var player_state = host.rooms[room].gamestate[shipName];
   if(Sync.setMove(packet, player_state)) {
     for(var i in packet) {
       player_state[i] = packet[i];

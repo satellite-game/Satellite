@@ -48877,14 +48877,26 @@ s.Keyboard = new Class({
   modifiers: ['shift', 'ctrl', 'alt', 'meta'],
 
   construct: function(game, player) {
+    var self = this;
     this.keyCodes = {};
+    this.socketSendKey.bind(this);
 
     // Listen to key events
     window.addEventListener('keydown', this.handleKeyChange.bind(this, true), false);
     window.addEventListener('keyup', this.handleKeyChange.bind(this, false), false);
-    // Listen to key events ___ SYNCED
-    window.addEventListener('keydown', this.socketSendKey.bind(this));
-    window.addEventListener('keyup', this.socketSendKey.bind(this));
+
+    // Listen to key events for syncing
+    this.keyDownAllowed = true;
+    $(document).keyup(function(e){
+      self.keyDownAllowed = true;
+      self.socketSendKey(e);
+    });
+    $(document).keydown(function(e){
+      if (self.keyDownAllowed) {
+        self.socketSendKey(e);
+        self.keyDownAllowed = false;
+      }
+    });
   },
 
   destruct: function() {
@@ -49085,7 +49097,8 @@ s.Controls = new Class({
     this.oculusCompensationZ = 0;
 
     // Mouse interface - mice options are: 'keyboard', 'none', 'oculus'
-    this.mouse = new s.Mouse('keyboard', options);
+    // this.mouse = new s.Mouse('keyboard', options);
+    this.mouse = new s.Mouse('none', options);
 
     console.log('Initialized gamepad...');
 
@@ -50272,9 +50285,6 @@ s.Comm = new Class( {
         this.socket.on( 'hit', this.makeTrigger( 'hit' ));
 
         this.socket.on( 'sync', this.makeTrigger( 'sync'));
-        //////////////////
-        this.socket.on( 'keySync', function (data) {console.log(data.pos);});
-        //////////////////
 
         this.game.hook( this.position );
 
@@ -51077,7 +51087,7 @@ s.SatelliteGame = new Class( {
         }
     },
     handleMove: function ( message ) {
-        console.log("A player moved");
+        console.log("A player moved", message);
         if ( message.name == this.pilot.name ) {
             // server told us to move
             console.log( 'Server reset position' );

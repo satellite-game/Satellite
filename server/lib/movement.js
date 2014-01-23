@@ -1,8 +1,12 @@
-module.exports = function (host, Sync) {
+module.exports = function(host, Sync) {
   return {
-    keyup: function (socket, packet) {
-      var playerState = host.rooms[host.sockets[socket.id].room]
-                        .gamestate[host.sockets[socket.id].name];
+    keySync: function (socket, packet) {
+      console.log('\n===============\n',host.sockets[socket.id],'\n===============\n');
+      var room = host.sockets[socket.id].room;
+      var shipName = host.sockets[socket.id].name;
+      var playerState = host.rooms[room].gamestate[shipName];
+
+      console.log('packet:\n',packet, 'playerState:\n',playerState, 'room:\n',room, 'shipName:\n',shipName);
 
       var isLegalMove = Sync.setMove(packet, playerState);
 
@@ -10,22 +14,9 @@ module.exports = function (host, Sync) {
         for(var i in packet) {
           playerState[i] = packet[i];
         };
-        timeId = continueMovement();
-        socket.emit('keySync', playerState);
+        socket.emit('move', playerState);
+        socket.broadcast.to(room).emit('move', playerState);
       }
-    },
-    keydown: function (socket, packet) {
-
-      var playerState = host.rooms[host.sockets[socket.id].room]
-                        .gamestate[host.sockets[socket.id].name];
-      var isLegalMove = Sync.setMove(packet, playerState);
-
-      if(isLegalMove) {
-        for(var i in packet) {
-          playerState[i] = packet[i];
-        };
-        socket.emit('keySync', playerState);
-      }
-    },
+    }
   }
 };

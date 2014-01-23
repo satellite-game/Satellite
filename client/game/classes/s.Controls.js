@@ -37,7 +37,8 @@ s.Controls = new Class({
     this.oculusCompensationZ = 0;
 
     // Mouse interface - mice options are: 'keyboard', 'none', 'oculus'
-    this.mouse = new s.Mouse('keyboard', options);
+    // this.mouse = new s.Mouse('keyboard', options);
+    this.mouse = new s.Mouse('none', options);
 
     console.log('Initialized gamepad...');
 
