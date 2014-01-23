@@ -181,7 +181,7 @@ s.Ship = new Class({
 
                 this.lastTurretFire = now;
 
-                if (this.name.slice(0,3) !== 'bot') {
+                if (!this.bot) {
                     this.game.sound.play('laser', 0.5);
                 }
             }
@@ -264,7 +264,7 @@ s.Ship = new Class({
         botEnemyList.push(this.game.player);
         var enemyShips = this.game.enemies._list;
         for (var i = 0; i < enemyShips.length; i++) {
-            if (enemyShips[i].name.slice(0,3) !== 'bot') {
+            if (!enemyShips[i].bot) {
                 botEnemyList.push(enemyShips[i]);
             }
         }

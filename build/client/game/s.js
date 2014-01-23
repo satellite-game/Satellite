@@ -48583,7 +48583,7 @@ s.Ship = new Class({
 
                 this.lastTurretFire = now;
 
-                if (this.name.slice(0,3) !== 'bot') {
+                if (!this.bot) {
                     this.game.sound.play('laser', 0.5);
                 }
             }
@@ -48666,7 +48666,7 @@ s.Ship = new Class({
         botEnemyList.push(this.game.player);
         var enemyShips = this.game.enemies._list;
         for (var i = 0; i < enemyShips.length; i++) {
-            if (enemyShips[i].name.slice(0,3) !== 'bot') {
+            if (!enemyShips[i].bot) {
                 botEnemyList.push(enemyShips[i]);
             }
         }
@@ -51357,6 +51357,7 @@ s.SatelliteGame = new Class( {
     handleHit: function(message) {
         var you = message.otherPlayerName;
         var killer = message.yourName;
+        var enemyYou = s.game.enemies.get(you);
         if (you === s.game.pilot.name){
             s.game.stopShields();
             s.game.rechargeShields();
@@ -51382,8 +51383,8 @@ s.SatelliteGame = new Class( {
             if (s.game.player.hull <= 0) {
                 s.game.handleDie(you, killer);
             }
-        } else if (you.slice(0,3) === 'bot') {
-            var enemyBot = s.game.enemies.get(you);
+        } else if (enemyYou.bot) {
+            var enemyBot = enemyYou;
 
             if (enemyBot.shields > 0){
                 enemyBot.shields -= 20;
@@ -51516,9 +51517,6 @@ s.SatelliteGame = new Class( {
         var updatePlayersWithBots = function() {
             
             var botEnemies = this.game.getBotEnemies();
-            console.log('sending positionsX: ', botEnemies['bot 1'].position[0]);
-            console.log('sending positionsY: ', botEnemies['bot 1'].position[1]);
-            console.log('sending positionsZ: ', botEnemies['bot 1'].position[2]);
             this.game.comm.botUpdate(botEnemies);
         };
         
@@ -51551,7 +51549,7 @@ s.SatelliteGame = new Class( {
         enemiesSocketInfo = {};
         var enemiesList = this.enemies._list;  
         for (var i = 0; i < enemiesList.length; i++) {
-            if (enemiesList[i].name.slice(0,3) === 'bot'){
+            if (enemiesList[i].bot){
                 var physics = enemiesList[i].root;
                 var position = makeArray(physics.position);
                 var rotation = makeArray(physics.rotation);
@@ -51579,10 +51577,7 @@ s.SatelliteGame = new Class( {
         //else make new bot with position
         // this.game.botCount = 0;
         for (var bot in message) {
-            console.log('handling positionsX: ', message[bot].position[0]);
-            console.log('handling positionsY: ', message[bot].position[1]);
-            console.log('handling positionsZ: ', message[bot].position[2]);
-            if ( !this.game.enemies.execute( message[bot].name, 'setPosition', [ message[bot].position, message[bot].rotation, message[bot].aVeloc, message[bot].lVeloc, false ] ) ) {
+            if ( !this.game.enemies.execute( message[bot].name, 'setPosition', [ message[bot].position, message[bot].rotation, message[bot].aVeloc, message[bot].lVeloc, true ] ) ) {
                 this.game.makeNewBot(message[bot]);
             }
         }

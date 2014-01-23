@@ -383,6 +383,7 @@ s.SatelliteGame = new Class( {
     handleHit: function(message) {
         var you = message.otherPlayerName;
         var killer = message.yourName;
+        var enemyYou = s.game.enemies.get(you);
         if (you === s.game.pilot.name){
             s.game.stopShields();
             s.game.rechargeShields();
@@ -408,8 +409,8 @@ s.SatelliteGame = new Class( {
             if (s.game.player.hull <= 0) {
                 s.game.handleDie(you, killer);
             }
-        } else if (you.slice(0,3) === 'bot') {
-            var enemyBot = s.game.enemies.get(you);
+        } else if (enemyYou.bot) {
+            var enemyBot = enemyYou;
 
             if (enemyBot.shields > 0){
                 enemyBot.shields -= 20;
@@ -574,7 +575,7 @@ s.SatelliteGame = new Class( {
         enemiesSocketInfo = {};
         var enemiesList = this.enemies._list;  
         for (var i = 0; i < enemiesList.length; i++) {
-            if (enemiesList[i].name.slice(0,3) === 'bot'){
+            if (enemiesList[i].bot){
                 var physics = enemiesList[i].root;
                 var position = makeArray(physics.position);
                 var rotation = makeArray(physics.rotation);
