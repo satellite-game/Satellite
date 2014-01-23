@@ -36,8 +36,12 @@ s.Controls = new Class({
     this.oculusCompensationY = 0;
     this.oculusCompensationZ = 0;
 
+    // Mouse interface - mice options are: 'keyboard', 'none', 'oculus'
+    // this.mouse = new s.Mouse('keyboard', options);
+    this.mouse = new s.Mouse('none', options);
+
     console.log('Initialized gamepad...');
-    
+
     this.gamepad.bind(Gamepad.Event.CONNECTED, function(device) {
       console.log('Gamepad connected: '+device.id);
     });
@@ -71,6 +75,7 @@ s.Controls = new Class({
 
   update: function( time, delta ) {
     var mouseControls = true;
+
     var gamepadYaw = false;
     var hasGamepad = !!this.gamepad.gamepads.length;
 
@@ -100,45 +105,39 @@ s.Controls = new Class({
       radius = this.HUD.subreticleBound.radius,
       crosshairs = {width: 30, height: 30};
 
-    // if (mouseControls) {
-    //   // Set yaw to zero if cursor is inside the crosshair region
-    //   if (this.HUD.targetX > centerX - crosshairs.width/2 && this.HUD.targetX < centerX + crosshairs.width/2){
-    //     yaw = 0;
-    //   } else {
-    //     // X scales yaw
-    //     var yawDivisor = this.HUD.targetX < centerX ?
-    //       (centerX-radius)/((centerX-this.HUD.targetX)*4) : -(centerX+radius)/((-centerX+this.HUD.targetX)*4);
-    //     yaw = yawSpeed/yawDivisor/thrustScalar;
-    //     console.log(yaw);
-    //   }
-
-    //   // Set pitch to zero if cursor is inside the crosshair region
-    //   if (this.HUD.targetY > centerY - crosshairs.height/2 && this.HUD.targetY < centerY + crosshairs.height/2){
-    //     pitch = 0;
-    //   } else {
-    //     // Y scales pitch
-    //     var pitchDivisor = this.HUD.targetY < centerY ?
-    //       (centerY+radius)/((centerY-this.HUD.targetY)*4) : -(centerY+radius)/((-centerY+this.HUD.targetY)*4);
-    //     pitch = pitchSpeed/pitchDivisor/thrustScalar;
-    //   }
-    // }
-    // else {
-    //   this.HUD.targetX = centerX;
-    //   this.HUD.targetY = centerY;
-    // }
-
     ///////////////////////
     //  OCULUS CONTROLS  //
     ///////////////////////
 
-
-
     if (this.oculus.detected) {
-      // mouseControls = false;
-      pitch = this.oculus.quat.x - this.oculusCompensationX;
-      yaw = this.oculus.quat.y - this.oculusCompensationY;
-      roll = this.oculus.quat.z - this.oculusCompensationZ;
+      this.mouse.mouseType = 'oculus';
+      pitch = this.oculus.quat.x - this.oculus.compensationX;
+      yaw = this.oculus.quat.y - this.oculus.compensationY;
+      roll = this.oculus.quat.z - this.oculus.compensationZ;
     }
+
+    ///////////////////////
+    //  MOUSE CONTROLS   //
+    ///////////////////////
+
+    var mouseUpdate = this.mouse.update({
+        centerX: centerX,
+        crosshairs: crosshairs,
+        yaw: yaw,
+        radius: radius,
+        yawSpeed: yawSpeed,
+        thrustScalar: thrustScalar,
+        centerY: centerY,
+        pitch: pitch,
+        pitchSpeed: pitchSpeed
+    });
+
+    pitch = mouseUpdate.pitch || pitch;
+    yaw = mouseUpdate.yaw || yaw;
+    roll = mouseUpdate.roll || roll;
+
+    brakes = mouseUpdate.brakes || brakes;
+    thrust = mouseUpdate.thrust || thrust;
 
     ///////////////////////
     // GAMEPAD CONTROLS  //
@@ -149,7 +148,7 @@ s.Controls = new Class({
 
     //   // TODO: Handle inverted option
     //   pitch = gamepadState.LEFT_STICK_Y;
-      
+
     //   if (gamepadYaw) {
     //     yaw = gamepadState.LEFT_STICK_X*-1;
     //   }
@@ -208,9 +207,9 @@ s.Controls = new Class({
     }
 
     if (this.keyboard.pressed('tilde')) {
-      this.oculusCompensationX = this.oculus.quat.x;
-      this.oculusCompensationY = this.oculus.quat.y;
-      this.oculusCompensationZ = this.oculus.quat.z;
+      this.oculus.compensationX = this.oculus.quat.x;
+      this.oculus.compensationY = this.oculus.quat.y;
+      this.oculus.compensationZ = this.oculus.quat.z;
     }
 
 
@@ -252,7 +251,8 @@ s.Controls = new Class({
     */
 
     if (thrust && this.options.thrustImpulse < s.config.ship.maxSpeed){
-      this.options.thrustImpulse += difference;
+      this.options.thrustImpulse += (difference > s.config.ship.maxSpeed) ?
+        s.config.ship.maxSpeed : difference;
     }
 
     if (brakes && this.options.thrustImpulse > 0){

@@ -15,3 +15,7 @@ Just run the default grunt task from the root directory by issuing `grunt`
 
 Running `grunt test` will initiate mocha/chai/sinon testing on both client side and server side. Running `grunt` will initiate the same testing suite. Both `grunt test` and `grunt` will not execute all tests until changes to a file are made to files.
 
+
+## Dev Staging
+
+Pushes to Azure with every merge to dev branch. [Link can be found here](http://satellite-stage.azurewebsites.net/)
