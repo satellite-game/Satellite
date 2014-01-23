@@ -40,7 +40,7 @@ s.Projectile = new Class({
                 this.comm.hit(mesh.name,this.game.pilot.name);
             }
         } else if (mesh.name === this.game.pilot.name && this.bot ) {
-            this.comm.botHit(mesh.name,this.game.pilot.name);
+            this.comm.botHit(mesh.name, this.pilot);
         }
         this.destruct();
     },
