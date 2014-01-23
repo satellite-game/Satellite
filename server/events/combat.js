@@ -6,18 +6,19 @@ module.exports = function (host, sync) {
       // console.log(room, shipName);
       // console.log('=====================');
       // console.log(host.rooms[room], host.rooms[room].gamestate);
-      var player_state = host.rooms[room].gamestate[shipName];
-      if(sync.setMove(packet, player_state)) {
+      var playerState = host.rooms[room].gamestate[shipName];
+      if(sync.setMove(packet, playerState)) {
         for(var i in packet) {
-          player_state[i] = packet[i];
+          playerState[i] = packet[i];
         };
-        socket.broadcast.to(host.sockets[socket.id].room).emit('move', player_state);
+        socket.broadcast.to(room).emit('move', playerState);
       }
     },
 
     fire: function( socket, packet ) {
+      var room = host.sockets[socket.id].room;
       socket.get('name', function (err, name) {
-          socket.broadcast.emit('fire', {
+          socket.broadcast.to(room).emit('fire', {
               name: packet.name,
               position: packet.position,
               rotation: packet.rotation,
@@ -27,11 +28,12 @@ module.exports = function (host, sync) {
     },
 
     hit: function( socket, packet ) {
+      var room = host.sockets[socket.id].room;
       var response = {
         otherPlayerName: packet.otherPlayerName,
         yourName: packet.yourName
       };
-      socket.broadcast.emit('hit', response);
+      socket.broadcast.to(room).emit('hit', response);
       socket.emit('hit', response);
     },
 

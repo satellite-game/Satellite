@@ -51101,7 +51101,7 @@ s.SatelliteGame = new Class( {
       console.log("A sync request has been made by the server!");
       console.log("This is enemies", s.game.enemies);
       console.log("This is enemies trying to map...", s.game.enemies.list());
-      //if our value does not match 
+      //if our value does not match
       // realign ourselves with Handlemove , take the difference add it to the velocity
       // realign all enemies with HandleMove, take the difference add it to the velocity .
       var moveSelf = function( self ) {};
