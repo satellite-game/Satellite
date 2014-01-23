@@ -211,10 +211,10 @@ s.Controls = new Class({
     }
 
     if (this.keyboard.pressed('escape')) {
-      if (this.menu.displayed) {
-        this.menu.close();
-      } else {
+      if (!this.menu.displayed) {
         this.menu.open();
+      } else {
+        this.menu.close();
       }
     }
 

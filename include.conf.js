@@ -9,6 +9,7 @@ module.exports = [
   "./client/lib/gamepad.js",
   "./client/lib/socketio/socket.io.js",
   "./client/lib/typefacejs/helvetiker_bold.typeface.js",
+  "./client/lib/typefacejs/helvetiker_regular.typeface.js",
   "./client/game/s.js",
   "./client/game/s.util.js",
   "./client/game/classes/s.EventEmitter.js",
