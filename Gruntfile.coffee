@@ -14,12 +14,13 @@ module.exports = (grunt) ->
       unit:
         configFile: 'karma.conf.js'
         autoWatch: false
+        singleRun: false
         background: true
       travis:
         configFile: 'karma.conf.js'
         autoWatch: false
         singleRun: true
-        browsers: ['PhantomJS']
+        browsers: ['sl_chrome_OSX9']
 
     # server-side:
     # ----------------
@@ -77,7 +78,7 @@ module.exports = (grunt) ->
       options:
         jshintrc: '.jshintrc'
       gruntfile: ['Gruntfile.js']
-      server: ['app.js']
+      server: ['server/**/*.js']
       client: ['client/**/*.js', '!**/models/**', '!**/lib/**']
       tests: ['tests/**/*.js', '!tests/oculus-testing-playground/**/*.js']
 
@@ -100,7 +101,7 @@ module.exports = (grunt) ->
         options:
           livereload: true
       server:
-        files: ['app.js']
+        files: ['server/**/*.js']
         tasks: ['server']
         options:
           livereload: true
@@ -133,6 +134,9 @@ module.exports = (grunt) ->
 
   # DEPENDENCIES
   # =================
+  # Loading dependencies
+  # for pkg of grunt.file.readJSON("package.json").devDependencies
+  #   grunt.loadNpmTasks pkg  if pkg isnt "grunt" and pkg.indexOf("grunt") is 0
 
   grunt.loadNpmTasks 'grunt-contrib-clean'
   grunt.loadNpmTasks 'grunt-contrib-concat'
@@ -141,9 +145,11 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-contrib-stylus'
   grunt.loadNpmTasks 'grunt-contrib-uglify'
   grunt.loadNpmTasks 'grunt-contrib-watch'
-  grunt.loadNpmTasks 'grunt-open'
-  grunt.loadNpmTasks 'grunt-nodemon'
+
   grunt.loadNpmTasks 'grunt-concurrent'
+  grunt.loadNpmTasks 'grunt-nodemon'
+  grunt.loadNpmTasks 'grunt-open'
+
   grunt.loadNpmTasks 'grunt-karma'
   grunt.loadNpmTasks 'grunt-mocha-chai-sinon'
 
@@ -159,4 +165,5 @@ module.exports = (grunt) ->
   grunt.registerTask 'server', ['jshint:server']
   grunt.registerTask 'client', ['jshint:client', 'copy:client', 'concat', 'stylus']
   grunt.registerTask 'client-prod', ['client', 'uglify']
-  grunt.registerTask 'default', ['server', 'client', 'karma:unit:start', 'concurrent']
+  grunt.registerTask 'default', ['copy:client', 'concat', 'stylus', 'concurrent']
+

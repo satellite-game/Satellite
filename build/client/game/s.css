@@ -1,0 +1,8 @@
+body{margin:0;background:#000;font-family:monospace;font-size:16px;cursor:url("textures/Mouse-Cursor.png"),auto}
+canvas{display:block}
+.load_screen{background-image:url("textures/load_screen.jpg");background-color:#00080d;background-size:cover;background-position:center center;text-align:center;position:absolute;height:100%;width:100%;z-index:101}
+.load_screen h1{color:#fff;font-size:1.2em;font-family:helvetica;font-weight:normal;font-size:.7em;text-transform:uppercase;letter-spacing:.4em;margin-top:200px}
+.track{width:8em;height:.1em;margin:15px auto;background:rgba(255,255,255,0.08)}
+.bar{width:.8em;height:100%;background:#fff;display:block;-webkit-animation:slide 3s ease-in-out infinite alternate}
+@-webkit-keyframes slide{100%{margin-left:90%}
+}

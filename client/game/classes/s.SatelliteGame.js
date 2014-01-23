@@ -56,6 +56,12 @@ s.SatelliteGame = new Class( {
             game: this
         } );
 
+        if (this.oculus.detected) {
+            console.log('Activating oculus HUD');
+            this.HUD.canvas.style.display = 'none';
+            this.HUD.oculusCanvas.style.display = 'block';
+        }
+
         this.player = new s.Player( {
             HUD: this.HUD,
             game: this,
@@ -68,7 +74,7 @@ s.SatelliteGame = new Class( {
 
         this.HUD.hp = this.player.hull;
         // Moon facing initilization
-        this.player.root.lookAt(this.moon.root.position);
+        //this.player.root.lookAt(this.moon.root.position);
 
         // Root camera to the player's position
         this.player.root.add( this.camera );
@@ -144,6 +150,7 @@ s.SatelliteGame = new Class( {
                 return false;
             },
             add: function ( enemyInfo ) {
+                console.log("LOL ENEMIES");
                 if ( this.has( enemyInfo.name ) ) {
                     this.delete( enemyInfo.name );
                     console.error( 'Bug: Player %s added twice', enemyInfo.name );
@@ -172,11 +179,15 @@ s.SatelliteGame = new Class( {
             }
         };
 
+        this.enemies = new s.Enemies({ game: this });
+
         // Dependent on controls; needs to be below s.Controls
         this.radar = new s.Radar( {
             game: this
             //controls: this.controls
         } );
+
+
 
         window.addEventListener( 'mousemove', function ( e ) {
             that.HUD.targetX = e.pageX;
@@ -310,7 +321,7 @@ s.SatelliteGame = new Class( {
         }
     },
     handleMove: function ( message ) {
-        
+        console.log("A player moved", message);
         if ( message.name == this.pilot.name ) {
             // server told us to move
             console.log( 'Server reset position' );
@@ -326,13 +337,12 @@ s.SatelliteGame = new Class( {
     },
     handleSync: function ( pak ) {
 
-      
-      var data = pak; 
+      var data = pak;
       var whoAmI = s.game.pilot.name,
           myData = pak[whoAmI];
-      
+
       var adjustPlayer = function( serverView ) {
-        
+
         var adjusted = [];
 
         var myView = s.game.player.getPositionPacket();
@@ -352,10 +362,9 @@ s.SatelliteGame = new Class( {
           }
 
         }
-        console.log(pos);
         s.game.player.setPosition( myView.pos, myView.rot, serverView.aVeloc, adjusted, false );
       };
-      
+
       adjustPlayer(myData);
       delete data[whoAmI];
 
@@ -378,6 +387,7 @@ s.SatelliteGame = new Class( {
     },
 
     handleKill: function(message) {
+        console.log(message);
         // get enemy position
         var position = s.game.enemies.get(message.killed).root.position;
         new s.Explosion({
