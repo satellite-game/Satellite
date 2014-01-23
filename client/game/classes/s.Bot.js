@@ -8,7 +8,7 @@ s.Bot = new Class( {
 		this.name = options.name;
 		this.pos = options.position;
 		this.rot = options.rotation;
-		this.bot = true;
+		this.isBot = true;
 	}
 
 } );

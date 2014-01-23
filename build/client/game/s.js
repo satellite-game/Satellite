@@ -48262,7 +48262,7 @@ s.Projectile = new Class({
         this.comm = this.game.comm;
         this.game = options.game;
         this.pilot = options.pilot;
-        this.bot = options.bot;
+        this.isBot = options.isBot;
         // handle parameters
         this.initialVelocity = options.initialVelocity;
         var that = this;
@@ -48294,7 +48294,7 @@ s.Projectile = new Class({
                 }
                 this.comm.hit(mesh.name,this.game.pilot.name);
             }
-        } else if (mesh.name === this.game.pilot.name && this.bot ) {
+        } else if (mesh.name === this.game.pilot.name && this.isBot ) {
             this.comm.botHit(mesh.name, this.pilot);
         }
         this.destruct();
@@ -48439,7 +48439,7 @@ s.Ship = new Class({
         this.alliance = options.alliance;
 
         this.game = options.game;
-        this.bot = options.bot || false;
+        this.isBot = options.isBot || false;
         this.name = options.name || '';
 
         this.root.name = this.name;
@@ -48450,7 +48450,7 @@ s.Ship = new Class({
         //////      BOT LOGIC    /////
         //////////////////////////////
 
-        if (options.bot) {
+        if (options.isBot) {
             //bot initialization
             this.controlBot = this.controlBot.bind(this);
             this.targetX = 0;
@@ -48565,7 +48565,7 @@ s.Ship = new Class({
                     position: position,
                     rotation: rotation,
                     initialVelocity: initialVelocity,
-                    bot: this.bot,
+                    isbBot: this.isBot,
                     team: this.alliance
                 });
 
@@ -48577,13 +48577,13 @@ s.Ship = new Class({
                     position: position,
                     rotation: rotation,
                     initialVelocity: initialVelocity,
-                    bot: this.bot,
+                    isBot: this.isBot,
                     team: this.alliance
                 });
 
                 this.lastTurretFire = now;
 
-                if (!this.bot) {
+                if (!this.isBot) {
                     this.game.sound.play('laser', 0.5);
                 }
             }
@@ -48666,7 +48666,7 @@ s.Ship = new Class({
         botEnemyList.push(this.game.player);
         var enemyShips = this.game.enemies._list;
         for (var i = 0; i < enemyShips.length; i++) {
-            if (!enemyShips[i].bot) {
+            if (!enemyShips[i].isBot) {
                 botEnemyList.push(enemyShips[i]);
             }
         }
@@ -48825,7 +48825,7 @@ s.Bot = new Class( {
 		this.name = options.name;
 		this.pos = options.position;
 		this.rot = options.rotation;
-		this.bot = true;
+		this.isBot = true;
 	}
 
 } );
@@ -51150,7 +51150,7 @@ s.SatelliteGame = new Class( {
                     game: that,
                     shipClass: 'human_ship_heavy',
                     name: enemyInfo.name,
-                    bot: enemyInfo.bot,
+                    isBot: enemyInfo.isBot,
                     position: new THREE.Vector3( enemyInfo.pos[ 0 ], enemyInfo.pos[ 1 ], enemyInfo.pos[ 2 ] ),
                     rotation: new THREE.Vector3( enemyInfo.rot[ 0 ], enemyInfo.rot[ 1 ], enemyInfo.rot[ 2 ] ),
                     alliance: 'enemy'
@@ -51383,7 +51383,7 @@ s.SatelliteGame = new Class( {
             if (s.game.player.hull <= 0) {
                 s.game.handleDie(zappedName, killer);
             }
-        } else if (zappedEnemy.bot) {
+        } else if (zappedEnemy.isBot) {
             
             if (zappedEnemy.shields > 0){
                 zappedEnemy.shields -= 20;
@@ -51505,7 +51505,7 @@ s.SatelliteGame = new Class( {
             lVeloc: this[botName].lVeloc,
             interp: this[botName].interp,
             name: this[botName].name,
-            bot: this[botName].bot,
+            isBot: this[botName].isBot,
             pos: this[botName].pos,
             rot: this[botName].rot
         });
@@ -51548,7 +51548,7 @@ s.SatelliteGame = new Class( {
         enemiesSocketInfo = {};
         var enemiesList = this.enemies._list;  
         for (var i = 0; i < enemiesList.length; i++) {
-            if (enemiesList[i].bot){
+            if (enemiesList[i].isBot){
                 var physics = enemiesList[i].root;
                 var position = makeArray(physics.position);
                 var rotation = makeArray(physics.rotation);

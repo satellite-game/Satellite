@@ -7,7 +7,7 @@ s.Projectile = new Class({
         this.comm = this.game.comm;
         this.game = options.game;
         this.pilot = options.pilot;
-        this.bot = options.bot;
+        this.isBot = options.isBot;
         // handle parameters
         this.initialVelocity = options.initialVelocity;
         var that = this;
@@ -39,7 +39,7 @@ s.Projectile = new Class({
                 }
                 this.comm.hit(mesh.name,this.game.pilot.name);
             }
-        } else if (mesh.name === this.game.pilot.name && this.bot ) {
+        } else if (mesh.name === this.game.pilot.name && this.isBot ) {
             this.comm.botHit(mesh.name, this.pilot);
         }
         this.destruct();

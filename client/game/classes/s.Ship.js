@@ -37,7 +37,7 @@ s.Ship = new Class({
         this.alliance = options.alliance;
 
         this.game = options.game;
-        this.bot = options.bot || false;
+        this.isBot = options.isBot || false;
         this.name = options.name || '';
 
         this.root.name = this.name;
@@ -48,7 +48,7 @@ s.Ship = new Class({
         //////      BOT LOGIC    /////
         //////////////////////////////
 
-        if (options.bot) {
+        if (options.isBot) {
             //bot initialization
             this.controlBot = this.controlBot.bind(this);
             this.targetX = 0;
@@ -163,7 +163,7 @@ s.Ship = new Class({
                     position: position,
                     rotation: rotation,
                     initialVelocity: initialVelocity,
-                    bot: this.bot,
+                    isbBot: this.isBot,
                     team: this.alliance
                 });
 
@@ -175,13 +175,13 @@ s.Ship = new Class({
                     position: position,
                     rotation: rotation,
                     initialVelocity: initialVelocity,
-                    bot: this.bot,
+                    isBot: this.isBot,
                     team: this.alliance
                 });
 
                 this.lastTurretFire = now;
 
-                if (!this.bot) {
+                if (!this.isBot) {
                     this.game.sound.play('laser', 0.5);
                 }
             }
@@ -264,7 +264,7 @@ s.Ship = new Class({
         botEnemyList.push(this.game.player);
         var enemyShips = this.game.enemies._list;
         for (var i = 0; i < enemyShips.length; i++) {
-            if (!enemyShips[i].bot) {
+            if (!enemyShips[i].isBot) {
                 botEnemyList.push(enemyShips[i]);
             }
         }
