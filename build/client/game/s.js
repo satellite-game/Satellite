@@ -48664,7 +48664,82 @@ s.Enemies = new Class({
 
     this._list.push( enemyShip );
     this._map[ enemyInfo.name ] = enemyShip; // this._map.set(enemyInfo.name, otherShip);
-  }
+  },
+
+  updateEnemies: function () {
+    /////////////////////////////////
+    // PREDICTIVE MOVEMENT SYSTEM //
+    /////////////////////////////////
+
+    // PARAMETERS
+    // aV   = vector from target to self
+    // a    = distance between self and target
+    // eV   = enemy's current velocity vector
+    // e    = magnitude of eV
+    // pV   = players's velocity vector
+    // b    = magnitude of bV plus initial bullet speed
+    // angD = angular differential
+    // velD = velocity differential
+    // t    = quadratic solution for time at which player bullet and enemy ship will simultaneously reach a given location
+    if ( enemies[i] && targetInSight ){
+
+      var aV = enemies[i].root.position.clone().add( self.position.clone().multiplyScalar(-1) );
+      var a  = aV.length();
+      var eV = this.target.getLinearVelocity();
+      var e  = eV.length();
+      var pV = self.getLinearVelocity();
+      var b = 5000+pV.length();
+
+      if (eV && b && aV){
+        var angD = aV.dot(eV);
+        var velD = (b*b - e*e);
+
+        var t = angD/velD + Math.sqrt( angD*angD + velD*a*a )/velD;
+
+        // Don't show the marker if the enemy is more than 4 seconds away
+        if (t < 4){
+
+          this.trailingPredictions.push(eV.multiplyScalar(t));
+          var pLen = this.trailingPredictions.length;
+
+          // If the previous frames had a prediction, tween the midpoint of all predictions and plot that
+          if (pLen > 3){
+            var pX = 0, pY = 0;
+            for (var p = 0; p < pLen; p++){
+
+              // Project 3D coords onto 2D plane in perspective of the camera;
+              // Scale predictions with current camera perspective
+              var current = s.projector.projectVector(
+                  this.target.position.clone().add( this.trailingPredictions[p] ), s.game.camera );
+              pX += (width + current.x*width)/2;
+              pY += -(-height + current.y*height)/2;
+
+            }
+            var enemyV2D = new THREE.Vector2(pX/pLen, pY/pLen);
+
+            if (enemyV2D.distanceTo(v2D) > size/3) {
+              // Draw the prediction marker
+              this.ctx.beginPath();
+              this.ctx.arc(enemyV2D.x, enemyV2D.y, size/5, 0, 2*this.PI, false);
+              this.ctx.fillStyle = "rgba(256,0,0,0.5)";
+              this.ctx.fill();
+              this.ctx.lineWidth = 2;
+              this.ctx.strokeStyle = this.menu.color;
+              this.ctx.stroke();
+            }
+
+            // remove the earliest trailing prediction
+            this.trailingPredictions.shift();
+
+          }
+        }
+      }
+    // If the target is no longer on screen, but lastV2D is still assigned, set to null
+    } else if ( this.trailingPredictions.length ) {
+        this.trailingPredictions = [];
+    }
+  },
+
 });
 s.Moon = new Class({
 	extend: s.GameObject,
@@ -50505,6 +50580,7 @@ s.Comm = new Class( {
 
     clockTick: function( ){
         this.time += 1;
+        this.time += 1;
         // if ( this.time >= 60 ){
         //     window.location.href = "http://satellite-game.com";
         // }
@@ -51186,16 +51262,45 @@ s.SatelliteGame = new Class( {
         }
     },
     handleSync: function ( pak ) {
-      console.log("A sync request has been made by the server!");
-      console.log("This is enemies", s.game.enemies);
-      console.log("This is enemies trying to map...", s.game.enemies.list());
-      //if our value does not match
-      // realign ourselves with Handlemove , take the difference add it to the velocity
-      // realign all enemies with HandleMove, take the difference add it to the velocity .
-      var moveSelf = function( self ) {};
-      var setCoords = function( entity ) {};
-      var adjustVel = function( entity ) {};
-      var checkDiff = function( client, server ) {};
+
+      var data = pak;
+      var whoAmI = s.game.pilot.name,
+          myData = pak[whoAmI];
+
+      var adjustPlayer = function( serverView ) {
+
+        var adjusted = [];
+
+        var myView = s.game.player.getPositionPacket();
+        for(var i = 0; i < serverView.lVeloc.length; i++) {
+          var pos = Math.abs(serverView.pos[i]) - Math.abs(myView.pos[i]);
+
+          if( pos >= 100 ) {
+            console.log("Experiencing whiplash!");
+            s.game.player.setPosition( serverView.pos, myView.rot, serverView.aVeloc, serverView.lVeloc, true );
+            return;
+          }
+
+          if(serverView.pos[i] >= 0) {
+            adjusted.push(serverView.lVeloc[i] + pos);
+          } else {
+            adjusted.push(serverView.lVeloc[i] - pos);
+          }
+
+        }
+        console.log(pos);
+        s.game.player.setPosition( myView.pos, myView.rot, serverView.aVeloc, adjusted, false );
+      };
+
+      adjustPlayer(myData);
+      delete data[whoAmI];
+
+      for(var i in data ) {
+        if( !s.game.enemies.execute( data[i].name, 'setPosition', [ data[i].pos, data[i].rot, data[i].aVeloc, data[i].lVeloc, true ] ) ) {
+          s.game.enemies.add( data[i] );
+        }
+      }
+
     },
 
     handlePlayerList: function(message) {
