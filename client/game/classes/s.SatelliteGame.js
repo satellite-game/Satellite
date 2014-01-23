@@ -409,36 +409,25 @@ s.SatelliteGame = new Class( {
             if (s.game.player.hull <= 0) {
                 s.game.handleDie(zappedName, killer);
             }
-        } else if (zappedEnemy.isBot) {
-            
+        } else {
             if (zappedEnemy.shields > 0){
                 zappedEnemy.shields -= 20;
-                console.log('bot shield is now: ', zappedEnemy.shields);
+                console.log(zappedName, ' shield is now: ', zappedEnemy.shields);
                 setTimeout(function() {
                     s.game.replenishEnemyShield(zappedEnemy);
                 }, 7000);
             } else {
                 zappedEnemy.hull -= 20;
-                console.log('bot hull is now: ', zappedEnemy.hull);
+                console.log(zappedName, ' hull is now: ', zappedEnemy.hull);
             }
-
-            if (zappedEnemy.hull <= 0) {
-                console.log('bot has died');
+            if (zappedEnemy.hull <= 0 && zappedEnemy.isBot) {
+                console.log(zappedName, ' has died');
                 s.game.handleKill.call(s, { killed: zappedName, killer: killer });
                 s.game.makeNewBot({
                     position: [ 23498, -25902, 24976 ]
                 });
             }
-        } else {
-            var enemy = s.game.enemies.get(zappedName);
-            enemy.shields -= 20;
-            setTimeout(function(){
-                console.log('recharged');
-                enemy.shields = 80;
-            }, 7000);
-            console.log('hit: ', enemy);
         }
-
     },
 
     handleFire: function(props) {
@@ -477,24 +466,24 @@ s.SatelliteGame = new Class( {
         }
     },
 
-    replenishEnemyShield: function (enemyBot) {
+    replenishEnemyShield: function (enemyShip) {
         var replenish = function() {
-            if (enemyBot.shields < s.config.ship.shields) {
-                enemyBot.shields++;
+            if (enemyShip.shields < s.config.ship.shields) {
+                enemyShip.shields++;
             } else {
-                this.stopEnemyShieldReplenish(enemyBot);
+                this.stopEnemyShieldReplenish(enemyShip);
             }
         };
         var that = this;
-        enemyBot.IDs = enemyBot.IDs || [];
-        enemyBot.IDs.push(setInterval(function() {
+        enemyShip.IDs = enemyShip.IDs || [];
+        enemyShip.IDs.push(setInterval(function() {
             replenish.call(that);
         }, 20));
     },
 
-    stopEnemyShieldReplenish: function (enemyBot) {
-        for (var i = 0; i < enemyBot.IDs.length; i++){
-            clearInterval(enemyBot.IDs[i]);
+    stopEnemyShieldReplenish: function (enemyShip) {
+        for (var i = 0; i < enemyShip.IDs.length; i++){
+            clearInterval(enemyShip.IDs[i]);
         }
     },
 
