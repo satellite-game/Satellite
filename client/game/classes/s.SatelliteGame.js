@@ -28,9 +28,10 @@ s.SatelliteGame = new Class( {
 
         //initally set lastBotCallback to null. updated in s.Ship
 
-        this.lastBotCallback = null;
         this.IDs = [];
         this.botCount = 0;
+        this.hostPlayer = false;
+
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
 		// No gravity
 		this.scene.setGravity(new THREE.Vector3(0, 0, 0));
@@ -449,6 +450,7 @@ s.SatelliteGame = new Class( {
         if (!you) {
             return;
         }
+        if (this.hostPlayer) { clearInterval(this.botPositionInterval); }
         s.game.stop();
         var HUD = s.game.HUD;
         HUD.ctx.fillStyle = "rgba(0,0,0,0.5)";
@@ -456,39 +458,6 @@ s.SatelliteGame = new Class( {
         HUD.ctx.drawImage(HUD.gameOver,HUD.canvas.width/2 - HUD.gameOver.width/2,HUD.canvas.height/2 - HUD.gameOver.height/2);
         s.game.comm.died(you, killer);
 
-    },
-
-    makeNewBot: function(options) {
-        
-        // If no options passed, set options to empty object and default values for position and rotation
-        options = options || {};
-
-        this.botCount = options.botCount || ++this.botCount;
-
-        // Generating a new bot with properties
-        var botName = options.name || 'bot ' + this.botCount;
-        var position = options.position || [22498, -25902, 24976];
-        var rotation = options.rotation || [0, Math.PI / 2, 0];
-        var lVeloc = options.lVeloc || [0, 0, 0];
-        var aVeloc = options.aVeloc || [0, 0, 0];
-
-        this[botName] = new s.Bot( {
-            name: botName,
-            position: [ position[0], position[1], position[2] ],
-            rotation: [ rotation[0], rotation[1], rotation[2] ],
-            lVeloc: lVeloc,
-            aVeloc: aVeloc
-        } );
-        
-        // Create bot and add it to enemies list
-        this.enemies.add( {
-            aVeloc: this[botName].aVeloc,
-            lVeloc: this[botName].lVeloc,
-            interp: this[botName].interp,
-            name: this[botName].name,
-            pos: this[botName].pos,
-            rot: this[botName].rot
-        });
     },
 
     shieldBoost: function(){
@@ -532,11 +501,66 @@ s.SatelliteGame = new Class( {
         s.game.loadScreen.setMessage(message);
     },
 
+    makeNewBot: function(options) {
+        
+        // If no options passed, set options to empty object and default values for position and rotation
+        options = options || {};
+
+        this.botCount = options.botCount || ++this.botCount;
+        this.botBulletCount = options.botBulletCount || this.botBulletCount;
+
+        // Generating a new bot with properties
+        var botName = options.name || 'bot ' + this.botCount;
+        var position = options.position || [22498, -25902, 24976];
+        var rotation = options.rotation || [0, Math.PI / 2, 0];
+        var lVeloc = options.lVeloc || [0, 0, 0];
+        var aVeloc = options.aVeloc || [0, 0, 0];
+
+        this[botName] = new s.Bot( {
+            name: botName,
+            position: [ position[0], position[1], position[2] ],
+            rotation: [ rotation[0], rotation[1], rotation[2] ],
+            lVeloc: lVeloc,
+            aVeloc: aVeloc
+        } );
+        
+        // Create bot and add it to enemies list
+        this.enemies.add( {
+            aVeloc: this[botName].aVeloc,
+            lVeloc: this[botName].lVeloc,
+            interp: this[botName].interp,
+            name: this[botName].name,
+            pos: this[botName].pos,
+            rot: this[botName].rot
+        });
+    },
+
+    //this function only gets called if client is the first player
     handleBotInfo: function() {
+        var updatePlayersWithBots = function() {
+            var botEnemies = this.game.getBotEnemies();
+            this.game.comm.botUpdate(botEnemies);
+        };
+        
+        var that = this;
+        if (!this.game.hostPlayer) {
+            //this the first time this function has been called with this client
+            this.game.botPositionInterval = setInterval(function() {
+                updatePlayersWithBots.call(that);
+            }, 2500);
+        }
+
+        this.game.hostPlayer = true;
         if (this.game.botCount === 0) {
             // Create a new bot
             this.game.makeNewBot();
         }
+
+        var botEnemies = this.game.getBotEnemies();
+        this.game.comm.botInfo(botEnemies);
+    },
+
+    getBotEnemies: function() {
         var makeArray = function (obj) {
             var result = [];
             result[0] = obj.x;
@@ -545,7 +569,7 @@ s.SatelliteGame = new Class( {
             return result;
         };
         enemiesSocketInfo = {};
-        var enemiesList = this.game.enemies._list;  
+        var enemiesList = this.enemies._list;  
         for (var i = 0; i < enemiesList.length; i++) {
             if (enemiesList[i].name.slice(0,3) === 'bot'){
                 var physics = enemiesList[i].root;
@@ -562,30 +586,23 @@ s.SatelliteGame = new Class( {
                     aVeloc: aVeloc,
                     lVeloc: lVeloc,
                     name: name,
-                    botCount: this.game.botCount
+                    botCount: this.botCount
                 };
             }
         }
-        // console.log('sending position info: ', enemiesSocketInfo['bot 1'].position);
-        this.game.comm.botInfo(enemiesSocketInfo);
+        return enemiesSocketInfo;
     },
 
     handleBotPositions: function(message) {
 
         //if the bot exists...update positions
         //else make new bot with position
-        this.game.botCount = 0;
+        // this.game.botCount = 0;
         for (var bot in message) {
-            this.game.makeNewBot(message[bot]);
-        // console.log('get message info from other player: ', message[bot].position);
+            if ( !this.game.enemies.execute( message[bot].name, 'setPosition', [ message[bot].position, message[bot].rotation, message[bot].aVeloc, message[bot].lVeloc, true ] ) ) {
+                this.game.makeNewBot(message[bot]);
+            }
         }
     }
-
-    // handleHook: function () {
-    //     var that = this;
-    //     this.game.hook(function() {
-    //         that.game.handleBotInfo();
-    //     });
-    // }
 
 } );
