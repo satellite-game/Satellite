@@ -2,14 +2,13 @@ module.exports = function (host, sync) {
   return {
 
     killed: function (socket, packet) {
-      socket.emit('killed', {
+      var room = host.sockets[socket.id].room;
+      var deathNotification = {
         killed: packet.you,
         killer: packet.killer
-      });
-      socket.broadcast.emit('killed', {
-        killed: packet.you,
-        killer: packet.killer
-      });
+      };
+      socket.emit('killed', deathNotification);
+      socket.broadcast.to(room).emit('killed', deathNotification);
     },
 
   };
