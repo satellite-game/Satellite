@@ -10,7 +10,7 @@ module.exports = function (host, sync) {
       if(sync.setMove(packet, playerState)) {
         for(var i in packet) {
           playerState[i] = packet[i];
-        };
+        }
         socket.broadcast.to(room).emit('move', playerState);
       }
     },
@@ -38,7 +38,7 @@ module.exports = function (host, sync) {
     },
 
   };
-}
+};
 
   // socket.on('move', function(message) {
   //     socket.get('name', function (err, name) {

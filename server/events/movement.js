@@ -18,5 +18,5 @@ module.exports = function(host, Sync) {
         socket.broadcast.to(room).emit('move', playerState);
       }
     }
-  }
+  };
 };

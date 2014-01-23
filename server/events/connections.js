@@ -1,7 +1,6 @@
 module.exports = function (map, host, Sync) {
   return {
     join: function( socket, data ) {
-      var target;
       console.log(data);
       if(host.rooms[data.room] === undefined) {
         host.init(socket.id, data.room, data);
@@ -26,7 +25,7 @@ module.exports = function (map, host, Sync) {
     },
 
   };
-}
+};
 
 // LEGACY CODE: not removed because I didn't write this module.
 ////////////////////////////////////////////////////////////////
