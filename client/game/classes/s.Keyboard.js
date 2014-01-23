@@ -39,14 +39,26 @@ s.Keyboard = new Class({
   modifiers: ['shift', 'ctrl', 'alt', 'meta'],
 
   construct: function(game, player) {
+    var self = this;
     this.keyCodes = {};
+    this.socketSendKey.bind(this);
 
     // Listen to key events
     window.addEventListener('keydown', this.handleKeyChange.bind(this, true), false);
     window.addEventListener('keyup', this.handleKeyChange.bind(this, false), false);
-    // Listen to key events ___ SYNCED
-    window.addEventListener('keydown', this.socketSendKey.bind(this));
-    window.addEventListener('keyup', this.socketSendKey.bind(this));
+
+    // Listen to key events for syncing
+    this.keyDownAllowed = true;
+    $(document).keyup(function(e){
+      self.keyDownAllowed = true;
+      self.socketSendKey(e);
+    });
+    $(document).keydown(function(e){
+      if (self.keyDownAllowed) {
+        self.socketSendKey(e);
+        self.keyDownAllowed = false;
+      }
+    });
   },
 
   destruct: function() {

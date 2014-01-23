@@ -19,16 +19,16 @@ var Manager = function( context, io ) {
       events.bot[type](socket, args);
     });
 
-    socket.on('combat', function( type, args ) {
-      events.combat[type](socket, args);
-    });
+    // socket.on('combat', function( type, args ) {
+    //   events.combat[type](socket, args);
+    // });
 
     socket.on('disconnect', function( args ) {
       events.flow['disconnect'](socket, args);
     });
 
     socket.on('keypress', function( type, args) {
-      events.movement[type]( socket, args );
+      events.movement.keySync( socket, args );
     });
   };
 };

@@ -9,14 +9,13 @@ Sync.prototype = Object.create({});
 
 Sync.prototype.setInit = function( socket, list, packet, shortcut ) {
   //this.instanceTime = new Date().getTime();
-     list.playerList[packet.name], list.gamestate[packet.name] =
-	  { 
+    list.gamestate[packet.name] = {
 	   	name: packet.name,
 	   	time: packet.time,
 	   	lVeloc: packet.lVeloc,
 	  	pos: packet.pos,
 	  	lAccel: [0,0,0]
-	  }
+	  };
 };
 
 Sync.prototype.setMove = function( packet, target ) { 
