@@ -48806,13 +48806,13 @@ s.Player = new Class({
 	construct: function(options) {
 		// Nothing here yet...
 		// Maybe collision detection and whatnot
-	this.game.hook(this.update);
-	},
-	update: function() {
-		if (this.hull <= 0){
-			this.game.handleDie();
-		}
+	// this.game.hook(this.update);
 	}
+	// update: function() {
+		// if (this.hull <= 0){
+			// this.game.handleDie();
+		// }
+	// }
 });
 
 s.Bot = new Class( {
@@ -51402,37 +51402,6 @@ s.SatelliteGame = new Class( {
                 });
             }
         }
-
-        // } else if (zappedEnemy.isBot) {
-            
-        //     if (zappedEnemy.shields > 0){
-        //         zappedEnemy.shields -= 20;
-        //         console.log('bot shield is now: ', zappedEnemy.shields);
-        //         setTimeout(function() {
-        //             s.game.replenishEnemyShield(zappedEnemy);
-        //         }, 7000);
-        //     } else {
-        //         zappedEnemy.hull -= 20;
-        //         console.log('bot hull is now: ', zappedEnemy.hull);
-        //     }
-
-        //     if (zappedEnemy.hull <= 0) {
-        //         console.log('bot has died');
-        //         s.game.handleKill.call(s, { killed: zappedName, killer: killer });
-        //         s.game.makeNewBot({
-        //             position: [ 23498, -25902, 24976 ]
-        //         });
-        //     }
-        // } else {
-        //     var enemy = s.game.enemies.get(zappedName);
-        //     enemy.shields -= 20;
-        //     setTimeout(function(){
-        //         console.log('recharged');
-        //         enemy.shields = 80;
-        //     }, 7000);
-        //     console.log('hit: ', enemy);
-        // }
-
     },
 
     handleFire: function(props) {
