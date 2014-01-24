@@ -49037,7 +49037,7 @@ s.Mouse = new Class({
 
 s.Oculus = new Class({
   construct: function () {
-    this.quat = {x: 0, y: 0, z: 0};
+    this.quat = new THREE.Quaternion();
     this.detected = false;
 
     this.compensationX = 0;
@@ -50644,15 +50644,12 @@ s.Menu = new Class({
         // Divides the field of view by the number of menu
         // items and moves hover up and down with head motion
 
-        // todo: move menu so you are looking at the hovered item (possibly very complicated!)
-
-        var viewingAngle = Math.PI/4 * (this.oculus.quat.x - this.oculus.compensationX); // or 180?
+        var viewingAngle = Math.PI/4 * (this.oculus.quat.x - this.oculus.compensationX);
         var tilt = ~~((this.menuItems.length/2 * this.oculus.quat.x - this.oculus.compensationX) * 6 + ~~(this.menuItems.length/2));
         var hover = this.menuItems[tilt];
         this.hoverItem(hover);
 
-        // trends towards infinity. consider limiting.
-        this.menuBox.position.setY((-150*Math.sin(viewingAngle))/Math.sin(Math.PI/4)/2+4);
+        this.menuBox.position.setY((-150*Math.sin(viewingAngle))/Math.sin(Math.PI/4)/2+4); // Man I don't know, math or something.
       } else {
         // todo: keyboard, mouse, and controller navigation
       }
@@ -50663,7 +50660,11 @@ s.Menu = new Class({
 
   showDefaultMenu: function () {
     this.menuScreen = 'default';
-    this.addMenuItems([{text: 'JOIN GAME', size: 5, action: 'showRoomList'}, {text: 'DISCONECT', size: 5, action: 'disconnect'}, {text: 'LEADERBOARD', size: 5, action: 'showScoreboard'}]);
+    this.addMenuItems([
+      {text: 'JOIN GAME', size: 5, action: 'showRoomList'},
+      {text: 'DISCONECT', size: 5, action: 'disconnect'},
+      {text: 'LEADERBOARD', size: 5, action: 'showScoreboard'}
+    ]);
   },
 
   showRoomList: function () {
