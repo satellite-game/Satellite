@@ -44,5 +44,12 @@ module.exports = {
     }], callback);
   },
 
+  incKillCount: function (roomName, playerID) {
+    db.HINCRBY(roomName+'_KILLS',playerID, 1, defaultCallback('incKillCount'));
+  },
+
+  incDeathCount: function (roomName, playerID) {
+    db.HINCRBY(roomName+'_DEATHS',playerID, 1, defaultCallback('incKillCount'));
+  },
 
 }
