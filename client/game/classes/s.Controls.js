@@ -115,10 +115,10 @@ s.Controls = new Class({
       if (this.keyboard.pressed('e')) {
         this.camera.rotation.setEulerFromQuaternion(this.oculus.quat);
       } else {
-      //   this.camera.rotation = new THREE.Vector3();
-      //   pitch = this.oculus.quat.x - this.oculus.compensationX;
-      //   yaw = this.oculus.quat.y - this.oculus.compensationY;
-      //   roll = this.oculus.quat.z - this.oculus.compensationZ;
+        this.camera.rotation = new THREE.Vector3();
+        pitch = this.oculus.quat.x - this.oculus.compensationX;
+        yaw = this.oculus.quat.y - this.oculus.compensationY;
+        roll = this.oculus.quat.z - this.oculus.compensationZ;
       }
 
     } else {
