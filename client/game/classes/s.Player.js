@@ -6,6 +6,8 @@ s.Player = new Class({
     this.game = options.game;
     this.HUD = options.HUD;
     this.firstPerson = false;
+    this.name = options.name || '';
+    this.initialize(options);
 
     this.root.castShadow = true;
 
@@ -61,5 +63,4 @@ s.Player = new Class({
     this.flames[3].scale.set(1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler);
     this.flames[4].scale.set(1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler);
   }
-
 });
