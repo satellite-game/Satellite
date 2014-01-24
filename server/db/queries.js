@@ -25,5 +25,24 @@ module.exports = {
     });
   },
 
+  joinRoom: function (roomName, playerName, callback) {
+    callback = callback || defaultCallback('joinRoom');
+
+    async.waterfall([function (callback){
+      callback(null, roomName);
+    },
+    this.addRoom,
+    function(resultData, callback) {
+      db.HSET(roomName+'_KILLS', playerID, 0, function(err, data){
+        callback(null, data);
+      });
+    },
+    function(resultData, callback) {
+      db.HSET(roomName+'_DEATHS', playerID, 0, function(err, data){
+        callback(null, data);
+      });
+    }], callback);
+  },
+
 
 }
