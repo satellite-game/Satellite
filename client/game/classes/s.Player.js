@@ -52,7 +52,8 @@ s.Player = new Class({
     // Adjusts engine glow based on linear velosity
     this.trailGlow.intensity = this.root.getLinearVelocity().length()/100;
 
-    var flameScaler = Math.random()*0.1 + 1;
+    var ocuScale = this.game.oculus.detected ? 0.2 : 1;
+    var flameScaler = (Math.random()*0.1 + 1)*ocuScale;
 
     this.flames[0].scale.set(2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler);
     this.flames[1].scale.set(3*this.trailGlow.intensity*flameScaler, 3*this.trailGlow.intensity*flameScaler, 3*this.trailGlow.intensity*flameScaler);

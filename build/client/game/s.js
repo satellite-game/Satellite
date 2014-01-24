@@ -48620,7 +48620,8 @@ s.Player = new Class({
     // Adjusts engine glow based on linear velosity
     this.trailGlow.intensity = this.root.getLinearVelocity().length()/100;
 
-    var flameScaler = Math.random()*0.1 + 1;
+    var ocuScale = this.game.oculus.detected ? 0.25 : 1;
+    var flameScaler = (Math.random()*0.1 + 1)*ocuScale;
 
     this.flames[0].scale.set(2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler);
     this.flames[1].scale.set(3*this.trailGlow.intensity*flameScaler, 3*this.trailGlow.intensity*flameScaler, 3*this.trailGlow.intensity*flameScaler);
@@ -49182,7 +49183,7 @@ s.Controls = new Class({
       yaw = this.oculus.quat.y - this.oculus.compensationY;
       roll = this.oculus.quat.z - this.oculus.compensationZ;
       if (this.menu.displayed) {
-        this.menu.updateSelection();
+        this.menu.updateHovered();
       }
     } else {
       this.mouse.mouseType = 'keyboard';
@@ -50481,14 +50482,21 @@ s.Menu = new Class({
     this.menuItems = [];
     this.menuScreen = 'default';
     this.cursorPosition = 0;
-    this.selectedItem = null;
+    this.hoveredItem = null;
 
     // PlaneGeometry would be better than a cube for this but harder to write because 
     // it would need to be rotated and all it's child objects would need to be rotated back.
     // Optimize at your own risk.
     this.menuBox = new THREE.Mesh( new THREE.CubeGeometry(2500, 2500, 1), new THREE.MeshBasicMaterial({color: 0x000000, transparent: true, opacity: 0.7}) );
 
-    // Format for adding menu items: {text: 'displayed_text_string'(required), font: 'font_name_string'(default "helvetiker"), bold: true/false (default false), size: number(1-5)(defualt 3), flat: true/false(changes shader, depth and bevel)(default false), small: true/false(overides flat, bold, and size to make a standardized readable small font)(default false)};
+    // Format for adding menu item object:
+    // { text: 'displayed_text_string'(required),
+    // action: 'callbackNameString' (called in context of 'this')(default null),
+    // font: 'font_name_string'(default "helvetiker"),
+    // bold: true/false (default false),
+    // size: number(1-5ish)(defualt 3),
+    // flat: true/false(changes shader, depth and bevel)(default false),
+    // small: true/false(overides flat, bold, and size to make a standardized readable small font)(default false) };
     
     this.menuBox.position.setZ(-150);
     this.menuBox.visible = false;
@@ -50503,7 +50511,6 @@ s.Menu = new Class({
   },
 
   addMenuItems: function ( items ) {
-
     // procedurally center aligns text, vertically center aligns menu
     var menuHeight = 0;
     var currentHeight = 0;
@@ -50517,6 +50524,8 @@ s.Menu = new Class({
       }
     }
     for (var i = 0; i < items.length; i++) {
+
+      if (!items[items.length-i-1].text) continue;
       // this is currently the only font. Supports normal and bold.
       // google typeface.js for how to add more.
       var bevelEnabled,
@@ -50547,12 +50556,13 @@ s.Menu = new Class({
         }
       }
 
-      var menuItemGeo = new THREE.TextGeometry(items[items.length-i-1].text, {font: font, size: size, height: size*2, weight: bold, bevelEnabled: bevelEnabled, bevelThickness: bevel, bevelSize: bevel});
+      var menuItemGeo = new THREE.TextGeometry(items[items.length-i-1].text, {font: font, size: size, height: size, weight: bold, bevelEnabled: bevelEnabled, bevelThickness: bevel, bevelSize: bevel});
       var menuItemMaterial = new THREE[mat]({color: 0x00CC00, ambient: 0x00FF00, specular: 0x33FF33, shininess: 5});
       var menuItem = new THREE.Mesh(menuItemGeo, menuItemMaterial);
       menuItem.position.setY((currentHeight)-(menuHeight/2)+(size/2)); // MATH?
       menuItem.position.setX(menuItem.geometry.boundingSphere.radius*-0.5);
       menuItem.visible = false;
+      menuItem.menuItemSelectCallback = items[items.length-i-1].action || null;
       this.menuBox.add( menuItem );
       this.menuItems.push( menuItem );
       currentHeight += size*2;
@@ -50590,13 +50600,13 @@ s.Menu = new Class({
     }
   },
 
-  selectItem: function ( item ) {
-    // changes appearance of selected item to make it obvious
-    // which one you have selected.
+  hoverItem: function ( item ) {
+    // changes appearance of hovered item to make it obvious
+    // which one you have hovered. red can be a placeholder.
     if (item) {
-      if (this.selectedItem !== item) {
-        this.deselectItem(this.selectedItem);
-        this.selectedItem = item;
+      if (this.hoveredItem !== item) {
+        this.unhoverItem(this.hoveredItem);
+        this.hoveredItem = item;
       }
       item.material.color.setHex(0xCC0000);
       if (item.material.ambient) {
@@ -50606,8 +50616,8 @@ s.Menu = new Class({
     }
   },
 
-  deselectItem: function ( item ) {
-    if (this.selectedItem) {
+  unhoverItem: function ( item ) {
+    if (this.hoveredItem) {
       item.material.color.setHex(0x00CC00);
       if (item.material.ambient) {
         item.material.ambient.setHex(0x00FF00);
@@ -50616,38 +50626,67 @@ s.Menu = new Class({
     }
   },
 
-  updateSelection: function () {
+  selectItem: function () {
+    this[this.hoveredItem.menuItemSelectCallback]();
+  },
+
+  updateHovered: function () {
     if (this.displayed && this.menuItems.length > 0) {
       if (this.oculus.detected) {
         // Oculus menu navigation
         // Divides the field of view by the number of menu
-        // items and moves selection up and down with head motion
+        // items and moves hover up and down with head motion
 
-        var viewingAngle = ~~((this.menuItems.length/2 * this.oculus.quat.x - this.oculus.compensationX) * 6 + Math.round(this.menuItems.length/2));
-        console.log(viewingAngle);
-        var selection = this.menuItems[viewingAngle];
-        this.selectItem(selection);
+        // todo: move menu so you are looking at the hovered item (possibly very complicated!)
+
+        var viewingAngle = Math.PI/4 * this.oculus.quat.x; // or 180?
+        var tilt = Math.round((this.menuItems.length/2 * this.oculus.quat.x - this.oculus.compensationX) * 6 + Math.round(this.menuItems.length/2));
+        console.log(tilt);
+        var hover = this.menuItems[tilt];
+        this.hoverItem(hover);
+
+        // trends towards infinity. consider limiting.
+        this.menuBox.position.setY((-150*Math.sin(viewingAngle))/Math.sin(Math.PI/4));
       } else {
         // todo: keyboard, mouse, and controller navigation
       }
     }
   },
 
+  // -- GAME SPECIFIC FUNCTIONS AND MENU SCREENS
+
   showDefaultMenu: function () {
     this.menuScreen = 'default';
-    this.addMenuItems([{text: 'JOIN GAME', size: 5}, {text: 'DISCONECT', size: 5}, {text: 'LEADERBOARD', size: 5}, {text: 'SMALL TEST TEXT 1', small: true}, {text: 'SMALL TEST TEXT 2', small: true}, {text: 'SMALL TEST TEXT 3', small: true}]);
+    this.addMenuItems([{text: 'JOIN GAME', size: 5, action: 'showRoomList'}, {text: 'DISCONECT', size: 5, action: 'disconnect'}, {text: 'LEADERBOARD', size: 5, action: 'showScoreboard'}]);
   },
 
   showRoomList: function () {
     this.clearMenu();
     this.menuScreen = 'rooms';
     var roomNames = [];
-    // some database stuff to get list of open rooms
-    var rooms = [];
+    // some database stuff to get list of existing rooms and order them by player count
+    var rooms = [{text: 'JOIN GAME', size: 5}];
     for (var i = 0; i < roomNames.length; i++) {
       rooms.push({text: roomNames[i], small: true});
     }
+    rooms.push({text: '+ CREATE NEW ROOM +', small: true, action: this.createRoom});
     this.addMenuItems(rooms);
+  },
+
+  showScoreboard: function () {
+    this.clearMenu();
+    this.menuScreen = 'scoreboard';
+    var playerNames = [];
+    // some database stuff to get list of players and order them by score
+    var players = [{text: 'LEADERBOARD', size: 5}];
+    for (var i = 0; i < database.length; i++) {
+      players.push({text: playerNames[i], small: true});
+    }
+
+  },
+
+  disconnect: function () {
+    // leave the game. possibly just by just refreshing the page?
   }
 });
 s.Game = new Class({

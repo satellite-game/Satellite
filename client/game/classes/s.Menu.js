@@ -42,7 +42,6 @@ s.Menu = new Class({
   },
 
   addMenuItems: function ( items ) {
-
     // procedurally center aligns text, vertically center aligns menu
     var menuHeight = 0;
     var currentHeight = 0;
@@ -56,6 +55,8 @@ s.Menu = new Class({
       }
     }
     for (var i = 0; i < items.length; i++) {
+
+      if (!items[items.length-i-1].text) continue;
       // this is currently the only font. Supports normal and bold.
       // google typeface.js for how to add more.
       var bevelEnabled,
@@ -86,7 +87,7 @@ s.Menu = new Class({
         }
       }
 
-      var menuItemGeo = new THREE.TextGeometry(items[items.length-i-1].text, {font: font, size: size, height: size*2, weight: bold, bevelEnabled: bevelEnabled, bevelThickness: bevel, bevelSize: bevel});
+      var menuItemGeo = new THREE.TextGeometry(items[items.length-i-1].text, {font: font, size: size, height: size, weight: bold, bevelEnabled: bevelEnabled, bevelThickness: bevel, bevelSize: bevel});
       var menuItemMaterial = new THREE[mat]({color: 0x00CC00, ambient: 0x00FF00, specular: 0x33FF33, shininess: 5});
       var menuItem = new THREE.Mesh(menuItemGeo, menuItemMaterial);
       menuItem.position.setY((currentHeight)-(menuHeight/2)+(size/2)); // MATH?
@@ -132,7 +133,7 @@ s.Menu = new Class({
 
   hoverItem: function ( item ) {
     // changes appearance of hovered item to make it obvious
-    // which one you have hovered.
+    // which one you have hovered. red can be a placeholder.
     if (item) {
       if (this.hoveredItem !== item) {
         this.unhoverItem(this.hoveredItem);
@@ -169,12 +170,14 @@ s.Menu = new Class({
 
         // todo: move menu so you are looking at the hovered item (possibly very complicated!)
 
-        var viewingAngle = ~~((this.menuItems.length/2 * this.oculus.quat.x - this.oculus.compensationX) * 6 + Math.round(this.menuItems.length/2));
-        console.log(viewingAngle);
-        var hover = this.menuItems[viewingAngle];
+        var viewingAngle = Math.PI/4 * this.oculus.quat.x; // or 180?
+        var tilt = Math.round((this.menuItems.length/2 * this.oculus.quat.x - this.oculus.compensationX) * 6 + Math.round(this.menuItems.length/2));
+        console.log(tilt);
+        var hover = this.menuItems[tilt];
         this.hoverItem(hover);
 
-
+        // trends towards infinity. consider limiting.
+        this.menuBox.position.setY((-150*Math.sin(viewingAngle))/Math.sin(Math.PI/4));
       } else {
         // todo: keyboard, mouse, and controller navigation
       }
@@ -192,7 +195,7 @@ s.Menu = new Class({
     this.clearMenu();
     this.menuScreen = 'rooms';
     var roomNames = [];
-    // some database stuff to get list of existing rooms
+    // some database stuff to get list of existing rooms and order them by player count
     var rooms = [{text: 'JOIN GAME', size: 5}];
     for (var i = 0; i < roomNames.length; i++) {
       rooms.push({text: roomNames[i], small: true});
@@ -214,6 +217,6 @@ s.Menu = new Class({
   },
 
   disconnect: function () {
-    // leave the game. possibly just by just refreshing the page.
+    // leave the game. possibly just by just refreshing the page?
   }
 });
