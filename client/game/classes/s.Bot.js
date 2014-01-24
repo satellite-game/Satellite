@@ -1,6 +1,6 @@
 s.Bot = new Class( {
   toString: 'Bot',
-  extend: s.GameObject,
+  extend: s.Ship,
 
   options: {
     leftTurretOffset: new THREE.Vector3(35, 0, -200),
@@ -16,11 +16,8 @@ s.Bot = new Class( {
     var rotation = options.rotation || [0, Math.PI / 2, 0];
 
     // Generating a new bot with properties
-    this.game = options.game;
     this.name = options.name || 'bot ' + (++this.game.botCount);
     this.isBot = true;
-    this.position = new THREE.Vector3( position[ 0 ], position[ 1 ], position[ 2 ] );
-    this.rotation = new THREE.Vector3( rotation[ 0 ], rotation[ 1 ], rotation[ 2 ] );
     
     this.botOptions = {
       rotationSpeed: Math.PI/2,
@@ -32,41 +29,11 @@ s.Bot = new Class( {
       rotationFadeFactor: 4
     };
 
-    var geometry = s.models[options.shipClass].geometry;
-    this.materials = s.models[options.shipClass].materials[0];
-    this.materials.emissive = new THREE.Color('rgb(255,255,255)');
-
-    var physiMaterial = Physijs.createMaterial(this.materials);
-    this.root = new Physijs.ConvexMesh(geometry, physiMaterial, 100);
-    this.root.position.copy(this.position);
-    this.root.rotation.copy(this.rotation);
-
-    this.lastTurretFire = 0;
-    this.lastMissileFire = 0;
-    this.alliance = options.alliance;
-
-    this.root.name = this.name;
-    this.hull = s.config.ship.hull;
-    this.shields = s.config.ship.shields;
-
-    //////////////////////////////
-    //////      BOT LOGIC    /////
-    //////////////////////////////
-
     //bot initialization
     this.controlBot = this.controlBot.bind(this);
     this.targetX = 0;
     this.targetY = 0;
 
-
-    //Create a camera for the bot
-    this.camera = new THREE.PerspectiveCamera(35, 1, 1, 300000);
-
-     // Root camera to the bot's position
-    this.root.add( this.camera );
-
-    // Setup camera: Cockpit view; COMMENT OUT FOR CHASE CAM
-    this.camera.position.set( 0, 0, 0 );
 
     //set a hook on the bot controls.
     //necessary because first player has bot join twice
@@ -79,6 +46,22 @@ s.Bot = new Class( {
 
     this.lastTime = new Date( ).getTime( );
 
+    //initialize s.Ship
+    this.initialize({
+      shipClass: options.shipClass,
+      position: new THREE.Vector3( position[ 0 ], position[ 1 ], position[ 2 ] ),
+      rotation: new THREE.Vector3( rotation[ 0 ], rotation[ 1 ], rotation[ 2 ] ),
+      alliance: options.alliance
+    });
+
+      //Create a camera for the bot
+    this.camera = new THREE.PerspectiveCamera(35, 1, 1, 300000);
+
+     // Root camera to the bot's position
+    this.root.add( this.camera );
+
+    // Setup camera: Cockpit view; COMMENT OUT FOR CHASE CAM
+    this.camera.position.set( 0, 0, 0 );
   },
 
   getOffset: function(offset) {

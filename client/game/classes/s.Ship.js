@@ -11,28 +11,29 @@ s.Ship = new Class({
     },
 
 	construct: function(options) {
-		var geometry = s.models[options.shipClass].geometry;
-		this.materials = s.models[options.shipClass].materials[0];
+        this.game = options.game;
+	},
+
+    initialize: function(options) {
+        var geometry = s.models[options.shipClass].geometry;
+        this.materials = s.models[options.shipClass].materials[0];
         this.materials.emissive = new THREE.Color('rgb(255,255,255)');
 
         var physiMaterial = Physijs.createMaterial(this.materials);
-		this.root = new Physijs.ConvexMesh(geometry, physiMaterial, 100);
-		this.root.position.copy(options.position);
-		this.root.rotation.copy(options.rotation);
+        this.root = new Physijs.ConvexMesh(geometry, physiMaterial, 100);
+        this.root.position.copy(options.position);
+        this.root.rotation.copy(options.rotation);
 
         this.lastTurretFire = 0;
         this.lastMissileFire = 0;
         this.alliance = options.alliance;
 
-        this.game = options.game;
-
-        this.root.name = options.name; //eventually refactor for both bot and player
+        this.root.name = this.name;
         this.hull = s.config.ship.hull;
         this.shields = s.config.ship.shields;
 
         this.lastTime = new Date( ).getTime( );
-
-	},
+    },
 
     getOffset: function(offset) {
         return offset.clone().applyMatrix4(this.root.matrixWorld);
