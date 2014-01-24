@@ -19,19 +19,19 @@ module.exports = {
         console.log('room DNE');
         db.HSET('rooms', roomName, 1, callback);
       } else {
+      // need to find the value (number of people in the room) for the hash and increase it here:
         console.log('room exists');
         callback(null, roomName);
       }
     });
   },
 
-  joinRoom: function (roomName, playerName, callback) {
-    callback = callback || defaultCallback('joinRoom');
+  joinRoom: function (roomName, playerName, joinCallback) {
+    joinCallback = joinCallback || defaultCallback('joinRoom');
 
     async.waterfall([function (callback){
-      callback(null, roomName);
+      this.addRoom(null, roomName, callback);
     },
-    this.addRoom,
     function(resultData, callback) {
       db.HSET(roomName+'_KILLS', playerID, 0, function(err, data){
         callback(null, data);
@@ -41,10 +41,37 @@ module.exports = {
       db.HSET(roomName+'_DEATHS', playerID, 0, function(err, data){
         callback(null, data);
       });
-    }], callback);
+    }], joinCallback);
   },
 
-  leaveRoom: function (roomName, playerName, callback) {},
+  leaveRoom: function (roomName, playerName, leaveCallback) {
+    leaveCallback = leaveCallback || defaultCallback('leaveRoom');
+
+    async.waterfall([function (callback){
+      db.HDEL(roomName+'_KILLS', playerID, function(err, data){
+        callback(null, data);
+      });
+    },
+    function(resultData, callback) {
+      db.HDEL(roomName+'_DEATHS', playerID, function(err, data){
+        callback(null, data);
+      });
+    },
+    function(resultData, callback) {
+      db.HINCRBY('rooms', roomName, -1, function(err, playersInRoom){
+        callback(null, playersInRoom);
+      });
+    },
+    function(playersInRoom, callback) {
+      if (playersInRoom < 1){
+        db.HDEL('rooms', roomName, function(err, data){
+          callback(null, data);
+        });
+      } else {
+        callback(null, playersInRoom);
+      }
+    }], leaveCallback);
+  },
 
   deleteRoom: function (roomName, callback) {},
 
