@@ -13,7 +13,7 @@ var Events = function( init ) {
     io = init.io,
     context = init.context;
 
-  this.flow     = connectionFlow(context, host, sync);
+  this.flow     = connectionFlow(context, host, sync, io);
   this.player   = player(host, sync);
   this.combat   = combat(host, sync);
   this.movement = movement(host, sync);

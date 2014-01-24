@@ -1,14 +1,18 @@
-module.exports = function (map, host, Sync) {
+module.exports = function (map, host, Sync, io) {
   return {
     join: function( socket, data ) {
-      console.log(data);
+      var target;
       if(host.rooms[data.room] === undefined) {
         host.init(socket.id, data.room, data);
+        target = host.rooms[data.room];
+        Sync.sync(io, data.room, host.rooms[data.room].gamestate);
+        Sync.setInit( socket.id, target, data );
       } else {
         host.add(socket.id, data.room, data);
+        target = host.rooms[data.room];
+        Sync.setInit( socket.id, target, data );
       }
-      var target = host.rooms[data.room];
-      Sync.setInit( socket.id, target, data );
+
       socket.emit('player list', target.playerList);
       socket.emit('map', map.mapItems);
       socket.join(data.room);
