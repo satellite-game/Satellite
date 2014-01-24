@@ -20,7 +20,14 @@ s.Menu = new Class({
     // Optimize at your own risk.
     this.menuBox = new THREE.Mesh( new THREE.CubeGeometry(2500, 2500, 1), new THREE.MeshBasicMaterial({color: 0x000000, transparent: true, opacity: 0.7}) );
 
-    // Format for adding menu items: {text: 'displayed_text_string'(required), action: callbackRefernece (what's run when item is selected.)(default null), font: 'font_name_string'(default "helvetiker"), bold: true/false (default false), size: number(1-5)(defualt 3), flat: true/false(changes shader, depth and bevel)(default false), small: true/false(overides flat, bold, and size to make a standardized readable small font)(default false)};
+    // Format for adding menu item object:
+    // { text: 'displayed_text_string'(required),
+    // action: 'callbackNameString' (called in context of 'this')(default null),
+    // font: 'font_name_string'(default "helvetiker"),
+    // bold: true/false (default false),
+    // size: number(1-5ish)(defualt 3),
+    // flat: true/false(changes shader, depth and bevel)(default false),
+    // small: true/false(overides flat, bold, and size to make a standardized readable small font)(default false) };
     
     this.menuBox.position.setZ(-150);
     this.menuBox.visible = false;
@@ -85,7 +92,7 @@ s.Menu = new Class({
       menuItem.position.setY((currentHeight)-(menuHeight/2)+(size/2)); // MATH?
       menuItem.position.setX(menuItem.geometry.boundingSphere.radius*-0.5);
       menuItem.visible = false;
-      menuItem.triggerableMenuBehavior = items[items.length-i-1].action || null;
+      menuItem.menuItemSelectCallback = items[items.length-i-1].action || null;
       this.menuBox.add( menuItem );
       this.menuItems.push( menuItem );
       currentHeight += size*2;
@@ -150,7 +157,7 @@ s.Menu = new Class({
   },
 
   selectItem: function () {
-    this.hoveredItem.triggerableMenuBehavior();
+    this[this.hoveredItem.menuItemSelectCallback]();
   },
 
   updateHovered: function () {
@@ -166,6 +173,8 @@ s.Menu = new Class({
         console.log(viewingAngle);
         var hover = this.menuItems[viewingAngle];
         this.hoverItem(hover);
+
+
       } else {
         // todo: keyboard, mouse, and controller navigation
       }
@@ -176,7 +185,7 @@ s.Menu = new Class({
 
   showDefaultMenu: function () {
     this.menuScreen = 'default';
-    this.addMenuItems([{text: 'JOIN GAME', size: 5, action: this.showRoomList}, {text: 'DISCONECT', size: 5, action: this.disconnect}, {text: 'LEADERBOARD', size: 5, action: this.showScoreboard}]);
+    this.addMenuItems([{text: 'JOIN GAME', size: 5, action: 'showRoomList'}, {text: 'DISCONECT', size: 5, action: 'disconnect'}, {text: 'LEADERBOARD', size: 5, action: 'showScoreboard'}]);
   },
 
   showRoomList: function () {
