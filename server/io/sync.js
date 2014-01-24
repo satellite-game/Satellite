@@ -16,6 +16,20 @@ Sync.prototype.setInit = function( socket, list, packet, shortcut ) {
     pos: packet.pos,
     lAccel: [0,0,0]
   };
+
+  var sync = function( io, room ) {
+    var thatio = io;
+    var thatRoom = room;
+    var that = this;
+    var thatDelay = that.sync_cycle;
+
+    setTimeout(function() {
+      thatio.sockets.in(thatRoom).emit('sync', that.gamestate);
+      that.sync( thatio, thatRoom);
+    }, thatDelay);
+  }; 
+
+  list.sync = sync;
 };
 
 Sync.prototype.setMove = function( packet, target ) {
@@ -32,32 +46,7 @@ Sync.prototype.setMove = function( packet, target ) {
 };
 
 
-Sync.prototype.sync = function( io, room , obj ) {
-  if(room === undefined) {
-    console.log("Room is undefined, aborting!");
-    return;
-  }
-  var that = this;
-  var thatRoom = room;
-  var thatio = io;
-  var thatState = obj;
 
-  for(var i in obj) {
-    thatState[i] = obj[i];
-  }
-
-  var thatDelay = that.sync_cycle;
-  setTimeout(function() {
-    var stateCopy = {};
-
-    for(var i in obj) {
-      stateCopy[i] = thatState[i];
-    }
-    console.log("Sync request being called out to ", thatRoom);
-    thatio.sockets.in(thatRoom).emit('sync', stateCopy);
-    that.sync( thatio, thatRoom, thatState);
-  }, thatDelay);
-};
 
 Sync.prototype.create = function(event, func) {
   Sync.prototype[event] = func;
