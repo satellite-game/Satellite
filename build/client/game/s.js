@@ -48334,7 +48334,8 @@ s.Turret = new Class({
         scale: new THREE.Vector3(50, 50, 1.0),
         color: {
             alliance: 0x00F2FF,
-            rebels: 0xFF0000
+            rebels: 0xFF0000,
+            enemy: 0xFF0000
         }
     },
 
@@ -48408,7 +48409,7 @@ s.Ship = new Class({
         rightTurretOffset: new THREE.Vector3(-35, 0, -200),
         missileOffset: new THREE.Vector3(0, 0, -120),
         turretFireTime: 200,
-        botTurretFireTime: 3000,
+        botTurretFireTime: 1700,
         missileFireTime: 1000
     },
 
@@ -48606,16 +48607,10 @@ s.Bot = new Class( {
       velocityFadeFactor: 16,
       rotationFadeFactor: 4
     };
-
+    console.log('this hook is run');
     //set a hook on the bot controls.
-    //unhook is necessary because first player has bot join twice
     this.controlBot = this.controlBot.bind(this);
-    // if (this.game.lastBotCallback) {
-    //   this.game.unhook( this.game.lastBotCallback );
-    // }
-
     this.game.hook( this.controlBot );
-    // this.game.lastBotCallback = this.controlBot;
 
     this.lastTime = new Date( ).getTime( );
 
