@@ -21,14 +21,8 @@ s.Bot = new Class( {
     };
 
     //set a hook on the bot controls.
-    //unhook is necessary because first player has bot join twice
     this.controlBot = this.controlBot.bind(this);
-    if (this.game.lastBotCallback) {
-      this.game.unhook( this.game.lastBotCallback );
-    }
-
     this.game.hook( this.controlBot );
-    this.game.lastBotCallback = this.controlBot;
 
     this.lastTime = new Date( ).getTime( );
 

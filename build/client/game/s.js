@@ -48610,12 +48610,12 @@ s.Bot = new Class( {
     //set a hook on the bot controls.
     //unhook is necessary because first player has bot join twice
     this.controlBot = this.controlBot.bind(this);
-    if (this.game.lastBotCallback) {
-      this.game.unhook( this.game.lastBotCallback );
-    }
+    // if (this.game.lastBotCallback) {
+    //   this.game.unhook( this.game.lastBotCallback );
+    // }
 
     this.game.hook( this.controlBot );
-    this.game.lastBotCallback = this.controlBot;
+    // this.game.lastBotCallback = this.controlBot;
 
     this.lastTime = new Date( ).getTime( );
 
@@ -51105,7 +51105,6 @@ s.SatelliteGame = new Class( {
                 // TODO: include velocities?
                 var enemyShip;
                 if (isBot) {
-                    debugger;
                     enemyShip = new s.Bot( {
                         game: that,
                         shipClass: 'human_ship_heavy',
@@ -51462,18 +51461,17 @@ s.SatelliteGame = new Class( {
             result[2] = obj.z;
             return result;
         };
+        
         enemiesSocketInfo = {};
         var enemiesList = this.enemies._list;  
         for (var i = 0; i < enemiesList.length; i++) {
             if (enemiesList[i].isBot){
                 var root = enemiesList[i].root;
-                // var position = makeArray(root.position);
-                // var rotation = makeArray(root.rotation);
+
+                //if there is a angular and linear velocity fnc, call it. else create a new 3 vector
                 var angularVeloc = (root.getAngularVelocity && root.getAngularVelocity()) || new THREE.Vector3();
                 var linearVeloc = (root.getLinearVelocity && root.getLinearVelocity()) || new THREE.Vector3();
-                // var aVeloc = makeArray(angularVeloc);
-                // var lVeloc = makeArray(linearVeloc);
-                // var name = root.name;
+                
                 enemiesSocketInfo[name] = {
                     position: makeArray(root.position),
                     rotation: makeArray(root.rotation),
