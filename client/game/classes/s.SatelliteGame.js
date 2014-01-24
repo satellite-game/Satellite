@@ -497,19 +497,18 @@ s.SatelliteGame = new Class( {
         s.game.loadScreen.setMessage(message);
     },
 
-    //this function only gets called if client is the first player
+    updatePlayersWithBots: function (fn) {
+        var botEnemies = this.getBotEnemies();
+        this.comm[fn](botEnemies);
+    },
+
+    //this function only gets called if client is the host player
     handleBotInfo: function() {
-        var updatePlayersWithBots = function() {
-            
-            var botEnemies = this.game.getBotEnemies();
-            this.game.comm.botUpdate(botEnemies);
-        };
-        
         var that = this;
         if (!this.game.hostPlayer) {
             //this the first time this function has been called with this client
             this.game.botPositionInterval = setInterval(function() {
-                updatePlayersWithBots.call(that);
+                that.game.updatePlayersWithBots('botUpdate');
             }, 2500);
         }
 
@@ -517,10 +516,8 @@ s.SatelliteGame = new Class( {
         if (this.game.botCount === 0) {
             // Create a new bot
             this.game.enemies.add( {}, 'bot');
-        }
-
-        var botEnemies = this.game.getBotEnemies();
-        this.game.comm.botInfo(botEnemies);
+        }        
+        that.game.updatePlayersWithBots('botInfo');
     },
 
     getBotEnemies: function() {

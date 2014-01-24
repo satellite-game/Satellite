@@ -20,10 +20,6 @@ s.Bot = new Class( {
       rotationFadeFactor: 4
     };
 
-    this.targetX = 0;
-    this.targetY = 0;
-
-
     //set a hook on the bot controls.
     //unhook is necessary because first player has bot join twice
     this.controlBot = this.controlBot.bind(this);

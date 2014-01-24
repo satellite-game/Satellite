@@ -48607,10 +48607,6 @@ s.Bot = new Class( {
       rotationFadeFactor: 4
     };
 
-    this.targetX = 0;
-    this.targetY = 0;
-
-
     //set a hook on the bot controls.
     //unhook is necessary because first player has bot join twice
     this.controlBot = this.controlBot.bind(this);
@@ -48668,33 +48664,9 @@ s.Bot = new Class( {
 
   controlBot: function( ) {
 
-
-    //////////////////////////////
-    ////  CLOSEST ENEMY LOGIC ////
-    //////////////////////////////  
-
-    //MAKE ENEMY LIST FOR BOT
-    // var botEnemyList = [];
-    // botEnemyList.push(this.game.player);
-    // var enemyShips = this.game.enemies._list;
-    // for (var i = 0; i < enemyShips.length; i++) {
-    //   if (!enemyShips[i].isBot) {
-    //     botEnemyList.push(enemyShips[i]);
-    //   }
-    // }
-
+    //get closest enemy
     this.getEnemyList();
     this.getClosestDistance();
-
-    //DETERMINE CLOSEST ENEMY
-    // var closestDistance;
-    // for (i = 0; i < botEnemyList.length; i++) {
-    //   var distance = this.root.position.distanceTo(botEnemyList[i].root.position);
-    //   if (!closestDistance || distance < closestDistance) {
-    //     closestDistance = distance;
-    //     this.target = botEnemyList[i];
-    //   }
-    // }
 
     //////////////////////////////
     //// THRUST/BREAK LOGIC ////
@@ -51458,19 +51430,23 @@ s.SatelliteGame = new Class( {
         s.game.loadScreen.setMessage(message);
     },
 
+    updatePlayersWithBots: function (fn) {
+        var botEnemies = this.getBotEnemies();
+        this.comm[fn](botEnemies);
+    },
+
     //this function only gets called if client is the first player
     handleBotInfo: function() {
-        var updatePlayersWithBots = function() {
+        // var updatePlayersWithBots = function() {
             
-            var botEnemies = this.game.getBotEnemies();
-            this.game.comm.botUpdate(botEnemies);
-        };
-        
+        //     var botEnemies = this.game.getBotEnemies();
+        //     this.game.comm.botUpdate(botEnemies);
+        // };
         var that = this;
         if (!this.game.hostPlayer) {
             //this the first time this function has been called with this client
             this.game.botPositionInterval = setInterval(function() {
-                updatePlayersWithBots.call(that);
+                that.game.updatePlayersWithBots('botUpdate');
             }, 2500);
         }
 
@@ -51479,9 +51455,10 @@ s.SatelliteGame = new Class( {
             // Create a new bot
             this.game.enemies.add( {}, 'bot');
         }
-
-        var botEnemies = this.game.getBotEnemies();
-        this.game.comm.botInfo(botEnemies);
+        
+        that.game.updatePlayersWithBots('botInfo');
+        // var botEnemies = this.game.getBotEnemies();
+        // this.game.comm.botInfo(botEnemies);
     },
 
     getBotEnemies: function() {
