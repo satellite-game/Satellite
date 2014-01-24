@@ -48438,55 +48438,61 @@ s.Ship = new Class({
     },
 
     getOffset: function(offset) {
+        debugger;
         return offset.clone().applyMatrix4(this.root.matrixWorld);
     },
 
 	fire: function(weapon){
 		var now =new Date().getTime();
-        var position;
         var rotation = this.root.rotation.clone();
         var initialVelocity = this.root.getLinearVelocity().clone();
+        
+        var bullet = {
+            game: this.game,
+            pilot: this.name,
+            rotation: rotation,
+            initialVelocity: initialVelocity,
+            isBot: this.isBot,
+            team: this.alliance
+        };
+        
+        var turretFireTime;
+        if (this.isBot) {
+            turretFireTime = this.options.botTurretFireTime;
+        } else {
+            turretFireTime = this.options.turretFireTime;
+            bullet.HUD = this.HUD;
+        }
 
         // Turrets
         if (weapon === 'turret'){
-            if (now - this.lastTurretFire > this.options.turretFireTime){
+            if (now - this.lastTurretFire > turretFireTime){
                 // Left bullet
-                position = this.getOffset(this.options.leftTurretOffset);
-                new s.Turret({
-                    HUD: this.HUD,
-                    game: this.game,
-                    pilot: this.name,
-                    position: position,
-                    rotation: rotation,
-                    initialVelocity: initialVelocity,
-                    team: this.alliance
-                });
-                this.game.handleFire({
-                    position: position,
-                    rotation: rotation,
-                    initialVelocity: initialVelocity
-                });
+                this.makeTurret(bullet, this.options.leftTurretOffset);
+
+                // bullet.position = this.getOffset(this.options.leftTurretOffset);
+                // new s.Turret(bullet);
+
+                // this.game.handleFire({
+                //     position: position,
+                //     rotation: rotation,
+                //     initialVelocity: initialVelocity
+                // });
 
                 // Right bullet
-                position = this.getOffset(this.options.rightTurretOffset);
-                new s.Turret({
-                    HUD: this.HUD,
-                    game: this.game,
-                    pilot: this.game.pilot.name,
-                    position: position,
-                    rotation: rotation,
-                    initialVelocity: initialVelocity,
-                    team: this.alliance
-                });
-                this.game.handleFire({
-                    position: position,
-                    rotation: rotation,
-                    initialVelocity: initialVelocity
-                });
+                this.makeTurret(bullet, this.options.rightTurretOffset);
+                // bullet.position = this.getOffset(this.options.rightTurretOffset);
+                // new s.Turret(bullet);
+
+                // this.game.handleFire({
+                //     position: position,
+                //     rotation: rotation,
+                //     initialVelocity: initialVelocity
+                // });
 
                 this.lastTurretFire = now;
 
-                this.game.sound.play('laser', 0.5);
+                if (!this.isBot) { this.game.sound.play('laser', 0.5); }
             }
         }
 
@@ -48505,6 +48511,18 @@ s.Ship = new Class({
 
                 this.lastMissileFire = now;
             }
+        }
+    },
+
+    makeTurret: function(bullet, turretOffset) {
+        bullet.position = this.getOffset(turretOffset);
+        new s.Turret(bullet);
+        if (!this.isBot) {
+            this.game.handleFire({
+                position: bullet.position,
+                rotation: bullet.rotation,
+                initialVelocity: bullet.initialVelocity
+            });
         }
     },
 
@@ -48590,15 +48608,6 @@ s.Bot = new Class( {
   toString: 'Bot',
   extend: s.Ship,
 
-  // options: {
-  //   leftTurretOffset: new THREE.Vector3(35, 0, -200),
-  //   rightTurretOffset: new THREE.Vector3(-35, 0, -200),
-  //   missileOffset: new THREE.Vector3(0, 0, -120),
-  //   turretFireTime: 200,
-  //   botTurretFireTime: 3000,
-  //   missileFireTime: 1000
-  // },
-
   construct: function( options ) {
     var position = options.position || [22498, -25902, 24976];
     var rotation = options.rotation || [0, Math.PI / 2, 0];
@@ -48653,50 +48662,46 @@ s.Bot = new Class( {
     this.camera.position.set( 0, 0, 0 );
   },
 
-  // getOffset: function(offset) {
-  //   return offset.clone().applyMatrix4(this.root.matrixWorld);
-  // },
-
   botFire: function (weapon) {
-    var now =new Date().getTime();
-    var position;
-    var rotation = this.root.rotation.clone();
-    var initialVelocity = this.root.getLinearVelocity().clone();
+    // var now =new Date().getTime();
+    // var position;
+    // var rotation = this.root.rotation.clone();
+    // var initialVelocity = this.root.getLinearVelocity().clone();
 
     // Turrets
-    if (weapon === 'turret'){
-      if (now - this.lastTurretFire > this.options.botTurretFireTime){
-        // Left bullet
-        position = this.getOffset(this.options.leftTurretOffset);
-        var bulletLeft = new s.Turret({
-          game: this.game,
-          pilot: this.name,
-          position: position,
-          rotation: rotation,
-          initialVelocity: initialVelocity,
-          isbBot: this.isBot,
-          team: this.alliance
-        });
+    // if (weapon === 'turret'){
+    //   // if (now - this.lastTurretFire > this.options.botTurretFireTime){
+    //     // Left bullet
+    //     // position = this.getOffset(this.options.leftTurretOffset);
+    //     new s.Turret({
+    //       game: this.game,
+    //       pilot: this.name,
+    //       position: position,
+    //       rotation: rotation,
+    //       initialVelocity: initialVelocity,
+    //       isbBot: this.isBot,
+    //       team: this.alliance
+    //     });
 
-        // Right bullet
-        position = this.getOffset(this.options.rightTurretOffset);
-        var bulletRight = new s.Turret({
-          game: this.game,
-          pilot: this.name,
-          position: position,
-          rotation: rotation,
-          initialVelocity: initialVelocity,
-          isBot: this.isBot,
-          team: this.alliance
-        });
+    //     // Right bullet
+    //     position = this.getOffset(this.options.rightTurretOffset);
+    //     new s.Turret({
+    //       game: this.game,
+    //       pilot: this.name,
+    //       position: position,
+    //       rotation: rotation,
+    //       initialVelocity: initialVelocity,
+    //       isBot: this.isBot,
+    //       team: this.alliance
+    //     });
 
-        this.lastTurretFire = now;
+    //     this.lastTurretFire = now;
 
-        if (!this.isBot) {
-          this.game.sound.play('laser', 0.5);
-        }
-      }
-    }
+    //     if (!this.isBot) {
+    //       this.game.sound.play('laser', 0.5);
+    //     }
+    //   }
+    // }
   },
 
 
@@ -48841,42 +48846,10 @@ s.Bot = new Class( {
     //////////////////////////////
 
     if ( Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && closestDistance < maxDistance) {
-      this.botFire('turret');
+      this.fire('turret');
     }
 
   }
-
-  // setPosition: function (position, rotation, aVeloc, lVeloc, interpolate) {
-  //     var posInterpolation = 0.05;
-  //     var rotInterpolation = 0.50;
-
-  //     if (interpolate) {
-  //         // Interpolate position by adding the difference of the calculated position and the position sent by the authoritative client
-  //         var newPositionVec = new THREE.Vector3(position[0], position[1], position[2]);
-  //         var posErrorVec = newPositionVec.sub(this.root.position).multiply(new THREE.Vector3(posInterpolation, posInterpolation, posInterpolation));
-  //         this.root.position.add(posErrorVec);
-  //     }
-  //     else {
-  //         // Directly set position
-  //         this.root.position.set(position[0], position[1], position[2]);
-  //     }
-
-  //     // Set rotation
-  //     if (rotation)
-  //         this.root.rotation.set(rotation[0], rotation[1], rotation[2]);
-
-  //     if (aVeloc !== undefined && this.root.setAngularVelocity)
-  //         this.root.setAngularVelocity({ x: aVeloc[0], y: aVeloc[1], z: aVeloc[2] });
-
-  //     if (lVeloc !== undefined && this.root.setLinearVelocity)
-  //         this.root.setLinearVelocity({ x: lVeloc[0], y: lVeloc[1], z: lVeloc[2] });
-
-  //     // Tell the physics engine to update our position
-  //     this.root.__dirtyPosition = true;
-  //     this.root.__dirtyRotation = true;
-  // },
-
-
 
 } );
 s.Moon = new Class({

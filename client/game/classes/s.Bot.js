@@ -56,48 +56,6 @@ s.Bot = new Class( {
     this.camera.position.set( 0, 0, 0 );
   },
 
-  botFire: function (weapon) {
-    var now =new Date().getTime();
-    var position;
-    var rotation = this.root.rotation.clone();
-    var initialVelocity = this.root.getLinearVelocity().clone();
-
-    // Turrets
-    if (weapon === 'turret'){
-      if (now - this.lastTurretFire > this.options.botTurretFireTime){
-        // Left bullet
-        position = this.getOffset(this.options.leftTurretOffset);
-        var bulletLeft = new s.Turret({
-          game: this.game,
-          pilot: this.name,
-          position: position,
-          rotation: rotation,
-          initialVelocity: initialVelocity,
-          isbBot: this.isBot,
-          team: this.alliance
-        });
-
-        // Right bullet
-        position = this.getOffset(this.options.rightTurretOffset);
-        var bulletRight = new s.Turret({
-          game: this.game,
-          pilot: this.name,
-          position: position,
-          rotation: rotation,
-          initialVelocity: initialVelocity,
-          isBot: this.isBot,
-          team: this.alliance
-        });
-
-        this.lastTurretFire = now;
-
-        if (!this.isBot) {
-          this.game.sound.play('laser', 0.5);
-        }
-      }
-    }
-  },
-
 
   controlBot: function( ) {
 
@@ -240,7 +198,7 @@ s.Bot = new Class( {
     //////////////////////////////
 
     if ( Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && closestDistance < maxDistance) {
-      this.botFire('turret');
+      this.fire('turret');
     }
 
   }
