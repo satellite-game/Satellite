@@ -49948,6 +49948,8 @@ s.Radar = new Class({
         ///////////////////
         // ENEMY MARKERS //
         ///////////////////
+
+        // todo: add elevation lines to enemy markers
         var enemyGeo = [], enemyMarker = [];
         radar.enemyCount = 0;
         for (var i = 0, len = that.enemies.list().length; i < len; i++){
@@ -50779,8 +50781,16 @@ s.SatelliteGame = new Class( {
         //// Setup camera: Cockpit view; COMMENT OUT FOR CHASE CAM
         // this.camera.position.set( 0, 0, 0 );
 
-        //// Setup camera: Chase view
+        //// Setup camera: Start in Chase view
         this.camera.position.set(0,35,250);
+
+        $(document).on('keyup', function(evt) {
+          if (evt.which === 86 && that.camera.position.equals( new THREE.Vector3(0,0,0) )) {
+            that.camera.position.set(0,35,250);
+          } else if (evt.which === 86) {
+            that.camera.position.set(0,0,0);
+          }
+        });
 
         // Planet camera
         // this.scene.add(this.camera);
