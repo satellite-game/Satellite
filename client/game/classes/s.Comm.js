@@ -87,6 +87,12 @@ s.Comm = new Class( {
 
         this.socket.on('hit', this.makeTrigger( 'hit' ));
 
+        this.socket.on('bot retrieval', this.makeTrigger( 'bot retrieval' ));
+
+        this.socket.on('bot positions', this.makeTrigger( 'bot positions' ));
+        
+
+
 
         this.game.hook( this.position );
 
@@ -145,10 +151,10 @@ s.Comm = new Class( {
             var shipPosition = s.game.player.getPositionPacket( );
 
             // TODO: Figure out if ship or turret actually moved
-            
+
 
             // If ship moved, send packet
-            
+
             if ( this.lastPosition !== shipPosition.pos ) {
 
                 // Build packet
@@ -230,5 +236,26 @@ s.Comm = new Class( {
         // if ( this.time >= 60 ){
         //     window.location.href = "http://satellite-game.com";
         // }
+    },
+
+    botInfo: function(message) {
+        this.socket.emit('botInfo', message);
+    },
+
+    botHit: function( yourName, botName ) {
+
+        this.time = 0;
+
+        this.socket.emit( 'botHit', {
+
+            yourName: yourName,
+            
+            botName: botName
+
+        });
+    },
+
+    botUpdate: function(enemies) {
+        this.socket.emit( 'botUpdate', enemies);
     }
 } );
