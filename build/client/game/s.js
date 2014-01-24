@@ -48590,14 +48590,14 @@ s.Bot = new Class( {
   toString: 'Bot',
   extend: s.Ship,
 
-  options: {
-    leftTurretOffset: new THREE.Vector3(35, 0, -200),
-    rightTurretOffset: new THREE.Vector3(-35, 0, -200),
-    missileOffset: new THREE.Vector3(0, 0, -120),
-    turretFireTime: 200,
-    botTurretFireTime: 3000,
-    missileFireTime: 1000
-  },
+  // options: {
+  //   leftTurretOffset: new THREE.Vector3(35, 0, -200),
+  //   rightTurretOffset: new THREE.Vector3(-35, 0, -200),
+  //   missileOffset: new THREE.Vector3(0, 0, -120),
+  //   turretFireTime: 200,
+  //   botTurretFireTime: 3000,
+  //   missileFireTime: 1000
+  // },
 
   construct: function( options ) {
     var position = options.position || [22498, -25902, 24976];
@@ -48641,6 +48641,8 @@ s.Bot = new Class( {
       alliance: options.alliance
     });
 
+
+    //CAMERA SETUP COMES AFER INITALIZE SO ROOT IS ALREADY SET UP
     //Create a camera for the bot
     this.camera = new THREE.PerspectiveCamera(35, 1, 1, 300000);
 
@@ -48651,9 +48653,9 @@ s.Bot = new Class( {
     this.camera.position.set( 0, 0, 0 );
   },
 
-  getOffset: function(offset) {
-    return offset.clone().applyMatrix4(this.root.matrixWorld);
-  },
+  // getOffset: function(offset) {
+  //   return offset.clone().applyMatrix4(this.root.matrixWorld);
+  // },
 
   botFire: function (weapon) {
     var now =new Date().getTime();
@@ -48842,37 +48844,37 @@ s.Bot = new Class( {
       this.botFire('turret');
     }
 
-  },
+  }
 
-  setPosition: function (position, rotation, aVeloc, lVeloc, interpolate) {
-      var posInterpolation = 0.05;
-      var rotInterpolation = 0.50;
+  // setPosition: function (position, rotation, aVeloc, lVeloc, interpolate) {
+  //     var posInterpolation = 0.05;
+  //     var rotInterpolation = 0.50;
 
-      if (interpolate) {
-          // Interpolate position by adding the difference of the calculated position and the position sent by the authoritative client
-          var newPositionVec = new THREE.Vector3(position[0], position[1], position[2]);
-          var posErrorVec = newPositionVec.sub(this.root.position).multiply(new THREE.Vector3(posInterpolation, posInterpolation, posInterpolation));
-          this.root.position.add(posErrorVec);
-      }
-      else {
-          // Directly set position
-          this.root.position.set(position[0], position[1], position[2]);
-      }
+  //     if (interpolate) {
+  //         // Interpolate position by adding the difference of the calculated position and the position sent by the authoritative client
+  //         var newPositionVec = new THREE.Vector3(position[0], position[1], position[2]);
+  //         var posErrorVec = newPositionVec.sub(this.root.position).multiply(new THREE.Vector3(posInterpolation, posInterpolation, posInterpolation));
+  //         this.root.position.add(posErrorVec);
+  //     }
+  //     else {
+  //         // Directly set position
+  //         this.root.position.set(position[0], position[1], position[2]);
+  //     }
 
-      // Set rotation
-      if (rotation)
-          this.root.rotation.set(rotation[0], rotation[1], rotation[2]);
+  //     // Set rotation
+  //     if (rotation)
+  //         this.root.rotation.set(rotation[0], rotation[1], rotation[2]);
 
-      if (aVeloc !== undefined && this.root.setAngularVelocity)
-          this.root.setAngularVelocity({ x: aVeloc[0], y: aVeloc[1], z: aVeloc[2] });
+  //     if (aVeloc !== undefined && this.root.setAngularVelocity)
+  //         this.root.setAngularVelocity({ x: aVeloc[0], y: aVeloc[1], z: aVeloc[2] });
 
-      if (lVeloc !== undefined && this.root.setLinearVelocity)
-          this.root.setLinearVelocity({ x: lVeloc[0], y: lVeloc[1], z: lVeloc[2] });
+  //     if (lVeloc !== undefined && this.root.setLinearVelocity)
+  //         this.root.setLinearVelocity({ x: lVeloc[0], y: lVeloc[1], z: lVeloc[2] });
 
-      // Tell the physics engine to update our position
-      this.root.__dirtyPosition = true;
-      this.root.__dirtyRotation = true;
-  },
+  //     // Tell the physics engine to update our position
+  //     this.root.__dirtyPosition = true;
+  //     this.root.__dirtyRotation = true;
+  // },
 
 
 
@@ -51461,8 +51463,6 @@ s.SatelliteGame = new Class( {
     },
 
     handleFire: function(props) {
-        // s.game.enemies.execute( 'bot 1', 'setPosition', [ [-20000,-20000,-20000], [0,0,0], [0,0,0], [0,0,0], true ] );
-        // this.enemies._list[0].root.position.set(0,0,0);
         s.game.comm.fire(props.position, props.rotation, props.initialVelocity);
     },
 
