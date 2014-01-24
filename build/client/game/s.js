@@ -48607,10 +48607,17 @@ s.Bot = new Class( {
       velocityFadeFactor: 16,
       rotationFadeFactor: 4
     };
-    console.log('this hook is run');
+
     //set a hook on the bot controls.
+    //unhook is necessary when bot dies and new bot is created
+    //need to refactor when multiple bots on screen
     this.controlBot = this.controlBot.bind(this);
+    if (this.game.lastBotCallBack) {
+      this.game.unhook (this.game.lastBotCallBack);
+    }
+
     this.game.hook( this.controlBot );
+    this.game.lastBotCallBack = this.controlBot;
 
     this.lastTime = new Date( ).getTime( );
 
@@ -51128,6 +51135,7 @@ s.SatelliteGame = new Class( {
                 }
                 
                 if (isBot) { console.log( '%s has joined the fray', enemyShip.name ); }
+
                 this._list.push( enemyShip );
                 this._map[ enemyShip.name ] = enemyShip; // this._map.set(enemyInfo.name, otherShip);
             }
@@ -51464,7 +51472,7 @@ s.SatelliteGame = new Class( {
             result[2] = obj.z;
             return result;
         };
-        
+
         enemiesSocketInfo = {};
         var enemiesList = this.enemies._list;  
         for (var i = 0; i < enemiesList.length; i++) {
