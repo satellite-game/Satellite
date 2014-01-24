@@ -111,7 +111,7 @@ s.Controls = new Class({
       yaw = this.oculus.quat.y - this.oculus.compensationY;
       roll = this.oculus.quat.z - this.oculus.compensationZ;
       if (this.menu.displayed) {
-        this.menu.updateSelection();
+        this.menu.updateHovered();
       }
     } else {
       this.mouse.mouseType = 'keyboard';

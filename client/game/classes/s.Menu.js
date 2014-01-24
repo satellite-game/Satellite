@@ -13,14 +13,14 @@ s.Menu = new Class({
     this.menuItems = [];
     this.menuScreen = 'default';
     this.cursorPosition = 0;
-    this.selectedItem = null;
+    this.hoveredItem = null;
 
     // PlaneGeometry would be better than a cube for this but harder to write because 
     // it would need to be rotated and all it's child objects would need to be rotated back.
     // Optimize at your own risk.
     this.menuBox = new THREE.Mesh( new THREE.CubeGeometry(2500, 2500, 1), new THREE.MeshBasicMaterial({color: 0x000000, transparent: true, opacity: 0.7}) );
 
-    // Format for adding menu items: {text: 'displayed_text_string'(required), font: 'font_name_string'(default "helvetiker"), bold: true/false (default false), size: number(1-5)(defualt 3), flat: true/false(changes shader, depth and bevel)(default false), small: true/false(overides flat, bold, and size to make a standardized readable small font)(default false)};
+    // Format for adding menu items: {text: 'displayed_text_string'(required), action: callbackRefernece (what's run when item is selected.)(default null), font: 'font_name_string'(default "helvetiker"), bold: true/false (default false), size: number(1-5)(defualt 3), flat: true/false(changes shader, depth and bevel)(default false), small: true/false(overides flat, bold, and size to make a standardized readable small font)(default false)};
     
     this.menuBox.position.setZ(-150);
     this.menuBox.visible = false;
@@ -85,6 +85,7 @@ s.Menu = new Class({
       menuItem.position.setY((currentHeight)-(menuHeight/2)+(size/2)); // MATH?
       menuItem.position.setX(menuItem.geometry.boundingSphere.radius*-0.5);
       menuItem.visible = false;
+      menuItem.triggerableMenuBehavior = items[items.length-i-1].action || null;
       this.menuBox.add( menuItem );
       this.menuItems.push( menuItem );
       currentHeight += size*2;
@@ -122,13 +123,13 @@ s.Menu = new Class({
     }
   },
 
-  selectItem: function ( item ) {
-    // changes appearance of selected item to make it obvious
-    // which one you have selected.
+  hoverItem: function ( item ) {
+    // changes appearance of hovered item to make it obvious
+    // which one you have hovered.
     if (item) {
-      if (this.selectedItem !== item) {
-        this.deselectItem(this.selectedItem);
-        this.selectedItem = item;
+      if (this.hoveredItem !== item) {
+        this.unhoverItem(this.hoveredItem);
+        this.hoveredItem = item;
       }
       item.material.color.setHex(0xCC0000);
       if (item.material.ambient) {
@@ -138,8 +139,8 @@ s.Menu = new Class({
     }
   },
 
-  deselectItem: function ( item ) {
-    if (this.selectedItem) {
+  unhoverItem: function ( item ) {
+    if (this.hoveredItem) {
       item.material.color.setHex(0x00CC00);
       if (item.material.ambient) {
         item.material.ambient.setHex(0x00FF00);
@@ -148,37 +149,62 @@ s.Menu = new Class({
     }
   },
 
-  updateSelection: function () {
+  selectItem: function () {
+    this.hoveredItem.triggerableMenuBehavior();
+  },
+
+  updateHovered: function () {
     if (this.displayed && this.menuItems.length > 0) {
       if (this.oculus.detected) {
         // Oculus menu navigation
         // Divides the field of view by the number of menu
-        // items and moves selection up and down with head motion
+        // items and moves hover up and down with head motion
+
+        // todo: move menu so you are looking at the hovered item (possibly very complicated!)
 
         var viewingAngle = ~~((this.menuItems.length/2 * this.oculus.quat.x - this.oculus.compensationX) * 6 + Math.round(this.menuItems.length/2));
         console.log(viewingAngle);
-        var selection = this.menuItems[viewingAngle];
-        this.selectItem(selection);
+        var hover = this.menuItems[viewingAngle];
+        this.hoverItem(hover);
       } else {
         // todo: keyboard, mouse, and controller navigation
       }
     }
   },
 
+  // -- GAME SPECIFIC FUNCTIONS AND MENU SCREENS
+
   showDefaultMenu: function () {
     this.menuScreen = 'default';
-    this.addMenuItems([{text: 'JOIN GAME', size: 5}, {text: 'DISCONECT', size: 5}, {text: 'LEADERBOARD', size: 5}, {text: 'SMALL TEST TEXT 1', small: true}, {text: 'SMALL TEST TEXT 2', small: true}, {text: 'SMALL TEST TEXT 3', small: true}]);
+    this.addMenuItems([{text: 'JOIN GAME', size: 5, action: this.showRoomList}, {text: 'DISCONECT', size: 5, action: this.disconnect}, {text: 'LEADERBOARD', size: 5, action: this.showScoreboard}]);
   },
 
   showRoomList: function () {
     this.clearMenu();
     this.menuScreen = 'rooms';
     var roomNames = [];
-    // some database stuff to get list of open rooms
-    var rooms = [];
+    // some database stuff to get list of existing rooms
+    var rooms = [{text: 'JOIN GAME', size: 5}];
     for (var i = 0; i < roomNames.length; i++) {
       rooms.push({text: roomNames[i], small: true});
     }
+    rooms.push({text: '+ CREATE NEW ROOM +', small: true, action: this.createRoom});
     this.addMenuItems(rooms);
+  },
+
+  showScoreboard: function () {
+    this.clearMenu();
+    this.menuScreen = 'scoreboard';
+    var playerNames = [];
+    // some database stuff to get list of players and order them by score
+    var players = [{text: 'LEADERBOARD', size: 5}];
+    for (var i = 0; i < database.length; i++) {
+      players.push({text: playerNames[i], small: true});
+    }
+
+  },
+
+  disconnect: function () {
+    // leave the game. possibly just by just refreshing the page.
   }
 });
