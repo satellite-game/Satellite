@@ -137,7 +137,6 @@ s.Comm = new Class( {
 
         var time = new Date( ).getTime( );
 
-
         // Never send faster than server can handle
 
         if ( time - s.game.comm.lastMessageTime >= 700 ) {

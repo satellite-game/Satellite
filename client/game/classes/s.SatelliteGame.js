@@ -150,7 +150,7 @@ s.SatelliteGame = new Class( {
                 return false;
             },
             add: function ( enemyInfo ) {
-                console.log("LOL ENEMIES");
+              
                 if ( this.has( enemyInfo.name ) ) {
                     this.delete( enemyInfo.name );
                     console.error( 'Bug: Player %s added twice', enemyInfo.name );
@@ -336,13 +336,15 @@ s.SatelliteGame = new Class( {
         }
     },
     handleSync: function ( pak ) {
-      console.log("Receiving a sync request");
-      var data = pak;
+      var data = {};
+      for(var i in pak) {
+        data[i] = pak[i];
+      };
       var whoAmI = s.game.pilot.name,
           myData = pak[whoAmI];
 
       var adjustPlayer = function( serverView ) {
-
+        console.log("This is the server view of your position ", serverView.pos);
         var adjusted = [];
 
         var myView = s.game.player.getPositionPacket();
