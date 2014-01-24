@@ -183,7 +183,7 @@ s.Menu = new Class({
         this.hoverItem(hover);
 
         // trends towards infinity. consider limiting.
-        this.menuBox.position.setY((-150*Math.sin(viewingAngle))/Math.sin(Math.PI/4));
+        this.menuBox.position.setY((-150*Math.sin(viewingAngle))/Math.sin(Math.PI/4)/2+4);
       } else {
         // todo: keyboard, mouse, and controller navigation
       }

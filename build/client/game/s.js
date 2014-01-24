@@ -50578,7 +50578,6 @@ s.Menu = new Class({
   },
 
   open: function () {
-    console.log(this.HUD);
     if (this.menuScreen !== 'default') {
       this.showDefaultMenu();
     }
@@ -50649,12 +50648,11 @@ s.Menu = new Class({
 
         var viewingAngle = Math.PI/4 * (this.oculus.quat.x - this.oculus.compensationX); // or 180?
         var tilt = ~~((this.menuItems.length/2 * this.oculus.quat.x - this.oculus.compensationX) * 6 + ~~(this.menuItems.length/2));
-        console.log(tilt);
         var hover = this.menuItems[tilt];
         this.hoverItem(hover);
 
         // trends towards infinity. consider limiting.
-        this.menuBox.position.setY((-150*Math.sin(viewingAngle))/Math.sin(Math.PI/4));
+        this.menuBox.position.setY((-150*Math.sin(viewingAngle))/Math.sin(Math.PI/4)/2+4);
       } else {
         // todo: keyboard, mouse, and controller navigation
       }
