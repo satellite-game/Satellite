@@ -1,12 +1,15 @@
 module.exports = function(host, Sync) {
   return {
+
     keySync: function (socket, packet) {
-      // console.log('\n====== ',host.sockets[socket.id],' ========\n');
       var room = host.sockets[socket.id].room;
       var shipName = host.sockets[socket.id].name;
       var playerState = host.rooms[room].gamestate[shipName];
-
       // console.log('\npacket:\n',packet,'\nroom:\n',room, '\nshipName:\n',shipName);
+
+      // packet.interp = true;
+      // console.log('\npacket:\n',packet,'\nroom:\n',room, '\nshipName:\n',shipName);
+      // socket.broadcast.to(room).emit('move', packet);
 
       var isLegalMove = Sync.setMove(packet, playerState);
 
@@ -14,9 +17,8 @@ module.exports = function(host, Sync) {
         for (var i in packet) {
           playerState[i] = packet[i];
         }
-        //socket.emit('move', playerState); -- this shoudln't be here
-        //socket.broadcast.to(room).emit('move', playerState);
       }
     }
+
   };
 };
