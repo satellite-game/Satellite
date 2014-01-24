@@ -49137,7 +49137,7 @@ s.Controls = new Class({
 
     var that = this;
 
-    $('body').keyup(function (e) {
+    $(document).keyup(function (e) {
       if (e.which === 81) {
         if (that.menu.displayed) {
           that.menu.close();
@@ -50576,9 +50576,11 @@ s.Menu = new Class({
       var menuItemGeo = new THREE.TextGeometry(items[items.length-i-1].text, {font: font, size: size, height: size, weight: bold, bevelEnabled: bevelEnabled, bevelThickness: bevel, bevelSize: bevel});
       var menuItemMaterial = new THREE[mat]({color: 0x00CC00, ambient: 0x00FF00, specular: 0x33FF33, shininess: 5});
       var menuItem = new THREE.Mesh(menuItemGeo, menuItemMaterial);
+
       menuItem.position.setY((currentHeight)-(menuHeight/2)+(size/2)); // MATH?
       menuItem.position.setX(menuItem.geometry.boundingSphere.radius*-0.5);
       menuItem.menuItemSelectCallback = items[items.length-i-1].action || null;
+      
       this.menuBox.add( menuItem );
       this.menuItems.push( menuItem );
       currentHeight += size*2;
@@ -50614,6 +50616,7 @@ s.Menu = new Class({
   close: function () {
     this.displayed = false;
     this.menuBox.visible = false;
+    this.cursorPosition = 0;
     for (var i = 0; i < this.menuBox.children.length; i++) {
       this.menuBox.children[i].visible = false;
     }
@@ -50657,6 +50660,7 @@ s.Menu = new Class({
     // this is my favorite part :]
     if (this.hoveredItem.menuItemSelectCallback) {
       this.clearMenu();
+      this.cursorPosition = 0;
       this[this.hoveredItem.menuItemSelectCallback]();
     }
   },
@@ -50734,8 +50738,8 @@ s.Game = new Class({
   extend: s.EventEmitter,
 
   construct: function(options) {
-        // Display load screen
-        this.loadScreen = new s.LoadScreen();
+    // Display load screen
+    this.loadScreen = new s.LoadScreen();
 
     var self = this;
 
@@ -50796,7 +50800,7 @@ s.Game = new Class({
     // this.oculus.detected = true;
 
     // TODO: abstract key listening
-    $(document).on('keydown', function(evt) {
+    $(document).on('keyup', function(evt) {
       if (evt.which === 13)
         self.toggleFullScreen();
     });
@@ -50878,7 +50882,7 @@ s.Game = new Class({
 
   // Attempt to start the game (if models and physics have begun)
   tryInitialize: function() {
-    if (this.modelsLoaded && this.physicsStarted && !this.initialized) {
+    if (this.modelsLoaded && this.physicsStarted && !this.initialized) { // && this.roomSelected) {
       this.initialize();
     }
   },
