@@ -439,8 +439,6 @@ s.SatelliteGame = new Class( {
     },
 
     handleFire: function(props) {
-        // s.game.enemies.execute( 'bot 1', 'setPosition', [ [-20000,-20000,-20000], [0,0,0], [0,0,0], [0,0,0], true ] );
-        // this.enemies._list[0].root.position.set(0,0,0);
         s.game.comm.fire(props.position, props.rotation, props.initialVelocity);
     },
 
