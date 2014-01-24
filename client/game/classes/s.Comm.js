@@ -88,7 +88,7 @@ s.Comm = new Class( {
 
         this.socket.on( 'sync', this.makeTrigger( 'sync'));
 
-        this.game.hook( this.position );
+        //this.game.hook( this.position );
 
         this.clockTick = this.clockTick.bind(this);
 
@@ -168,7 +168,7 @@ s.Comm = new Class( {
                 };
 
                 // Broadcast position
-
+                
                 s.game.comm.socket.emit( 'combat','move', packet );
 
                 s.game.comm.lastMessageTime = time;

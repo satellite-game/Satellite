@@ -344,15 +344,14 @@ s.SatelliteGame = new Class( {
           myData = pak[whoAmI];
 
       var adjustPlayer = function( serverView ) {
-        console.log("This is the server view of your position ", serverView.pos);
         var adjusted = [];
 
         var myView = s.game.player.getPositionPacket();
         for(var i = 0; i < serverView.lVeloc.length; i++) {
           var pos = Math.abs(serverView.pos[i]) - Math.abs(myView.pos[i]);
 
-          if( pos >= 100 ) {
-            console.log("Experiencing whiplash!");
+          if( pos >= 500 ) {
+            console.log("Experiencing whiplash!", pos);
             s.game.player.setPosition( serverView.pos, myView.rot, serverView.aVeloc, serverView.lVeloc, true );
             return;
           }
@@ -364,8 +363,8 @@ s.SatelliteGame = new Class( {
           }
 
         }
-        
-        s.game.player.setPosition( myView.pos, myView.rot, serverView.aVeloc, adjusted, false );
+        s.game.comm.position();
+        //s.game.player.setPosition( myView.pos, myView.rot, serverView.aVeloc, adjusted, false );
       };
 
       adjustPlayer(myData);
