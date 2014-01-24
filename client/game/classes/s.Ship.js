@@ -168,5 +168,4 @@ s.Ship = new Class({
     handleDie: function(){
         this.destruct();
     }
-
 });
