@@ -11,7 +11,7 @@ s.Menu = new Class({
     this.HUD = options.game.HUD;
     this.oculus = options.game.oculus;
     this.menuItems = [];
-    this.menuScreen = 'default';
+    this.menuScreen = 'none';
     this.cursorPosition = 0;
     this.hoveredItem = null;
 
@@ -38,7 +38,7 @@ s.Menu = new Class({
       this.menuBox.position.setZ(-50);
     }
 
-    this.showDefaultMenu();
+    // this.showDefaultMenu();
   },
 
   addMenuItems: function ( items ) {
@@ -92,7 +92,6 @@ s.Menu = new Class({
       var menuItem = new THREE.Mesh(menuItemGeo, menuItemMaterial);
       menuItem.position.setY((currentHeight)-(menuHeight/2)+(size/2)); // MATH?
       menuItem.position.setX(menuItem.geometry.boundingSphere.radius*-0.5);
-      menuItem.visible = false;
       menuItem.menuItemSelectCallback = items[items.length-i-1].action || null;
       this.menuBox.add( menuItem );
       this.menuItems.push( menuItem );
@@ -105,6 +104,10 @@ s.Menu = new Class({
     // Turns out it's just leaving invisible ghosts of
     // your menu screens physically floating out in space.
     // todo: not that.
+    this.menuItems = [];
+    for (var i = 0; i < this.menuBox.children.length; i++) {
+      this.menuBox.children[i].visible = false;
+    }
     this.menuBox.children = [];
   },
 
@@ -194,33 +197,41 @@ s.Menu = new Class({
     this.addMenuItems([
       {text: 'JOIN GAME', size: 5, action: 'showRoomList'},
       {text: 'DISCONECT', size: 5, action: 'disconnect'},
-      {text: 'LEADERBOARD', size: 5, action: 'showScoreboard'}
+      {text: 'LEADERBOARD', size: 5, action: 'showScoreboard'},
+      {text: 'SAMPLE TEXT', size: 5, action: 'showTestMenu'}
     ]);
   },
 
   showRoomList: function () {
     this.clearMenu();
     this.menuScreen = 'rooms';
-    var roomNames = [];
-    // some database stuff to get list of existing rooms and order them by player count
-    var rooms = [{text: 'JOIN GAME', size: 5}];
-    for (var i = 0; i < roomNames.length; i++) {
-      rooms.push({text: roomNames[i], small: true});
-    }
-    rooms.push({text: '+ CREATE NEW ROOM +', small: true, action: this.createRoom});
-    this.addMenuItems(rooms);
+    // var roomNames = [];
+    // // some database stuff to get list of existing rooms and order them by player count
+    // var rooms = [{text: 'JOIN GAME', size: 5}];
+    // for (var i = 0; i < roomNames.length; i++) {
+    //   rooms.push({text: roomNames[i], small: true});
+    // }
+    // rooms.push({text: '+ CREATE NEW ROOM +', small: true, action: this.createRoom});
+    // this.addMenuItems(rooms);
   },
 
   showScoreboard: function () {
     this.clearMenu();
     this.menuScreen = 'scoreboard';
-    var playerNames = [];
-    // some database stuff to get list of players and order them by score
-    var players = [{text: 'LEADERBOARD', size: 5}];
-    for (var i = 0; i < database.length; i++) {
-      players.push({text: playerNames[i], small: true});
-    }
+    // var playerNames = [];
+    // // some database stuff to get list of players and order them by score
+    // var players = [{text: 'LEADERBOARD', size: 5}];
+    // for (var i = 0; i < database.length; i++) {
+    //   players.push({text: playerNames[i], small: true});
+    // }
 
+  },
+
+  showTestMenu: function () {
+    this.clearMenu();
+    this.menuScreen = 'test';
+    var players = [{text: 'SAMPLE TEXT 1', size: 5}, {text: 'SAMPLE TEXT 2', size: 5}, {text: 'SAMPLE TEXT 3', size: 5}, {text: 'SAMPLE TEXT 4', size: 5}];
+    this.addMenuItems( players );
   },
 
   disconnect: function () {

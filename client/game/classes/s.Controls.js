@@ -61,6 +61,23 @@ s.Controls = new Class({
     this.firing = false;
 
     this.lastTime = new Date( ).getTime( );
+
+    var that = this;
+
+    $('body').keyup(function (e) {
+      if (e.which === 81) {
+        if (that.menu.displayed) {
+          that.menu.close();
+        } else {
+          that.menu.open();
+        }
+      } else {
+        if (e.which === 32 && that.menu.displayed) {
+          console.log('attempted to select menu item');
+          that.menu.selectItem();
+        }
+      }
+    });
   },
 
   destruct: function( ) {
@@ -207,14 +224,6 @@ s.Controls = new Class({
       this.oculus.compensationX = this.oculus.quat.x;
       this.oculus.compensationY = this.oculus.quat.y;
       this.oculus.compensationZ = this.oculus.quat.z;
-    }
-
-    if (this.keyboard.pressed('q')) {
-      if (!this.menu.displayed) {
-        this.menu.open();
-      } else {
-        this.menu.close();
-      }
     }
 
 
