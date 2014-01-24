@@ -51288,7 +51288,7 @@ s.SatelliteGame = new Class( {
           }
 
         }
-        console.log("Moving the player!");
+        
         s.game.player.setPosition( myView.pos, myView.rot, serverView.aVeloc, adjusted, false );
       };
 
