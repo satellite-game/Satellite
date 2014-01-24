@@ -1,272 +1,284 @@
 s.Game = new Class({
-	extend: s.EventEmitter,
+  extend: s.EventEmitter,
 
-	construct: function(options) {
+  construct: function(options) {
         // Display load screen
         this.loadScreen = new s.LoadScreen();
 
-		var self = this;
+    var self = this;
 
-		/*===============================================
-		=             Comms Handler Binding            =
-		===================================================*/
+    /*===============================================
+    =             Comms Handler Binding            =
+    ===================================================*/
 
-		// Communication
+    // Communication
 
 
-		/*-----  End of  Comms Handler Binding  ------*/
+    /*-----  End of  Comms Handler Binding  ------*/
 
-		this.doRender = false;
-		this.lastRender = 0;
+    this.doRender = false;
+    this.lastRender = 0;
 
-		// Store functions that should be called before render
-		this.hookedFuncs = [];
+    // Oculus Rift setup
+    this.oculus = new s.Oculus();
 
-		// Bind render function permenantly
-		this.render = this.render.bind(this);
+    // Store functions that should be called before render
+    this.hookedFuncs = [];
 
-		// Configure Physijs
-		Physijs.scripts.worker = 'lib/physijs_worker.js';
-		Physijs.scripts.ammo = 'ammo.js';
+    // Bind render function permenantly
+    this.render = this.render.bind(this);
 
-		// Create renderer
-		this.renderer = new THREE.WebGLRenderer({
-			antialias: true
-		});
+    // Configure Physijs
+    Physijs.scripts.worker = 'lib/physijs_worker.js';
+    Physijs.scripts.ammo = 'ammo.js';
 
-		// Enable alpha
-		this.renderer.setClearColorHex(0x000000, 0);
+    // Create renderer
+    this.renderer = new THREE.WebGLRenderer({
+      antialias: true
+    });
 
-		// Create a camera
-		this.camera = new THREE.PerspectiveCamera(35, 1, 1, 300000);
+    // Enable alpha
+    this.renderer.setClearColorHex(0x000000, 0);
 
-		// Configure shadows
-		this.renderer.shadowMapEnabled = true;
-		this.renderer.shadowMapSoft = true;
-		this.renderer.shadowMapCullFrontFaces = false;
+    // Create a camera
+    this.camera = new THREE.PerspectiveCamera(35, 1, 1, 300000);
 
-		// Create the scene
-		this.scene = scene = new Physijs.Scene();
+    // Configure shadows
+    this.renderer.shadowMapEnabled = true;
+    this.renderer.shadowMapSoft = true;
+    this.renderer.shadowMapCullFrontFaces = false;
 
-		// If we want to attach the camera to an object, doing this first causes a Physijs error
-		// this.scene.add(this.camera);
+    // Create the scene
+    this.scene = scene = new Physijs.Scene();
 
-		// Add the renderer's canvas to the DOM
-		this.el = this.renderer.domElement;
-		$(document.body).append(this.el);
+    // If we want to attach the camera to an object, doing this first causes a Physijs error
+    // this.scene.add(this.camera);
 
-		// TODO: abstract key listening
-		$(document).on('keydown', function(evt) {
-			if (evt.which === 13)
-				self.toggleFullScreen();
-		});
+    // Add the renderer's canvas to the DOM
+    this.el = this.renderer.domElement;
+    $(document.body).append(this.el);
 
-		// Handle window resizes
-		$(window).on('resize', this.fitWindow.bind(this));
-		this.fitWindow();
+    // Oculus Rift split-screen effect
+    this.riftCam = new THREE.OculusRiftEffect(this.renderer);
+    // for testing
+    // this.oculus.detected = true;
 
-		// Handle fullscreen state changes
-		$(document).on('fullscreenchange mozfullscreenchange webkitfullscreenchange', this.handleFullscreenChange.bind(this));
-		this.handleFullscreenChange();
+    // TODO: abstract key listening
+    $(document).on('keydown', function(evt) {
+      if (evt.which === 13)
+        self.toggleFullScreen();
+    });
 
-		// Handle pointer lock changes
-		$(document).on('pointerlockchange mozpointerlockchange webkitpointerlockchange', this.handlePointerLockChange.bind(this));
-		$(document).on('pointerlockerror mozpointerlockerror webkitpointerlockerror', this.handlePointerLockError.bind(this));
+    // Handle window resizes
+    $(window).on('resize', this.fitWindow.bind(this));
+    this.fitWindow();
 
-		// Monitor rendering stats
-		this.render_stats = new Stats();
-		$(this.render_stats.domElement).css({
-			position: 'absolute',
-			top: 0,
-			zIndex: 100
-		}).appendTo(document.body);
+    // Handle fullscreen state changes
+    $(document).on('fullscreenchange mozfullscreenchange webkitfullscreenchange', this.handleFullscreenChange.bind(this));
+    this.handleFullscreenChange();
 
-		this.physics_stats = physics_stats = new Stats();
-		$(this.physics_stats.domElement).css({
-			position: 'absolute',
-			top: '50px',
-			zIndex: 100
-		}).appendTo(document.body);
+    // Handle pointer lock changes
+    $(document).on('pointerlockchange mozpointerlockchange webkitpointerlockchange', this.handlePointerLockChange.bind(this));
+    $(document).on('pointerlockerror mozpointerlockerror webkitpointerlockerror', this.handlePointerLockError.bind(this));
 
-		// Physics engine statistics
-		this.scene.addEventListener(
-			'update',
-			function() {
-				physics_stats.update();
-			}
-		);
+    // Monitor rendering stats
+    this.render_stats = new Stats();
+    $(this.render_stats.domElement).css({
+      position: 'absolute',
+      top: 0,
+      zIndex: 100
+    }).appendTo(document.body);
 
-		// Physics engine ready state
-		// TODO: This event seems to fire before the engine is actually doing anything
-		this.physicsStarted = false;
-		this.scene.addEventListener(
-			'ready',
-			function() {
-				self.physicsStarted = true;
-				self.tryInitialize();
-			}
-		);
+    this.physics_stats = physics_stats = new Stats();
+    $(this.physics_stats.domElement).css({
+      position: 'absolute',
+      top: '50px',
+      zIndex: 100
+    }).appendTo(document.body);
 
-		// Start loading models
-		// TODO: Load different conditionally based on game type
-		s.util.loadModels({
-			models: this.models,
-			complete: function(models) {
-				self.modelsLoaded = true;
+    // Physics engine statistics
+    this.scene.addEventListener(
+      'update',
+      function() {
+        physics_stats.update();
+      }
+    );
 
-				// Store loaded models
-				s.models = models;
+    // Physics engine ready state
+    // TODO: This event seems to fire before the engine is actually doing anything
+    this.physicsStarted = false;
+    this.scene.addEventListener(
+      'ready',
+      function() {
+        self.physicsStarted = true;
+        self.tryInitialize();
+      }
+    );
 
-				// Attempt to start the game
-				self.tryInitialize(this);
-			}
-		});
+    // Start loading models
+    // TODO: Load different conditionally based on game type
+    s.util.loadModels({
+      models: this.models,
+      complete: function(models) {
+        self.modelsLoaded = true;
 
-		s.util.loadTextures({
-			textures: this.textures,
-			complete: function(textures) {
-				self.texturesLoaded = true;
+        // Store loaded models
+        s.models = models;
 
-				// Store loaded textures
-				s.textures = textures;
+        // Attempt to start the game
+        self.tryInitialize(this);
+      }
+    });
 
-				// Attempt to start the game
-				self.tryInitialize(this);
-			}
-		});
-	},
+    s.util.loadTextures({
+      textures: this.textures,
+      complete: function(textures) {
+        self.texturesLoaded = true;
 
-	// Attempt to start the game (if models and physics have begun)
-	tryInitialize: function() {
-		if (this.modelsLoaded && this.physicsStarted && !this.initialized) {
-			this.initialize();
-		}
-	},
+        // Store loaded textures
+        s.textures = textures;
 
-	isFullScreen: function() {
-		return (screen.width === window.outerWidth && screen.height === window.outerHeight);
-	},
+        // Attempt to start the game
+        self.tryInitialize(this);
+      }
+    });
+  },
 
-	handleFullscreenChange: function(evt) {
-		if (this.isFullScreen()) {
-			console.log('Full screen mode entered!');
+  // Attempt to start the game (if models and physics have begun)
+  tryInitialize: function() {
+    if (this.modelsLoaded && this.physicsStarted && !this.initialized) {
+      this.initialize();
+    }
+  },
 
-			this.el.requestPointerLock = this.el.requestPointerLock ||
+  isFullScreen: function() {
+    return (screen.width === window.outerWidth && screen.height === window.outerHeight);
+  },
+
+  handleFullscreenChange: function(evt) {
+    if (this.isFullScreen()) {
+      console.log('Full screen mode entered!');
+
+      this.el.requestPointerLock = this.el.requestPointerLock ||
                                          this.el.mozRequestPointerLock ||
                                          this.el.webkitRequestPointerLock;
-			this.el.requestPointerLock();
-		}
-		else {
-			console.log('Full screen mode exited!');
-		}
-	},
+      this.el.requestPointerLock();
+    }
+    else {
+      console.log('Full screen mode exited!');
+    }
+  },
 
-	toggleFullScreen: function() {
-		if (!this.isFullScreen()) {
-			if (document.documentElement.requestFullScreen) {
-				document.documentElement.requestFullScreen();
-			}
-			else if (document.documentElement.mozRequestFullScreen) {
-				document.documentElement.mozRequestFullScreen();
-			}
-			else if (document.documentElement.webkitRequestFullScreen) {
-				document.documentElement.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-			}
-		}
-		else {
-			if (document.cancelFullScreen) {
-				document.cancelFullScreen();
-			}
-			else if (document.mozCancelFullScreen) {
-				document.mozCancelFullScreen();
-			}
-			else if (document.webkitCancelFullScreen) {
-				document.webkitCancelFullScreen();
-			}
-		}
-	},
+  toggleFullScreen: function() {
+    if (!this.isFullScreen()) {
+      if (document.documentElement.requestFullScreen) {
+        document.documentElement.requestFullScreen();
+      }
+      else if (document.documentElement.mozRequestFullScreen) {
+        document.documentElement.mozRequestFullScreen();
+      }
+      else if (document.documentElement.webkitRequestFullScreen) {
+        document.documentElement.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+      }
+    }
+    else {
+      if (document.cancelFullScreen) {
+        document.cancelFullScreen();
+      }
+      else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      }
+      else if (document.webkitCancelFullScreen) {
+        document.webkitCancelFullScreen();
+      }
+    }
+  },
 
-	handlePointerLockChange: function() {
-		if (document.mozPointerLockElement === this.el || document.webkitPointerLockElement === this.el) {
-			console.log('Pointer Lock was successful.');
-			this.pointerLocked = true;
-		}
-		else {
-			console.log('Pointer Lock was lost.');
-			this.pointerLocked = false;
-		}
-	},
+  handlePointerLockChange: function() {
+    if (document.mozPointerLockElement === this.el || document.webkitPointerLockElement === this.el) {
+      console.log('Pointer Lock was successful.');
+      this.pointerLocked = true;
+    }
+    else {
+      console.log('Pointer Lock was lost.');
+      this.pointerLocked = false;
+    }
+  },
 
-	handlePointerLockError: function() {
-		console.log('Error while locking pointer.');
-		this.pointerLocked = false;
-	},
+  handlePointerLockError: function() {
+    console.log('Error while locking pointer.');
+    this.pointerLocked = false;
+  },
 
-	// Size the renderer to fit the window
-	fitWindow: function() {
-		this.setSize(window.innerWidth, window.innerHeight);
-	},
+  // Size the renderer to fit the window
+  fitWindow: function() {
+    this.setSize(window.innerWidth, window.innerHeight);
+  },
 
-	// Set the size of the renderer
-	setSize: function(width, height) {
-		this.width = width;
-		this.height = height;
-		this.renderer.setSize(width, height);
-		if (this.camera) {
-			this.camera.aspect = width/height;
-			this.camera.updateProjectionMatrix();
-		}
-	},
+  // Set the size of the renderer
+  setSize: function(width, height) {
+    this.width = width;
+    this.height = height;
+    this.renderer.setSize(width, height);
+    if (this.camera) {
+      this.camera.aspect = width/height;
+      this.camera.updateProjectionMatrix();
+    }
+  },
 
-	// Add a callback to the rendering loop
-	hook: function(callback) {
-		this.hookedFuncs.push(callback);
-	},
+  // Add a callback to the rendering loop
+  hook: function(callback) {
+    this.hookedFuncs.push(callback);
+  },
 
-	// Remove a callback from the rendering loop
-	unhook: function(callback) {
-		var index = this.hookedFuncs.indexOf(callback);
-		if (~index)
-			this.hookedFuncs.splice(index, 1);
-	},
+  // Remove a callback from the rendering loop
+  unhook: function(callback) {
+    var index = this.hookedFuncs.indexOf(callback);
+    if (~index)
+      this.hookedFuncs.splice(index, 1);
+  },
 
-	// Start rendering
-	start: function() {
-        this.loadScreen.remove();
-		this.doRender = true;
-		requestAnimationFrame(this.render);
-	},
+  // Start rendering
+  start: function() {
+    this.loadScreen.remove();
+    this.doRender = true;
+    requestAnimationFrame(this.render);
+  },
 
-	// Stop rendering
-	stop: function() {
-		this.doRender = false;
-	},
+  // Stop rendering
+  stop: function() {
+    this.doRender = false;
+  },
 
-	// Perform render
-	render: function(now) {
-		if (this.doRender) {
-			// Simulate physics
-			this.scene.simulate();
+  // Perform render
+  render: function(now) {
+    if (this.doRender) {
+      // Simulate physics
+      this.scene.simulate();
 
-			// Calculate the time since the last frame was rendered
-			var delta = now - this.lastRender;
-			this.lastRender = now;
-			// Run each hooked function before rendering
-			// This may need to happen BEFORE physics simulation
-			this.hookedFuncs.forEach(function(func) {
-				func(now, delta);
-			});
+      // Calculate the time since the last frame was rendered
+      var delta = now - this.lastRender;
+      this.lastRender = now;
+      // Run each hooked function before rendering
+      // This may need to happen BEFORE physics simulation
+      this.hookedFuncs.forEach(function(func) {
+        func(now, delta);
+      });
 
-            // Render radar loop
-            this.radarRenderer.render( this.radarScene, this.radarCamera );
+      // Render main scene for Oculus if one is detected
+      // otherwise render scene and radar normally.
+      if (this.oculus.detected) {
+        this.riftCam.render( this.scene, this.camera );
+        this.riftRadar.render( this.radarScene, this.radarCamera );
+      } else {
+        this.renderer.render( this.scene, this.camera );
+        this.radarRenderer.render( this.radarScene, this.radarCamera );
+      }
 
-			// Render main scene
-			this.renderer.render( this.scene, this.camera );
+      // Request the next frame to be rendered
+      requestAnimationFrame(this.render);
 
-            this.render_stats.update();
-
-			// Request the next frame to be rendered
-			requestAnimationFrame(this.render);
-		}
-	}
+      this.render_stats.update();
+    }
+  }
 });

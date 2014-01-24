@@ -49,4 +49,6 @@ Thumbs.db
 .idea/
 *.sublime-workspace
 
-/build/
+coverage
+/tests/oculus-testing-playground
+test-mocha

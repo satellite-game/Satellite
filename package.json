@@ -14,7 +14,6 @@
     "url": "https://github.com/lazd/Satellite/issues"
   },
   "devDependencies": {
-    "grunt-cli": "0.1.x",
     "grunt": "0.4.x",
     "grunt-contrib-clean": "0.5.x",
     "grunt-contrib-concat": "0.3.x",
@@ -25,11 +24,24 @@
     "grunt-contrib-stylus": "0.7.x",
     "grunt-nodemon": "~0.1.0",
     "grunt-concurrent": "~0.3.0",
-    "grunt-open": "~0.2.2"
+    "grunt-open": "~0.2.2",
+    "grunt-karma": "~0.6.2",
+    "mocha": "~1.17.0",
+    "karma": "~0.10.9",
+    "karma-mocha": "~0.1.1",
+    "karma-sinon-chai": "~0.1.4",
+    "karma-firefox-launcher": "~0.1.0",
+    "karma-chrome-launcher": "~0.1.0",
+    "karma-coverage": "~0.1.2",
+    "socket.io": "~0.9.16",
+    "socket.io-client": "~0.9.16",
+    "grunt-mocha-chai-sinon": "0.0.7",
+    "karma-phantomjs-launcher": "~0.1.1",
+    "karma-sauce-launcher": "~0.1.7"
   },
   "engines": {
-    "node": "0.10.15",
-    "npm": "1.1.x"
+    "node": "*",
+    "npm": "*"
   },
   "keywords": [
     "game",
@@ -42,13 +54,8 @@
     "path": "~0.4.9"
   },
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "test": "grunt travisCI --single-run"
   },
-  "subdomain": "lockon",
-  "engines": {
-    "node": "0.10.15",
-    "npm": "1.1.x"
-  }
+  "subdomain": "lockon"
 }
-
-

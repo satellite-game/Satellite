@@ -42,7 +42,7 @@ s.Comm = new Class( {
 
 
     construct: function ( options ) {
-        
+
         //binding the game's context
 
         this.game = options.game;
@@ -227,8 +227,8 @@ s.Comm = new Class( {
 
     clockTick: function( ){
         this.time += 1;
-        if ( this.time >= 60 ){
-            window.location.href = "http://satellite-game.com";
-        }
+        // if ( this.time >= 60 ){
+        //     window.location.href = "http://satellite-game.com";
+        // }
     }
 } );
