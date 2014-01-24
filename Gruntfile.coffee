@@ -166,4 +166,3 @@ module.exports = (grunt) ->
   grunt.registerTask 'client', ['jshint:client', 'copy:client', 'concat', 'stylus']
   grunt.registerTask 'client-prod', ['client', 'uglify']
   grunt.registerTask 'default', ['server', 'client', 'karma:unit:start', 'concurrent']
-
