@@ -53,7 +53,7 @@ Sync.prototype.sync = function( io, room , obj ) {
     for(var i in obj) {
       stateCopy[i] = thatState[i];
     }
-
+    console.log("Sync request being called out to ", thatRoom);
     thatio.sockets.in(thatRoom).emit('sync', stateCopy);
     that.sync( thatio, thatRoom, thatState);
   }, thatDelay);
