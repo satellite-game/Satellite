@@ -51105,6 +51105,7 @@ s.SatelliteGame = new Class( {
                 // TODO: include velocities?
                 var enemyShip;
                 if (isBot) {
+                    debugger;
                     enemyShip = new s.Bot( {
                         game: that,
                         shipClass: 'human_ship_heavy',
@@ -51435,13 +51436,8 @@ s.SatelliteGame = new Class( {
         this.comm[fn](botEnemies);
     },
 
-    //this function only gets called if client is the first player
+    //this function only gets called if client is the host player
     handleBotInfo: function() {
-        // var updatePlayersWithBots = function() {
-            
-        //     var botEnemies = this.game.getBotEnemies();
-        //     this.game.comm.botUpdate(botEnemies);
-        // };
         var that = this;
         if (!this.game.hostPlayer) {
             //this the first time this function has been called with this client
@@ -51454,11 +51450,8 @@ s.SatelliteGame = new Class( {
         if (this.game.botCount === 0) {
             // Create a new bot
             this.game.enemies.add( {}, 'bot');
-        }
-        
+        }        
         that.game.updatePlayersWithBots('botInfo');
-        // var botEnemies = this.game.getBotEnemies();
-        // this.game.comm.botInfo(botEnemies);
     },
 
     getBotEnemies: function() {
@@ -51473,20 +51466,20 @@ s.SatelliteGame = new Class( {
         var enemiesList = this.enemies._list;  
         for (var i = 0; i < enemiesList.length; i++) {
             if (enemiesList[i].isBot){
-                var physics = enemiesList[i].root;
-                var position = makeArray(physics.position);
-                var rotation = makeArray(physics.rotation);
-                var angularVeloc = (physics.getAngularVelocity && physics.getAngularVelocity()) || new THREE.Vector3();
-                var linearVeloc = (physics.getLinearVelocity && physics.getLinearVelocity()) || new THREE.Vector3();
-                var aVeloc = makeArray(angularVeloc);
-                var lVeloc = makeArray(linearVeloc);
-                var name = physics.name;
+                var root = enemiesList[i].root;
+                // var position = makeArray(root.position);
+                // var rotation = makeArray(root.rotation);
+                var angularVeloc = (root.getAngularVelocity && root.getAngularVelocity()) || new THREE.Vector3();
+                var linearVeloc = (root.getLinearVelocity && root.getLinearVelocity()) || new THREE.Vector3();
+                // var aVeloc = makeArray(angularVeloc);
+                // var lVeloc = makeArray(linearVeloc);
+                // var name = root.name;
                 enemiesSocketInfo[name] = {
-                    position: position,
-                    rotation: rotation,
-                    aVeloc: aVeloc,
-                    lVeloc: lVeloc,
-                    name: name
+                    position: makeArray(root.position),
+                    rotation: makeArray(root.rotation),
+                    aVeloc: makeArray(angularVeloc),
+                    lVeloc: makeArray(linearVeloc),
+                    name: root.name
                 };
                 enemiesSocketInfo.botCount = this.botCount;
             }

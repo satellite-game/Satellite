@@ -528,24 +528,23 @@ s.SatelliteGame = new Class( {
             result[2] = obj.z;
             return result;
         };
+        
         enemiesSocketInfo = {};
         var enemiesList = this.enemies._list;  
         for (var i = 0; i < enemiesList.length; i++) {
             if (enemiesList[i].isBot){
-                var physics = enemiesList[i].root;
-                var position = makeArray(physics.position);
-                var rotation = makeArray(physics.rotation);
-                var angularVeloc = (physics.getAngularVelocity && physics.getAngularVelocity()) || new THREE.Vector3();
-                var linearVeloc = (physics.getLinearVelocity && physics.getLinearVelocity()) || new THREE.Vector3();
-                var aVeloc = makeArray(angularVeloc);
-                var lVeloc = makeArray(linearVeloc);
-                var name = physics.name;
+                var root = enemiesList[i].root;
+
+                //if there is a angular and linear velocity fnc, call it. else create a new 3 vector
+                var angularVeloc = (root.getAngularVelocity && root.getAngularVelocity()) || new THREE.Vector3();
+                var linearVeloc = (root.getLinearVelocity && root.getLinearVelocity()) || new THREE.Vector3();
+                
                 enemiesSocketInfo[name] = {
-                    position: position,
-                    rotation: rotation,
-                    aVeloc: aVeloc,
-                    lVeloc: lVeloc,
-                    name: name
+                    position: makeArray(root.position),
+                    rotation: makeArray(root.rotation),
+                    aVeloc: makeArray(angularVeloc),
+                    lVeloc: makeArray(linearVeloc),
+                    name: root.name
                 };
                 enemiesSocketInfo.botCount = this.botCount;
             }
