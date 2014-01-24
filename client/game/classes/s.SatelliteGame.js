@@ -26,8 +26,6 @@ s.SatelliteGame = new Class( {
 	initialize: function() {
 		var that = this;
 
-        //initally set lastBotCallback to null. updated in s.Ship
-
         this.IDs = [];
         this.botCount = 0;
         this.hostPlayer = false;
@@ -91,8 +89,16 @@ s.SatelliteGame = new Class( {
         //// Setup camera: Cockpit view; COMMENT OUT FOR CHASE CAM
         // this.camera.position.set( 0, 0, 0 );
 
-        //// Setup camera: Chase view
+        //// Setup camera: Start in Chase view
         this.camera.position.set(0,35,250);
+
+        $(document).on('keyup', function(evt) {
+          if (evt.which === 86 && that.camera.position.equals( new THREE.Vector3(0,0,0) )) {
+            that.camera.position.set(0,35,250);
+          } else if (evt.which === 86) {
+            that.camera.position.set(0,0,0);
+          }
+        });
 
         // Planet camera
         // this.scene.add(this.camera);
@@ -158,7 +164,7 @@ s.SatelliteGame = new Class( {
                 }
                 return false;
             },
-            add: function ( enemyInfo ) {
+            add: function ( enemyInfo, isBot ) {
                 if ( this.has( enemyInfo.name ) ) {
                     this.delete( enemyInfo.name );
                     console.error( 'Bug: Player %s added twice', enemyInfo.name );
@@ -168,21 +174,35 @@ s.SatelliteGame = new Class( {
                         console.log( enemyInfo );
                         console.trace( );
                     }
-                    console.log( '%s has joined the fray', enemyInfo.name );
+                    if (!isBot) { console.log( '%s has joined the fray', enemyInfo.name ); }
                 }
 
                 // TODO: include velocities?
-                var enemyShip = new s.Player( {
-                    game: that,
-                    shipClass: 'human_ship_heavy',
-                    name: enemyInfo.name,
-                    position: new THREE.Vector3( enemyInfo.pos[ 0 ], enemyInfo.pos[ 1 ], enemyInfo.pos[ 2 ] ),
-                    rotation: new THREE.Vector3( enemyInfo.rot[ 0 ], enemyInfo.rot[ 1 ], enemyInfo.rot[ 2 ] ),
-                    alliance: 'enemy'
-                } );
+                var enemyShip;
+                if (isBot) {
+                    enemyShip = new s.Bot( {
+                        game: that,
+                        shipClass: 'human_ship_heavy',
+                        name: enemyInfo.name,
+                        position: enemyInfo.position,
+                        rotation: enemyInfo.rotation,
+                        alliance: 'enemy'
+                    } );
+                } else {
+                    enemyShip = new s.Player( {
+                        game: that,
+                        shipClass: 'human_ship_heavy',
+                        name: enemyInfo.name,
+                        position: new THREE.Vector3( enemyInfo.pos[ 0 ], enemyInfo.pos[ 1 ], enemyInfo.pos[ 2 ] ),
+                        rotation: new THREE.Vector3( enemyInfo.rot[ 0 ], enemyInfo.rot[ 1 ], enemyInfo.rot[ 2 ] ),
+                        alliance: 'enemy'
+                    } );
+                }
+                
+                if (isBot) { console.log( '%s has joined the fray', enemyShip.name ); }
 
                 this._list.push( enemyShip );
-                this._map[ enemyInfo.name ] = enemyShip; // this._map.set(enemyInfo.name, otherShip);
+                this._map[ enemyShip.name ] = enemyShip; // this._map.set(enemyInfo.name, otherShip);
             }
         };
 
@@ -380,9 +400,10 @@ s.SatelliteGame = new Class( {
     },
 
     handleHit: function(message) {
-        var you = message.otherPlayerName;
+        var zappedName = message.otherPlayerName;
         var killer = message.yourName;
-        if (you === s.game.pilot.name){
+        var zappedEnemy = s.game.enemies.get(zappedName);
+        if (zappedName === s.game.pilot.name){
             s.game.stopShields();
             s.game.rechargeShields();
             if (s.game.player.shields > 0){
@@ -405,44 +426,28 @@ s.SatelliteGame = new Class( {
             console.log('You were hit with a laser by %s! Your HP: %d', killer, s.game.player.hull);
 
             if (s.game.player.hull <= 0) {
-                s.game.handleDie(you, killer);
-            }
-        } else if (you.slice(0,3) === 'bot') {
-            var enemyBot = s.game.enemies.get(you);
-
-            if (enemyBot.shields > 0){
-                enemyBot.shields -= 20;
-                console.log('bot shield is now: ', enemyBot.shields);
-                setTimeout(function() {
-                    s.game.replenishEnemyShield(enemyBot);
-                }, 7000);
-            } else {
-                enemyBot.hull -= 20;
-                console.log('bot hull is now: ', enemyBot.hull);
-            }
-
-            if (enemyBot.hull <= 0) {
-                console.log('bot has died');
-                s.game.handleKill.call(s, { killed: you, killer: killer });
-                s.game.makeNewBot({
-                    position: [ 23498, -25902, 24976 ]
-                });
+                s.game.handleDie(zappedName, killer);
             }
         } else {
-            var enemy = s.game.enemies.get(you);
-            enemy.shields -= 20;
-            setTimeout(function(){
-                console.log('recharged');
-                enemy.shields = 80;
-            }, 7000);
-            console.log('hit: ', enemy);
+            if (zappedEnemy.shields > 0){
+                zappedEnemy.shields -= 20;
+                console.log(zappedName, ' shield is now: ', zappedEnemy.shields);
+                setTimeout(function() {
+                    s.game.replenishEnemyShield(zappedEnemy);
+                }, 7000);
+            } else {
+                zappedEnemy.hull -= 20;
+                console.log(zappedName, ' hull is now: ', zappedEnemy.hull);
+            }
+            if (zappedEnemy.hull <= 0 && zappedEnemy.isBot) {
+                console.log(zappedName, ' has died');
+                s.game.handleKill.call(s, { killed: zappedName, killer: killer });
+                s.game.enemies.add( {position: [ 23498, -25902, 24976 ]}, 'bot' );
+            }
         }
-
     },
 
     handleFire: function(props) {
-        // s.game.enemies.execute( 'bot 1', 'setPosition', [ [-20000,-20000,-20000], [0,0,0], [0,0,0], [0,0,0], true ] );
-        // this.enemies._list[0].root.position.set(0,0,0);
         s.game.comm.fire(props.position, props.rotation, props.initialVelocity);
     },
 
@@ -476,24 +481,24 @@ s.SatelliteGame = new Class( {
         }
     },
 
-    replenishEnemyShield: function (enemyBot) {
+    replenishEnemyShield: function (enemyShip) {
         var replenish = function() {
-            if (enemyBot.shields < s.config.ship.shields) {
-                enemyBot.shields++;
+            if (enemyShip.shields < s.config.ship.shields) {
+                enemyShip.shields++;
             } else {
-                this.stopEnemyShieldReplenish(enemyBot);
+                this.stopEnemyShieldReplenish(enemyShip);
             }
         };
         var that = this;
-        enemyBot.IDs = enemyBot.IDs || [];
-        enemyBot.IDs.push(setInterval(function() {
+        enemyShip.IDs = enemyShip.IDs || [];
+        enemyShip.IDs.push(setInterval(function() {
             replenish.call(that);
         }, 20));
     },
 
-    stopEnemyShieldReplenish: function (enemyBot) {
-        for (var i = 0; i < enemyBot.IDs.length; i++){
-            clearInterval(enemyBot.IDs[i]);
+    stopEnemyShieldReplenish: function (enemyShip) {
+        for (var i = 0; i < enemyShip.IDs.length; i++){
+            clearInterval(enemyShip.IDs[i]);
         }
     },
 
@@ -501,63 +506,27 @@ s.SatelliteGame = new Class( {
         s.game.loadScreen.setMessage(message);
     },
 
-    makeNewBot: function(options) {
-        
-        // If no options passed, set options to empty object and default values for position and rotation
-        options = options || {};
-
-        this.botCount = options.botCount || ++this.botCount;
-        this.botBulletCount = options.botBulletCount || this.botBulletCount;
-
-        // Generating a new bot with properties
-        var botName = options.name || 'bot ' + this.botCount;
-        var position = options.position || [22498, -25902, 24976];
-        var rotation = options.rotation || [0, Math.PI / 2, 0];
-        var lVeloc = options.lVeloc || [0, 0, 0];
-        var aVeloc = options.aVeloc || [0, 0, 0];
-
-        this[botName] = new s.Bot( {
-            name: botName,
-            position: [ position[0], position[1], position[2] ],
-            rotation: [ rotation[0], rotation[1], rotation[2] ],
-            lVeloc: lVeloc,
-            aVeloc: aVeloc
-        } );
-        
-        // Create bot and add it to enemies list
-        this.enemies.add( {
-            aVeloc: this[botName].aVeloc,
-            lVeloc: this[botName].lVeloc,
-            interp: this[botName].interp,
-            name: this[botName].name,
-            pos: this[botName].pos,
-            rot: this[botName].rot
-        });
+    updatePlayersWithBots: function (fn) {
+        var botEnemies = this.getBotEnemies();
+        this.comm[fn](botEnemies);
     },
 
-    //this function only gets called if client is the first player
+    //this function only gets called if client is the host player
     handleBotInfo: function() {
-        var updatePlayersWithBots = function() {
-            var botEnemies = this.game.getBotEnemies();
-            this.game.comm.botUpdate(botEnemies);
-        };
-        
         var that = this;
         if (!this.game.hostPlayer) {
             //this the first time this function has been called with this client
             this.game.botPositionInterval = setInterval(function() {
-                updatePlayersWithBots.call(that);
+                that.game.updatePlayersWithBots('botUpdate');
             }, 2500);
         }
 
         this.game.hostPlayer = true;
         if (this.game.botCount === 0) {
             // Create a new bot
-            this.game.makeNewBot();
-        }
-
-        var botEnemies = this.game.getBotEnemies();
-        this.game.comm.botInfo(botEnemies);
+            this.game.enemies.add( {}, 'bot');
+        }        
+        that.game.updatePlayersWithBots('botInfo');
     },
 
     getBotEnemies: function() {
@@ -568,39 +537,37 @@ s.SatelliteGame = new Class( {
             result[2] = obj.z;
             return result;
         };
+
         enemiesSocketInfo = {};
         var enemiesList = this.enemies._list;  
         for (var i = 0; i < enemiesList.length; i++) {
-            if (enemiesList[i].name.slice(0,3) === 'bot'){
-                var physics = enemiesList[i].root;
-                var position = makeArray(physics.position);
-                var rotation = makeArray(physics.rotation);
-                var angularVeloc = (physics.getAngularVelocity && physics.getAngularVelocity()) || new THREE.Vector3();
-                var linearVeloc = (physics.getLinearVelocity && physics.getLinearVelocity()) || new THREE.Vector3();
-                var aVeloc = makeArray(angularVeloc);
-                var lVeloc = makeArray(linearVeloc);
-                var name = physics.name;
+            if (enemiesList[i].isBot){
+                var root = enemiesList[i].root;
+
+                //if there is a angular and linear velocity fnc, call it. else create a new 3 vector
+                var angularVeloc = (root.getAngularVelocity && root.getAngularVelocity()) || new THREE.Vector3();
+                var linearVeloc = (root.getLinearVelocity && root.getLinearVelocity()) || new THREE.Vector3();
+                
                 enemiesSocketInfo[name] = {
-                    position: position,
-                    rotation: rotation,
-                    aVeloc: aVeloc,
-                    lVeloc: lVeloc,
-                    name: name,
-                    botCount: this.botCount
+                    position: makeArray(root.position),
+                    rotation: makeArray(root.rotation),
+                    aVeloc: makeArray(angularVeloc),
+                    lVeloc: makeArray(linearVeloc),
+                    name: root.name
                 };
+                enemiesSocketInfo.botCount = this.botCount;
             }
         }
         return enemiesSocketInfo;
     },
 
     handleBotPositions: function(message) {
-
+        this.game.botCount = message.botCount;
         //if the bot exists...update positions
-        //else make new bot with position
-        // this.game.botCount = 0;
+        //else make new bot with bot information
         for (var bot in message) {
-            if ( !this.game.enemies.execute( message[bot].name, 'setPosition', [ message[bot].position, message[bot].rotation, message[bot].aVeloc, message[bot].lVeloc, true ] ) ) {
-                this.game.makeNewBot(message[bot]);
+            if ( bot !== 'botCount' && !this.game.enemies.execute( message[bot].name, 'setPosition', [ message[bot].position, message[bot].rotation, message[bot].aVeloc, message[bot].lVeloc, true ] ) ) {
+                this.game.enemies.add(message[bot], 'bot');
             }
         }
     }
