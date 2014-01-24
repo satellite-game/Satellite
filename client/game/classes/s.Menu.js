@@ -90,9 +90,11 @@ s.Menu = new Class({
       var menuItemGeo = new THREE.TextGeometry(items[items.length-i-1].text, {font: font, size: size, height: size, weight: bold, bevelEnabled: bevelEnabled, bevelThickness: bevel, bevelSize: bevel});
       var menuItemMaterial = new THREE[mat]({color: 0x00CC00, ambient: 0x00FF00, specular: 0x33FF33, shininess: 5});
       var menuItem = new THREE.Mesh(menuItemGeo, menuItemMaterial);
+
       menuItem.position.setY((currentHeight)-(menuHeight/2)+(size/2)); // MATH?
       menuItem.position.setX(menuItem.geometry.boundingSphere.radius*-0.5);
       menuItem.menuItemSelectCallback = items[items.length-i-1].action || null;
+      
       this.menuBox.add( menuItem );
       this.menuItems.push( menuItem );
       currentHeight += size*2;
@@ -128,6 +130,7 @@ s.Menu = new Class({
   close: function () {
     this.displayed = false;
     this.menuBox.visible = false;
+    this.cursorPosition = 0;
     for (var i = 0; i < this.menuBox.children.length; i++) {
       this.menuBox.children[i].visible = false;
     }
@@ -171,6 +174,7 @@ s.Menu = new Class({
     // this is my favorite part :]
     if (this.hoveredItem.menuItemSelectCallback) {
       this.clearMenu();
+      this.cursorPosition = 0;
       this[this.hoveredItem.menuItemSelectCallback]();
     }
   },

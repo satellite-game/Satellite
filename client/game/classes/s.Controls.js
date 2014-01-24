@@ -64,7 +64,7 @@ s.Controls = new Class({
 
     var that = this;
 
-    $('body').keyup(function (e) {
+    $(document).keyup(function (e) {
       if (e.which === 81) {
         if (that.menu.displayed) {
           that.menu.close();
