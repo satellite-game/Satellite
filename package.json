@@ -37,7 +37,8 @@
     "socket.io-client": "~0.9.16",
     "grunt-mocha-chai-sinon": "0.0.7",
     "karma-phantomjs-launcher": "~0.1.1",
-    "karma-sauce-launcher": "~0.1.7"
+    "karma-sauce-launcher": "~0.1.7",
+    "redis": "~0.10.0"
   },
   "engines": {
     "node": "*",
