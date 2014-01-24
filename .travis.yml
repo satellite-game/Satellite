@@ -1,12 +1,17 @@
 language: node_js
 node_js:
-  - '0.10'
+- '0.10'
+env:
+  global:
+  - secure: f+AWKr1CgJiHUlzBiJzn99bawb+nucq5AtzJwUQ5ulOPSX4OUesXgk/Ohw0Ibo+0oNwJyN1czFaiizyj/OMXtR+SbmE7FrLdi3BN69qgyDzvjcXFinnXFjz31ykCRvj4OlLduRegFdLyVH7nLKrd9gfiVyjmQSf/mmAs72no4LU=
+  - secure: SDggOvQ6DDqZMTGU/PSAWhX7N8DP6U5u5ZAULkXj6M0/j5kVRZCoN1BqxuuJd2qPvxNm7X2OBUD+93E1R5gcEeU0ydFOe0fjMnl9Te7wyePwj6YEEQ4u4iklzjXLNCw7Cj5llaCcaqcx703eIrZQXF6IO5NJr1YlWqEqglgataM=
 notifications:
   email:
-      - stites.sr@gmail.com
-      - ehannum@gmail.com
-      - joaosteing@gmail.com
-      - steinernein@gmail.com
-      - cooperjbrandon@gmail.com
+  - stites.sr@gmail.com
+  - ehannum@gmail.com
+  - joaosteing@gmail.com
+  - steinernein@gmail.com
+  - cooperjbrandon@gmail.com
 before_script:
-  - 'npm install -g grunt-cli'
+- echo 'Installing Grunt'
+- npm install -g grunt-cli

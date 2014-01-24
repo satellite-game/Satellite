@@ -89,8 +89,16 @@ s.SatelliteGame = new Class( {
         //// Setup camera: Cockpit view; COMMENT OUT FOR CHASE CAM
         // this.camera.position.set( 0, 0, 0 );
 
-        //// Setup camera: Chase view
+        //// Setup camera: Start in Chase view
         this.camera.position.set(0,35,250);
+
+        $(document).on('keyup', function(evt) {
+          if (evt.which === 86 && that.camera.position.equals( new THREE.Vector3(0,0,0) )) {
+            that.camera.position.set(0,35,250);
+          } else if (evt.which === 86) {
+            that.camera.position.set(0,0,0);
+          }
+        });
 
         // Planet camera
         // this.scene.add(this.camera);
@@ -192,6 +200,7 @@ s.SatelliteGame = new Class( {
                 }
                 
                 if (isBot) { console.log( '%s has joined the fray', enemyShip.name ); }
+
                 this._list.push( enemyShip );
                 this._map[ enemyShip.name ] = enemyShip; // this._map.set(enemyInfo.name, otherShip);
             }
@@ -419,6 +428,27 @@ s.SatelliteGame = new Class( {
             if (s.game.player.hull <= 0) {
                 s.game.handleDie(zappedName, killer);
             }
+        } else if (you.slice(0,3) === 'bot') {
+            var enemyBot = s.game.enemies.get(you);
+
+            if (enemyBot.shields > 0){
+                enemyBot.shields -= 20;
+                console.log('bot shield is now: ', enemyBot.shields);
+                setTimeout(function() {
+                    s.game.replenishEnemyShield(enemyBot);
+                }, 7000);
+            } else {
+                enemyBot.hull -= 20;
+                console.log('bot hull is now: ', enemyBot.hull);
+            }
+
+            if (enemyBot.hull <= 0) {
+                console.log('bot has died');
+                s.game.handleKill.call(s, { killed: you, killer: killer });
+                s.game.makeNewBot({
+                    position: [ 23498, -25902, 24976 ]
+                });
+            }
         } else {
             if (zappedEnemy.shields > 0){
                 zappedEnemy.shields -= 20;
@@ -528,7 +558,7 @@ s.SatelliteGame = new Class( {
             result[2] = obj.z;
             return result;
         };
-        
+
         enemiesSocketInfo = {};
         var enemiesList = this.enemies._list;  
         for (var i = 0; i < enemiesList.length; i++) {
