@@ -29,14 +29,13 @@ s.Bot = new Class( {
       rotationFadeFactor: 4
     };
 
-    //bot initialization
-    this.controlBot = this.controlBot.bind(this);
     this.targetX = 0;
     this.targetY = 0;
 
 
     //set a hook on the bot controls.
-    //necessary because first player has bot join twice
+    //unhook is necessary because first player has bot join twice
+    this.controlBot = this.controlBot.bind(this);
     if (this.game.lastBotCallback) {
       this.game.unhook( this.game.lastBotCallback );
     }
@@ -54,10 +53,10 @@ s.Bot = new Class( {
       alliance: options.alliance
     });
 
-      //Create a camera for the bot
+    //Create a camera for the bot
     this.camera = new THREE.PerspectiveCamera(35, 1, 1, 300000);
 
-     // Root camera to the bot's position
+    // Root camera to the bot's position
     this.root.add( this.camera );
 
     // Setup camera: Cockpit view; COMMENT OUT FOR CHASE CAM
