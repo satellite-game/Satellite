@@ -5,6 +5,7 @@ s.Player = new Class({
 		// Maybe collision detection and whatnot
 		this.HUD = options.HUD;
 		this.name = options.name || '';
+		this.initialize(options);
 	}
 
 });
