@@ -64,6 +64,32 @@ s.Controls = new Class({
     this.firing = false;
 
     this.lastTime = new Date( ).getTime( );
+
+    var that = this;
+    $(document).keydown(function(e) {
+      if (e.keyCode === 69){
+        that.camera.useQuaternion = true;
+        that.camera.rotation.applyQuaternion( that.oculus.quat );
+        // that.camera.rotation = new THREE.Vector3();
+        // var t = new THREE.Quaternion(0,0.5,0);
+        // var x = that.camera.quaternion.slerp( t , 0.07 );
+        // that.camera.quaternion.slerp( new THREE.Quaternion(1,0.7,-.8
+        // // THREE.Quaternion.slerp( that.camera.quaternion, new THREE.Quaternion(1,0.7,-.8
+        //     // that.oculus.quat.x,
+        //     // that.oculus.quat.y,
+        //     // that.oculus.quat.z
+        //   // ), that.camera.quaternion, 0.07 );
+        //   ), 0.07 );
+      }
+    });
+    $(document).keyup(function(e) {
+      if (e.keyCode === 69){
+        that.camera.useQuaternion = false;
+        that.camera.rotation = new THREE.Vector3();
+        // that.camera.quaternion.slerp( new THREE.Quaternion(), 0.07 );
+        // THREE.Quaternion.slerp( that.camera.quaternion,  new THREE.Quaternion(), that.camera.quaternion, 0.07 );
+      }
+    });
   },
 
   destruct: function( ) {
@@ -110,9 +136,17 @@ s.Controls = new Class({
 
     if (this.oculus.detected) {
       this.mouse.mouseType = 'oculus';
-      pitch = this.oculus.quat.x - this.oculus.compensationX;
-      yaw = this.oculus.quat.y - this.oculus.compensationY;
-      roll = this.oculus.quat.z - this.oculus.compensationZ;
+
+      // if (this.keyboard.pressed('e')) {
+        // this.camera.useQuaternion = true;
+        this.camera.rotation.setEulerFromQuaternion(this.oculus.quat);
+      // } else {
+      //   this.camera.rotation = new THREE.Vector3();
+      //   pitch = this.oculus.quat.x - this.oculus.compensationX;
+      //   yaw = this.oculus.quat.y - this.oculus.compensationY;
+      //   roll = this.oculus.quat.z - this.oculus.compensationZ;
+      // }
+
     } else {
       this.mouse.mouseType = 'keyboard';
     }
@@ -212,7 +246,6 @@ s.Controls = new Class({
       this.oculus.compensationY = this.oculus.quat.y;
       this.oculus.compensationZ = this.oculus.quat.z;
     }
-
 
     //////////////////////////////
     // MOTION AND PHYSICS LOGIC //
