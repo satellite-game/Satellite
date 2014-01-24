@@ -21,8 +21,15 @@ s.Bot = new Class( {
     };
 
     //set a hook on the bot controls.
+    //unhook is necessary when bot dies and new bot is created
+    //need to refactor when multiple bots on screen
     this.controlBot = this.controlBot.bind(this);
+    if (this.game.lastBotCallBack) {
+      this.game.unhook (this.game.lastBotCallBack);
+    }
+
     this.game.hook( this.controlBot );
+    this.game.lastBotCallBack = this.controlBot;
 
     this.lastTime = new Date( ).getTime( );
 
