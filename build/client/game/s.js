@@ -48438,7 +48438,6 @@ s.Ship = new Class({
     },
 
     getOffset: function(offset) {
-        debugger;
         return offset.clone().applyMatrix4(this.root.matrixWorld);
     },
 
@@ -48470,28 +48469,10 @@ s.Ship = new Class({
                 // Left bullet
                 this.makeTurret(bullet, this.options.leftTurretOffset);
 
-                // bullet.position = this.getOffset(this.options.leftTurretOffset);
-                // new s.Turret(bullet);
-
-                // this.game.handleFire({
-                //     position: position,
-                //     rotation: rotation,
-                //     initialVelocity: initialVelocity
-                // });
-
                 // Right bullet
                 this.makeTurret(bullet, this.options.rightTurretOffset);
-                // bullet.position = this.getOffset(this.options.rightTurretOffset);
-                // new s.Turret(bullet);
-
-                // this.game.handleFire({
-                //     position: position,
-                //     rotation: rotation,
-                //     initialVelocity: initialVelocity
-                // });
 
                 this.lastTurretFire = now;
-
                 if (!this.isBot) { this.game.sound.play('laser', 0.5); }
             }
         }
@@ -48662,46 +48643,26 @@ s.Bot = new Class( {
     this.camera.position.set( 0, 0, 0 );
   },
 
-  botFire: function (weapon) {
-    // var now =new Date().getTime();
-    // var position;
-    // var rotation = this.root.rotation.clone();
-    // var initialVelocity = this.root.getLinearVelocity().clone();
+  getEnemyList: function () {
+    this.botEnemyList = [];
+    this.botEnemyList.push(this.game.player);
+    var enemyShips = this.game.enemies._list;
+    for (var i = 0; i < enemyShips.length; i++) {
+      if (!enemyShips[i].isBot) {
+        this.botEnemyList.push(enemyShips[i]);
+      }
+    }
+  },
 
-    // Turrets
-    // if (weapon === 'turret'){
-    //   // if (now - this.lastTurretFire > this.options.botTurretFireTime){
-    //     // Left bullet
-    //     // position = this.getOffset(this.options.leftTurretOffset);
-    //     new s.Turret({
-    //       game: this.game,
-    //       pilot: this.name,
-    //       position: position,
-    //       rotation: rotation,
-    //       initialVelocity: initialVelocity,
-    //       isbBot: this.isBot,
-    //       team: this.alliance
-    //     });
-
-    //     // Right bullet
-    //     position = this.getOffset(this.options.rightTurretOffset);
-    //     new s.Turret({
-    //       game: this.game,
-    //       pilot: this.name,
-    //       position: position,
-    //       rotation: rotation,
-    //       initialVelocity: initialVelocity,
-    //       isBot: this.isBot,
-    //       team: this.alliance
-    //     });
-
-    //     this.lastTurretFire = now;
-
-    //     if (!this.isBot) {
-    //       this.game.sound.play('laser', 0.5);
-    //     }
-    //   }
-    // }
+  getClosestDistance: function () {
+    this.closestDistance = null;
+    for (i = 0; i < this.botEnemyList.length; i++) {
+      var distance = this.root.position.distanceTo(this.botEnemyList[i].root.position);
+      if (!this.closestDistance || distance < this.closestDistance) {
+        this.closestDistance = distance;
+        this.target = this.botEnemyList[i];
+      }
+    }
   },
 
 
@@ -48713,24 +48674,27 @@ s.Bot = new Class( {
     //////////////////////////////  
 
     //MAKE ENEMY LIST FOR BOT
-    var botEnemyList = [];
-    botEnemyList.push(this.game.player);
-    var enemyShips = this.game.enemies._list;
-    for (var i = 0; i < enemyShips.length; i++) {
-      if (!enemyShips[i].isBot) {
-        botEnemyList.push(enemyShips[i]);
-      }
-    }
+    // var botEnemyList = [];
+    // botEnemyList.push(this.game.player);
+    // var enemyShips = this.game.enemies._list;
+    // for (var i = 0; i < enemyShips.length; i++) {
+    //   if (!enemyShips[i].isBot) {
+    //     botEnemyList.push(enemyShips[i]);
+    //   }
+    // }
+
+    this.getEnemyList();
+    this.getClosestDistance();
 
     //DETERMINE CLOSEST ENEMY
-    var closestDistance;
-    for (i = 0; i < botEnemyList.length; i++) {
-      var distance = this.root.position.distanceTo(botEnemyList[i].root.position);
-      if (!closestDistance || distance < closestDistance) {
-        closestDistance = distance;
-        this.target = botEnemyList[i];
-      }
-    }
+    // var closestDistance;
+    // for (i = 0; i < botEnemyList.length; i++) {
+    //   var distance = this.root.position.distanceTo(botEnemyList[i].root.position);
+    //   if (!closestDistance || distance < closestDistance) {
+    //     closestDistance = distance;
+    //     this.target = botEnemyList[i];
+    //   }
+    // }
 
     //////////////////////////////
     //// THRUST/BREAK LOGIC ////
@@ -48744,13 +48708,13 @@ s.Bot = new Class( {
 
     var  maxDistance = 4100, minDistance = 1500;
 
-    if (closestDistance > maxDistance) {
+    if (this.closestDistance > maxDistance) {
       thrust = 1;
     }
-    else if (closestDistance < minDistance) {
+    else if (this.closestDistance < minDistance) {
       brakes = 1;
     } else {
-      var ratio = (closestDistance - minDistance) / (maxDistance - minDistance);
+      var ratio = (this.closestDistance - minDistance) / (maxDistance - minDistance);
       var optimumSpeed = s.config.ship.maxSpeed * ratio;
       if (optimumSpeed < this.botOptions.thrustImpulse) { brakes = 1; }
       if (optimumSpeed > this.botOptions.thrustImpulse) { thrust = 1; }
@@ -48845,7 +48809,7 @@ s.Bot = new Class( {
     ///////  FIRING LOGIC ////////
     //////////////////////////////
 
-    if ( Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && closestDistance < maxDistance) {
+    if ( Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && this.closestDistance < maxDistance) {
       this.fire('turret');
     }
 
