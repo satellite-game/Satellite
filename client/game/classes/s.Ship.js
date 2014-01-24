@@ -11,7 +11,6 @@ s.Ship = new Class({
     },
 
 	construct: function(options) {
-        this.HUD = options.HUD;
 		var geometry = s.models[options.shipClass].geometry;
 		this.materials = s.models[options.shipClass].materials[0];
         this.materials.emissive = new THREE.Color('rgb(255,255,255)');
@@ -26,10 +25,8 @@ s.Ship = new Class({
         this.alliance = options.alliance;
 
         this.game = options.game;
-        this.isBot = options.isBot || false;
-        this.name = options.name || '';
 
-        this.root.name = this.name;
+        this.root.name = options.name; //eventually refactor for both bot and player
         this.hull = s.config.ship.hull;
         this.shields = s.config.ship.shields;
 
