@@ -73,6 +73,8 @@ s.Controls = new Class({
 
   },
 
+  firstRender: true,
+
   update: function( time, delta ) {
     var mouseControls = true;
 
@@ -112,7 +114,17 @@ s.Controls = new Class({
     if (this.oculus.detected) {
       this.mouse.mouseType = 'oculus';
 
+      if (this.firstRender){
+        this.oculus.compensationX = this.oculus.quat.x;
+        this.oculus.compensationY = this.oculus.quat.y;
+        this.oculus.compensationZ = this.oculus.quat.z;
+        this.oculus.compensationW = this.oculus.quat.w;
+        this.firstRender = false;
+      }
+
       if (this.keyboard.pressed('e')) {
+        var initialQuat = new THREE.Quaternion();
+        var initialQuat.setFromEuler( THREE.Vector3(); );
         this.camera.rotation.setEulerFromQuaternion(this.oculus.quat);
       } else {
         this.camera.rotation = new THREE.Vector3();

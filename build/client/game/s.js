@@ -49136,6 +49136,9 @@ s.Controls = new Class({
 
       if (this.keyboard.pressed('e')) {
         this.camera.rotation.setEulerFromQuaternion(this.oculus.quat);
+        this.camera.rotation.x -= this.oculus.compensationX;
+        this.camera.rotation.y -= this.oculus.compensationY;
+        this.camera.rotation.z -= this.oculus.compensationZ;
       } else {
         this.camera.rotation = new THREE.Vector3();
         pitch = this.oculus.quat.x - this.oculus.compensationX;
