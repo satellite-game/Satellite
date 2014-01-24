@@ -9,7 +9,7 @@ s.Bot = new Class( {
     // Generating a new bot with properties
     this.name = options.name || 'bot ' + (++this.game.botCount);
     this.isBot = true;
-    
+
     this.botOptions = {
       rotationSpeed: Math.PI/2,
       pitchSpeed: Math.PI/4,
@@ -84,7 +84,7 @@ s.Bot = new Class( {
 
     //////////////////////////////
     //// THRUST/BREAK LOGIC ////
-    //////////////////////////////    
+    //////////////////////////////
 
     var now = new Date( ).getTime( );
     var difference = now - this.lastTime;
@@ -117,7 +117,7 @@ s.Bot = new Class( {
 
     //////////////////////////////
     // LEFT/RIGHT/UP/DOWN LOGIC //
-    //////////////////////////////       
+    //////////////////////////////
 
     var vTarget3D;
     var vTarget2D;
