@@ -14,8 +14,8 @@ module.exports = function(host, Sync) {
         for (var i in packet) {
           playerState[i] = packet[i];
         }
-        socket.emit('move', playerState);
-        socket.broadcast.to(room).emit('move', playerState);
+        //socket.emit('move', playerState); -- this shoudln't be here
+        //socket.broadcast.to(room).emit('move', playerState);
       }
     }
   };
