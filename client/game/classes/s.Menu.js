@@ -118,6 +118,8 @@ s.Menu = new Class({
       this.menuBox.children[i].visible = true;
     }
     // todo: hide HUD while open.
+    this.HUD.canvas.style.display = 'none';
+    this.HUD.oculusCanvas.style.display = 'none';
   },
 
   close: function () {
@@ -128,6 +130,11 @@ s.Menu = new Class({
     }
     if (this.menuScreen !== 'default') {
       this.clearMenu();
+    }
+    if (this.oculus.detected) {
+      this.HUD.oculusCanvas.style.display = 'block';
+    } else {
+      this.HUD.canvas.style.display = 'block';
     }
   },
 
@@ -170,9 +177,8 @@ s.Menu = new Class({
 
         // todo: move menu so you are looking at the hovered item (possibly very complicated!)
 
-        var viewingAngle = Math.PI/4 * this.oculus.quat.x; // or 180?
-        var tilt = Math.round((this.menuItems.length/2 * this.oculus.quat.x - this.oculus.compensationX) * 6 + Math.round(this.menuItems.length/2));
-        console.log(tilt);
+        var viewingAngle = Math.PI/4 * (this.oculus.quat.x - this.oculus.compensationX); // or 180?
+        var tilt = ~~((this.menuItems.length/2 * this.oculus.quat.x - this.oculus.compensationX) * 6 + ~~(this.menuItems.length/2));
         var hover = this.menuItems[tilt];
         this.hoverItem(hover);
 

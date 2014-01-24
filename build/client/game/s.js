@@ -48620,7 +48620,7 @@ s.Player = new Class({
     // Adjusts engine glow based on linear velosity
     this.trailGlow.intensity = this.root.getLinearVelocity().length()/100;
 
-    var ocuScale = this.game.oculus.detected ? 0.25 : 1;
+    var ocuScale = this.game.oculus.detected ? 0.2 : 1;
     var flameScaler = (Math.random()*0.1 + 1)*ocuScale;
 
     this.flames[0].scale.set(2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler);
@@ -50578,6 +50578,7 @@ s.Menu = new Class({
   },
 
   open: function () {
+    console.log(this.HUD);
     if (this.menuScreen !== 'default') {
       this.showDefaultMenu();
     }
@@ -50587,6 +50588,8 @@ s.Menu = new Class({
       this.menuBox.children[i].visible = true;
     }
     // todo: hide HUD while open.
+    this.HUD.canvas.style.display = 'none';
+    this.HUD.oculusCanvas.style.display = 'none';
   },
 
   close: function () {
@@ -50597,6 +50600,11 @@ s.Menu = new Class({
     }
     if (this.menuScreen !== 'default') {
       this.clearMenu();
+    }
+    if (this.oculus.detected) {
+      this.HUD.oculusCanvas.style.display = 'block';
+    } else {
+      this.HUD.canvas.style.display = 'block';
     }
   },
 
@@ -50639,8 +50647,8 @@ s.Menu = new Class({
 
         // todo: move menu so you are looking at the hovered item (possibly very complicated!)
 
-        var viewingAngle = Math.PI/4 * this.oculus.quat.x; // or 180?
-        var tilt = Math.round((this.menuItems.length/2 * this.oculus.quat.x - this.oculus.compensationX) * 6 + Math.round(this.menuItems.length/2));
+        var viewingAngle = Math.PI/4 * (this.oculus.quat.x - this.oculus.compensationX); // or 180?
+        var tilt = ~~((this.menuItems.length/2 * this.oculus.quat.x - this.oculus.compensationX) * 6 + ~~(this.menuItems.length/2));
         console.log(tilt);
         var hover = this.menuItems[tilt];
         this.hoverItem(hover);
