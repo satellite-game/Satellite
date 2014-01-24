@@ -168,10 +168,14 @@ s.Menu = new Class({
   },
 
   selectItem: function () {
-    this[this.hoveredItem.menuItemSelectCallback]();
+    // this is my favorite part :]
+    if (this.hoveredItem.menuItemSelectCallback) {
+      this.clearMenu();
+      this[this.hoveredItem.menuItemSelectCallback]();
+    }
   },
 
-  updateHovered: function () {
+  updateHovered: function (direction) {
     if (this.displayed && this.menuItems.length > 0) {
       if (this.oculus.detected) {
         // Oculus menu navigation
@@ -185,7 +189,12 @@ s.Menu = new Class({
 
         this.menuBox.position.setY((-150*Math.sin(viewingAngle))/Math.sin(Math.PI/4)/2+4); // Man I don't know, math or something.
       } else {
-        // todo: keyboard, mouse, and controller navigation
+        if (direction === 'up' && this.cursorPosition < this.menuItems.length-1) {
+          this.cursorPosition++;
+        } else if (direction === 'down' && this.cursorPosition > 0) {
+          this.cursorPosition--;
+        }
+        this.hoverItem(this.menuItems[this.cursorPosition]);
       }
     }
   },
@@ -198,12 +207,11 @@ s.Menu = new Class({
       {text: 'JOIN GAME', size: 5, action: 'showRoomList'},
       {text: 'DISCONECT', size: 5, action: 'disconnect'},
       {text: 'LEADERBOARD', size: 5, action: 'showScoreboard'},
-      {text: 'SAMPLE TEXT', size: 5, action: 'showTestMenu'}
+      {text: 'SAMPLE MENU', size: 5, action: 'showTestMenu'}
     ]);
   },
 
   showRoomList: function () {
-    this.clearMenu();
     this.menuScreen = 'rooms';
     // var roomNames = [];
     // // some database stuff to get list of existing rooms and order them by player count
@@ -216,7 +224,6 @@ s.Menu = new Class({
   },
 
   showScoreboard: function () {
-    this.clearMenu();
     this.menuScreen = 'scoreboard';
     // var playerNames = [];
     // // some database stuff to get list of players and order them by score
@@ -228,7 +235,6 @@ s.Menu = new Class({
   },
 
   showTestMenu: function () {
-    this.clearMenu();
     this.menuScreen = 'test';
     var players = [{text: 'SAMPLE TEXT 1', size: 5}, {text: 'SAMPLE TEXT 2', size: 5}, {text: 'SAMPLE TEXT 3', size: 5}, {text: 'SAMPLE TEXT 4', size: 5}];
     this.addMenuItems( players );

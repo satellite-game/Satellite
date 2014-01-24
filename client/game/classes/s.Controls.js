@@ -72,9 +72,16 @@ s.Controls = new Class({
           that.menu.open();
         }
       } else {
-        if (e.which === 32 && that.menu.displayed) {
-          console.log('attempted to select menu item');
-          that.menu.selectItem();
+        if (that.menu.displayed) {
+          if (e.which === 32) {
+            that.menu.selectItem();
+          }
+          if (e.which === 38) {
+            that.menu.updateHovered('up');
+          }
+          if (e.which === 40) {
+            that.menu.updateHovered('down');
+          }
         }
       }
     });
