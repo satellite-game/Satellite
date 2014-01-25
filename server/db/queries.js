@@ -23,7 +23,22 @@ module.exports = {
     });
   },
 
-  deleteRoom: function (roomName, callback) {},
+  deleteRooms: function (roomName, callback){
+    callback = callback || defaultCallback('deleteRooms');
+    async.waterfall([function (callback) {
+      db.HDEL('rooms', roomName, function(err, data){
+        callback(null, data);
+      });
+    }, function (data, callback) {
+      db.DEL(roomName+'_KILLS', function(err, data){
+        callback(null, data);
+      });
+    }, function (data, callback) {
+      db.DEL(roomName+'_DEATHS', function(err, data){
+        callback(null, data);
+      });
+    }], callback);
+  },
 
   joinRoom: function (roomName, playerID, joinCallback) {
     var that = this;
@@ -52,6 +67,7 @@ module.exports = {
 
   leaveRoom: function (roomName, playerID, leaveCallback) {
     leaveCallback = leaveCallback || defaultCallback('leaveRoom');
+    var that = this;
 
     async.waterfall([function (callback){
       db.HDEL(roomName+'_KILLS', playerID, function(err, data){
@@ -71,9 +87,7 @@ module.exports = {
     // need to remove the old rooms from the _KILLS and _DEATHS sections
     function(playersInRoom, callback) {
       if (playersInRoom < 1){
-        db.HDEL('rooms', roomName, function(err, data){
-          callback(null, data);
-        });
+        that.deleteRooms(roomName);
       } else {
         callback(null, playersInRoom);
       }
