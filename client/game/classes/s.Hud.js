@@ -90,6 +90,13 @@ s.HUD = new Class({
             blue: 255,
             alpha: 0.75
         });
+        this.spaceStation = new s.Color({
+            game: this.game,
+            red: 0,
+            green: 0,
+            blue: 255,
+            alpha: 0.5
+        });
 
         // array containing trailing predictive targets
         this.trailingPredictions = [];
@@ -305,6 +312,48 @@ s.HUD = new Class({
                 this.ctx.arc( moon2D.x+centerX, -(moon2D.y-centerY), 10, 0, 2*this.PI, false );
 
             this.ctx.fillStyle = "black";
+            this.ctx.fill();
+            this.ctx.lineWidth = 2;
+            this.ctx.strokeStyle = this.menu.color;
+            this.ctx.stroke();
+        }
+
+        ///////////////////////////
+        // BASE TARGETING SYSTEM //
+        ///////////////////////////
+
+        this.base = s.game.spaceStation.root;
+
+        var vbase3D = this.base.position.clone();
+        var vbase2D = s.projector.projectVector( vbase3D, s.game.camera );
+        var baseInSight, distanceToBase, v2DBase;
+
+        if ( Math.abs(vbase2D.x) <= 0.95 && Math.abs(vbase2D.y) <= 0.95 && vbase2D.z < 1 ) {
+            baseInSight = true;
+            distanceToBase = this.game.player.root.position.distanceTo(this.base.position);
+            size = Math.round((width - distanceToBase/100)/26);
+        }
+
+        // base targeting reticule and targeting box
+        if ( baseInSight && distanceToBase > 5500 ) {
+            v2DBase = vbase2D.clone();
+            v2DBase.x =  ( width  + v2DBase.x*width  )/2;
+            v2DBase.y = -(-height + v2DBase.y*height )/2;
+
+            this.ctx.strokeRect( v2DBase.x-size, v2DBase.y-size, size*2, size*2 );
+            this.ctx.lineWidth = 1;
+            this.ctx.strokeStyle = this.menu.color;
+        } else if ( !baseInSight ) {
+            var base2D = new THREE.Vector2(vbase2D.x, vbase2D.y);
+            base2D.multiplyScalar(1/base2D.length()).multiplyScalar(this.subreticleBound.radius+34);
+
+            this.ctx.beginPath();
+            if (vbase2D.z > 1)
+                this.ctx.arc( -base2D.x+centerX, (-base2D.y+centerY), 10, 0, 2*this.PI, false );
+            else
+                this.ctx.arc( base2D.x+centerX, -(base2D.y-centerY), 10, 0, 2*this.PI, false );
+
+            this.ctx.fillStyle = "blue";
             this.ctx.fill();
             this.ctx.lineWidth = 2;
             this.ctx.strokeStyle = this.menu.color;
