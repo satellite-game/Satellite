@@ -211,7 +211,6 @@ io.sockets.on('connection', function (socket) {
             killed: message.you,
             killer: message.killer
         });
-        // delete clients[socket.id];
         if (socket.id === hostPlayer) {
             for (var key in clients) {
                 if (key !== hostPlayer) { hostPlayer = key; }
