@@ -47764,7 +47764,7 @@ Math.toRadians = function(degrees) {
 
 /**
 	Load textures
-	
+
 	@param {Object} options  Options object
 	@param {Array} models  Array of texture names to load
 	@param {Function} complete  Function to call when loading is complete
@@ -47779,7 +47779,7 @@ s.util.loadTextures = function(options) {
 	var loaded = function(name, texture) {
 		// Store texture
 		textures[name] = texture;
-		
+
 		// Track progress
 		toLoad--;
 		if (toLoad === 0) {
@@ -47795,7 +47795,7 @@ s.util.loadTextures = function(options) {
 				options.progress(pct, textures[name]);
 		}
 	};
-	
+
 	options.textures.forEach(function(name, index) {
 		// Strip file extension
 		var shortName = name.split('.')[0];
@@ -47806,7 +47806,7 @@ s.util.loadTextures = function(options) {
 
 /**
 	Load models
-	
+
 	@param {Object} options  Options object
 	@param {Array} models  Array of model names to load
 	@param {Function} complete  Function to call when loading is complete
@@ -47824,7 +47824,7 @@ s.util.loadModels = function(options) {
 			geometry: geometry,
 			materials: materials
 		};
-		
+
 		// Track progress
 		toLoad--;
 		if (toLoad === 0) {
@@ -47840,7 +47840,7 @@ s.util.loadModels = function(options) {
 				options.progress(pct, models[name]);
 		}
 	};
-	
+
 	options.models.forEach(function(name, index) {
 		s.loader.load('game/models/'+name+'.json', loaded.bind(null, name));
 	});
@@ -47848,7 +47848,7 @@ s.util.loadModels = function(options) {
 
 /**
 	Get 3D coordinates of a 2D point
-	
+
 	@param {Number} x  2D x coordinate
 	@param {Number} y  2D y coordinate
 	@param {Number} width  Width of canvas
@@ -47858,25 +47858,25 @@ s.util.loadModels = function(options) {
 s.util.get3DCoords = function(x, y, width, height, camera) {
 	// Convert to normalized device coordinates
 	var ndc = s.util.getNDC(x, y, width, height);
-	
+
 	var startVector = new THREE.Vector3();
 	var endVector = new THREE.Vector3();
 	var dirVector = new THREE.Vector3();
 	var goalVector = new THREE.Vector3();
 	var t;
-	
+
 	// Create vectors above and below ground plane at our NDCs
 	startVector.set(ndc.x, ndc.y, -1.0);
 	endVector.set(ndc.x, ndc.y, 1.0);
-	
+
 	// Convert back to 3D world coordinates
 	startVector = s.projector.unprojectVector(startVector, camera);
 	endVector = s.projector.unprojectVector(endVector, camera);
-	
+
 	// Get direction from startVector to endVector
 	dirVector.subVectors(endVector, startVector);
 	dirVector.normalize();
-	
+
 	// Find intersection where y = 0
 	t = startVector.y / -(dirVector.y);
 
@@ -47886,13 +47886,13 @@ s.util.get3DCoords = function(x, y, width, height, camera) {
 		startVector.y + t * dirVector.y,
 		startVector.z + t * dirVector.z
 	);
-	
+
 	return goalVector;
 };
 
 /**
 	Create a ray between two points
-	
+
 	@param {THREE.Vector3} pointA  Start point
 	@param {THREE.Vector3} pointB  End point
 */
@@ -47900,13 +47900,13 @@ s.util.createRay = function(pointA, pointB) {
 	var rayStart = pointA;
 	var rayDirection = new THREE.Vector3();
 	rayDirection.subVectors(pointB, pointA).normalize();
-	
+
 	return new THREE.Raycaster(rayStart, rayDirection);
 };
 
 /**
-	Get the normalized device coordinate 
-	
+	Get the normalized device coordinate
+
 	@param {Number} x  2D x coordinate
 	@param {Number} y  2D y coordinate
 	@param {Number} width  Width of canvas
@@ -47921,19 +47921,19 @@ s.util.getNDC = function(x, y, width, height) {
 
 /**
 	Get 2D coordinates from a Vector3
-	
+
 	@param {THREE.Vector3} objVector  Vector representing the object position
 	@param {Number} width  Width of canvas
 	@param {Number} height  Height of canvas
 */
 s.util.get2DCoords = function(objVector, width, height) {
 	var vector3D = objVector.clone();
-	
+
 	var vector2D = this.projector.projectVector(vector3D, this.camera);
-	
+
 	vector2D.y = -(vector2D.y*height - height)/2;
 	vector2D.x = (vector2D.x*width + width)/2;
-	
+
 	return vector2D;
 };
 
@@ -50958,11 +50958,14 @@ s.SatelliteGame = new Class( {
         return Math.floor(Math.random()* 15000 + 15000) * coefficient;
     },
 
-	initialize: function() {
-		var that = this;
+    construct: function() {
+        this.botCount = 0;
+    },
+
+    initialize: function() {
+        var that = this;
 
         this.IDs = [];
-        this.botCount = 0;
         this.hostPlayer = false;
 
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
@@ -51133,7 +51136,7 @@ s.SatelliteGame = new Class( {
                         alliance: 'enemy'
                     } );
                 }
-                
+
                 if (isBot) { console.log( '%s has joined the fray', enemyShip.name ); }
 
                 this._list.push( enemyShip );
@@ -51460,7 +51463,7 @@ s.SatelliteGame = new Class( {
         if (this.game.botCount === 0) {
             // Create a new bot
             this.game.enemies.add( {}, 'bot');
-        }        
+        }
         that.game.updatePlayersWithBots('botInfo');
     },
 
@@ -51474,7 +51477,7 @@ s.SatelliteGame = new Class( {
         };
 
         enemiesSocketInfo = {};
-        var enemiesList = this.enemies._list;  
+        var enemiesList = this.enemies._list;
         for (var i = 0; i < enemiesList.length; i++) {
             if (enemiesList[i].isBot){
                 var root = enemiesList[i].root;
@@ -51482,7 +51485,7 @@ s.SatelliteGame = new Class( {
                 //if there is a angular and linear velocity fnc, call it. else create a new 3 vector
                 var angularVeloc = (root.getAngularVelocity && root.getAngularVelocity()) || new THREE.Vector3();
                 var linearVeloc = (root.getLinearVelocity && root.getLinearVelocity()) || new THREE.Vector3();
-                
+
                 enemiesSocketInfo[name] = {
                     position: makeArray(root.position),
                     rotation: makeArray(root.rotation),
