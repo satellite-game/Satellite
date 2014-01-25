@@ -18,6 +18,7 @@ s.Game = new Class({
 
     this.doRender = false;
     this.lastRender = 0;
+    this.roomSelected = false;
 
     // Oculus Rift setup
     this.oculus = new s.Oculus();
@@ -146,7 +147,7 @@ s.Game = new Class({
 
   // Attempt to start the game (if models and physics have begun)
   tryInitialize: function() {
-    if (this.modelsLoaded && this.physicsStarted && !this.initialized) { // && this.roomSelected) {
+    if (this.modelsLoaded && this.physicsStarted && !this.initialized) {
       this.initialize();
     }
   },
