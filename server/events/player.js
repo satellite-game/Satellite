@@ -11,8 +11,8 @@ module.exports = function (host, sync) {
       };
 
       // change the playerStats
-      db.incKillCount(deathNotification.killer);
-      db.incDeathCount(deathNotification.killed);
+      db.incKillCount(room, deathNotification.killer);
+      db.incDeathCount(room, deathNotification.killed);
 
       socket.emit('killed', deathNotification);
       socket.broadcast.to(room).emit('killed', deathNotification);

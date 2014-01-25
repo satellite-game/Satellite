@@ -15,13 +15,15 @@ module.exports = {
     db.hgetall('rooms', function(err, data){
       if (err) throw 'addRoom error: ' + err;
       if (!data[roomName]){
-        db.HSET('rooms', roomName, 1, function(err, data){callback(err, data)});
+        db.HSET('rooms', roomName, 1, function(err, data){callback(err, data);});
       } else {
         console.log('room exists');
-        db.HINCRBY('rooms', roomName, 1, function(err, data){callback(err, data)});
+        db.HINCRBY('rooms', roomName, 1, function(err, data){callback(err, data);});
       }
     });
   },
+
+  deleteRoom: function (roomName, callback) {},
 
   joinRoom: function (roomName, playerID, joinCallback) {
     var that = this;
@@ -79,11 +81,11 @@ module.exports = {
   },
 
   incKillCount: function (roomName, playerID) {
-    db.HINCRBY(roomName+'_KILLS',playerID, 1, defaultCallback('incKillCount'));
+    db.HINCRBY(roomName+'_KILLS', playerID, 1, defaultCallback('incKillCount'));
   },
 
   incDeathCount: function (roomName, playerID) {
-    db.HINCRBY(roomName+'_DEATHS',playerID, 1, defaultCallback('incKillCount'));
+    db.HINCRBY(roomName+'_DEATHS', playerID, 1, defaultCallback('incKillCount'));
   },
 
 };

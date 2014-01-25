@@ -15,7 +15,7 @@ module.exports = function (map, host, Sync, io) {
         Sync.setInit( socket.id, target, data );
       }
 
-      db.joinRoom(data.room, data.name, function(){});  // add to game in the db
+      db.joinRoom(data.room, data.name);  // add to game in the db
 
       socket.emit('player list', target.playerList);
       socket.emit('map', map.mapItems);
