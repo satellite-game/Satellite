@@ -87,12 +87,11 @@ s.Comm = new Class( {
         this.socket.on( 'hit', this.makeTrigger( 'hit' ));
 
         this.socket.on( 'sync', this.makeTrigger( 'sync'));
-
         this.socket.on( 'bot retrieval', this.makeTrigger( 'bot retrieval' ));
 
         this.socket.on( 'bot positions', this.makeTrigger( 'bot positions' ));
 
-        this.game.hook( this.position );
+        // this.game.hook( this.position );
 
         this.clockTick = this.clockTick.bind(this);
 
@@ -140,7 +139,6 @@ s.Comm = new Class( {
     position: function ( ) {
 
         var time = new Date( ).getTime( );
-
 
         // Never send faster than server can handle
 
