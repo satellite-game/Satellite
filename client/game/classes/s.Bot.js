@@ -77,7 +77,6 @@ s.Bot = new Class( {
 
 
   controlBot: function( ) {
-
     //get closest enemy
     this.getEnemyList();
     this.getClosestDistance();
@@ -89,28 +88,34 @@ s.Bot = new Class( {
     var now = new Date( ).getTime( );
     var difference = now - this.lastTime;
 
-    var thrust = 0;
-    var brakes = 0;
+    // bot movement states
+    this.moveStates = {
+      thrust: 0,
+      brakes: 0,
+      pitch: 0,
+      roll: 0,
+      yaw: 0
+    };
 
     var  maxDistance = 4100, minDistance = 1500;
 
     if (this.closestDistance > maxDistance) {
-      thrust = 1;
+      this.moveStates.thrust = 1;
     }
     else if (this.closestDistance < minDistance) {
-      brakes = 1;
+      this.moveStates.brakes = 1;
     } else {
       var ratio = (this.closestDistance - minDistance) / (maxDistance - minDistance);
-      var optimumSpeed = s.config.ship.maxSpeed * ratio;
-      if (optimumSpeed < this.botOptions.thrustImpulse) { brakes = 1; }
-      if (optimumSpeed > this.botOptions.thrustImpulse) { thrust = 1; }
+      this.moveStates.optimumSpeed = s.config.ship.maxSpeed * ratio;
+      if (this.moveStates.optimumSpeed < this.botOptions.thrustImpulse) { this.moveStates.brakes = 1; }
+      if (this.moveStates.optimumSpeed > this.botOptions.thrustImpulse) { this.moveStates.thrust = 1; }
     }
 
-    if (thrust && this.botOptions.thrustImpulse < s.config.ship.maxSpeed){
+    if (this.moveStates.thrust && this.botOptions.thrustImpulse < s.config.ship.maxSpeed){
       this.botOptions.thrustImpulse += difference;
     }
 
-    if (brakes && this.botOptions.thrustImpulse > 0){
+    if (this.moveStates.brakes && this.botOptions.thrustImpulse > 0){
       this.botOptions.thrustImpulse -= difference;
     }
 
@@ -122,14 +127,10 @@ s.Bot = new Class( {
     var vTarget3D;
     var vTarget2D;
 
-    var pitch = 0;
-    var roll = 0;
-    var yaw = 0;
+    var yawSpeed    = this.botOptions.yawSpeed;
+    var pitchSpeed  = this.botOptions.pitchSpeed;
 
-    var yawSpeed    = this.botOptions.yawSpeed,
-    pitchSpeed  = this.botOptions.pitchSpeed;
-
-    var thrustScalar = this.botOptions.thrustImpulse/s.config.ship.maxSpeed + 1;
+    var thrustScalar = this.botOptions.thrustImpulse / s.config.ship.maxSpeed + 1;
 
     // TARGET HUD MARKING
     if ( this.target ) {
@@ -142,28 +143,28 @@ s.Bot = new Class( {
     if (vTarget2D.z < 1) {
         //go left; else if go right
         if (vTarget2D.x < -0.15) {
-          yaw = yawSpeed / thrustScalar;
+          this.moveStates.yaw = yawSpeed / thrustScalar;
         } else if (vTarget2D.x > 0.15) {
-          yaw = -1 * yawSpeed / thrustScalar;
+          this.moveStates.yaw = -1 * yawSpeed / thrustScalar;
         }
         //do down; else if go up
         if (vTarget2D.y < -0.15) {
-          pitch = -1*pitchSpeed / thrustScalar;
+          this.moveStates.pitch = -1 * pitchSpeed / thrustScalar;
         } else if (vTarget2D.y > 0.15) {
-          pitch  = pitchSpeed / thrustScalar;
+          this.moveStates.pitch  = pitchSpeed / thrustScalar;
         }
       } else {
         //go right; else if go left
         if (vTarget2D.x < 0) {
-          yaw = -1* yawSpeed / thrustScalar;
+          this.moveStates.yaw = -1 * yawSpeed / thrustScalar;
         } else if (vTarget2D.x >= 0) {
-          yaw = yawSpeed / thrustScalar;
+          this.moveStates.yaw = yawSpeed / thrustScalar;
         }
         //do up; else if go down
         if (vTarget2D.y < 0) {
-          pitch = pitchSpeed / thrustScalar;
+          this.moveStates.pitch = pitchSpeed / thrustScalar;
         } else if (vTarget2D.y > 0) {
-          pitch  = -1 * pitchSpeed / thrustScalar;
+          this.moveStates.pitch  = -1 * pitchSpeed / thrustScalar;
         }
       }
 
@@ -180,7 +181,7 @@ s.Bot = new Class( {
     angularVelocity = angularVelocity.clone().divideScalar(this.botOptions.rotationFadeFactor);
     this.root.setAngularVelocity(angularVelocity);
 
-    var newAngularVelocity = new THREE.Vector3(pitch, yaw, roll).applyMatrix4(rotationMatrix).add(angularVelocity);
+    var newAngularVelocity = new THREE.Vector3(this.moveStates.pitch, this.moveStates.yaw, this.moveStates.roll).applyMatrix4(rotationMatrix).add(angularVelocity);
     this.root.setAngularVelocity(newAngularVelocity);
 
     var impulse = linearVelocity.clone().negate();
