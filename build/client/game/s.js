@@ -48445,7 +48445,7 @@ s.Ship = new Class({
     },
 
 	fire: function(weapon){
-		var now =new Date().getTime();
+		var now = new Date().getTime();
         var rotation = this.root.rotation.clone();
         var initialVelocity = this.root.getLinearVelocity().clone();
         
@@ -49289,7 +49289,6 @@ s.Controls = new Class({
 
   toString: 'Controls',
 
-
   options: {
 
     rotationSpeed: Math.PI/2,
@@ -49598,7 +49597,6 @@ s.HUD = new Class({
 		this.ctx = this.canvas.getContext('2d');
 
         // Oculus Hud rendering
-        // Left eye
         this.oculusCanvas = document.createElement('canvas');
 
         this.oculusCanvas.height = window.innerHeight/2;
@@ -49892,7 +49890,7 @@ s.HUD = new Class({
 
         //////////////////////////////////////////
         // ENEMY TARGETING AND CALLSIGN DISPLAY //
-        /////////////////////////////////////////
+        //////////////////////////////////////////
 
         var self = s.game.player.root;
 
@@ -50063,16 +50061,16 @@ s.HUD = new Class({
             grd.addColorStop(1,"rgba(256,0,0,0.75)");
 
             // Fill with gradient
-            this.ctx.fillStyle = grd;
-            this.ctx.fillRect(0,0,width,height);
+            // this.ctx.fillStyle = grd;
+            // this.ctx.fillRect(0,0,width,height);
         }
         if (this.shieldsFull.alpha !== 0){
             var grade = this.ctx.createRadialGradient(centerX,centerY,width/12,centerX,centerY,width * (1.5 - this.shieldsFull.alpha));
             grade.addColorStop(0,"rgba(0,0,0,0)");
             grade.addColorStop(1,this.shieldsFull.color);
 
-            this.ctx.fillStyle = grade;
-            this.ctx.fillRect(0,0,width,height);
+            // this.ctx.fillStyle = grade;
+            // this.ctx.fillRect(0,0,width,height);
         }
 
 
@@ -50086,8 +50084,8 @@ s.HUD = new Class({
         this.ctx.stroke();
 
         this.oculusCtx.clearRect(0, 0, this.oculusCanvas.width, this.oculusCanvas.height);
-        this.oculusCtx.drawImage(this.canvas, 50*1.08, -50, window.innerWidth/2, window.innerHeight/2);
-        this.oculusCtx.drawImage(this.canvas, this.oculusCanvas.width/2-50*1.08, -50, window.innerWidth/2, window.innerHeight/2);
+        this.oculusCtx.drawImage(this.canvas, 50*1.07, -50, window.innerWidth/2, window.innerHeight/2);
+        this.oculusCtx.drawImage(this.canvas, this.oculusCanvas.width/2-50*1.07, -50, window.innerWidth/2, window.innerHeight/2);
     }
 
 });
@@ -50450,257 +50448,171 @@ s.Radar = new Class({
 *
 **/
 
-s.Comm = new Class( {
+s.Comm = new Class({
 
-    extend: s.EventEmitter,
+  extend: s.EventEmitter,
 
+  toString: "Comm",
 
-    toString: "Comm",
+  // makeTrigger is responsible for broadcasting all events
 
+  // receieved from the server to the rest of the game.
 
-    // makeTrigger is responsible for broadcasting all events
+  makeTrigger: function ( evt ) {
+    var that = this;
 
-    // receieved from the server to the rest of the game.
+    return function ( message ) {
+      that.trigger.call( that, evt, message );
+    };
+  },
 
+  destruct: function ( ) {
+    // TODO: Send server some kind of destruct message?
+  },
 
-    makeTrigger: function ( evt ) {
+  construct: function ( options ) {
+    this.game = options.game;
+    this.player = options.player;
+    this.ship = options.ship;
+    this.pilot = options.pilot;
 
-        var that = this;
+    var that = this;
 
-        return function ( message ) {
+    this.lastMessageTime = new Date( ).getTime( );
+    this.clockTick = this.clockTick.bind(this);
+    this.timer = setInterval(this.clockTick,1000);
+    this.time = 0;
+  },
 
-            that.trigger.call( that, evt, message );
+  connectSockets: function (server) {
+    this.socket = io.connect( 'http://' + server );
 
-        };
+    this.socket.on('failed', function ( message ) {
+      // try to reconnect
+      that.connected();
+    });
+    this.socket.on('join', this.makeTrigger('join'));
+    this.socket.on('player list', this.makeTrigger('player list'));
+    this.socket.on('leave', this.makeTrigger('leave'));
+    this.socket.on('move', this.makeTrigger('move'));
+    this.socket.on('killed', this.makeTrigger('killed'));
+    this.socket.on('fire', this.makeTrigger('fire'));
+    this.socket.on('hit', this.makeTrigger('hit'));
+    this.socket.on('bot retrieval', this.makeTrigger('bot retrieval'));
+    this.socket.on('bot positions', this.makeTrigger('bot positions'));
 
-    },
+    this.game.hook( this.position );
 
+    this.connected();
+  },
 
-    destruct: function ( ) {
+  connected: function ( ) {
+    var time = new Date( ).getTime( );
 
-        // TODO: Send server some kind of destruct message?
+    var shipPosition = this.game.player.getPositionPacket( );
 
-    },
+    var packet = {
+      evt: 'joined',
+      name: this.pilot.name,
+      time: time,
+      pos: shipPosition.pos,
+      rot: shipPosition.rot,
+      aVeloc: shipPosition.aVeloc,
+      lVeloc: shipPosition.lVeloc
+    };
 
+    // Broadcast position
 
-    construct: function ( options ) {
+    this.socket.emit( 'join', packet );
+  },
 
-        //binding the game's context
+  position: function ( ) {
+    var time = new Date( ).getTime( );
 
-        this.game = options.game;
+    // Never send faster than server can handle
 
-        // Prepend http. Doing this so that you can customize the server before finalizing the string.
+    if ( time - s.game.comm.lastMessageTime >= 15 ) {
 
-        options.server = 'http://' + options.server;
+      var shipPosition = s.game.player.getPositionPacket( );
 
-        this.player = options.player;
+      // TODO: Figure out if ship or turret actually moved
+      // If ship moved, send packet
 
-        this.ship = options.ship;
+      if ( this.lastPosition !== shipPosition.pos ) {
 
-        this.pilot = options.pilot;
-
-        var that = this;
-
-
-        this.lastMessageTime = new Date( ).getTime( );
-
-        // Create socket connection
-
-
-        this.socket = io.connect( options.server );
-
-
-        this.socket.on( 'join', this.makeTrigger( 'join' ) );
-
-        this.socket.on( 'failed', function ( message ) {
-            // try to reconnect
-            that.connected( );
-        } );
-
-        this.socket.on( 'player list', this.makeTrigger( 'player list' ) );
-
-        this.socket.on( 'leave', this.makeTrigger( 'leave' ) );
-
-        this.socket.on( 'move', this.makeTrigger( 'move' ) );
-
-        this.socket.on('killed', this.makeTrigger( 'killed' ));
-
-        this.socket.on('fire', this.makeTrigger( 'fire' ));
-
-        this.socket.on('hit', this.makeTrigger( 'hit' ));
-
-        this.socket.on('bot retrieval', this.makeTrigger( 'bot retrieval' ));
-
-        this.socket.on('bot positions', this.makeTrigger( 'bot positions' ));
-        
-
-
-
-        this.game.hook( this.position );
-
-        this.clockTick = this.clockTick.bind(this);
-
-        this.timer = setInterval(this.clockTick,1000);
+        // Build packet
 
         this.time = 0;
 
-
-    },
-
-    connected: function ( ) {
-
-
-        var time = new Date( ).getTime( );
-
-
-        var shipPosition = this.game.player.getPositionPacket( );
-
         var packet = {
-
-            evt: 'joined',
-
-            name: this.pilot.name,
-
-            time: time,
-
-            pos: shipPosition.pos,
-
-            rot: shipPosition.rot,
-
-            aVeloc: shipPosition.aVeloc,
-
-            lVeloc: shipPosition.lVeloc
-
+          time: time,
+          pos: shipPosition.pos,
+          rot: shipPosition.rot,
+          aVeloc: shipPosition.aVeloc,
+          lVeloc: shipPosition.lVeloc
         };
-
 
         // Broadcast position
 
-        this.socket.emit( 'join', packet );
+        s.game.comm.socket.emit( 'move', packet );
 
-    },
+        s.game.comm.lastMessageTime = time;
 
-
-    position: function ( ) {
-
-        var time = new Date( ).getTime( );
-
-
-        // Never send faster than server can handle
-
-        if ( time - s.game.comm.lastMessageTime >= 15 ) {
-
-            var shipPosition = s.game.player.getPositionPacket( );
-
-            // TODO: Figure out if ship or turret actually moved
-
-
-            // If ship moved, send packet
-
-            if ( this.lastPosition !== shipPosition.pos ) {
-
-                // Build packet
-
-                this.time = 0;
-
-                var packet = {
-
-                    time: time,
-
-                    pos: shipPosition.pos,
-
-                    rot: shipPosition.rot,
-
-                    aVeloc: shipPosition.aVeloc,
-
-                    lVeloc: shipPosition.lVeloc
-
-                };
-
-                // Broadcast position
-
-
-                s.game.comm.socket.emit( 'move', packet );
-
-                s.game.comm.lastMessageTime = time;
-
-                this.lastPosition = shipPosition.pos;
-
-            }
-        }
-    },
-
-
-    fire: function( pos, rot, velocity ) {
-
-        this.time = 0;
-
-        this.socket.emit( 'fire', {
-
-            position: pos,
-
-            rotation: rot,
-
-            initialVelocity: velocity
-
-        });
-    },
-
-
-    died: function( you, killer ) {
-
-        this.socket.emit( 'killed',{
-
-            you: you,
-
-            killer: killer
-
-             });
-
-    },
-
-
-    hit: function( otherPlayerName, yourName ) {
-
-        this.time = 0;
-
-        this.socket.emit( 'hit', {
-
-            otherPlayerName: otherPlayerName,
-
-            yourName: yourName
-
-        });
-    },
-
-    clockTick: function( ){
-        this.time += 1;
-        // if ( this.time >= 60 ){
-        //     window.location.href = "http://satellite-game.com";
-        // }
-    },
-
-    botInfo: function(message) {
-        this.socket.emit('botInfo', message);
-    },
-
-    botHit: function( yourName, botName ) {
-
-        this.time = 0;
-
-        this.socket.emit( 'botHit', {
-
-            yourName: yourName,
-            
-            botName: botName
-
-        });
-    },
-
-    botUpdate: function(enemies) {
-        this.socket.emit( 'botUpdate', enemies);
+        this.lastPosition = shipPosition.pos;
+      }
     }
-} );
+  },
+
+  fire: function( pos, rot, velocity ) {
+    this.time = 0;
+
+    this.socket.emit( 'fire', {
+      position: pos,
+      rotation: rot,
+      initialVelocity: velocity
+    });
+  },
+
+  died: function( you, killer ) {
+    this.socket.emit( 'killed',{
+      you: you,
+      killer: killer
+    });
+  },
+
+  hit: function( otherPlayerName, yourName ) {
+    this.time = 0;
+
+    this.socket.emit( 'hit', {
+      otherPlayerName: otherPlayerName,
+      yourName: yourName
+    });
+  },
+
+  clockTick: function( ){
+    this.time += 1;
+    // if ( this.time >= 60 ){
+    //     window.location.href = "http://satellite-game.com";
+    // }
+  },
+
+  botInfo: function(message) {
+    this.socket.emit('botInfo', message);
+  },
+
+  botHit: function( yourName, botName ) {
+    this.time = 0;
+
+    this.socket.emit( 'botHit', {
+      yourName: yourName,
+      botName: botName
+    });
+  },
+
+  botUpdate: function(enemies) {
+    this.socket.emit( 'botUpdate', enemies);
+  }
+});
 
 s.LoadScreen = new Class( {
 
@@ -50749,13 +50661,15 @@ s.Menu = new Class({
     this.menuBox = new THREE.Mesh( new THREE.CubeGeometry(2500, 2500, 1), new THREE.MeshBasicMaterial({color: 0x000000, transparent: true, opacity: 0.7}) );
 
     // Format for adding menu item object:
-    // { text: 'displayed_text_string'(required),
-    // action: 'callbackNameString' (called in context of 'this')(default null),
-    // font: 'font_name_string'(default "helvetiker"),
-    // bold: true/false (default false),
-    // size: number(1-5ish)(defualt 3),
-    // flat: true/false(changes shader, depth and bevel)(default false),
-    // small: true/false(overides flat, bold, and size to make a standardized readable small font)(default false) };
+    // {
+    //   text:   'displayed text string'(required),
+    //   action: 'callbackNameString' (called in context of 'this')(default null),
+    //   font:   'font name string'(default "helvetiker"),
+    //   bold:   true/false (default false),
+    //   size:   number(1-5ish)(defualt 3),
+    //   flat:   true/false(changes shader, depth and bevel)(default false),
+    //   small:  true/false(overides flat, bold, and size to make a standardized readable small font)(default false)
+    // };
     
     this.menuBox.position.setZ(-150);
     this.menuBox.visible = false;
@@ -50765,8 +50679,6 @@ s.Menu = new Class({
     if (this.oculus.detected) {
       this.menuBox.position.setZ(-50);
     }
-
-    // this.showDefaultMenu();
   },
 
   addMenuItems: function ( items ) {
@@ -50822,7 +50734,7 @@ s.Menu = new Class({
       menuItem.position.setY((currentHeight)-(menuHeight/2)+(size/2)); // MATH?
       menuItem.position.setX(menuItem.geometry.boundingSphere.radius*-0.5);
       menuItem.menuItemSelectCallback = items[items.length-i-1].action || null;
-      
+
       this.menuBox.add( menuItem );
       this.menuItems.push( menuItem );
       currentHeight += size*2;
@@ -50834,10 +50746,10 @@ s.Menu = new Class({
     // Turns out it's just leaving invisible ghosts of
     // your menu screens physically floating out in space.
     // todo: not that.
-    this.menuItems = [];
     for (var i = 0; i < this.menuBox.children.length; i++) {
       this.menuBox.children[i].visible = false;
     }
+    this.menuItems = [];
     this.menuBox.children = [];
   },
 
@@ -50850,7 +50762,6 @@ s.Menu = new Class({
     for (var i = 0; i < this.menuBox.children.length; i++) {
       this.menuBox.children[i].visible = true;
     }
-    // todo: hide HUD while open.
     this.HUD.canvas.style.display = 'none';
     this.HUD.oculusCanvas.style.display = 'none';
   },
@@ -50899,11 +50810,12 @@ s.Menu = new Class({
   },
 
   selectItem: function () {
-    // this is my favorite part :]
+    // todo: cache menu screens during game load
+    // currently recreating text mesh on every screen switch.
     if (this.hoveredItem.menuItemSelectCallback) {
       this.clearMenu();
-      this.cursorPosition = 0;
       this[this.hoveredItem.menuItemSelectCallback]();
+      this.cursorPosition = 0;
     }
   },
 
@@ -50913,14 +50825,16 @@ s.Menu = new Class({
         // Oculus menu navigation
         // Divides the field of view by the number of menu
         // items and moves hover up and down with head motion
+        // todo: use ray casting to select items more accurately
 
         var viewingAngle = Math.PI/4 * (this.oculus.quat.x - this.oculus.compensationX);
         var tilt = ~~((this.menuItems.length/2 * this.oculus.quat.x - this.oculus.compensationX) * 6 + ~~(this.menuItems.length/2));
         var hover = this.menuItems[tilt];
         this.hoverItem(hover);
 
-        this.menuBox.position.setY((-150*Math.sin(viewingAngle))/Math.sin(Math.PI/4)/2+4); // Man I don't know, math or something.
+        this.menuBox.position.setY((-150*Math.sin(viewingAngle))/Math.sin(Math.PI/4)/2+4); // ...ish
       } else {
+        // todo: skip over items with no action property
         if (direction === 'up' && this.cursorPosition < this.menuItems.length-1) {
           this.cursorPosition++;
         } else if (direction === 'down' && this.cursorPosition > 0) {
@@ -50932,9 +50846,25 @@ s.Menu = new Class({
   },
 
   // -- GAME SPECIFIC FUNCTIONS AND MENU SCREENS
+  // methods referenced in a menuItem's 'action'
+  // property need to be defined here.
+
+  showInitialMenu: function () {
+    this.menuScreen = 'init';
+    this.displayed = true;
+    this.menuBox.visible = true;
+
+    this.addMenuItems([
+      {text: 'JOIN GAME', size: 5, action: 'showRoomList'},
+      {text: 'CREATE GAME', size: 5, action: 'createRoom'},
+      {text: 'SAMPLE MENU', size: 5, action: 'showTestMenu'},
+      {text: 'QUIT', size: 5, action: 'disconnect'}
+    ]);
+  },
 
   showDefaultMenu: function () {
     this.menuScreen = 'default';
+
     this.addMenuItems([
       {text: 'JOIN GAME', size: 5, action: 'showRoomList'},
       {text: 'DISCONECT', size: 5, action: 'disconnect'},
@@ -50945,37 +50875,76 @@ s.Menu = new Class({
 
   showRoomList: function () {
     this.menuScreen = 'rooms';
+
     // var roomNames = [];
     // // some database stuff to get list of existing rooms and order them by player count
     // var rooms = [{text: 'JOIN GAME', size: 5}];
     // for (var i = 0; i < roomNames.length; i++) {
-    //   rooms.push({text: roomNames[i], small: true});
+    //   rooms.push({text: roomNames[i], small: true, action: 'joinRoom', room: someRoomVar});
     // }
-    // rooms.push({text: '+ CREATE NEW ROOM +', small: true, action: this.createRoom});
+    // rooms.push({text: '+ CREATE NEW ROOM +', small: true, action: 'createRoom'});
     // this.addMenuItems(rooms);
+    this.addMenuItems([
+      {text: 'SELECT A ROOM', size: 5},
+      {text: 'hey strong bad', small: true, action: 'joinRoom'},
+      {text: 'you jumped over', small: true, action: 'joinRoom'},
+      {text: 'some a muh busses', small: true, action: 'joinRoom'}
+    ]);
+  },
+
+  joinRoom: function () {
+    var room = this.hoveredItem.room;
+    // some socket changing stuff.
+    // then basically just remove the player and respawn
+    // sim-fuckin-ple.
+    this.game.roomSelected = true;
+    this.game.comm.connectSockets(room);
+    this.close();
   },
 
   showScoreboard: function () {
     this.menuScreen = 'scoreboard';
-    // var playerNames = [];
     // // some database stuff to get list of players and order them by score
     // var players = [{text: 'LEADERBOARD', size: 5}];
     // for (var i = 0; i < database.length; i++) {
-    //   players.push({text: playerNames[i], small: true});
+    //   players.push({text: database[i].name+'...'+database[i].score, small: true});
     // }
-
+    // this.addMenuItems(players);
   },
 
   showTestMenu: function () {
     this.menuScreen = 'test';
-    var players = [{text: 'SAMPLE TEXT 1', size: 5}, {text: 'SAMPLE TEXT 2', size: 5}, {text: 'SAMPLE TEXT 3', size: 5}, {text: 'SAMPLE TEXT 4', size: 5}];
-    this.addMenuItems( players );
+    this.addMenuItems([
+      {text: 'SAMPLE TEXT 1', size: 5},
+      {text: 'SAMPLE TEXT 2', size: 2},
+      {text: 'SAMPLE TEXT 3', size: 4},
+      {text: 'SAMPLE TEXT 4', size: 3}
+    ]);
   },
 
   disconnect: function () {
-    // leave the game. possibly just by just refreshing the page?
+    // leave the game. possibly just by redirecting to home page?
+    console.log('Disconnecting...');
+  },
+
+  gameOver: function (killer) {
+    this.clearMenu();
+    this.displayed = true;
+    this.menuBox.visible = true;
+    this.HUD.canvas.style.display = 'none';
+    this.HUD.oculusCanvas.style.display = 'none';
+
+    this.menuScreen = 'dead';
+    this.addMenuItems([
+      {text: 'YOU DIED', size: 6},
+      {text: 'YOU WERE KILLED BY '+killer.toUpperCase()},
+      {text: 'RESPAWNING IN 6 SEC...'},
+      {text: ' '},
+      {text: 'DISCONNECT', size: 5, action: 'disconnect'}
+    ]);
   }
 });
+
 s.Game = new Class({
   extend: s.EventEmitter,
 
@@ -50996,6 +50965,7 @@ s.Game = new Class({
 
     this.doRender = false;
     this.lastRender = 0;
+    this.roomSelected = false;
 
     // Oculus Rift setup
     this.oculus = new s.Oculus();
@@ -51124,7 +51094,7 @@ s.Game = new Class({
 
   // Attempt to start the game (if models and physics have begun)
   tryInitialize: function() {
-    if (this.modelsLoaded && this.physicsStarted && !this.initialized) { // && this.roomSelected) {
+    if (this.modelsLoaded && this.physicsStarted && !this.initialized) {
       this.initialize();
     }
   },
@@ -51334,6 +51304,8 @@ s.SatelliteGame = new Class( {
             game: this
         });
 
+        this.menu.showInitialMenu();
+
         if (this.oculus.detected) {
             console.log('Activating oculus HUD');
             this.HUD.canvas.style.display = 'none';
@@ -51499,7 +51471,7 @@ s.SatelliteGame = new Class( {
             player: this.player,
             server: window.location.hostname + ':' + window.location.port
         } );
-
+        
         this.comm.on('fire', that.handleEnemyFire);
         this.comm.on('hit', that.handleHit);
         this.comm.on('player list', that.handlePlayerList);
@@ -51514,7 +51486,6 @@ s.SatelliteGame = new Class( {
 
         this.handleLoadMessages('initializing physics');
         this.player.root.addEventListener('ready', function(){
-            that.comm.connected( );
             s.game.start();
         });
 	},
@@ -51711,7 +51682,7 @@ s.SatelliteGame = new Class( {
     },
 
     handleFire: function(props) {
-        s.game.comm.fire(props.position, props.rotation, props.initialVelocity);
+        if (s.game.roomSelected) s.game.comm.fire(props.position, props.rotation, props.initialVelocity);
     },
 
     handleDie: function(you, killer) {
@@ -51719,6 +51690,7 @@ s.SatelliteGame = new Class( {
             return;
         }
         if (this.hostPlayer) { clearInterval(this.botPositionInterval); }
+<<<<<<< HEAD
         s.game.stop();
         var HUD = s.game.HUD;
         HUD.ctx.fillStyle = "rgba(0,0,0,0.5)";
@@ -51738,6 +51710,16 @@ s.SatelliteGame = new Class( {
             that.hostPlayer = false;
             that.restart();
         }, 6000);
+=======
+        // var HUD = s.game.HUD;
+        // HUD.ctx.fillStyle = "rgba(0,0,0,0.5)";
+        // HUD.ctx.fillRect(0,0,HUD.canvas.width,HUD.canvas.height);
+        // HUD.ctx.drawImage(HUD.gameOver,HUD.canvas.width/2 - HUD.gameOver.width/2,HUD.canvas.height/2 - HUD.gameOver.height/2);
+        this.menu.gameOver(killer);
+        if (s.game.roomSelected) s.game.comm.died(you, killer);
+
+        // s.game.stop();
+>>>>>>> menu
     },
 
     shieldBoost: function(){

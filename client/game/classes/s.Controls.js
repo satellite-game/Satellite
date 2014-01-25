@@ -2,7 +2,6 @@ s.Controls = new Class({
 
   toString: 'Controls',
 
-
   options: {
 
     rotationSpeed: Math.PI/2,
