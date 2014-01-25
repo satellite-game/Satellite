@@ -198,7 +198,7 @@ s.SatelliteGame = new Class( {
                         alliance: 'enemy'
                     } );
                 }
-                
+
                 if (isBot) { console.log( '%s has joined the fray', enemyShip.name ); }
 
                 this._list.push( enemyShip );
@@ -525,7 +525,7 @@ s.SatelliteGame = new Class( {
         if (this.game.botCount === 0) {
             // Create a new bot
             this.game.enemies.add( {}, 'bot');
-        }        
+        }
         that.game.updatePlayersWithBots('botInfo');
     },
 
@@ -539,7 +539,7 @@ s.SatelliteGame = new Class( {
         };
 
         enemiesSocketInfo = {};
-        var enemiesList = this.enemies._list;  
+        var enemiesList = this.enemies._list;
         for (var i = 0; i < enemiesList.length; i++) {
             if (enemiesList[i].isBot){
                 var root = enemiesList[i].root;
@@ -547,7 +547,7 @@ s.SatelliteGame = new Class( {
                 //if there is a angular and linear velocity fnc, call it. else create a new 3 vector
                 var angularVeloc = (root.getAngularVelocity && root.getAngularVelocity()) || new THREE.Vector3();
                 var linearVeloc = (root.getLinearVelocity && root.getLinearVelocity()) || new THREE.Vector3();
-                
+
                 enemiesSocketInfo[name] = {
                     position: makeArray(root.position),
                     rotation: makeArray(root.rotation),
