@@ -50,6 +50,21 @@ describe('Bot class', function () {
     runSpecs(specs, done);
   });
 
+  it('should have botOptions property with default values', function (done) {
+    var specs = function (bot) {
+      expect(bot.botOptions).to.be.an('object');
+      expect(bot.botOptions).to.have.property('rotationSpeed').and.to.not.equal(undefined);
+      expect(bot.botOptions).to.have.property('pitchSpeed').and.to.not.equal(undefined);
+      expect(bot.botOptions).to.have.property('yawSpeed').and.to.not.equal(undefined);
+      expect(bot.botOptions).to.have.property('thrustImpulse').and.to.not.equal(undefined);
+      expect(bot.botOptions).to.have.property('brakePower').and.to.not.equal(undefined);
+      expect(bot.botOptions).to.have.property('velocityFadeFactor').and.to.not.equal(undefined);
+      expect(bot.botOptions).to.have.property('rotationFadeFactor').and.to.not.equal(undefined);
+    };
+
+    runSpecs(specs, done);
+  });
+
   describe('handle enemies', function () {
     it('should get enemies list', function (done) {
       var specs = function (bot) {
@@ -83,8 +98,9 @@ describe('Bot class', function () {
 
       runSpecs(specs, done);
     });
-
   });
+
+
 });
 
 
