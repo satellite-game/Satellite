@@ -11,14 +11,14 @@ module.exports = function(host, Sync) {
       // console.log('\npacket:\n',packet,'\nroom:\n',room, '\nshipName:\n',shipName);
       // socket.broadcast.to(room).emit('move', packet);
 
-      var isLegalMove = Sync.setMove(packet, playerState);
+      // var isLegalMove = Sync.setMove(packet, playerState);
 
-      if (isLegalMove) {
-        console.log("Success!");
+      // if (isLegalMove) {
+      //   console.log("Success!");
         for (var i in packet) {
           playerState[i] = packet[i];
         };
-      }
+      // }
     }
 
   };
