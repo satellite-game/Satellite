@@ -50,6 +50,8 @@ s.Comm = new Class( {
 
         this.player = options.player;
 
+        this.delta = 0;
+
         this.ship = options.ship;
 
         this.pilot = options.pilot;
@@ -134,49 +136,58 @@ s.Comm = new Class( {
 
 
     position: function ( ) {
+      if(this.lastPosition === undefined) {
+        this.lastPosition = s.game.player.getPositionPacket( );
+        this.lastTime = new Date().getTime;
+      }
+      var time = new Date( ).getTime( ); 
+      var shipPosition = s.game.player.getPositionPacket( );
+          shipPosition.laccel = [];
+          shipPosition.aAccel = [];
+      var delta = function() {
+        var results = {};
+        var diff;
+        var t_diff; 
+        for(var i = 0; i < 3; i++) { 
+          
+          diff = Math.abs( shipPosition.lVeloc[i] - this.lastPosition.lVeloc[i]);
+          t_diff = time - this.lastTime; 
+          if(t_diff === 0 || NaN) {
+            return "Invalid";
+          } else {
+            shipPosition.laccel.push(diff/t_diff);
+          };
 
-        var time = new Date( ).getTime( );
+          diff = Math.abs( shipPosition.aVeloc[i] - this.lastPosition.aVeloc[i]);
+          t_diff = time - this.lastTime; 
+          if(t_diff === 0 || NaN) {
+            return "Invalid";
+          } else {
+            shipPosition.aAccel.push(diff/t_diff);
+          };
 
-        // Never send faster than server can handle
+        };
+        return results;
+      }();
+      
+      if(delta === 'Invalid') {
+        return;
+      } else {
+        var packet = {
+          time: time,
+          pos: shipPosition.pos,
+          rot: shipPosition.rot,
+          aVeloc: shipPosition.aVeloc,
+          lVeloc: shipPosition.lVeloc,
+          aAccel: shipPosition.aAccel,
+          lAccel: shipPosition.lAccel
+        };
 
-        if ( time - s.game.comm.lastMessageTime >= 700 ) {
-
-            var shipPosition = s.game.player.getPositionPacket( );
-
-            // TODO: Figure out if ship or turret actually moved
-
-            // If ship moved, send packet
-
-            if ( this.lastPosition !== shipPosition.pos ) {
-
-                // Build packet
-
-                this.time = 0;
-
-                var packet = {
-
-                    time: time,
-
-                    pos: shipPosition.pos,
-
-                    rot: shipPosition.rot,
-
-                    aVeloc: shipPosition.aVeloc,
-
-                    lVeloc: shipPosition.lVeloc
-
-                };
-
-                // Broadcast position
-                
-                s.game.comm.socket.emit( 'combat','move', packet );
-
-                s.game.comm.lastMessageTime = time;
-
-                this.lastPosition = shipPosition.pos;
-
-            }
-        }
+        s.game.comm.socket.emit( 'combat','move', packet );
+        s.game.comm.lastMessageTime = time;
+        this.lastPosition = shipPosition.pos;
+        this.lastTime = time; 
+      };
     },
 
 
@@ -224,37 +235,37 @@ s.Comm = new Class( {
 
     clockTick: function( ){
         this.time += 1;
-        this.time += 1;
+        this.time += 1; // Why do we have a replication here?
         // if ( this.time >= 60 ){
         //     window.location.href = "http://satellite-game.com";
         // }
-    },
-
-    sendKey: function(direction, key){
-        var time = new Date().getTime();
-        // Never send faster than server can handle
-        if ( time - s.game.comm.lastMessageTime >= 15 ) {
-            var shipPosition = s.game.player.getPositionPacket();
-            // TODO: Figure out if ship or turret actually moved
-            // If ship moved, send packet
-            if ( this.lastPosition !== shipPosition.pos ) {
-                // Build packet
-                this.time = 0;
-
-                var packet = {
-                    time: time,
-                    room: this.room,
-                    name: this.pilot.name,
-                    pos: shipPosition.pos,
-                    rot: shipPosition.rot,
-                    aVeloc: shipPosition.aVeloc,
-                    lVeloc: shipPosition.lVeloc
-                };
-                // Broadcast position
-                this.socket.emit( 'keypress', direction, $.extend(packet, { direction: direction, key: key }) );
-                s.game.comm.lastMessageTime = time;
-                this.lastPosition = shipPosition.pos;
-            }
-        }
     }
+
+    // sendKey: function(direction, key){
+    //     var time = new Date().getTime();
+    //     // Never send faster than server can handle
+    //     if ( time - s.game.comm.lastMessageTime >= 15 ) {
+    //         var shipPosition = s.game.player.getPositionPacket();
+    //         // TODO: Figure out if ship or turret actually moved
+    //         // If ship moved, send packet
+    //         if ( this.lastPosition !== shipPosition.pos ) {
+    //             // Build packet
+    //             this.time = 0;
+
+    //             var packet = {
+    //                 time: time,
+    //                 room: this.room,
+    //                 name: this.pilot.name,
+    //                 pos: shipPosition.pos,
+    //                 rot: shipPosition.rot,
+    //                 aVeloc: shipPosition.aVeloc,
+    //                 lVeloc: shipPosition.lVeloc
+    //             };
+    //             // Broadcast position
+    //             this.socket.emit( 'keypress', direction, $.extend(packet, { direction: direction, key: key }) );
+    //             s.game.comm.lastMessageTime = time;
+    //             this.lastPosition = shipPosition.pos;
+    //         }
+    //     }
+    // }
 } );
