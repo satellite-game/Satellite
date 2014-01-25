@@ -8,6 +8,8 @@ module.exports = [
   "./client/lib/Stats.js",
   "./client/lib/gamepad.js",
   "./client/lib/socketio/socket.io.js",
+  "./client/lib/typefacejs/helvetiker_bold.typeface.js",
+  "./client/lib/typefacejs/helvetiker_regular.typeface.js",
   "./client/game/s.js",
   "./client/game/s.util.js",
   "./client/game/classes/s.EventEmitter.js",
@@ -31,6 +33,7 @@ module.exports = [
   "./client/game/classes/s.Radar.js",
   "./client/game/classes/s.Comm.js",
   "./client/game/classes/s.LoadScreen.js",
+  "./client/game/classes/s.Menu.js",
   "./client/game/classes/s.Game.js",
   "./client/game/classes/s.SatelliteGame.js"
 ];
