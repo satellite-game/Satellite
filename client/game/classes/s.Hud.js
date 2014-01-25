@@ -318,9 +318,9 @@ s.HUD = new Class({
             this.ctx.stroke();
         }
 
-        ///////////////////////////
-        // BASE TARGETING SYSTEM //
-        ///////////////////////////
+        //////////////////////////////////
+        // SPACE BASE TARGETING SYSTEM //
+        /////////////////////////////////
 
         this.base = s.game.spaceStation.root;
 
@@ -359,6 +359,49 @@ s.HUD = new Class({
             this.ctx.strokeStyle = this.menu.color;
             this.ctx.stroke();
         }
+
+        //////////////////////////////////
+        // MOON BASE TARGETING SYSTEM //
+        /////////////////////////////////
+
+        this.moonBase = s.game.moonBaseTall.root;
+
+        var vmoonBase3D = this.moonBase.position.clone();
+        var vmoonBase2D = s.projector.projectVector( vmoonBase3D, s.game.camera );
+        var moonBaseInSight, distanceTomoonBase, v2DmoonBase;
+
+        if ( Math.abs(vmoonBase2D.x) <= 0.95 && Math.abs(vmoonBase2D.y) <= 0.95 && vmoonBase2D.z < 1 ) {
+            moonBaseInSight = true;
+            distanceTomoonBase = this.game.player.root.position.distanceTo(this.moonBase.position);
+            size = Math.round((width - distanceTomoonBase/100)/26);
+        }
+
+        // moonBase targeting reticule and targeting box
+        if ( moonBaseInSight) {
+            v2DmoonBase = vmoonBase2D.clone();
+            v2DmoonBase.x =  ( width  + v2DmoonBase.x*width  )/2;
+            v2DmoonBase.y = -(-height + v2DmoonBase.y*height )/2;
+
+            this.ctx.strokeRect( v2DmoonBase.x-size, v2DmoonBase.y-size, size*2, size*2 );
+            this.ctx.lineWidth = 1;
+            this.ctx.strokeStyle = this.menu.color;
+        } else if ( !moonBaseInSight ) {
+            var moonBase2D = new THREE.Vector2(vmoonBase2D.x, vmoonBase2D.y);
+            moonBase2D.multiplyScalar(1/moonBase2D.length()).multiplyScalar(this.subreticleBound.radius+34);
+
+            this.ctx.beginPath();
+            if (vmoonBase2D.z > 1)
+                this.ctx.arc( -moonBase2D.x+centerX, (-moonBase2D.y+centerY), 10, 0, 2*this.PI, false );
+            else
+                this.ctx.arc( moonBase2D.x+centerX, -(moonBase2D.y-centerY), 10, 0, 2*this.PI, false );
+
+            this.ctx.fillStyle = "yello";
+            this.ctx.fill();
+            this.ctx.lineWidth = 2;
+            this.ctx.strokeStyle = this.menu.color;
+            this.ctx.stroke();
+        }
+
 
 
         //////////////////////////////////////////
