@@ -56,10 +56,16 @@ s.SatelliteGame = new Class( {
         this.callsigns = this.callsigns || ["Apollo","Strobe","Sage","Polkadot","Moonglow","Steel","Vanguard","Prong","Uptight","Blackpony","Hawk","Ramrod","Dice","Falcon","Rap","Buckshot","Cobra","Magpie","Warhawk","Boxer","Devil","Hammer","Phantom","Sharkbait","Dusty","Icon","Blade","Pedro","Stinger","Yellow Jacket","Limit","Sabre","Misty","Whiskey","Dice","Antic","Arrow","Auto","Avalon","Bandit","Banshee","Blackjack","Bulldog","Caesar","Cajun","Challenger","Chuggs","Cindy","Cracker","Dagger","Dino","Esso","Express","Fangs","Fighting Freddie","Freight Train","Freemason","Fury","Gamma","Gear","Ghost","Ginger","Greasy","Havoc","Hornet","Husky","Jackal","Jaguar","Jedi","Jazz","Jester","Knife","Kitty Hawk","Knight","Knightrider","Koala","Komono","Lancer","Lexus","Lion","Levi","Lucid","Malty","Mail Truck","Magma","Magnet","Malibu","Medusa","Maul","Monster","Misfit","Moss","Moose","Mustang","Nail","Nasa","Nacho","Nighthawk","Ninja","Neptune","Odin","Occult","Nukem","Ozark","Pagan","Pageboy","Panther","Peachtree","Phenom","Polestar","Punisher","Ram","Rambo","Raider","Raven","Razor","Rupee","Sabre","Rust","Ruin","Sultan","Savor","Scandal","Scorpion","Shooter","Smokey","Sniper","Spartan","Thunder","Titus","Titan","Timber Wolf","Totem","Trump","Venom","Veil","Viper","Weasel","Warthog","Winter","Wiki","Wild","Yonder","Yogi","Yucca","Zeppelin","Zeus","Zesty"];
 
         this.pilot.name = this.callsigns[Math.floor(this.callsigns.length*Math.random())] + ' ' + ( new Date( ).getTime( ) % 100 );
-        // Add a ship
+        
+        // Add a hud
         this.HUD = new s.HUD( {
             game: this
         } );
+
+        // Add menu
+        this.menu = new s.Menu({
+            game: this
+        });
 
         if (this.oculus.detected) {
             console.log('Activating oculus HUD');
@@ -75,22 +81,11 @@ s.SatelliteGame = new Class( {
             position: new THREE.Vector3(23498, -25902, 24976),
             name: this.pilot.name,
             rotation: new THREE.Vector3( 0, Math.PI/2, 0 ),
-            alliance: 'alliance'
+            alliance: 'alliance',
+            camera: this.camera
         } );
-
+        
         this.HUD.hp = this.player.hull;
-
-        // Moon facing initilization
-        //this.player.root.lookAt(this.moon.root.position);
-
-        // Root camera to the player's position
-        this.player.root.add( this.camera );
-
-        //// Setup camera: Cockpit view; COMMENT OUT FOR CHASE CAM
-        // this.camera.position.set( 0, 0, 0 );
-
-        //// Setup camera: Start in Chase view
-        this.camera.position.set(0,35,250);
 
         $(document).on('keyup', function(evt) {
           if (evt.which === 86 && that.camera.position.equals( new THREE.Vector3(0,0,0) )) {
@@ -113,7 +108,8 @@ s.SatelliteGame = new Class( {
             game: this,
             player: this.player,
             camera: this.camera,
-            HUD: this.HUD
+            HUD: this.HUD,
+            menu: this.menu
         } );
 
         /******************
