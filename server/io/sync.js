@@ -1,7 +1,7 @@
 var Sync = function( time, tolerance, syncCycle ) {
   this.cycle = time || 1000;
   this.tol = tolerance || 5;
-  this.sync_cycle = 2000 || syncCycle;
+  this.sync_cycle = 500 || syncCycle;
 };
 
 
@@ -53,7 +53,7 @@ Sync.prototype.sync = function( io, room , obj ) {
     for(var i in obj) {
       stateCopy[i] = thatState[i];
     }
-    console.log("Sync request being called out to ", thatRoom);
+    // console.log("Sync request being called out to ", thatRoom);
     thatio.sockets.in(thatRoom).emit('sync', stateCopy);
     that.sync( thatio, thatRoom, thatState);
   }, thatDelay);
