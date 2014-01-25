@@ -10,6 +10,7 @@ module.exports = function(config) {
     files: require('./include.conf')
       .concat([
         'tests/Function.prototype.bind_polyfill.js',
+        'tests/client/preload.js',
         'tests/client/**/*.js',
         { pattern: 'tests/mock/*.json', watched: true, served: true, included: false }
       ]),
