@@ -48280,7 +48280,7 @@ s.Projectile = new Class({
     },
 
     handleCollision: function(mesh, position){
-        //check if your turret hit someone
+        //check if your turret hit someone and if necessary the person is on the other team
         //else if check if you got hit by a bot
         if (this.pilot === this.game.pilot.name){
             if (mesh.instance.alliance && mesh.instance.alliance === "enemy"){
@@ -49667,6 +49667,13 @@ s.HUD = new Class({
             green: 200,
             blue: 255,
             alpha: 0.75
+        });
+        this.enemyTarget = new s.Color({
+            game: this.game,
+            red: 255,
+            green: 0,
+            blue: 0,
+            alpha: 0.5
         });
 
         // array containing trailing predictive targets
@@ -51296,6 +51303,7 @@ s.SatelliteGame = new Class( {
         this.IDs = [];
         this.botCount = 0;
         this.hostPlayer = false;
+        this.teamMode = true;
 
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
 		// No gravity
@@ -51452,13 +51460,15 @@ s.SatelliteGame = new Class( {
                         alliance: 'enemy'
                     } );
                 } else {
+                    var alliance = 'enemy';
+                    if (s.game.teamMode) { alliance = 'alliance'; }
                     enemyShip = new s.Player( {
                         game: that,
                         shipClass: 'human_ship_heavy',
                         name: enemyInfo.name,
                         position: new THREE.Vector3( enemyInfo.pos[ 0 ], enemyInfo.pos[ 1 ], enemyInfo.pos[ 2 ] ),
                         rotation: new THREE.Vector3( enemyInfo.rot[ 0 ], enemyInfo.rot[ 1 ], enemyInfo.rot[ 2 ] ),
-                        alliance: 'enemy'
+                        alliance: alliance
                     } );
                 }
                 
@@ -51657,7 +51667,7 @@ s.SatelliteGame = new Class( {
                 position: bulletPosition,
                 rotation: bulletRotation,
                 initialVelocity: initialVelocity,
-                team: 'rebels'
+                team: 'alliance'
             });
 
     },

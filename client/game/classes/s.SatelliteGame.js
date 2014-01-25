@@ -29,6 +29,7 @@ s.SatelliteGame = new Class( {
         this.IDs = [];
         this.botCount = 0;
         this.hostPlayer = false;
+        this.teamMode = true;
 
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
 		// No gravity
@@ -185,13 +186,15 @@ s.SatelliteGame = new Class( {
                         alliance: 'enemy'
                     } );
                 } else {
+                    var alliance = 'enemy';
+                    if (s.game.teamMode) { alliance = 'alliance'; }
                     enemyShip = new s.Player( {
                         game: that,
                         shipClass: 'human_ship_heavy',
                         name: enemyInfo.name,
                         position: new THREE.Vector3( enemyInfo.pos[ 0 ], enemyInfo.pos[ 1 ], enemyInfo.pos[ 2 ] ),
                         rotation: new THREE.Vector3( enemyInfo.rot[ 0 ], enemyInfo.rot[ 1 ], enemyInfo.rot[ 2 ] ),
-                        alliance: 'enemy'
+                        alliance: alliance
                     } );
                 }
                 
@@ -390,7 +393,7 @@ s.SatelliteGame = new Class( {
                 position: bulletPosition,
                 rotation: bulletRotation,
                 initialVelocity: initialVelocity,
-                team: 'rebels'
+                team: 'alliance'
             });
 
     },
