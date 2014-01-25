@@ -12,27 +12,25 @@ module.exports = {
 
   addRoom: function (roomName, callback) {
     callback = callback || defaultCallback('addRoom');
-    db.get('rooms', function(data){
-      console.log(roomName);
-      if (roomName !== undefined && roomName !== null && data[roomName]){
-        console.log('room DNE');
-        db.HSET('rooms', roomName, 1, callback);
+    db.hgetall('rooms', function(err, data){
+      if (err) throw 'addRoom error: ' + err;
+      if (!data[roomName]){
+        db.HSET('rooms', roomName, 1, function(err, data){callback(err, data)});
       } else {
-      // need to find the value (number of people in the room) for the hash and increase it here:
         console.log('room exists');
-        callback(null, roomName);
+        db.HINCRBY('rooms', roomName, 1, function(err, data){callback(err, data)});
       }
     });
   },
 
-  joinRoom: function (roomName, playerName, joinCallback) {
+  joinRoom: function (roomName, playerID, joinCallback) {
     var that = this;
     joinCallback = joinCallback || defaultCallback('joinRoom');
 
     async.waterfall([function (callback){
       console.log('drop0');
       console.log(arguments);
-      that.addRoom(null, roomName, callback);
+      that.addRoom(roomName, callback);
     },
     function(resultData, callback) {
       console.log('drop1');
