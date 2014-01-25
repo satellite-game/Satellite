@@ -361,7 +361,7 @@ s.SatelliteGame = new Class( {
       var data = {};
       for(var i in pak) {
         data[i] = pak[i];
-      };
+      }
       var whoAmI = s.game.pilot.name,
           myData = pak[whoAmI];
 
@@ -393,9 +393,9 @@ s.SatelliteGame = new Class( {
       adjustPlayer(myData);
       delete data[whoAmI];
 
-      for(var i in data ) {
-        if( !s.game.enemies.execute( data[i].name, 'setPosition', [ data[i].pos, data[i].rot, data[i].aVeloc, data[i].lVeloc, true ] ) ) {
-          s.game.enemies.add( data[i] );
+      for(var j in data ) {
+        if( !s.game.enemies.execute( data[j].name, 'setPosition', [ data[j].pos, data[j].rot, data[j].aVeloc, data[j].lVeloc, true ] ) ) {
+          s.game.enemies.add( data[j] );
         }
       }
 
