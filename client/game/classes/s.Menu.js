@@ -7,13 +7,18 @@ s.Menu = new Class({
 
   construct: function ( options ) {
     this.displayed = false;
+    this.game = options.game;
     this.camera = options.game.camera;
     this.HUD = options.game.HUD;
     this.oculus = options.game.oculus;
+
     this.menuItems = [];
     this.menuScreen = 'none';
     this.cursorPosition = 0;
     this.hoveredItem = null;
+
+    this.selectorRay = new THREE.Raycaster(new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,1), 0, 300);
+    // this.selectorHelper = new THREE.ArrowHelper(new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,-0.3), 50, 0xFF00FF);
 
     // PlaneGeometry would be better than a cube for this but harder to write because 
     // it would need to be rotated and all it's child objects would need to be rotated back.
@@ -35,6 +40,8 @@ s.Menu = new Class({
     this.menuBox.visible = false;
 
     this.camera.add( this.menuBox );
+    this.camera.add( this.selectorRay );
+    // this.camera.add( this.selectorHelper );
 
     if (this.oculus.detected) {
       this.menuBox.position.setZ(-50);
@@ -193,6 +200,7 @@ s.Menu = new Class({
         this.hoverItem(hover);
 
         this.menuBox.position.setY((-150*Math.sin(viewingAngle))/Math.sin(Math.PI/4)/2+4); // ...ish
+        // console.log(this.selectorRay.intersectObjects(this.menuBox.children));
       } else {
         // todo: skip over items with no action property
         if (direction === 'up' && this.cursorPosition < this.menuItems.length-1) {
@@ -226,30 +234,38 @@ s.Menu = new Class({
     this.menuScreen = 'default';
 
     this.addMenuItems([
-      {text: 'JOIN GAME', size: 5, action: 'showRoomList'},
-      {text: 'DISCONECT', size: 5, action: 'disconnect'},
+      {text: 'CHANGE ROOM', size: 5, action: 'showRoomList'},
       {text: 'LEADERBOARD', size: 5, action: 'showScoreboard'},
-      {text: 'SAMPLE MENU', size: 5, action: 'showTestMenu'}
+      {text: 'SAMPLE MENU', size: 5, action: 'showTestMenu'},
+      {text: 'DISCONECT', size: 5, action: 'disconnect'}
     ]);
   },
 
   showRoomList: function () {
     this.menuScreen = 'rooms';
 
-    // var roomNames = [];
-    // // some database stuff to get list of existing rooms and order them by player count
-    // var rooms = [{text: 'JOIN GAME', size: 5}];
-    // for (var i = 0; i < roomNames.length; i++) {
-    //   rooms.push({text: roomNames[i], small: true, action: 'joinRoom', room: someRoomVar});
-    // }
-    // rooms.push({text: '+ CREATE NEW ROOM +', small: true, action: 'createRoom'});
-    // this.addMenuItems(rooms);
-    this.addMenuItems([
-      {text: 'SELECT A ROOM', size: 5},
-      {text: 'hey strong bad', small: true, action: 'joinRoom'},
-      {text: 'you jumped over', small: true, action: 'joinRoom'},
-      {text: 'some a muh busses', small: true, action: 'joinRoom'}
-    ]);
+    $.get({
+      url: '/rooms',
+      datatype: 'json',
+      success: function (data) {
+
+        var roomList = [{text: 'JOIN GAME', size: 5}];
+        for (var i = 0; i < data.length; i++) {
+          roomList.push({text: data[i].name + '...' + data[i].players, small: true, action: 'joinRoom', room: rooms[i].name});
+        }
+        roomList.push({text: '+ CREATE NEW ROOM +', small: true, action: 'createRoom'});
+        this.addMenuItems(roomList);
+      },
+      error: function (err) {
+        throw new Error('Failed to get room list from /rooms');
+      }
+    });
+    // this.addMenuItems([
+    //   {text: 'SELECT A ROOM', size: 5},
+    //   {text: 'hey strong bad', small: true, action: 'joinRoom', room: 'asdf'},
+    //   {text: 'you jumped over', small: true, action: 'joinRoom', room: 'test'},
+    //   {text: 'some a muh busses', small: true, action: 'joinRoom', room: 'puh fuh fuh'}
+    // ]);
   },
 
   joinRoom: function () {
@@ -262,14 +278,30 @@ s.Menu = new Class({
     this.close();
   },
 
+  createRoom: function () {
+    console.log('No.');
+  },
+
   showScoreboard: function () {
     this.menuScreen = 'scoreboard';
-    // // some database stuff to get list of players and order them by score
-    // var players = [{text: 'LEADERBOARD', size: 5}];
-    // for (var i = 0; i < database.length; i++) {
-    //   players.push({text: database[i].name+'...'+database[i].score, small: true});
-    // }
-    // this.addMenuItems(players);
+
+    $.get({
+      url: '/scores',
+      datatype: 'json',
+      data: {room: s.game.comm.room},
+      success: function (data) {
+
+        var players = [{text: 'LEADERBOARD', size: 5}];
+        for (var i = 0; i < data.length; i++) {
+          players.push({text: data[i].name+'...'+data[i].score, small: true});
+        }
+        this.addMenuItems(players);
+
+      },
+      error: function (err) {
+        throw new Error('Failed to get player scores from /' + this.game.comm.room);
+      }
+    });
   },
 
   showTestMenu: function () {
