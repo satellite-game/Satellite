@@ -2,6 +2,15 @@ describe('Bot class', function () {
 
   var makeBot = function (specs, done) {
     setTimeout(function () {
+      s.game.player = new s.Player({
+        game: s.game,
+        shipClass: 'human_ship_heavy',
+        position: new THREE.Vector3(23498, -25902, 24976),
+        name: 'Player name',
+        rotation: new THREE.Vector3( 0, Math.PI/2, 0 ),
+        alliance: 'alliance'
+      });
+
       var bot = new s.Bot({
         game: s.game,
         shipClass: 'human_ship_heavy',
@@ -37,8 +46,11 @@ describe('Bot class', function () {
   it('should get enemies list', function (done) {
     var specs = function (bot) {
       expect(bot.getEnemyList).to.be.an('function');
+      expect(bot.botEnemyList).to.equal(undefined);
       bot.getEnemyList();
       expect(bot.botEnemyList).to.be.an('array');
+      expect(bot.botEnemyList.length).to.equal(1);
+      expect(bot.botEnemyList[0].name).to.equal('Player name');
     };
 
     makeBot(specs, done);
