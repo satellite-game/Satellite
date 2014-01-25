@@ -23,11 +23,14 @@ s.SatelliteGame = new Class( {
         return Math.floor(Math.random()* 15000 + 15000) * coefficient;
     },
 
-	initialize: function() {
-		var that = this;
+    construct: function() {
+        this.botCount = 0;
+    },
+
+    initialize: function() {
+        var that = this;
 
         this.IDs = [];
-        this.botCount = 0;
         this.hostPlayer = false;
 
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
