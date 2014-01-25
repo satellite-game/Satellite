@@ -33,4 +33,26 @@ describe('Bot class', function () {
 
     makeBot(specs, done);
   });
+
+  it('should get enemies list', function (done) {
+    var specs = function (bot) {
+      expect(bot.getEnemyList).to.be.an('function');
+      bot.getEnemyList();
+      expect(bot.botEnemyList).to.be.an('array');
+    };
+
+    makeBot(specs, done);
+  });
+
 });
+
+
+
+
+
+
+
+
+
+
+
