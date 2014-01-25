@@ -75,6 +75,11 @@ s.Bot = new Class( {
     }
   },
 
+  getEnemyPositions: function () {
+    this.target = this.target.root;
+    this.moveStates.vTarget3D = this.target.position.clone();
+    this.moveStates.vTarget2D = s.projector.projectVector(this.moveStates.vTarget3D, this.camera);
+  },
 
   controlBot: function( ) {
     //get closest enemy
@@ -130,11 +135,8 @@ s.Bot = new Class( {
     var thrustScalar = this.botOptions.thrustImpulse / s.config.ship.maxSpeed + 1;
 
     // TARGET HUD MARKING
-    if ( this.target ) {
-      this.target = this.target.root;
-
-      this.moveStates.vTarget3D = this.target.position.clone();
-      this.moveStates.vTarget2D = s.projector.projectVector(this.moveStates.vTarget3D, this.camera);
+    if (this.target) {
+      this.getEnemyPositions();
     }
 
     if (this.moveStates.vTarget2D.z < 1) {
