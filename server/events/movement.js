@@ -14,9 +14,10 @@ module.exports = function(host, Sync) {
       var isLegalMove = Sync.setMove(packet, playerState);
 
       if (isLegalMove) {
+        console.log("Success!");
         for (var i in packet) {
           playerState[i] = packet[i];
-        }
+        };
       }
     }
 

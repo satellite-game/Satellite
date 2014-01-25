@@ -7,8 +7,8 @@ module.exports = function (map, host, Sync, io) {
       if(host.rooms[data.room] === undefined) {
         host.init(socket.id, data.room, data);
         target = host.rooms[data.room];
-        Sync.sync(io, data.room, host.rooms[data.room].gamestate);
         Sync.setInit( socket.id, target, data );
+        host.rooms[data.room].sync(io, data.room);
       } else {
         host.add(socket.id, data.room, data);
         target = host.rooms[data.room];

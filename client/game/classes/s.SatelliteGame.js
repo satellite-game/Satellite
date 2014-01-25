@@ -358,21 +358,22 @@ s.SatelliteGame = new Class( {
         }
     },
     handleSync: function ( pak ) {
-      console.log("Receiving a sync request");
-      var data = pak;
+      var data = {};
+      for(var i in pak) {
+        data[i] = pak[i];
+      };
       var whoAmI = s.game.pilot.name,
           myData = pak[whoAmI];
 
       var adjustPlayer = function( serverView ) {
-
         var adjusted = [];
 
         var myView = s.game.player.getPositionPacket();
         for(var i = 0; i < serverView.lVeloc.length; i++) {
           var pos = Math.abs(serverView.pos[i]) - Math.abs(myView.pos[i]);
 
-          if( pos >= 100 ) {
-            console.log("Experiencing whiplash!");
+          if( pos >= 500 ) {
+            console.log("Experiencing whiplash!", pos);
             s.game.player.setPosition( serverView.pos, myView.rot, serverView.aVeloc, serverView.lVeloc, true );
             return;
           }
@@ -385,7 +386,8 @@ s.SatelliteGame = new Class( {
 
         }
 
-        s.game.player.setPosition( myView.pos, myView.rot, serverView.aVeloc, adjusted, false );
+        s.game.comm.position();
+        //s.game.player.setPosition( myView.pos, myView.rot, serverView.aVeloc, adjusted, false );
       };
 
       adjustPlayer(myData);

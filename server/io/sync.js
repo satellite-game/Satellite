@@ -1,7 +1,7 @@
 var Sync = function( time, tolerance, syncCycle ) {
   this.cycle = time || 1000;
-  this.tol = tolerance || 5;
-  this.sync_cycle = 500 || syncCycle;
+  this.tol = tolerance || 100;
+  this.sync_cycle = 100 || syncCycle;
 };
 
 
@@ -16,6 +16,29 @@ Sync.prototype.setInit = function( socket, list, packet, shortcut ) {
     pos: packet.pos,
     lAccel: [0,0,0]
   };
+
+  var sync = function( io, room ) {
+    var thatio = io;
+    var thatRoom = room;
+    var that = this;
+    var thatDelay = that.cycle; 
+
+    setTimeout(function() {
+      //adjust(that.gamestate, that.cycle); This needs tweaking.
+      thatio.sockets.in(thatRoom).emit('sync', that.gamestate);
+      that.sync( thatio, thatRoom);
+    }, thatDelay);
+  }; 
+
+  var adjust = function( gamestate, cycle ) {
+    for(var i in gamestate) {
+      for(var x = 0; x < 3; x++) {
+        gamestate[i].pos[x] += gamestate[i].lVeloc[x] * (cycle/1000);
+      };
+    };
+  };
+  list.cycle = this.sync_cycle;
+  list.sync = sync;
 };
 
 Sync.prototype.setMove = function( packet, target ) {
@@ -29,34 +52,6 @@ Sync.prototype.setMove = function( packet, target ) {
   }
 
   return this.check(target, packet, calctime);
-};
-
-
-Sync.prototype.sync = function( io, room , obj ) {
-  if(room === undefined) {
-    console.log("Room is undefined, aborting!");
-    return;
-  }
-  var that = this;
-  var thatRoom = room;
-  var thatio = io;
-  var thatState = obj;
-
-  for(var i in obj) {
-    thatState[i] = obj[i];
-  }
-
-  var thatDelay = that.sync_cycle;
-  setTimeout(function() {
-    var stateCopy = {};
-
-    for(var i in obj) {
-      stateCopy[i] = thatState[i];
-    }
-    // console.log("Sync request being called out to ", thatRoom);
-    thatio.sockets.in(thatRoom).emit('sync', stateCopy);
-    that.sync( thatio, thatRoom, thatState);
-  }, thatDelay);
 };
 
 Sync.prototype.create = function(event, func) {
