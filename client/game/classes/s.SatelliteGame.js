@@ -7,7 +7,8 @@ s.SatelliteGame = new Class( {
 		'phobos_hifi',
 		'phobos_lofi',
         'human_ship_heavy',
-		'human_ship_light'
+		'human_ship_light',
+        'human_space_station'
 	],
 
     textures: [
