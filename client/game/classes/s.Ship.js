@@ -43,7 +43,7 @@ s.Ship = new Class({
 		var now =new Date().getTime();
         var rotation = this.root.rotation.clone();
         var initialVelocity = this.root.getLinearVelocity().clone();
-        
+
         var bullet = {
             game: this.game,
             pilot: this.name,
@@ -52,7 +52,7 @@ s.Ship = new Class({
             isBot: this.isBot,
             team: this.alliance
         };
-        
+
         var turretFireTime;
         if (this.isBot) {
             turretFireTime = this.options.botTurretFireTime;
