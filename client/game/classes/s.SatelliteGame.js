@@ -25,6 +25,96 @@ s.SatelliteGame = new Class( {
 
     construct: function() {
         this.botCount = 0;
+
+        /******************
+         Enemy setup
+         ******************/
+        this.enemies = {
+            _list: [ ],
+            _map: {}, // new WeakMap()
+            get: function ( nameOrId ) {
+                if ( typeof nameOrId == 'string' ) {
+                    return this._map[ nameOrId ]; // return enemies._map.get(nameOrId);
+                } else if ( typeof nameOrId == 'number' ) {
+                    return this._list( nameOrId );
+                }
+            },
+            has: function ( nameOrId ) {
+                return !!this.get( nameOrId );
+            },
+            execute: function ( nameOrId, operation, args ) {
+                var enemy = this.get( nameOrId );
+                if ( enemy ) {
+                    enemy[ operation ].apply( enemy, args );
+                    return true;
+                }
+                return false;
+            },
+            forEach: function ( callback ) {
+                this._list.forEach( callback );
+            },
+            list: function ( ) {
+                return this._list;
+            },
+            delete: function ( nameOrId ) {
+                var enemy = this.get( nameOrId );
+                if ( enemy ) {
+                    // Remove from map
+                    delete this._map[ enemy.name ]; // this._map.delete(enemy.name);
+
+                    // Remove from array
+                    var enemyIndex = this._list.indexOf( enemy );
+                    if ( ~enemyIndex )
+                        this._list.splice( enemyIndex, 1 );
+
+                    // destroy
+                    enemy.destruct( );
+
+                    return true;
+                }
+                return false;
+            },
+            add: function ( enemyInfo, isBot ) {
+                if ( this.has( enemyInfo.name ) ) {
+                    this.delete( enemyInfo.name );
+                    console.error( 'Bug: Player %s added twice', enemyInfo.name );
+                } else {
+                    if ( enemyInfo.name === null ) {
+                        console.error( 'Bug: enemyInfo contained null player name' );
+                        console.log( enemyInfo );
+                        console.trace( );
+                    }
+                    if (!isBot) { console.log( '%s has joined the fray', enemyInfo.name ); }
+                }
+
+                // TODO: include velocities?
+                var enemyShip;
+                if (isBot) {
+                    enemyShip = new s.Bot( {
+                        game: s.game,
+                        shipClass: 'human_ship_heavy',
+                        name: enemyInfo.name,
+                        position: enemyInfo.position,
+                        rotation: enemyInfo.rotation,
+                        alliance: 'enemy'
+                    } );
+                } else {
+                    enemyShip = new s.Player( {
+                        game: s.game,
+                        shipClass: 'human_ship_heavy',
+                        name: enemyInfo.name,
+                        position: new THREE.Vector3( enemyInfo.pos[ 0 ], enemyInfo.pos[ 1 ], enemyInfo.pos[ 2 ] ),
+                        rotation: new THREE.Vector3( enemyInfo.rot[ 0 ], enemyInfo.rot[ 1 ], enemyInfo.rot[ 2 ] ),
+                        alliance: 'enemy'
+                    } );
+                }
+
+                if (isBot) { console.log( '%s has joined the fray', enemyShip.name ); }
+
+                this._list.push( enemyShip );
+                this._map[ enemyShip.name ] = enemyShip; // this._map.set(enemyInfo.name, otherShip);
+            }
+        };
     },
 
     initialize: function() {
@@ -119,95 +209,95 @@ s.SatelliteGame = new Class( {
             HUD: this.HUD
         } );
 
-        /******************
-         Enemy setup
-         ******************/
-        this.enemies = {
-            _list: [ ],
-            _map: {}, // new WeakMap()
-            get: function ( nameOrId ) {
-                if ( typeof nameOrId == 'string' ) {
-                    return this._map[ nameOrId ]; // return enemies._map.get(nameOrId);
-                } else if ( typeof nameOrId == 'number' ) {
-                    return this._list( nameOrId );
-                }
-            },
-            has: function ( nameOrId ) {
-                return !!this.get( nameOrId );
-            },
-            execute: function ( nameOrId, operation, args ) {
-                var enemy = this.get( nameOrId );
-                if ( enemy ) {
-                    enemy[ operation ].apply( enemy, args );
-                    return true;
-                }
-                return false;
-            },
-            forEach: function ( callback ) {
-                this._list.forEach( callback );
-            },
-            list: function ( ) {
-                return this._list;
-            },
-            delete: function ( nameOrId ) {
-                var enemy = this.get( nameOrId );
-                if ( enemy ) {
-                    // Remove from map
-                    delete this._map[ enemy.name ]; // this._map.delete(enemy.name);
+        // /******************
+        //  Enemy setup
+        //  ******************/
+        // this.enemies = {
+        //     _list: [ ],
+        //     _map: {}, // new WeakMap()
+        //     get: function ( nameOrId ) {
+        //         if ( typeof nameOrId == 'string' ) {
+        //             return this._map[ nameOrId ]; // return enemies._map.get(nameOrId);
+        //         } else if ( typeof nameOrId == 'number' ) {
+        //             return this._list( nameOrId );
+        //         }
+        //     },
+        //     has: function ( nameOrId ) {
+        //         return !!this.get( nameOrId );
+        //     },
+        //     execute: function ( nameOrId, operation, args ) {
+        //         var enemy = this.get( nameOrId );
+        //         if ( enemy ) {
+        //             enemy[ operation ].apply( enemy, args );
+        //             return true;
+        //         }
+        //         return false;
+        //     },
+        //     forEach: function ( callback ) {
+        //         this._list.forEach( callback );
+        //     },
+        //     list: function ( ) {
+        //         return this._list;
+        //     },
+        //     delete: function ( nameOrId ) {
+        //         var enemy = this.get( nameOrId );
+        //         if ( enemy ) {
+        //             // Remove from map
+        //             delete this._map[ enemy.name ]; // this._map.delete(enemy.name);
 
-                    // Remove from array
-                    var enemyIndex = this._list.indexOf( enemy );
-                    if ( ~enemyIndex )
-                        this._list.splice( enemyIndex, 1 );
+        //             // Remove from array
+        //             var enemyIndex = this._list.indexOf( enemy );
+        //             if ( ~enemyIndex )
+        //                 this._list.splice( enemyIndex, 1 );
 
-                    // destroy
-                    enemy.destruct( );
+        //             // destroy
+        //             enemy.destruct( );
 
-                    return true;
-                }
-                return false;
-            },
-            add: function ( enemyInfo, isBot ) {
-                if ( this.has( enemyInfo.name ) ) {
-                    this.delete( enemyInfo.name );
-                    console.error( 'Bug: Player %s added twice', enemyInfo.name );
-                } else {
-                    if ( enemyInfo.name === null ) {
-                        console.error( 'Bug: enemyInfo contained null player name' );
-                        console.log( enemyInfo );
-                        console.trace( );
-                    }
-                    if (!isBot) { console.log( '%s has joined the fray', enemyInfo.name ); }
-                }
+        //             return true;
+        //         }
+        //         return false;
+        //     },
+        //     add: function ( enemyInfo, isBot ) {
+        //         if ( this.has( enemyInfo.name ) ) {
+        //             this.delete( enemyInfo.name );
+        //             console.error( 'Bug: Player %s added twice', enemyInfo.name );
+        //         } else {
+        //             if ( enemyInfo.name === null ) {
+        //                 console.error( 'Bug: enemyInfo contained null player name' );
+        //                 console.log( enemyInfo );
+        //                 console.trace( );
+        //             }
+        //             if (!isBot) { console.log( '%s has joined the fray', enemyInfo.name ); }
+        //         }
 
-                // TODO: include velocities?
-                var enemyShip;
-                if (isBot) {
-                    enemyShip = new s.Bot( {
-                        game: that,
-                        shipClass: 'human_ship_heavy',
-                        name: enemyInfo.name,
-                        position: enemyInfo.position,
-                        rotation: enemyInfo.rotation,
-                        alliance: 'enemy'
-                    } );
-                } else {
-                    enemyShip = new s.Player( {
-                        game: that,
-                        shipClass: 'human_ship_heavy',
-                        name: enemyInfo.name,
-                        position: new THREE.Vector3( enemyInfo.pos[ 0 ], enemyInfo.pos[ 1 ], enemyInfo.pos[ 2 ] ),
-                        rotation: new THREE.Vector3( enemyInfo.rot[ 0 ], enemyInfo.rot[ 1 ], enemyInfo.rot[ 2 ] ),
-                        alliance: 'enemy'
-                    } );
-                }
+        //         // TODO: include velocities?
+        //         var enemyShip;
+        //         if (isBot) {
+        //             enemyShip = new s.Bot( {
+        //                 game: that,
+        //                 shipClass: 'human_ship_heavy',
+        //                 name: enemyInfo.name,
+        //                 position: enemyInfo.position,
+        //                 rotation: enemyInfo.rotation,
+        //                 alliance: 'enemy'
+        //             } );
+        //         } else {
+        //             enemyShip = new s.Player( {
+        //                 game: that,
+        //                 shipClass: 'human_ship_heavy',
+        //                 name: enemyInfo.name,
+        //                 position: new THREE.Vector3( enemyInfo.pos[ 0 ], enemyInfo.pos[ 1 ], enemyInfo.pos[ 2 ] ),
+        //                 rotation: new THREE.Vector3( enemyInfo.rot[ 0 ], enemyInfo.rot[ 1 ], enemyInfo.rot[ 2 ] ),
+        //                 alliance: 'enemy'
+        //             } );
+        //         }
 
-                if (isBot) { console.log( '%s has joined the fray', enemyShip.name ); }
+        //         if (isBot) { console.log( '%s has joined the fray', enemyShip.name ); }
 
-                this._list.push( enemyShip );
-                this._map[ enemyShip.name ] = enemyShip; // this._map.set(enemyInfo.name, otherShip);
-            }
-        };
+        //         this._list.push( enemyShip );
+        //         this._map[ enemyShip.name ] = enemyShip; // this._map.set(enemyInfo.name, otherShip);
+        //     }
+        // };
 
         // Dependent on controls; needs to be below s.Controls
         this.radar = new s.Radar( {
