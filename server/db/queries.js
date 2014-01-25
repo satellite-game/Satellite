@@ -62,6 +62,7 @@ module.exports = {
         callback(null, playersInRoom);
       });
     },
+    // need to remove the old rooms from the _KILLS and _DEATHS sections
     function(playersInRoom, callback) {
       if (playersInRoom < 1){
         db.HDEL('rooms', roomName, function(err, data){
