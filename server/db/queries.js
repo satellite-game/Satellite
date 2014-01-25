@@ -3,18 +3,17 @@ var async = require('async');
 
 var defaultCallback = function (functionName) {
   return function (err, data){
-    if (err) throw err;
+    if (err) throw functionName + ' : ' + err;
     console.log(functionName, 'successfull! ', data);
   };
-}
+};
 
 module.exports = {
 
   addRoom: function (roomName, callback) {
     callback = callback || defaultCallback('addRoom');
-
     db.get('rooms', function(data){
-      console.log(arguments);
+      console.log(roomName);
       if (roomName !== undefined && roomName !== null && data[roomName]){
         console.log('room DNE');
         db.HSET('rooms', roomName, 1, callback);
@@ -27,24 +26,31 @@ module.exports = {
   },
 
   joinRoom: function (roomName, playerName, joinCallback) {
+    var that = this;
     joinCallback = joinCallback || defaultCallback('joinRoom');
 
     async.waterfall([function (callback){
-      this.addRoom(null, roomName, callback);
+      console.log('drop0');
+      console.log(arguments);
+      that.addRoom(null, roomName, callback);
     },
     function(resultData, callback) {
+      console.log('drop1');
+      console.log(arguments);
       db.HSET(roomName+'_KILLS', playerID, 0, function(err, data){
         callback(null, data);
       });
     },
     function(resultData, callback) {
+      console.log('drop2');
+      console.log(arguments);
       db.HSET(roomName+'_DEATHS', playerID, 0, function(err, data){
         callback(null, data);
       });
     }], joinCallback);
   },
 
-  leaveRoom: function (roomName, playerName, leaveCallback) {
+  leaveRoom: function (roomName, playerID, leaveCallback) {
     leaveCallback = leaveCallback || defaultCallback('leaveRoom');
 
     async.waterfall([function (callback){
@@ -82,4 +88,4 @@ module.exports = {
     db.HINCRBY(roomName+'_DEATHS',playerID, 1, defaultCallback('incKillCount'));
   },
 
-}
+};
