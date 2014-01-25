@@ -12,9 +12,7 @@ s.Comm = new Class( {
 
     extend: s.EventEmitter,
 
-
     toString: "Comm",
-
 
     // makeTrigger is responsible for broadcasting all events
 
@@ -22,7 +20,6 @@ s.Comm = new Class( {
 
 
     makeTrigger: function ( evt ) {
-
         var that = this;
 
         return function ( message ) {
@@ -57,6 +54,8 @@ s.Comm = new Class( {
 
         this.pilot = options.pilot;
 
+        this.room = options.room;
+
         var that = this;
 
 
@@ -81,18 +80,17 @@ s.Comm = new Class( {
 
         this.socket.on( 'move', this.makeTrigger( 'move' ) );
 
-        this.socket.on('killed', this.makeTrigger( 'killed' ));
+        this.socket.on( 'killed', this.makeTrigger( 'killed' ));
 
-        this.socket.on('fire', this.makeTrigger( 'fire' ));
+        this.socket.on( 'fire', this.makeTrigger( 'fire' ));
 
-        this.socket.on('hit', this.makeTrigger( 'hit' ));
+        this.socket.on( 'hit', this.makeTrigger( 'hit' ));
 
-        this.socket.on('bot retrieval', this.makeTrigger( 'bot retrieval' ));
+        this.socket.on( 'sync', this.makeTrigger( 'sync'));
 
-        this.socket.on('bot positions', this.makeTrigger( 'bot positions' ));
-        
+        this.socket.on( 'bot retrieval', this.makeTrigger( 'bot retrieval' ));
 
-
+        this.socket.on( 'bot positions', this.makeTrigger( 'bot positions' ));
 
         this.game.hook( this.position );
 
@@ -112,8 +110,8 @@ s.Comm = new Class( {
 
 
         var shipPosition = this.game.player.getPositionPacket( );
-
         var packet = {
+            room: this.room,
 
             evt: 'joined',
 
@@ -127,14 +125,14 @@ s.Comm = new Class( {
 
             aVeloc: shipPosition.aVeloc,
 
-            lVeloc: shipPosition.lVeloc
+            lVeloc: shipPosition.lVeloc,
 
         };
 
 
         // Broadcast position
 
-        this.socket.emit( 'join', packet );
+        this.socket.emit('join', packet );
 
     },
 
@@ -146,12 +144,11 @@ s.Comm = new Class( {
 
         // Never send faster than server can handle
 
-        if ( time - s.game.comm.lastMessageTime >= 15 ) {
+        if ( time - s.game.comm.lastMessageTime >= 700 ) {
 
             var shipPosition = s.game.player.getPositionPacket( );
 
             // TODO: Figure out if ship or turret actually moved
-
 
             // If ship moved, send packet
 
@@ -177,8 +174,7 @@ s.Comm = new Class( {
 
                 // Broadcast position
 
-
-                s.game.comm.socket.emit( 'move', packet );
+                s.game.comm.socket.emit( 'combat','move', packet );
 
                 s.game.comm.lastMessageTime = time;
 
@@ -193,7 +189,7 @@ s.Comm = new Class( {
 
         this.time = 0;
 
-        this.socket.emit( 'fire', {
+        this.socket.emit( 'combat','fire', {
 
             position: pos,
 
@@ -207,7 +203,7 @@ s.Comm = new Class( {
 
     died: function( you, killer ) {
 
-        this.socket.emit( 'killed',{
+        this.socket.emit( 'player','killed',{
 
             you: you,
 
@@ -222,7 +218,7 @@ s.Comm = new Class( {
 
         this.time = 0;
 
-        this.socket.emit( 'hit', {
+        this.socket.emit( 'combat','hit', {
 
             otherPlayerName: otherPlayerName,
 
@@ -233,9 +229,38 @@ s.Comm = new Class( {
 
     clockTick: function( ){
         this.time += 1;
+        this.time += 1;
         // if ( this.time >= 60 ){
         //     window.location.href = "http://satellite-game.com";
         // }
+    },
+
+    sendKey: function(direction, key){
+        var time = new Date().getTime();
+        // Never send faster than server can handle
+        if ( time - s.game.comm.lastMessageTime >= 15 ) {
+            var shipPosition = s.game.player.getPositionPacket();
+            // TODO: Figure out if ship or turret actually moved
+            // If ship moved, send packet
+            if ( this.lastPosition !== shipPosition.pos ) {
+                // Build packet
+                this.time = 0;
+
+                var packet = {
+                    time: time,
+                    room: this.room,
+                    name: this.pilot.name,
+                    pos: shipPosition.pos,
+                    rot: shipPosition.rot,
+                    aVeloc: shipPosition.aVeloc,
+                    lVeloc: shipPosition.lVeloc
+                };
+                // Broadcast position
+                this.socket.emit( 'keypress', direction, $.extend(packet, { direction: direction, key: key }) );
+                s.game.comm.lastMessageTime = time;
+                this.lastPosition = shipPosition.pos;
+            }
+        }
     },
 
     botInfo: function(message) {
@@ -249,7 +274,7 @@ s.Comm = new Class( {
         this.socket.emit( 'botHit', {
 
             yourName: yourName,
-            
+
             botName: botName
 
         });

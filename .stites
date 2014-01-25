@@ -1,0 +1,8 @@
+todo.md
+[x] collect players on server side by room
+[ ] alter a player's speed to a different point in the map
+[ ] ensure that the interprolation is working correctly
+[ ] increase the players position by the controls
+[ ] calculate linear velocity
+[ ] calculate angular velocity
+[ ] Make sure this works for two players in the room

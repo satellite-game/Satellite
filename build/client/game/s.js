@@ -47749,8 +47749,9 @@ var s = {
         // Create a model loader
         s.loader = new THREE.JSONLoader();
 
-        // Create game
+        var room = prompt('room?');
         s.game = new s.SatelliteGame();
+        s.game.room = room;
     }
 };
 
@@ -48846,6 +48847,167 @@ s.Bot = new Class( {
   }
 
 } );
+s.Enemies = new Class({
+  _list: [ ],
+  _map: {}, // new WeakMap()
+
+  construct: function (enemyOptions) {
+    this.game = enemyOptions.game;
+  },
+
+  get: function ( nameOrId ) {
+    if ( typeof nameOrId == 'string' ) {
+      return this._map[ nameOrId ]; // return enemies._map.get(nameOrId);
+    } else if ( typeof nameOrId == 'number' ) {
+      return this._list( nameOrId );
+    }
+  },
+
+  has: function ( nameOrId ) {
+    return !!this.get( nameOrId );
+  },
+
+  execute: function ( nameOrId, operation, args ) {
+    var enemy = this.get( nameOrId );
+    if ( enemy ) {
+      enemy[ operation ].apply( enemy, args );
+      return true;
+    }
+    return false;
+  },
+
+  forEach: function ( callback ) {
+    this._list.forEach( callback );
+  },
+
+  list: function ( ) {
+    return this._list;
+  },
+
+  delete: function ( nameOrId ) {
+    var enemy = this.get( nameOrId );
+    if ( enemy ) {
+      // Remove from map
+      delete this._map[ enemy.name ]; // this._map.delete(enemy.name);
+
+      // Remove from array
+      var enemyIndex = this._list.indexOf( enemy );
+      if ( ~enemyIndex )
+          this._list.splice( enemyIndex, 1 );
+
+      // destroy
+      enemy.destruct( );
+
+      return true;
+    }
+    return false;
+  },
+
+  add: function ( enemyInfo ) {
+    var that = this;
+
+    console.log("LOL ENEMIES");
+    if ( this.has( enemyInfo.name ) ) {
+      this.delete( enemyInfo.name );
+      console.error( 'Bug: Player %s added twice', enemyInfo.name );
+    } else {
+      if ( enemyInfo.name === null ) {
+        console.error( 'Bug: enemyInfo contained null player name' );
+        console.log( enemyInfo );
+        console.trace( );
+      }
+      console.log( '%s has joined the fray', enemyInfo.name );
+    }
+
+    // TODO: include velocities?
+    var enemyShip = new s.Player( {
+      game: that.game,
+      shipClass: 'human_ship_heavy',
+      name: enemyInfo.name,
+      position: new THREE.Vector3( enemyInfo.pos[ 0 ], enemyInfo.pos[ 1 ], enemyInfo.pos[ 2 ] ),
+      rotation: new THREE.Vector3( enemyInfo.rot[ 0 ], enemyInfo.rot[ 1 ], enemyInfo.rot[ 2 ] ),
+      alliance: 'enemy'
+    } );
+
+    this._list.push( enemyShip );
+    this._map[ enemyInfo.name ] = enemyShip; // this._map.set(enemyInfo.name, otherShip);
+  },
+
+  updateEnemies: function () {
+    /////////////////////////////////
+    // PREDICTIVE MOVEMENT SYSTEM //
+    /////////////////////////////////
+
+    // PARAMETERS
+    // aV   = vector from target to self
+    // a    = distance between self and target
+    // eV   = enemy's current velocity vector
+    // e    = magnitude of eV
+    // pV   = players's velocity vector
+    // b    = magnitude of bV plus initial bullet speed
+    // angD = angular differential
+    // velD = velocity differential
+    // t    = quadratic solution for time at which player bullet and enemy ship will simultaneously reach a given location
+    if ( enemies[i] && targetInSight ){
+
+      var aV = enemies[i].root.position.clone().add( self.position.clone().multiplyScalar(-1) );
+      var a  = aV.length();
+      var eV = this.target.getLinearVelocity();
+      var e  = eV.length();
+      var pV = self.getLinearVelocity();
+      var b = 5000+pV.length();
+
+      if (eV && b && aV){
+        var angD = aV.dot(eV);
+        var velD = (b*b - e*e);
+
+        var t = angD/velD + Math.sqrt( angD*angD + velD*a*a )/velD;
+
+        // Don't show the marker if the enemy is more than 4 seconds away
+        if (t < 4){
+
+          this.trailingPredictions.push(eV.multiplyScalar(t));
+          var pLen = this.trailingPredictions.length;
+
+          // If the previous frames had a prediction, tween the midpoint of all predictions and plot that
+          if (pLen > 3){
+            var pX = 0, pY = 0;
+            for (var p = 0; p < pLen; p++){
+
+              // Project 3D coords onto 2D plane in perspective of the camera;
+              // Scale predictions with current camera perspective
+              var current = s.projector.projectVector(
+                  this.target.position.clone().add( this.trailingPredictions[p] ), s.game.camera );
+              pX += (width + current.x*width)/2;
+              pY += -(-height + current.y*height)/2;
+
+            }
+            var enemyV2D = new THREE.Vector2(pX/pLen, pY/pLen);
+
+            if (enemyV2D.distanceTo(v2D) > size/3) {
+              // Draw the prediction marker
+              this.ctx.beginPath();
+              this.ctx.arc(enemyV2D.x, enemyV2D.y, size/5, 0, 2*this.PI, false);
+              this.ctx.fillStyle = "rgba(256,0,0,0.5)";
+              this.ctx.fill();
+              this.ctx.lineWidth = 2;
+              this.ctx.strokeStyle = this.menu.color;
+              this.ctx.stroke();
+            }
+
+            // remove the earliest trailing prediction
+            this.trailingPredictions.shift();
+
+          }
+        }
+      }
+    // If the target is no longer on screen, but lastV2D is still assigned, set to null
+    } else if ( this.trailingPredictions.length ) {
+        this.trailingPredictions = [];
+    }
+  },
+
+});
 s.Moon = new Class({
 	extend: s.GameObject,
 
@@ -49123,19 +49285,59 @@ s.Keyboard = new Class({
     'tilde'   : 192
   },
 
+  keysInv: {
+    37  : 'left',
+    38  : 'up',
+    39  : 'right',
+    40  : 'down',
+    32  : 'space',
+    33  : 'pageup',
+    34  : 'pagedown',
+    9   : 'tab',
+    87  : 'w',
+    65  : 'a',
+    83  : 's',
+    68  : 'd',
+    192 : 'tilde',
+    16  : 'shift',
+  },
+
   modifiers: ['shift', 'ctrl', 'alt', 'meta'],
 
   construct: function(game, player) {
+    var self = this;
     this.keyCodes = {};
+    this.socketSendKey.bind(this);
 
     // Listen to key events
     window.addEventListener('keydown', this.handleKeyChange.bind(this, true), false);
     window.addEventListener('keyup', this.handleKeyChange.bind(this, false), false);
+
+    // Listen to key events for syncing
+    this.keyDownAllowed = true;
+    $(document).keyup(function(e){
+      self.keyDownAllowed = true;
+      self.socketSendKey(e);
+    });
+    $(document).keydown(function(e){
+      if (self.keyDownAllowed) {
+        self.socketSendKey(e);
+        self.keyDownAllowed = false;
+      }
+    });
   },
 
   destruct: function() {
     window.removeEventListener('keydown', this.handleKeyChange, false);
     window.removeEventListener('keyup', this.handleKeyChange, false);
+  },
+
+  socketSendKey: function(e) {
+    var key = this.keysInv[e.keyCode];
+
+    if (key) {
+      s.game.comm.sendKey(e.type, key);
+    }
   },
 
   handleKeyChange: function(pressed, e) {
@@ -49321,7 +49523,8 @@ s.Controls = new Class({
     this.oculus = this.game.oculus;
 
     // Mouse interface - mice options are: 'keyboard', 'none', 'oculus'
-    this.mouse = new s.Mouse('keyboard', options);
+    // this.mouse = new s.Mouse('keyboard', options);
+    this.mouse = new s.Mouse('none', options);
 
     console.log('Initialized gamepad...');
 
@@ -49424,8 +49627,6 @@ s.Controls = new Class({
       if (this.menu.displayed) {
         this.menu.updateHovered();
       }
-    } else {
-      this.mouse.mouseType = 'keyboard';
     }
 
     ///////////////////////
@@ -50454,9 +50655,7 @@ s.Comm = new Class( {
 
     extend: s.EventEmitter,
 
-
     toString: "Comm",
-
 
     // makeTrigger is responsible for broadcasting all events
 
@@ -50464,7 +50663,6 @@ s.Comm = new Class( {
 
 
     makeTrigger: function ( evt ) {
-
         var that = this;
 
         return function ( message ) {
@@ -50499,6 +50697,8 @@ s.Comm = new Class( {
 
         this.pilot = options.pilot;
 
+        this.room = options.room;
+
         var that = this;
 
 
@@ -50523,18 +50723,17 @@ s.Comm = new Class( {
 
         this.socket.on( 'move', this.makeTrigger( 'move' ) );
 
-        this.socket.on('killed', this.makeTrigger( 'killed' ));
+        this.socket.on( 'killed', this.makeTrigger( 'killed' ));
 
-        this.socket.on('fire', this.makeTrigger( 'fire' ));
+        this.socket.on( 'fire', this.makeTrigger( 'fire' ));
 
-        this.socket.on('hit', this.makeTrigger( 'hit' ));
+        this.socket.on( 'hit', this.makeTrigger( 'hit' ));
 
-        this.socket.on('bot retrieval', this.makeTrigger( 'bot retrieval' ));
+        this.socket.on( 'sync', this.makeTrigger( 'sync'));
 
-        this.socket.on('bot positions', this.makeTrigger( 'bot positions' ));
-        
+        this.socket.on( 'bot retrieval', this.makeTrigger( 'bot retrieval' ));
 
-
+        this.socket.on( 'bot positions', this.makeTrigger( 'bot positions' ));
 
         this.game.hook( this.position );
 
@@ -50554,8 +50753,8 @@ s.Comm = new Class( {
 
 
         var shipPosition = this.game.player.getPositionPacket( );
-
         var packet = {
+            room: this.room,
 
             evt: 'joined',
 
@@ -50569,14 +50768,14 @@ s.Comm = new Class( {
 
             aVeloc: shipPosition.aVeloc,
 
-            lVeloc: shipPosition.lVeloc
+            lVeloc: shipPosition.lVeloc,
 
         };
 
 
         // Broadcast position
 
-        this.socket.emit( 'join', packet );
+        this.socket.emit('join', packet );
 
     },
 
@@ -50588,12 +50787,11 @@ s.Comm = new Class( {
 
         // Never send faster than server can handle
 
-        if ( time - s.game.comm.lastMessageTime >= 15 ) {
+        if ( time - s.game.comm.lastMessageTime >= 700 ) {
 
             var shipPosition = s.game.player.getPositionPacket( );
 
             // TODO: Figure out if ship or turret actually moved
-
 
             // If ship moved, send packet
 
@@ -50619,8 +50817,7 @@ s.Comm = new Class( {
 
                 // Broadcast position
 
-
-                s.game.comm.socket.emit( 'move', packet );
+                s.game.comm.socket.emit( 'combat','move', packet );
 
                 s.game.comm.lastMessageTime = time;
 
@@ -50635,7 +50832,7 @@ s.Comm = new Class( {
 
         this.time = 0;
 
-        this.socket.emit( 'fire', {
+        this.socket.emit( 'combat','fire', {
 
             position: pos,
 
@@ -50649,7 +50846,7 @@ s.Comm = new Class( {
 
     died: function( you, killer ) {
 
-        this.socket.emit( 'killed',{
+        this.socket.emit( 'player','killed',{
 
             you: you,
 
@@ -50664,7 +50861,7 @@ s.Comm = new Class( {
 
         this.time = 0;
 
-        this.socket.emit( 'hit', {
+        this.socket.emit( 'combat','hit', {
 
             otherPlayerName: otherPlayerName,
 
@@ -50675,9 +50872,38 @@ s.Comm = new Class( {
 
     clockTick: function( ){
         this.time += 1;
+        this.time += 1;
         // if ( this.time >= 60 ){
         //     window.location.href = "http://satellite-game.com";
         // }
+    },
+
+    sendKey: function(direction, key){
+        var time = new Date().getTime();
+        // Never send faster than server can handle
+        if ( time - s.game.comm.lastMessageTime >= 15 ) {
+            var shipPosition = s.game.player.getPositionPacket();
+            // TODO: Figure out if ship or turret actually moved
+            // If ship moved, send packet
+            if ( this.lastPosition !== shipPosition.pos ) {
+                // Build packet
+                this.time = 0;
+
+                var packet = {
+                    time: time,
+                    room: this.room,
+                    name: this.pilot.name,
+                    pos: shipPosition.pos,
+                    rot: shipPosition.rot,
+                    aVeloc: shipPosition.aVeloc,
+                    lVeloc: shipPosition.lVeloc
+                };
+                // Broadcast position
+                this.socket.emit( 'keypress', direction, $.extend(packet, { direction: direction, key: key }) );
+                s.game.comm.lastMessageTime = time;
+                this.lastPosition = shipPosition.pos;
+            }
+        }
     },
 
     botInfo: function(message) {
@@ -50691,7 +50917,7 @@ s.Comm = new Class( {
         this.socket.emit( 'botHit', {
 
             yourName: yourName,
-            
+
             botName: botName
 
         });
@@ -51292,7 +51518,6 @@ s.SatelliteGame = new Class( {
 
 	initialize: function() {
 		var that = this;
-
         this.IDs = [];
         this.botCount = 0;
         this.hostPlayer = false;
@@ -51321,9 +51546,8 @@ s.SatelliteGame = new Class( {
 
         this.pilot = {};
         this.callsigns = this.callsigns || ["Apollo","Strobe","Sage","Polkadot","Moonglow","Steel","Vanguard","Prong","Uptight","Blackpony","Hawk","Ramrod","Dice","Falcon","Rap","Buckshot","Cobra","Magpie","Warhawk","Boxer","Devil","Hammer","Phantom","Sharkbait","Dusty","Icon","Blade","Pedro","Stinger","Yellow Jacket","Limit","Sabre","Misty","Whiskey","Dice","Antic","Arrow","Auto","Avalon","Bandit","Banshee","Blackjack","Bulldog","Caesar","Cajun","Challenger","Chuggs","Cindy","Cracker","Dagger","Dino","Esso","Express","Fangs","Fighting Freddie","Freight Train","Freemason","Fury","Gamma","Gear","Ghost","Ginger","Greasy","Havoc","Hornet","Husky","Jackal","Jaguar","Jedi","Jazz","Jester","Knife","Kitty Hawk","Knight","Knightrider","Koala","Komono","Lancer","Lexus","Lion","Levi","Lucid","Malty","Mail Truck","Magma","Magnet","Malibu","Medusa","Maul","Monster","Misfit","Moss","Moose","Mustang","Nail","Nasa","Nacho","Nighthawk","Ninja","Neptune","Odin","Occult","Nukem","Ozark","Pagan","Pageboy","Panther","Peachtree","Phenom","Polestar","Punisher","Ram","Rambo","Raider","Raven","Razor","Rupee","Sabre","Rust","Ruin","Sultan","Savor","Scandal","Scorpion","Shooter","Smokey","Sniper","Spartan","Thunder","Titus","Titan","Timber Wolf","Totem","Trump","Venom","Veil","Viper","Weasel","Warthog","Winter","Wiki","Wild","Yonder","Yogi","Yucca","Zeppelin","Zeus","Zesty"];
-
         this.pilot.name = this.callsigns[Math.floor(this.callsigns.length*Math.random())] + ' ' + ( new Date( ).getTime( ) % 100 );
-        
+
         // Add a hud
         this.HUD = new s.HUD( {
             game: this
@@ -51351,7 +51575,7 @@ s.SatelliteGame = new Class( {
             alliance: 'alliance',
             camera: this.camera
         } );
-        
+
         this.HUD.hp = this.player.hull;
 
         $(document).on('keyup', function(evt) {
@@ -51427,6 +51651,7 @@ s.SatelliteGame = new Class( {
                 }
                 return false;
             },
+
             add: function ( enemyInfo, isBot ) {
                 if ( this.has( enemyInfo.name ) ) {
                     this.delete( enemyInfo.name );
@@ -51461,13 +51686,15 @@ s.SatelliteGame = new Class( {
                         alliance: 'enemy'
                     } );
                 }
-                
+
                 if (isBot) { console.log( '%s has joined the fray', enemyShip.name ); }
 
                 this._list.push( enemyShip );
                 this._map[ enemyShip.name ] = enemyShip; // this._map.set(enemyInfo.name, otherShip);
             }
         };
+
+        this.enemies = new s.Enemies({ game: this });
 
         // Dependent on controls; needs to be below s.Controls
         this.radar = new s.Radar( {
@@ -51494,6 +51721,7 @@ s.SatelliteGame = new Class( {
         } );
 
         this.comm = new s.Comm( {
+            room: this.room,
             game: that,
             pilot: that.pilot,
             player: this.player,
@@ -51507,6 +51735,7 @@ s.SatelliteGame = new Class( {
         this.comm.on( 'join', that.handleJoin );
         this.comm.on( 'leave', that.handleLeave );
         this.comm.on( 'move', that.handleMove );
+        this.comm.on( 'sync', that.handleSync);
         this.comm.on( 'bot retrieval', that.handleBotInfo );
         this.comm.on( 'bot positions', that.handleBotPositions );
 
@@ -51598,6 +51827,7 @@ s.SatelliteGame = new Class( {
     },
 
     handleJoin: function ( message ) {
+           console.log("Received a join");
            s.game.enemies.add( message );
     },
     handleLeave: function ( message ) {
@@ -51606,6 +51836,7 @@ s.SatelliteGame = new Class( {
         }
     },
     handleMove: function ( message ) {
+        console.log("A player moved", message);
         if ( message.name == this.pilot.name ) {
             // server told us to move
             console.log( 'Server reset position' );
@@ -51619,6 +51850,47 @@ s.SatelliteGame = new Class( {
             }
         }
     },
+    handleSync: function ( pak ) {
+      console.log("Receiving a sync request");
+      var data = pak;
+      var whoAmI = s.game.pilot.name,
+          myData = pak[whoAmI];
+
+      var adjustPlayer = function( serverView ) {
+
+        var adjusted = [];
+
+        var myView = s.game.player.getPositionPacket();
+        for(var i = 0; i < serverView.lVeloc.length; i++) {
+          var pos = Math.abs(serverView.pos[i]) - Math.abs(myView.pos[i]);
+
+          if( pos >= 100 ) {
+            console.log("Experiencing whiplash!");
+            s.game.player.setPosition( serverView.pos, myView.rot, serverView.aVeloc, serverView.lVeloc, true );
+            return;
+          }
+
+          if(serverView.pos[i] >= 0) {
+            adjusted.push(serverView.lVeloc[i] + pos);
+          } else {
+            adjusted.push(serverView.lVeloc[i] - pos);
+          }
+
+        }
+
+        s.game.player.setPosition( myView.pos, myView.rot, serverView.aVeloc, adjusted, false );
+      };
+
+      adjustPlayer(myData);
+      delete data[whoAmI];
+
+      for(var i in data ) {
+        if( !s.game.enemies.execute( data[i].name, 'setPosition', [ data[i].pos, data[i].rot, data[i].aVeloc, data[i].lVeloc, true ] ) ) {
+          s.game.enemies.add( data[i] );
+        }
+      }
+
+    },
 
     handlePlayerList: function(message) {
         for (var otherPlayerName in message) {
@@ -51631,6 +51903,7 @@ s.SatelliteGame = new Class( {
     },
 
     handleKill: function(message) {
+        console.log(message);
         // get enemy position
         var position = s.game.enemies.get(message.killed).root.position;
         new s.Explosion({
@@ -51800,7 +52073,7 @@ s.SatelliteGame = new Class( {
         if (this.game.botCount === 0) {
             // Create a new bot
             this.game.enemies.add( {}, 'bot');
-        }        
+        }
         that.game.updatePlayersWithBots('botInfo');
     },
 
@@ -51814,7 +52087,7 @@ s.SatelliteGame = new Class( {
         };
 
         enemiesSocketInfo = {};
-        var enemiesList = this.enemies._list;  
+        var enemiesList = this.enemies._list;
         for (var i = 0; i < enemiesList.length; i++) {
             if (enemiesList[i].isBot){
                 var root = enemiesList[i].root;
@@ -51822,7 +52095,7 @@ s.SatelliteGame = new Class( {
                 //if there is a angular and linear velocity fnc, call it. else create a new 3 vector
                 var angularVeloc = (root.getAngularVelocity && root.getAngularVelocity()) || new THREE.Vector3();
                 var linearVeloc = (root.getLinearVelocity && root.getLinearVelocity()) || new THREE.Vector3();
-                
+
                 enemiesSocketInfo[name] = {
                     position: makeArray(root.position),
                     rotation: makeArray(root.rotation),
