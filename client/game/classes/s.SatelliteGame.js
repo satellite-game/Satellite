@@ -8,7 +8,8 @@ s.SatelliteGame = new Class( {
 		'phobos_lofi',
         'human_ship_heavy',
 		'human_ship_light',
-        'human_space_station'
+        'human_space_station',
+        'human_building_tall'
 	],
 
     textures: [
@@ -56,6 +57,11 @@ s.SatelliteGame = new Class( {
 
         // Add spacestation
         this.spaceStation = new s.SpaceStation( {
+            game: this
+        } );
+
+        // Add tall moon base
+        this.moonBaseTall = new s.MoonBaseTall( {
             game: this
         } );
 

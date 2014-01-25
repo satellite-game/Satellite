@@ -48280,7 +48280,7 @@ s.Projectile = new Class({
     },
 
     handleCollision: function(mesh, position){
-        //check if your turret hit someone and if necessary the person is on the other team
+        //check if your turret hit someone
         //else if check if you got hit by a bot
         if (this.pilot === this.game.pilot.name){
             if (mesh.instance.alliance && mesh.instance.alliance === "enemy"){
@@ -48840,7 +48840,7 @@ s.Bot = new Class( {
     //////////////////////////////
 
     if ( Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && this.closestDistance < maxDistance) {
-      this.fire('turret');
+      // this.fire('turret');
     }
 
   }
@@ -48901,9 +48901,40 @@ s.SpaceStation = new Class({
 
 		this.root = new Physijs.ConvexMesh(geometry, new THREE.MeshFaceMaterial(materials), 0);
 
-        this.root.name = "space_station";
+    this.root.name = "space_station";
 		this.root.position.copy(options.position);
 		this.root.rotation.copy(options.rotation);
+		// this.root.receiveShadow = true; // Causes shader error
+	}
+});
+
+s.MoonBaseTall = new Class({
+	extend: s.GameObject,
+
+	construct: function(options){
+		// handle parameters
+		this.options = options = jQuery.extend({
+			position: new THREE.Vector3(-6516.61181640625, 334.5599060058594, -99.58238220214844),
+			rotation: new THREE.Vector3(0,-0.25,1.45)
+		}, options);
+
+		var geometry = s.models.human_building_tall.geometry;
+		var materials = s.models.human_building_tall.materials;
+
+		// Setup physical properties
+		materials[0] = Physijs.createMaterial(
+			materials[0],
+			1, // high friction
+			0.4 // low restitution
+		);
+
+		this.root = new Physijs.ConvexMesh(geometry, new THREE.MeshFaceMaterial(materials), 0);
+
+    this.root.name = "moon_base_tall";
+		this.root.position.copy(options.position);
+		this.root.rotation.copy(options.rotation);
+
+    // this.game.moon.root.add(this);
 		// this.root.receiveShadow = true; // Causes shader error
 	}
 });
@@ -49350,7 +49381,7 @@ s.Controls = new Class({
     this.oculus = this.game.oculus;
 
     // Mouse interface - mice options are: 'keyboard', 'none', 'oculus'
-    this.mouse = new s.Mouse('keyboard', options);
+    // this.mouse = new s.Mouse('keyboard', options);
 
     console.log('Initialized gamepad...');
 
@@ -49454,27 +49485,27 @@ s.Controls = new Class({
         this.menu.updateHovered();
       }
     } else {
-      this.mouse.mouseType = 'keyboard';
+      // this.mouse.mouseType = 'keyboard';
     }
 
     ///////////////////////
     //  MOUSE CONTROLS   //
     ///////////////////////
 
-    var mouseUpdate = this.mouse.update({
-        centerX: centerX,
-        crosshairs: crosshairs,
-        yaw: yaw,
-        radius: radius,
-        yawSpeed: yawSpeed,
-        thrustScalar: thrustScalar,
-        centerY: centerY,
-        pitch: pitch,
-        pitchSpeed: pitchSpeed
-    });
+    // var mouseUpdate = this.mouse.update({
+    //     centerX: centerX,
+    //     crosshairs: crosshairs,
+    //     yaw: yaw,
+    //     radius: radius,
+    //     yawSpeed: yawSpeed,
+    //     thrustScalar: thrustScalar,
+    //     centerY: centerY,
+    //     pitch: pitch,
+    //     pitchSpeed: pitchSpeed
+    // });
 
-    pitch = mouseUpdate.pitch || pitch;
-    yaw = mouseUpdate.yaw || yaw;
+    // pitch = mouseUpdate.pitch || pitch;
+    // yaw = mouseUpdate.yaw || yaw;
 
     ///////////////////////
     // GAMEPAD CONTROLS  //
@@ -49697,11 +49728,11 @@ s.HUD = new Class({
             blue: 255,
             alpha: 0.75
         });
-        this.enemyTarget = new s.Color({
+        this.spaceStation = new s.Color({
             game: this.game,
-            red: 255,
+            red: 0,
             green: 0,
-            blue: 0,
+            blue: 255,
             alpha: 0.5
         });
 
@@ -49925,9 +49956,9 @@ s.HUD = new Class({
             this.ctx.stroke();
         }
 
-        ///////////////////////////
-        // BASE TARGETING SYSTEM //
-        ///////////////////////////
+        //////////////////////////////////
+        // SPACE BASE TARGETING SYSTEM //
+        /////////////////////////////////
 
         this.base = s.game.spaceStation.root;
 
@@ -49966,6 +49997,49 @@ s.HUD = new Class({
             this.ctx.strokeStyle = this.menu.color;
             this.ctx.stroke();
         }
+
+        //////////////////////////////////
+        // MOON BASE TARGETING SYSTEM //
+        /////////////////////////////////
+
+        this.moonBase = s.game.moonBaseTall.root;
+
+        var vmoonBase3D = this.moonBase.position.clone();
+        var vmoonBase2D = s.projector.projectVector( vmoonBase3D, s.game.camera );
+        var moonBaseInSight, distanceTomoonBase, v2DmoonBase;
+
+        if ( Math.abs(vmoonBase2D.x) <= 0.95 && Math.abs(vmoonBase2D.y) <= 0.95 && vmoonBase2D.z < 1 ) {
+            moonBaseInSight = true;
+            distanceTomoonBase = this.game.player.root.position.distanceTo(this.moonBase.position);
+            size = Math.round((width - distanceTomoonBase/100)/26);
+        }
+
+        // moonBase targeting reticule and targeting box
+        if ( moonBaseInSight) {
+            v2DmoonBase = vmoonBase2D.clone();
+            v2DmoonBase.x =  ( width  + v2DmoonBase.x*width  )/2;
+            v2DmoonBase.y = -(-height + v2DmoonBase.y*height )/2;
+
+            this.ctx.strokeRect( v2DmoonBase.x-size, v2DmoonBase.y-size, size*2, size*2 );
+            this.ctx.lineWidth = 1;
+            this.ctx.strokeStyle = this.menu.color;
+        } else if ( !moonBaseInSight ) {
+            var moonBase2D = new THREE.Vector2(vmoonBase2D.x, vmoonBase2D.y);
+            moonBase2D.multiplyScalar(1/moonBase2D.length()).multiplyScalar(this.subreticleBound.radius+34);
+
+            this.ctx.beginPath();
+            if (vmoonBase2D.z > 1)
+                this.ctx.arc( -moonBase2D.x+centerX, (-moonBase2D.y+centerY), 10, 0, 2*this.PI, false );
+            else
+                this.ctx.arc( moonBase2D.x+centerX, -(moonBase2D.y-centerY), 10, 0, 2*this.PI, false );
+
+            this.ctx.fillStyle = "yello";
+            this.ctx.fill();
+            this.ctx.lineWidth = 2;
+            this.ctx.strokeStyle = this.menu.color;
+            this.ctx.stroke();
+        }
+
 
 
         //////////////////////////////////////////
@@ -51353,7 +51427,8 @@ s.SatelliteGame = new Class( {
 		'phobos_lofi',
         'human_ship_heavy',
 		'human_ship_light',
-        'human_space_station'
+        'human_space_station',
+        'human_building_tall'
 	],
 
     textures: [
@@ -51401,6 +51476,11 @@ s.SatelliteGame = new Class( {
 
         // Add spacestation
         this.spaceStation = new s.SpaceStation( {
+            game: this
+        } );
+
+        // Add tall moon base
+        this.moonBaseTall = new s.MoonBaseTall( {
             game: this
         } );
 
