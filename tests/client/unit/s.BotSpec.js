@@ -50,26 +50,41 @@ describe('Bot class', function () {
     runSpecs(specs, done);
   });
 
-  it('should get enemies list', function (done) {
-    var specs = function (bot) {
-      expect(bot.getEnemyList).to.be.an('function');
-      expect(bot.botEnemyList).to.equal(undefined);
+  describe('handle enemies', function () {
+    it('should get enemies list', function (done) {
+      var specs = function (bot) {
+        expect(bot.getEnemyList).to.be.an('function');
+        expect(bot.botEnemyList).to.equal(undefined);
 
-      var player2 = makePlayer('Player two');
-      s.game.enemies._list.push(player2);
-      s.game.enemies._map[player2.name] = player2;
+        var player2 = makePlayer('Player two');
+        s.game.enemies._list.push(player2);
+        s.game.enemies._map[player2.name] = player2;
 
-      bot.getEnemyList();
+        bot.getEnemyList();
 
-      expect(bot.botEnemyList).to.be.an('array');
-      expect(bot.botEnemyList.length).to.equal(2);
-      expect(bot.botEnemyList[0].name).to.equal('Player one');
-      expect(bot.botEnemyList[1].name).to.equal('Player two');
-    };
+        expect(bot.botEnemyList).to.be.an('array');
+        expect(bot.botEnemyList.length).to.equal(2);
+        expect(bot.botEnemyList[0].name).to.equal('Player one');
+        expect(bot.botEnemyList[1].name).to.equal('Player two');
+      };
 
-    runSpecs(specs, done);
+      runSpecs(specs, done);
+    });
+
+    it('should get closest enemy distance', function (done) {
+      var specs = function (bot) {
+        bot.getEnemyList();
+
+        expect(bot.getClosestDistance).to.be.an('function');
+        expect(bot.closestDistance).to.equal(undefined);
+        bot.getClosestDistance();
+        expect(bot.closestDistance).to.not.equal(undefined).and.to.not.equal(null);
+      };
+
+      runSpecs(specs, done);
+    });
+
   });
-
 });
 
 
