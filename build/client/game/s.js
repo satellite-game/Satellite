@@ -48840,7 +48840,7 @@ s.Bot = new Class( {
     //////////////////////////////
 
     if ( Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && this.closestDistance < maxDistance) {
-      // this.fire('turret');
+      this.fire('turret');
     }
 
   }
@@ -49381,7 +49381,7 @@ s.Controls = new Class({
     this.oculus = this.game.oculus;
 
     // Mouse interface - mice options are: 'keyboard', 'none', 'oculus'
-    // this.mouse = new s.Mouse('keyboard', options);
+    this.mouse = new s.Mouse('keyboard', options);
 
     console.log('Initialized gamepad...');
 
@@ -49485,27 +49485,27 @@ s.Controls = new Class({
         this.menu.updateHovered();
       }
     } else {
-      // this.mouse.mouseType = 'keyboard';
+      this.mouse.mouseType = 'keyboard';
     }
 
     ///////////////////////
     //  MOUSE CONTROLS   //
     ///////////////////////
 
-    // var mouseUpdate = this.mouse.update({
-    //     centerX: centerX,
-    //     crosshairs: crosshairs,
-    //     yaw: yaw,
-    //     radius: radius,
-    //     yawSpeed: yawSpeed,
-    //     thrustScalar: thrustScalar,
-    //     centerY: centerY,
-    //     pitch: pitch,
-    //     pitchSpeed: pitchSpeed
-    // });
+    var mouseUpdate = this.mouse.update({
+        centerX: centerX,
+        crosshairs: crosshairs,
+        yaw: yaw,
+        radius: radius,
+        yawSpeed: yawSpeed,
+        thrustScalar: thrustScalar,
+        centerY: centerY,
+        pitch: pitch,
+        pitchSpeed: pitchSpeed
+    });
 
-    // pitch = mouseUpdate.pitch || pitch;
-    // yaw = mouseUpdate.yaw || yaw;
+    pitch = mouseUpdate.pitch || pitch;
+    yaw = mouseUpdate.yaw || yaw;
 
     ///////////////////////
     // GAMEPAD CONTROLS  //
@@ -49728,13 +49728,6 @@ s.HUD = new Class({
             blue: 255,
             alpha: 0.75
         });
-        this.spaceStation = new s.Color({
-            game: this.game,
-            red: 0,
-            green: 0,
-            blue: 255,
-            alpha: 0.5
-        });
 
         // array containing trailing predictive targets
         this.trailingPredictions = [];
@@ -49750,11 +49743,11 @@ s.HUD = new Class({
         // TURNING SUBRETICLE //
         ////////////////////////
 
-        var velocity = this.controls.options.thrustImpulse,
-            height = window.innerHeight,
-            width = window.innerWidth,
-            centerX = width/2,
-            centerY = height/2;
+        var velocity = this.controls.options.thrustImpulse;
+        this.height = height = window.innerHeight,
+        this.width = width = window.innerWidth;
+        this.centerX = centerX = width/2,
+        this.centerY = centerY = height/2;
 
         if (this.canvas.height !== height){
             this.canvas.height = height;
@@ -49956,89 +49949,93 @@ s.HUD = new Class({
             this.ctx.stroke();
         }
 
-        //////////////////////////////////
-        // SPACE BASE TARGETING SYSTEM //
-        /////////////////////////////////
+        this.screenTargets('spaceStation');
+        this.screenTargets('moonBaseTall');
 
-        this.base = s.game.spaceStation.root;
 
-        var vbase3D = this.base.position.clone();
-        var vbase2D = s.projector.projectVector( vbase3D, s.game.camera );
-        var baseInSight, distanceToBase, v2DBase;
+        // //////////////////////////////////
+        // // SPACE BASE TARGETING SYSTEM //
+        // /////////////////////////////////
 
-        if ( Math.abs(vbase2D.x) <= 0.95 && Math.abs(vbase2D.y) <= 0.95 && vbase2D.z < 1 ) {
-            baseInSight = true;
-            distanceToBase = this.game.player.root.position.distanceTo(this.base.position);
-            size = Math.round((width - distanceToBase/100)/26);
-        }
+        // this.base = s.game.spaceStation.root;
 
-        // base targeting reticule and targeting box
-        if ( baseInSight && distanceToBase > 5500 ) {
-            v2DBase = vbase2D.clone();
-            v2DBase.x =  ( width  + v2DBase.x*width  )/2;
-            v2DBase.y = -(-height + v2DBase.y*height )/2;
+        // var vbase3D = this.base.position.clone();
+        // var vbase2D = s.projector.projectVector( vbase3D, s.game.camera );
+        // var baseInSight, distanceToBase, v2DBase;
 
-            this.ctx.strokeRect( v2DBase.x-size, v2DBase.y-size, size*2, size*2 );
-            this.ctx.lineWidth = 1;
-            this.ctx.strokeStyle = this.menu.color;
-        } else if ( !baseInSight ) {
-            var base2D = new THREE.Vector2(vbase2D.x, vbase2D.y);
-            base2D.multiplyScalar(1/base2D.length()).multiplyScalar(this.subreticleBound.radius+34);
+        // if ( Math.abs(vbase2D.x) <= 0.95 && Math.abs(vbase2D.y) <= 0.95 && vbase2D.z < 1 ) {
+        //     baseInSight = true;
+        //     distanceToBase = this.game.player.root.position.distanceTo(this.base.position);
+        //     size = Math.round((width - distanceToBase/100)/26);
+        // }
 
-            this.ctx.beginPath();
-            if (vbase2D.z > 1)
-                this.ctx.arc( -base2D.x+centerX, (-base2D.y+centerY), 10, 0, 2*this.PI, false );
-            else
-                this.ctx.arc( base2D.x+centerX, -(base2D.y-centerY), 10, 0, 2*this.PI, false );
+        // // base targeting reticule and targeting box
+        // if ( baseInSight && distanceToBase > 5500 ) {
+        //     v2DBase = vbase2D.clone();
+        //     v2DBase.x =  ( width  + v2DBase.x*width  )/2;
+        //     v2DBase.y = -(-height + v2DBase.y*height )/2;
 
-            this.ctx.fillStyle = "blue";
-            this.ctx.fill();
-            this.ctx.lineWidth = 2;
-            this.ctx.strokeStyle = this.menu.color;
-            this.ctx.stroke();
-        }
+        //     this.ctx.strokeRect( v2DBase.x-size, v2DBase.y-size, size*2, size*2 );
+        //     this.ctx.lineWidth = 1;
+        //     this.ctx.strokeStyle = this.menu.color;
+        // } else if ( !baseInSight ) {
+        //     var base2D = new THREE.Vector2(vbase2D.x, vbase2D.y);
+        //     base2D.multiplyScalar(1/base2D.length()).multiplyScalar(this.subreticleBound.radius+34);
 
-        //////////////////////////////////
-        // MOON BASE TARGETING SYSTEM //
-        /////////////////////////////////
+        //     this.ctx.beginPath();
+        //     if (vbase2D.z > 1)
+        //         this.ctx.arc( -base2D.x+centerX, (-base2D.y+centerY), 10, 0, 2*this.PI, false );
+        //     else
+        //         this.ctx.arc( base2D.x+centerX, -(base2D.y-centerY), 10, 0, 2*this.PI, false );
 
-        this.moonBase = s.game.moonBaseTall.root;
+        //     this.ctx.fillStyle = "blue";
+        //     this.ctx.fill();
+        //     this.ctx.lineWidth = 2;
+        //     this.ctx.strokeStyle = this.menu.color;
+        //     this.ctx.stroke();
+        // }
 
-        var vmoonBase3D = this.moonBase.position.clone();
-        var vmoonBase2D = s.projector.projectVector( vmoonBase3D, s.game.camera );
-        var moonBaseInSight, distanceTomoonBase, v2DmoonBase;
+        // //////////////////////////////////
+        // // MOON BASE TARGETING SYSTEM //
+        // /////////////////////////////////
 
-        if ( Math.abs(vmoonBase2D.x) <= 0.95 && Math.abs(vmoonBase2D.y) <= 0.95 && vmoonBase2D.z < 1 ) {
-            moonBaseInSight = true;
-            distanceTomoonBase = this.game.player.root.position.distanceTo(this.moonBase.position);
-            size = Math.round((width - distanceTomoonBase/100)/26);
-        }
+        // this.moonBase = s.game.moonBaseTall.root;
 
-        // moonBase targeting reticule and targeting box
-        if ( moonBaseInSight) {
-            v2DmoonBase = vmoonBase2D.clone();
-            v2DmoonBase.x =  ( width  + v2DmoonBase.x*width  )/2;
-            v2DmoonBase.y = -(-height + v2DmoonBase.y*height )/2;
+        // var vmoonBase3D = this.moonBase.position.clone();
+        // var vmoonBase2D = s.projector.projectVector( vmoonBase3D, s.game.camera );
+        // var moonBaseInSight, distanceTomoonBase, v2DmoonBase;
 
-            this.ctx.strokeRect( v2DmoonBase.x-size, v2DmoonBase.y-size, size*2, size*2 );
-            this.ctx.lineWidth = 1;
-            this.ctx.strokeStyle = this.menu.color;
-        } else if ( !moonBaseInSight ) {
-            var moonBase2D = new THREE.Vector2(vmoonBase2D.x, vmoonBase2D.y);
-            moonBase2D.multiplyScalar(1/moonBase2D.length()).multiplyScalar(this.subreticleBound.radius+34);
+        // if ( Math.abs(vmoonBase2D.x) <= 0.95 && Math.abs(vmoonBase2D.y) <= 0.95 && vmoonBase2D.z < 1 ) {
+        //     moonBaseInSight = true;
+        //     distanceTomoonBase = this.game.player.root.position.distanceTo(this.moonBase.position);
+        //     size = Math.round((width - distanceTomoonBase/100)/26);
+        // }
 
-            this.ctx.beginPath();
-            if (vmoonBase2D.z > 1)
-                this.ctx.arc( -moonBase2D.x+centerX, (-moonBase2D.y+centerY), 10, 0, 2*this.PI, false );
-            else
-                this.ctx.arc( moonBase2D.x+centerX, -(moonBase2D.y-centerY), 10, 0, 2*this.PI, false );
+        // // moonBase targeting reticule and targeting box
+        // if ( moonBaseInSight) {
+        //     v2DmoonBase = vmoonBase2D.clone();
+        //     v2DmoonBase.x =  ( width  + v2DmoonBase.x*width  )/2;
+        //     v2DmoonBase.y = -(-height + v2DmoonBase.y*height )/2;
 
-            this.ctx.fillStyle = "yello";
-            this.ctx.fill();
-            this.ctx.lineWidth = 2;
-            this.ctx.strokeStyle = this.menu.color;
-            this.ctx.stroke();
-        }
+        //     this.ctx.strokeRect( v2DmoonBase.x-size, v2DmoonBase.y-size, size*2, size*2 );
+        //     this.ctx.lineWidth = 1;
+        //     this.ctx.strokeStyle = this.menu.color;
+        // } else if ( !moonBaseInSight ) {
+        //     var moonBase2D = new THREE.Vector2(vmoonBase2D.x, vmoonBase2D.y);
+        //     moonBase2D.multiplyScalar(1/moonBase2D.length()).multiplyScalar(this.subreticleBound.radius+34);
+
+        //     this.ctx.beginPath();
+        //     if (vmoonBase2D.z > 1)
+        //         this.ctx.arc( -moonBase2D.x+centerX, (-moonBase2D.y+centerY), 10, 0, 2*this.PI, false );
+        //     else
+        //         this.ctx.arc( moonBase2D.x+centerX, -(moonBase2D.y-centerY), 10, 0, 2*this.PI, false );
+
+        //     this.ctx.fillStyle = "yello";
+        //     this.ctx.fill();
+        //     this.ctx.lineWidth = 2;
+        //     this.ctx.strokeStyle = this.menu.color;
+        //     this.ctx.stroke();
+        // }
 
 
 
@@ -50240,8 +50237,52 @@ s.HUD = new Class({
         this.oculusCtx.clearRect(0, 0, this.oculusCanvas.width, this.oculusCanvas.height);
         this.oculusCtx.drawImage(this.canvas, 50*1.08, -50, window.innerWidth/2, window.innerHeight/2);
         this.oculusCtx.drawImage(this.canvas, this.oculusCanvas.width/2-50*1.08, -50, window.innerWidth/2, window.innerHeight/2);
-    }
+    },
 
+    screenTargets: function (base) {
+
+        this[base] = s.game[base].root;
+
+        var vbase3D = this[base].position.clone();
+        var vbase2D = s.projector.projectVector( vbase3D, s.game.camera );
+        var baseInSight, distanceToBase, v2DBase;
+
+        if ( Math.abs(vbase2D.x) <= 0.95 && Math.abs(vbase2D.y) <= 0.95 && vbase2D.z < 1 ) {
+            baseInSight = true;
+            distanceToBase = this.game.player.root.position.distanceTo(this[base].position);
+            size = Math.round((this.width - distanceToBase/100)/26);
+        }
+
+        // base targeting reticule and targeting box
+        if ( baseInSight && distanceToBase > 5500 ) {
+            v2DBase = vbase2D.clone();
+            v2DBase.x =  ( this.width  + v2DBase.x*this.width  )/2;
+            v2DBase.y = -(-this.height + v2DBase.y*this.height )/2;
+
+            this.ctx.strokeRect( v2DBase.x-size, v2DBase.y-size, size*2, size*2 );
+            this.ctx.lineWidth = 1;
+            this.ctx.strokeStyle = this.menu.color;
+        } else if ( !baseInSight ) {
+            var base2D = new THREE.Vector2(vbase2D.x, vbase2D.y);
+            base2D.multiplyScalar(1/base2D.length()).multiplyScalar(this.subreticleBound.radius+34);
+
+            this.ctx.beginPath();
+            if (vbase2D.z > 1)
+                this.ctx.arc( -base2D.x+this.centerX, (-base2D.y+this.centerY), 10, 0, 2*this.PI, false );
+            else
+                this.ctx.arc( base2D.x+this.centerX, -(base2D.y-this.centerY), 10, 0, 2*this.PI, false );
+
+            if (base === 'moonBaseTall') {
+                this.ctx.fillStyle = "yellow";
+            } else {
+                this.ctx.fillStyle = "blue";
+            }
+            this.ctx.fill();
+            this.ctx.lineWidth = 2;
+            this.ctx.strokeStyle = this.menu.color;
+            this.ctx.stroke();
+        }
+    }
 });
 
 s.Radar = new Class({
