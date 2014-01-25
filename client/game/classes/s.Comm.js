@@ -90,7 +90,7 @@ s.Comm = new Class( {
 
         this.socket.on( 'sync', this.makeTrigger( 'sync'));
 
-        //this.game.hook( this.position );
+        this.game.hook( this.position );
 
         this.clockTick = this.clockTick.bind(this);
 
