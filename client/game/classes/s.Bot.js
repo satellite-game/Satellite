@@ -124,9 +124,6 @@ s.Bot = new Class( {
     // LEFT/RIGHT/UP/DOWN LOGIC //
     //////////////////////////////
 
-    var vTarget3D;
-    var vTarget2D;
-
     var yawSpeed    = this.botOptions.yawSpeed;
     var pitchSpeed  = this.botOptions.pitchSpeed;
 
@@ -136,34 +133,34 @@ s.Bot = new Class( {
     if ( this.target ) {
       this.target = this.target.root;
 
-      vTarget3D = this.target.position.clone();
-      vTarget2D = s.projector.projectVector(vTarget3D, this.camera);
+      this.moveStates.vTarget3D = this.target.position.clone();
+      this.moveStates.vTarget2D = s.projector.projectVector(this.moveStates.vTarget3D, this.camera);
     }
 
-    if (vTarget2D.z < 1) {
+    if (this.moveStates.vTarget2D.z < 1) {
         //go left; else if go right
-        if (vTarget2D.x < -0.15) {
+        if (this.moveStates.vTarget2D.x < -0.15) {
           this.moveStates.yaw = yawSpeed / thrustScalar;
-        } else if (vTarget2D.x > 0.15) {
+        } else if (this.moveStates.vTarget2D.x > 0.15) {
           this.moveStates.yaw = -1 * yawSpeed / thrustScalar;
         }
         //do down; else if go up
-        if (vTarget2D.y < -0.15) {
+        if (this.moveStates.vTarget2D.y < -0.15) {
           this.moveStates.pitch = -1 * pitchSpeed / thrustScalar;
-        } else if (vTarget2D.y > 0.15) {
+        } else if (this.moveStates.vTarget2D.y > 0.15) {
           this.moveStates.pitch  = pitchSpeed / thrustScalar;
         }
       } else {
         //go right; else if go left
-        if (vTarget2D.x < 0) {
+        if (this.moveStates.vTarget2D.x < 0) {
           this.moveStates.yaw = -1 * yawSpeed / thrustScalar;
-        } else if (vTarget2D.x >= 0) {
+        } else if (this.moveStates.vTarget2D.x >= 0) {
           this.moveStates.yaw = yawSpeed / thrustScalar;
         }
         //do up; else if go down
-        if (vTarget2D.y < 0) {
+        if (this.moveStates.vTarget2D.y < 0) {
           this.moveStates.pitch = pitchSpeed / thrustScalar;
-        } else if (vTarget2D.y > 0) {
+        } else if (this.moveStates.vTarget2D.y > 0) {
           this.moveStates.pitch  = -1 * pitchSpeed / thrustScalar;
         }
       }
@@ -196,7 +193,7 @@ s.Bot = new Class( {
     ///////  FIRING LOGIC ////////
     //////////////////////////////
 
-    if ( Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && this.closestDistance < maxDistance) {
+    if ( Math.abs(this.moveStates.vTarget2D.x) <= 0.15 && Math.abs(this.moveStates.vTarget2D.y) <= 0.15 && this.moveStates.vTarget2D.z < 1 && this.closestDistance < maxDistance) {
       this.fire('turret');
     }
 
