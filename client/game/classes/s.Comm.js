@@ -87,6 +87,7 @@ s.Comm = new Class( {
         this.socket.on( 'hit', this.makeTrigger( 'hit' ));
 
         this.socket.on( 'sync', this.makeTrigger( 'sync'));
+
         this.socket.on( 'bot retrieval', this.makeTrigger( 'bot retrieval' ));
 
         this.socket.on( 'bot positions', this.makeTrigger( 'bot positions' ));
