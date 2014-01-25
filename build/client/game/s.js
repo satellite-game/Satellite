@@ -49924,119 +49924,34 @@ s.HUD = new Class({
         // MOON TARGETING SYSTEM //
         ///////////////////////////
 
-        this.moon = s.game.moon.root;
+        // this.moon = s.game.moon.root;
 
-        var vMoon3D = this.moon.position.clone();
-        var vMoon2D = s.projector.projectVector( vMoon3D, s.game.camera );
-        var moonInSight = !!( Math.abs(vMoon2D.x) <= 0.95 && Math.abs(vMoon2D.y) <= 0.95 && vMoon2D.z < 1 );
+        // var vMoon3D = this.moon.position.clone();
+        // var vMoon2D = s.projector.projectVector( vMoon3D, s.game.camera );
+        // var moonInSight = !!( Math.abs(vMoon2D.x) <= 0.95 && Math.abs(vMoon2D.y) <= 0.95 && vMoon2D.z < 1 );
 
-        // Moon targeting reticule
-        if ( !moonInSight ) {
+        // // Moon targeting reticule
+        // if ( !moonInSight ) {
 
-            var moon2D = new THREE.Vector2(vMoon2D.x, vMoon2D.y);
-            moon2D.multiplyScalar(1/moon2D.length()).multiplyScalar(this.subreticleBound.radius+34);
-
-            this.ctx.beginPath();
-            if (vMoon2D.z > 1)
-                this.ctx.arc( -moon2D.x+centerX, (-moon2D.y+centerY), 10, 0, 2*this.PI, false );
-            else
-                this.ctx.arc( moon2D.x+centerX, -(moon2D.y-centerY), 10, 0, 2*this.PI, false );
-
-            this.ctx.fillStyle = "black";
-            this.ctx.fill();
-            this.ctx.lineWidth = 2;
-            this.ctx.strokeStyle = this.menu.color;
-            this.ctx.stroke();
-        }
-
-        this.screenTargets('spaceStation');
-        this.screenTargets('moonBaseTall');
-
-
-        // //////////////////////////////////
-        // // SPACE BASE TARGETING SYSTEM //
-        // /////////////////////////////////
-
-        // this.base = s.game.spaceStation.root;
-
-        // var vbase3D = this.base.position.clone();
-        // var vbase2D = s.projector.projectVector( vbase3D, s.game.camera );
-        // var baseInSight, distanceToBase, v2DBase;
-
-        // if ( Math.abs(vbase2D.x) <= 0.95 && Math.abs(vbase2D.y) <= 0.95 && vbase2D.z < 1 ) {
-        //     baseInSight = true;
-        //     distanceToBase = this.game.player.root.position.distanceTo(this.base.position);
-        //     size = Math.round((width - distanceToBase/100)/26);
-        // }
-
-        // // base targeting reticule and targeting box
-        // if ( baseInSight && distanceToBase > 5500 ) {
-        //     v2DBase = vbase2D.clone();
-        //     v2DBase.x =  ( width  + v2DBase.x*width  )/2;
-        //     v2DBase.y = -(-height + v2DBase.y*height )/2;
-
-        //     this.ctx.strokeRect( v2DBase.x-size, v2DBase.y-size, size*2, size*2 );
-        //     this.ctx.lineWidth = 1;
-        //     this.ctx.strokeStyle = this.menu.color;
-        // } else if ( !baseInSight ) {
-        //     var base2D = new THREE.Vector2(vbase2D.x, vbase2D.y);
-        //     base2D.multiplyScalar(1/base2D.length()).multiplyScalar(this.subreticleBound.radius+34);
+        //     var moon2D = new THREE.Vector2(vMoon2D.x, vMoon2D.y);
+        //     moon2D.multiplyScalar(1/moon2D.length()).multiplyScalar(this.subreticleBound.radius+34);
 
         //     this.ctx.beginPath();
-        //     if (vbase2D.z > 1)
-        //         this.ctx.arc( -base2D.x+centerX, (-base2D.y+centerY), 10, 0, 2*this.PI, false );
+        //     if (vMoon2D.z > 1)
+        //         this.ctx.arc( -moon2D.x+centerX, (-moon2D.y+centerY), 10, 0, 2*this.PI, false );
         //     else
-        //         this.ctx.arc( base2D.x+centerX, -(base2D.y-centerY), 10, 0, 2*this.PI, false );
+        //         this.ctx.arc( moon2D.x+centerX, -(moon2D.y-centerY), 10, 0, 2*this.PI, false );
 
-        //     this.ctx.fillStyle = "blue";
+        //     this.ctx.fillStyle = "black";
         //     this.ctx.fill();
         //     this.ctx.lineWidth = 2;
         //     this.ctx.strokeStyle = this.menu.color;
         //     this.ctx.stroke();
         // }
 
-        // //////////////////////////////////
-        // // MOON BASE TARGETING SYSTEM //
-        // /////////////////////////////////
-
-        // this.moonBase = s.game.moonBaseTall.root;
-
-        // var vmoonBase3D = this.moonBase.position.clone();
-        // var vmoonBase2D = s.projector.projectVector( vmoonBase3D, s.game.camera );
-        // var moonBaseInSight, distanceTomoonBase, v2DmoonBase;
-
-        // if ( Math.abs(vmoonBase2D.x) <= 0.95 && Math.abs(vmoonBase2D.y) <= 0.95 && vmoonBase2D.z < 1 ) {
-        //     moonBaseInSight = true;
-        //     distanceTomoonBase = this.game.player.root.position.distanceTo(this.moonBase.position);
-        //     size = Math.round((width - distanceTomoonBase/100)/26);
-        // }
-
-        // // moonBase targeting reticule and targeting box
-        // if ( moonBaseInSight) {
-        //     v2DmoonBase = vmoonBase2D.clone();
-        //     v2DmoonBase.x =  ( width  + v2DmoonBase.x*width  )/2;
-        //     v2DmoonBase.y = -(-height + v2DmoonBase.y*height )/2;
-
-        //     this.ctx.strokeRect( v2DmoonBase.x-size, v2DmoonBase.y-size, size*2, size*2 );
-        //     this.ctx.lineWidth = 1;
-        //     this.ctx.strokeStyle = this.menu.color;
-        // } else if ( !moonBaseInSight ) {
-        //     var moonBase2D = new THREE.Vector2(vmoonBase2D.x, vmoonBase2D.y);
-        //     moonBase2D.multiplyScalar(1/moonBase2D.length()).multiplyScalar(this.subreticleBound.radius+34);
-
-        //     this.ctx.beginPath();
-        //     if (vmoonBase2D.z > 1)
-        //         this.ctx.arc( -moonBase2D.x+centerX, (-moonBase2D.y+centerY), 10, 0, 2*this.PI, false );
-        //     else
-        //         this.ctx.arc( moonBase2D.x+centerX, -(moonBase2D.y-centerY), 10, 0, 2*this.PI, false );
-
-        //     this.ctx.fillStyle = "yello";
-        //     this.ctx.fill();
-        //     this.ctx.lineWidth = 2;
-        //     this.ctx.strokeStyle = this.menu.color;
-        //     this.ctx.stroke();
-        // }
-
+        this.screenTargets('moon', 'black');
+        this.screenTargets('spaceStation', 'blue');
+        this.screenTargets('moonBaseTall', 'yellow');
 
 
         //////////////////////////////////////////
@@ -50239,7 +50154,7 @@ s.HUD = new Class({
         this.oculusCtx.drawImage(this.canvas, this.oculusCanvas.width/2-50*1.08, -50, window.innerWidth/2, window.innerHeight/2);
     },
 
-    screenTargets: function (base) {
+    screenTargets: function (base, fillColor) {
 
         this[base] = s.game[base].root;
 
@@ -50254,15 +50169,7 @@ s.HUD = new Class({
         }
 
         // base targeting reticule and targeting box
-        if ( baseInSight && distanceToBase > 5500 ) {
-            v2DBase = vbase2D.clone();
-            v2DBase.x =  ( this.width  + v2DBase.x*this.width  )/2;
-            v2DBase.y = -(-this.height + v2DBase.y*this.height )/2;
-
-            this.ctx.strokeRect( v2DBase.x-size, v2DBase.y-size, size*2, size*2 );
-            this.ctx.lineWidth = 1;
-            this.ctx.strokeStyle = this.menu.color;
-        } else if ( !baseInSight ) {
+        if ( !baseInSight ) {
             var base2D = new THREE.Vector2(vbase2D.x, vbase2D.y);
             base2D.multiplyScalar(1/base2D.length()).multiplyScalar(this.subreticleBound.radius+34);
 
@@ -50272,15 +50179,22 @@ s.HUD = new Class({
             else
                 this.ctx.arc( base2D.x+this.centerX, -(base2D.y-this.centerY), 10, 0, 2*this.PI, false );
 
-            if (base === 'moonBaseTall') {
-                this.ctx.fillStyle = "yellow";
-            } else {
-                this.ctx.fillStyle = "blue";
-            }
+
+            this.ctx.fillStyle = fillColor;
             this.ctx.fill();
             this.ctx.lineWidth = 2;
             this.ctx.strokeStyle = this.menu.color;
             this.ctx.stroke();
+        }
+        if (base === 'moon') { return; }
+        if ( baseInSight && distanceToBase > 5500 ) {
+            v2DBase = vbase2D.clone();
+            v2DBase.x =  ( this.width  + v2DBase.x*this.width  )/2;
+            v2DBase.y = -(-this.height + v2DBase.y*this.height )/2;
+
+            this.ctx.strokeRect( v2DBase.x-size, v2DBase.y-size, size*2, size*2 );
+            this.ctx.lineWidth = 1;
+            this.ctx.strokeStyle = this.menu.color;
         }
     }
 });
