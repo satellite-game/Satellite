@@ -463,6 +463,16 @@ s.SatelliteGame = new Class( {
         HUD.ctx.drawImage(HUD.gameOver,HUD.canvas.width/2 - HUD.gameOver.width/2,HUD.canvas.height/2 - HUD.gameOver.height/2);
         s.game.comm.died(you, killer);
 
+        this.restartGame();
+    },
+
+    restartGame: function() {
+        var that = this;
+        setTimeout(function() {
+            that.player.shields = s.config.ship.shields;
+            that.player.hull = s.config.ship.hull;
+            that.restart();
+        }, 6000);
     },
 
     shieldBoost: function(){
