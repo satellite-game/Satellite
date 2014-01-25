@@ -4,7 +4,7 @@ s.SpaceStation = new Class({
 	construct: function(options){
 		// handle parameters
 		this.options = options = jQuery.extend({
-			position: new THREE.Vector3(0, 0, 0),
+			position: new THREE.Vector3(20000, 20000, 20000),
 			rotation: new THREE.Vector3(0, 0, 0)
 		}, options);
 
@@ -20,7 +20,7 @@ s.SpaceStation = new Class({
 
 		this.root = new Physijs.ConvexMesh(geometry, new THREE.MeshFaceMaterial(materials), 0);
 
-        this.root.name = "space_station";
+    this.root.name = "space_station";
 		this.root.position.copy(options.position);
 		this.root.rotation.copy(options.rotation);
 		// this.root.receiveShadow = true; // Causes shader error
