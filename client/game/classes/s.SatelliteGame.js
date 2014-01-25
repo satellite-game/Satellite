@@ -343,21 +343,21 @@ s.SatelliteGame = new Class( {
             console.log( '%s has left', message.name );
         }
     },
-    handleMove: function ( message ) {
-        console.log("A player moved", message);
-        if ( message.name == this.pilot.name ) {
-            // server told us to move
-            console.log( 'Server reset position' );
+    // handleMove: function ( message ) {
+    //     console.log("A player moved", message);
+    //     if ( message.name == this.pilot.name ) {
+    //         // server told us to move
+    //         console.log( 'Server reset position' );
 
-            // Return to center
-            s.game.player.setPosition( message.pos, message.rot, message.aVeloc, message.lVeloc, false ); // Never interpolate our own movement
-        } else {
-            // Enemy moved
-            if ( !s.game.enemies.execute( message.name, 'setPosition', [ message.pos, message.rot, message.aVeloc, message.lVeloc, message.interp ] ) ) {
-                s.game.enemies.add( message );
-            }
-        }
-    },
+    //         // Return to center
+    //         s.game.player.setPosition( message.pos, message.rot, message.aVeloc, message.lVeloc, false ); // Never interpolate our own movement
+    //     } else {
+    //         // Enemy moved
+    //         if ( !s.game.enemies.execute( message.name, 'setPosition', [ message.pos, message.rot, message.aVeloc, message.lVeloc, message.interp ] ) ) {
+    //             s.game.enemies.add( message );
+    //         }
+    //     }
+    // },
     handleSync: function ( pak ) {
       var data = {};
       for(var i in pak) {
@@ -373,7 +373,7 @@ s.SatelliteGame = new Class( {
         for(var i = 0; i < serverView.lVeloc.length; i++) {
           var pos = Math.abs(serverView.pos[i]) - Math.abs(myView.pos[i]);
 
-          if( pos >= 500 ) {
+          if( pos >= 1700 ) {
             console.log("Experiencing whiplash!", pos);
             s.game.player.setPosition( serverView.pos, myView.rot, serverView.aVeloc, serverView.lVeloc, true );
             return;
