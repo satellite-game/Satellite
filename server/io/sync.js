@@ -24,7 +24,7 @@ Sync.prototype.setInit = function( socket, list, packet, shortcut ) {
     var thatDelay = that.cycle; 
 
     setTimeout(function() {
-      //adjust(that.gamestate, that.cycle);
+      //adjust(that.gamestate, that.cycle); This needs tweaking.
       thatio.sockets.in(thatRoom).emit('sync', that.gamestate);
       that.sync( thatio, thatRoom);
     }, thatDelay);
@@ -37,7 +37,6 @@ Sync.prototype.setInit = function( socket, list, packet, shortcut ) {
       };
     };
   };
-
   list.cycle = this.sync_cycle;
   list.sync = sync;
 };
