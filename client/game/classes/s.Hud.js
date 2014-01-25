@@ -20,7 +20,6 @@ s.HUD = new Class({
 		this.ctx = this.canvas.getContext('2d');
 
         // Oculus Hud rendering
-        // Left eye
         this.oculusCanvas = document.createElement('canvas');
 
         this.oculusCanvas.height = window.innerHeight/2;
@@ -314,7 +313,7 @@ s.HUD = new Class({
 
         //////////////////////////////////////////
         // ENEMY TARGETING AND CALLSIGN DISPLAY //
-        /////////////////////////////////////////
+        //////////////////////////////////////////
 
         var self = s.game.player.root;
 
@@ -485,16 +484,16 @@ s.HUD = new Class({
             grd.addColorStop(1,"rgba(256,0,0,0.75)");
 
             // Fill with gradient
-            this.ctx.fillStyle = grd;
-            this.ctx.fillRect(0,0,width,height);
+            // this.ctx.fillStyle = grd;
+            // this.ctx.fillRect(0,0,width,height);
         }
         if (this.shieldsFull.alpha !== 0){
             var grade = this.ctx.createRadialGradient(centerX,centerY,width/12,centerX,centerY,width * (1.5 - this.shieldsFull.alpha));
             grade.addColorStop(0,"rgba(0,0,0,0)");
             grade.addColorStop(1,this.shieldsFull.color);
 
-            this.ctx.fillStyle = grade;
-            this.ctx.fillRect(0,0,width,height);
+            // this.ctx.fillStyle = grade;
+            // this.ctx.fillRect(0,0,width,height);
         }
 
 
@@ -508,8 +507,8 @@ s.HUD = new Class({
         this.ctx.stroke();
 
         this.oculusCtx.clearRect(0, 0, this.oculusCanvas.width, this.oculusCanvas.height);
-        this.oculusCtx.drawImage(this.canvas, 50*1.08, -50, window.innerWidth/2, window.innerHeight/2);
-        this.oculusCtx.drawImage(this.canvas, this.oculusCanvas.width/2-50*1.08, -50, window.innerWidth/2, window.innerHeight/2);
+        this.oculusCtx.drawImage(this.canvas, 50*1.07, -50, window.innerWidth/2, window.innerHeight/2);
+        this.oculusCtx.drawImage(this.canvas, this.oculusCanvas.width/2-50*1.07, -50, window.innerWidth/2, window.innerHeight/2);
     }
 
 });
