@@ -51275,7 +51275,7 @@ s.SatelliteGame = new Class( {
         for(var i = 0; i < serverView.lVeloc.length; i++) {
           var pos = Math.abs(serverView.pos[i]) - Math.abs(myView.pos[i]);
 
-          if( pos >= 500 ) {
+          if( pos >= 1700 ) {
             console.log("Experiencing whiplash!", pos);
             s.game.player.setPosition( serverView.pos, myView.rot, serverView.aVeloc, serverView.lVeloc, true );
             return;
