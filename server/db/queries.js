@@ -14,11 +14,16 @@ module.exports = {
     callback = callback || defaultCallback('addRoom');
     db.hgetall('rooms', function(err, data){
       if (err) throw 'addRoom error: ' + err;
-      if (!data[roomName]){
-        db.HSET('rooms', roomName, 1, function(err, data){callback(err, data);});
+      if (!data || !data[roomName]){
+        console.log('room DNE');
+        db.HSET('rooms', roomName, 1, function(err, data){
+          callback(err, data);
+        });
       } else {
         console.log('room exists');
-        db.HINCRBY('rooms', roomName, 1, function(err, data){callback(err, data);});
+        db.HINCRBY('rooms', roomName, 1, function(err, data){
+          callback(err, data);
+        });
       }
     });
   },
@@ -45,20 +50,14 @@ module.exports = {
     joinCallback = joinCallback || defaultCallback('joinRoom');
 
     async.waterfall([function (callback){
-      console.log('drop0');
-      console.log(arguments);
       that.addRoom(roomName, callback);
     },
     function(resultData, callback) {
-      console.log('drop1');
-      console.log(arguments);
       db.HSET(roomName+'_KILLS', playerID, 0, function(err, data){
         callback(null, data);
       });
     },
     function(resultData, callback) {
-      console.log('drop2');
-      console.log(arguments);
       db.HSET(roomName+'_DEATHS', playerID, 0, function(err, data){
         callback(null, data);
       });
@@ -84,7 +83,7 @@ module.exports = {
         callback(null, playersInRoom);
       });
     },
-    // need to remove the old rooms from the _KILLS and _DEATHS sections
+    // need to remove the room's _KILLS and _DEATHS hashes
     function(playersInRoom, callback) {
       if (playersInRoom < 1){
         that.deleteRooms(roomName);
