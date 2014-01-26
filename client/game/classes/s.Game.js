@@ -2,14 +2,14 @@ s.Game = new Class({
   extend: s.EventEmitter,
 
   construct: function(options) {
-        // Display load screen
-        this.loadScreen = new s.LoadScreen();
+    // Display load screen
+    this.loadScreen = new s.LoadScreen();
 
     var self = this;
 
     /*===============================================
-    =             Comms Handler Binding            =
-    ===================================================*/
+    =              Comms Handler Binding            =
+    =================================================*/
 
     // Communication
 
@@ -64,7 +64,7 @@ s.Game = new Class({
     // this.oculus.detected = true;
 
     // TODO: abstract key listening
-    $(document).on('keydown', function(evt) {
+    $(document).on('keyup', function(evt) {
       if (evt.which === 13)
         self.toggleFullScreen();
     });
@@ -146,7 +146,7 @@ s.Game = new Class({
 
   // Attempt to start the game (if models and physics have begun)
   tryInitialize: function() {
-    if (this.modelsLoaded && this.physicsStarted && !this.initialized) {
+    if (this.modelsLoaded && this.physicsStarted && !this.initialized) { // && this.roomSelected) {
       this.initialize();
     }
   },
@@ -242,6 +242,11 @@ s.Game = new Class({
      this.loadScreen.remove();
      this.doRender = true;
      requestAnimationFrame(this.render);
+   },
+
+   restart: function() {
+    this.doRender = true;
+    requestAnimationFrame(this.render);
    },
 
    // Stop rendering
