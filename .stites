@@ -1,8 +1,7 @@
 todo.md
-[x] collect players on server side by room
-[ ] alter a player's speed to a different point in the map
-[ ] ensure that the interprolation is working correctly
-[ ] increase the players position by the controls
-[ ] calculate linear velocity
-[ ] calculate angular velocity
-[ ] Make sure this works for two players in the room
+[ ] movement prediction on the client side.
+[ ] fix the azure branch - send stuff to a seperate branch for staging
+[ ] fix travis
+[ ] redis gets
+[ ] check your six - FIX IT
+[ ] what to do with the oculus

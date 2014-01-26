@@ -2,16 +2,19 @@ s.Projectile = new Class({
 	extend: s.GameObject,
 
     construct: function(options){
-        this.HUD = options.HUD;
+        this.HUD = options.HUD || null;
         this.game = options.game;
         this.comm = this.game.comm;
         this.game = options.game;
         this.pilot = options.pilot;
+        this.isBot = options.isBot;
         // handle parameters
         this.initialVelocity = options.initialVelocity;
         var that = this;
         // Destory projectile after 4 secs
-        setTimeout(function(){that.destruct();}, 4000);
+        setTimeout(function(){
+            that.destruct();
+        }, 4000);
     },
 
 	init: function(_super){
@@ -20,6 +23,8 @@ s.Projectile = new Class({
     },
 
     handleCollision: function(mesh, position){
+        //check if your turret hit someone
+        //else if check if you got hit by a bot
         if (this.pilot === this.game.pilot.name){
             if (mesh.instance.alliance && mesh.instance.alliance === "enemy"){
                 this.HUD.menu.animate({
@@ -34,6 +39,8 @@ s.Projectile = new Class({
                 }
                 this.comm.hit(mesh.name,this.game.pilot.name);
             }
+        } else if (mesh.name === this.game.pilot.name && this.isBot ) {
+            this.comm.botHit(mesh.name, this.pilot);
         }
         this.destruct();
     },
