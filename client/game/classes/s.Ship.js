@@ -40,7 +40,7 @@ s.Ship = new Class({
     },
 
 	fire: function(weapon){
-		var now =new Date().getTime();
+		var now = new Date().getTime();
         var rotation = this.root.rotation.clone();
         var initialVelocity = this.root.getLinearVelocity().clone();
 
