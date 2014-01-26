@@ -1,4 +1,4 @@
-s.SpaceStation = new Class({
+s.BuildingTall = new Class({
 	extend: s.GameObject,
 
 	construct: function(options){
@@ -8,8 +8,8 @@ s.SpaceStation = new Class({
 			rotation: options.rotation
 		}, options);
 
-		var geometry = s.models.human_space_station.geometry;
-		var materials = s.models.human_space_station.materials;
+		var geometry = s.models.human_building_tall.geometry;
+		var materials = s.models.human_building_tall.materials;
 
 		// Setup physical properties
 		materials[0] = Physijs.createMaterial(
@@ -20,7 +20,7 @@ s.SpaceStation = new Class({
 
 		this.root = new Physijs.ConvexMesh(geometry, new THREE.MeshFaceMaterial(materials), 0);
 
-        this.root.name = "space_station";
+        this.root.name = "building_tall";
 		this.root.position.copy(options.position);
 		this.root.rotation.copy(options.rotation);
 		// this.root.receiveShadow = true; // Causes shader error
