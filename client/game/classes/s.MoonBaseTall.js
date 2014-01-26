@@ -24,7 +24,6 @@ s.MoonBaseTall = new Class({
 		this.root.position.copy(options.position);
 		this.root.rotation.copy(options.rotation);
 
-    // this.game.moon.root.add(this);
 		// this.root.receiveShadow = true; // Causes shader error
 	}
 });
