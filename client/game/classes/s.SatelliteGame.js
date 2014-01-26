@@ -72,18 +72,18 @@ s.SatelliteGame = new Class( {
             game: this
         } );
 
+        if (this.oculus.detected) {
+            console.log('Activating oculus HUD');
+            this.HUD.canvas.style.display = 'none';
+            this.HUD.oculusCanvas.style.display = 'block';
+        }
+
         // Add menu
         this.menu = new s.Menu({
             game: this
         });
 
         this.menu.showInitialMenu();
-
-        if (this.oculus.detected) {
-            console.log('Activating oculus HUD');
-            this.HUD.canvas.style.display = 'none';
-            this.HUD.oculusCanvas.style.display = 'block';
-        }
 
         this.player = new s.Player( {
             HUD: this.HUD,
@@ -462,10 +462,9 @@ s.SatelliteGame = new Class( {
         if (!you) {
             return;
         }
-        if (this.hostPlayer) { clearInterval(this.botPositionInterval); }
-        s.game.stop();
+        if (this.hostPlayer) clearInterval(this.botPositionInterval);
         this.menu.gameOver(killer);
-        s.game.comm.died(you, killer);
+        if (s.game.roomSelected) s.game.comm.died(you, killer);
 
         this.restartGame();
     },
