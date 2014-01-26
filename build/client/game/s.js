@@ -48934,7 +48934,6 @@ s.MoonBaseTall = new Class({
 		this.root.position.copy(options.position);
 		this.root.rotation.copy(options.rotation);
 
-    // this.game.moon.root.add(this);
 		// this.root.receiveShadow = true; // Causes shader error
 	}
 });
@@ -49919,9 +49918,9 @@ s.HUD = new Class({
         this.ctx.fillText("Survivors: " + (enemiesLen + 1), width-128-36, 256+30 );
         this.ctx.fill();
 
-        this.screenTargets(s.game.moon.root, 'black', 34, 550);
-        this.screenTargets(s.game.spaceStation.root, 'blue', 34, 5500);
-        this.screenTargets(s.game.moonBaseTall.root, 'yellow', 34, 5500);
+        this.findTargets(s.game.moon.root, 'black', 34, 550);
+        this.findTargets(s.game.spaceStation.root, 'blue', 34, 5500);
+        this.findTargets(s.game.moonBaseTall.root, 'yellow', 34, 5500);
 
 
         //////////////////////////////////////////
@@ -49968,7 +49967,7 @@ s.HUD = new Class({
 
             // TARGET HUD MARKING
             if ( this.target ) {
-                 this.screenTargets(this.target.root, "rgba(256,0,0,0.5)", 12, 0);
+                 this.findTargets(this.target.root, "rgba(256,0,0,0.5)", 12, 0);
 
                 /////////////////////////////////
                 // PREDICTIVE TARGETING SYSTEM //
@@ -50081,28 +50080,28 @@ s.HUD = new Class({
         this.oculusCtx.drawImage(this.canvas, this.oculusCanvas.width/2-50*1.08, -50, window.innerWidth/2, window.innerHeight/2);
     },
 
-    screenTargets: function (base, fillColor, distanceFromRadius, maxBoxDistance) {
+    findTargets: function (circleTarget, fillColor, distanceFromRadius, maxBoxDistance) {
 
-        var vbase3D = base.position.clone();
-        var vbase2D = s.projector.projectVector( vbase3D, s.game.camera );
-        var baseInSight, distanceToBase, v2DBase, size; 
+        var vcircleTarget3D = circleTarget.position.clone();
+        var vcircleTarget2D = s.projector.projectVector( vcircleTarget3D, s.game.camera );
+        var circleTargetInSight, distanceTocircleTarget, v2DcircleTarget, size; 
 
-        if ( Math.abs(vbase2D.x) <= 0.95 && Math.abs(vbase2D.y) <= 0.95 && vbase2D.z < 1 ) {
-            baseInSight = true;
-            distanceToBase = this.game.player.root.position.distanceTo(base.position);
-            size = Math.round((this.width - distanceToBase/100)/26);
+        if ( Math.abs(vcircleTarget2D.x) <= 0.95 && Math.abs(vcircleTarget2D.y) <= 0.95 && vcircleTarget2D.z < 1 ) {
+            circleTargetInSight = true;
+            distanceTocircleTarget = this.game.player.root.position.distanceTo(circleTarget.position);
+            size = Math.round((this.width - distanceTocircleTarget/100)/26);
         }
 
-        // base targeting reticule and targeting box
-        if ( !baseInSight ) {
-            var base2D = new THREE.Vector2(vbase2D.x, vbase2D.y);
-            base2D.multiplyScalar(1/base2D.length()).multiplyScalar(this.subreticleBound.radius+distanceFromRadius);
+        // circleTarget targeting reticule and targeting box
+        if ( !circleTargetInSight ) {
+            var circleTarget2D = new THREE.Vector2(vcircleTarget2D.x, vcircleTarget2D.y);
+            circleTarget2D.multiplyScalar(1/circleTarget2D.length()).multiplyScalar(this.subreticleBound.radius+distanceFromRadius);
 
             this.ctx.beginPath();
-            if (vbase2D.z > 1)
-                this.ctx.arc( -base2D.x+this.centerX, (-base2D.y+this.centerY), 10, 0, 2*this.PI, false );
+            if (vcircleTarget2D.z > 1)
+                this.ctx.arc( -circleTarget2D.x+this.centerX, (-circleTarget2D.y+this.centerY), 10, 0, 2*this.PI, false );
             else
-                this.ctx.arc( base2D.x+this.centerX, -(base2D.y-this.centerY), 10, 0, 2*this.PI, false );
+                this.ctx.arc( circleTarget2D.x+this.centerX, -(circleTarget2D.y-this.centerY), 10, 0, 2*this.PI, false );
 
 
             this.ctx.fillStyle = fillColor;
@@ -50111,62 +50110,17 @@ s.HUD = new Class({
             this.ctx.strokeStyle = this.menu.color;
             this.ctx.stroke();
         }
-        if (base === s.game.moon.root) { return; }
-        if ( baseInSight && distanceToBase > maxBoxDistance ) {
-            v2DBase = vbase2D.clone();
-            v2DBase.x =  ( this.width  + v2DBase.x*this.width  )/2;
-            v2DBase.y = -(-this.height + v2DBase.y*this.height )/2;
+        if (circleTarget === s.game.moon.root) { return; }
+        if ( circleTargetInSight && distanceTocircleTarget > maxBoxDistance ) {
+            v2DcircleTarget = vcircleTarget2D.clone();
+            v2DcircleTarget.x =  ( this.width  + v2DcircleTarget.x*this.width  )/2;
+            v2DcircleTarget.y = -(-this.height + v2DcircleTarget.y*this.height )/2;
 
-            this.ctx.strokeRect( v2DBase.x-size, v2DBase.y-size, size*2, size*2 );
+            this.ctx.strokeRect( v2DcircleTarget.x-size, v2DcircleTarget.y-size, size*2, size*2 );
             this.ctx.lineWidth = 1;
             this.ctx.strokeStyle = this.menu.color;
         }
     }
-
-
-    // this.target = this.target.root;
-
-    // var vTarget3D = this.target.position.clone();
-    // var vTarget2D = s.projector.projectVector(vTarget3D, s.game.camera);
-
-    // var distanceToTarget, v2D, size;
-
-    // if ( Math.abs(vTarget2D.x) <= 0.95 && Math.abs(vTarget2D.y) <= 0.95 && vTarget2D.z < 1 ){
-        // targetInSight = true;
-        // distanceToTarget = self.position.distanceTo(this.target.position);
-        // size = Math.round((width - distanceToTarget/100)/26);
-    // }
-
-    // // Targeting box
-    // if ( targetInSight ){
-
-    //     v2D = vTarget2D.clone();
-    //     v2D.x =  ( width  + v2D.x*width  )/2;
-    //     v2D.y = -(-height + v2D.y*height )/2;
-
-    //     this.ctx.strokeRect( v2D.x-size, v2D.y-size, size*2, size*2 );
-    //     this.ctx.lineWidth = 1;
-    //     this.ctx.strokeStyle = this.menu.color;
-
-    // Radial direction marker
-    // } else {
-
-        // v2D = new THREE.Vector2(vTarget2D.x, vTarget2D.y);
-        // v2D.multiplyScalar(1/v2D.length()).multiplyScalar(this.subreticleBound.radius+12);
-
-        // this.ctx.beginPath();
-        // if (vTarget2D.z > 1)
-        //     this.ctx.arc( -v2D.x+centerX, (-v2D.y+centerY), 10, 0, 2*this.PI, false);
-        // else
-        //     this.ctx.arc( v2D.x+centerX, -(v2D.y-centerY), 10, 0, 2*this.PI, false);
-
-        // this.ctx.fillStyle = "rgba(256,0,0,0.5)";
-        // this.ctx.fill();
-        // this.ctx.lineWidth = 2;
-        // this.ctx.strokeStyle = this.menu.color;
-        // this.ctx.stroke();
-
-    // }
 });
 
 s.Radar = new Class({
