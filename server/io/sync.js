@@ -1,6 +1,6 @@
 var Sync = function( time, tolerance, syncCycle ) {
   this.cycle = time || 1000;
-  this.tol = tolerance || 100;
+  this.tol = tolerance || 1500;
   this.sync_cycle = 100 || syncCycle;
 };
 
