@@ -8,6 +8,8 @@ module.exports = [
   "./client/lib/Stats.js",
   "./client/lib/gamepad.js",
   "./client/lib/socketio/socket.io.js",
+  "./client/lib/typefacejs/helvetiker_bold.typeface.js",
+  "./client/lib/typefacejs/helvetiker_regular.typeface.js",
   "./client/game/s.js",
   "./client/game/s.util.js",
   "./client/game/classes/s.EventEmitter.js",
@@ -22,6 +24,9 @@ module.exports = [
   "./client/game/classes/s.Player.js",
   "./client/game/classes/s.Bot.js",
   "./client/game/classes/s.Moon.js",
+  "./client/game/classes/s.BuildingTall.js",
+  "./client/game/classes/s.BuildingShort.js",
+  "./client/game/classes/s.SpaceStation.js",
   "./client/game/classes/s.Color.js",
   "./client/game/classes/s.Keyboard.js",
   "./client/game/classes/s.Mouse.js",
@@ -31,6 +36,7 @@ module.exports = [
   "./client/game/classes/s.Radar.js",
   "./client/game/classes/s.Comm.js",
   "./client/game/classes/s.LoadScreen.js",
+  "./client/game/classes/s.Menu.js",
   "./client/game/classes/s.Game.js",
   "./client/game/classes/s.SatelliteGame.js"
 ];
