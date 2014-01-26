@@ -72,16 +72,18 @@ s.SatelliteGame = new Class( {
             game: this
         } );
 
-        // Add menu
-        this.menu = new s.Menu({
-            game: this
-        });
-
         if (this.oculus.detected) {
             console.log('Activating oculus HUD');
             this.HUD.canvas.style.display = 'none';
             this.HUD.oculusCanvas.style.display = 'block';
         }
+
+        // Add menu
+        this.menu = new s.Menu({
+            game: this
+        });
+
+        this.menu.showInitialMenu();
 
         this.player = new s.Player( {
             HUD: this.HUD,
@@ -242,7 +244,7 @@ s.SatelliteGame = new Class( {
             player: this.player,
             server: window.location.hostname + ':' + window.location.port
         } );
-
+        
         this.comm.on('fire', that.handleEnemyFire);
         this.comm.on('hit', that.handleHit);
         this.comm.on('player list', that.handlePlayerList);
@@ -257,7 +259,6 @@ s.SatelliteGame = new Class( {
 
         this.handleLoadMessages('initializing physics');
         this.player.root.addEventListener('ready', function(){
-            that.comm.connected( );
             s.game.start();
         });
 	},
@@ -454,20 +455,16 @@ s.SatelliteGame = new Class( {
     },
 
     handleFire: function(props) {
-        s.game.comm.fire(props.position, props.rotation, props.initialVelocity);
+        if (s.game.roomSelected) s.game.comm.fire(props.position, props.rotation, props.initialVelocity);
     },
 
     handleDie: function(you, killer) {
         if (!you) {
             return;
         }
-        if (this.hostPlayer) { clearInterval(this.botPositionInterval); }
-        s.game.stop();
-        var HUD = s.game.HUD;
-        HUD.ctx.fillStyle = "rgba(0,0,0,0.5)";
-        HUD.ctx.fillRect(0,0,HUD.canvas.width,HUD.canvas.height);
-        HUD.ctx.drawImage(HUD.gameOver,HUD.canvas.width/2 - HUD.gameOver.width/2,HUD.canvas.height/2 - HUD.gameOver.height/2);
-        s.game.comm.died(you, killer);
+        if (this.hostPlayer) clearInterval(this.botPositionInterval);
+        this.menu.gameOver(killer);
+        if (s.game.roomSelected) s.game.comm.died(you, killer);
 
         this.restartGame();
     },
