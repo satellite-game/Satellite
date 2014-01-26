@@ -2,7 +2,7 @@ module.exports = [
   "./client/lib/jquery.js",
   "./client/lib/Class.js",
   "./client/lib/three.js",
-  "./client/lib/OculusBridge.js",
+  "./client/lib/vr.js",
   "./client/lib/RiftCamera.js",
   "./client/lib/physi.js",
   "./client/lib/Stats.js",
