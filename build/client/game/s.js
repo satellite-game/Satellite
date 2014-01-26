@@ -50897,8 +50897,8 @@ s.Turret = new Class({
         scale: new THREE.Vector3(50, 50, 1.0),
         color: {
             alliance: 0x00F2FF,
-            rebels: 0xFF0000,
-            enemy: 0xFF0000
+            rebels: 0xFF4400,
+            enemy: 0xFF4400
         }
     },
 
@@ -50919,7 +50919,11 @@ s.Turret = new Class({
             color: this.color
         }));
 
-        sprite.scale.copy(this.options.scale);
+        if (s.game.oculus.detected) {
+            sprite.scale.set(20, 20, 1.0);
+        } else {
+            sprite.scale.copy(this.options.scale);
+        }
         this.root.add(sprite);
 
         // Position the projectile relative to the ship
@@ -50971,8 +50975,8 @@ s.Ship = new Class({
         leftTurretOffset: new THREE.Vector3(35, 0, -200),
         rightTurretOffset: new THREE.Vector3(-35, 0, -200),
         missileOffset: new THREE.Vector3(0, 0, -120),
-        turretFireTime: 200,
-        botTurretFireTime: 1700,
+        turretFireTime: 150,
+        botTurretFireTime: 1000,
         missileFireTime: 1000
     },
 
@@ -50999,6 +51003,7 @@ s.Ship = new Class({
         this.shields = s.config.ship.shields;
 
         this.lastTime = new Date( ).getTime( );
+        this. alternateFire = false;
     },
 
     getOffset: function(offset) {
@@ -51026,15 +51031,17 @@ s.Ship = new Class({
             turretFireTime = this.options.turretFireTime;
             bullet.HUD = this.HUD;
         }
-
         // Turrets
         if (weapon === 'turret'){
             if (now - this.lastTurretFire > turretFireTime){
-                // Left bullet
-                this.makeTurret(bullet, this.options.leftTurretOffset);
-
-                // Right bullet
-                this.makeTurret(bullet, this.options.rightTurretOffset);
+                if ( this.alternateFire ) {
+                    // Left bullet
+                    this.makeTurret(bullet, this.options.leftTurretOffset);
+                } else {
+                    // Right bullet
+                    this.makeTurret(bullet, this.options.rightTurretOffset);
+                }
+                this.alternateFire = !this.alternateFire;
 
                 this.lastTurretFire = now;
                 if (!this.isBot) { this.game.sound.play('laser', 0.5); }
@@ -51904,9 +51911,15 @@ s.Oculus = new Class({
     this.detected = false;
     this.game = options.game;
 
-    vr.load(function () {
+    vr.load(function (err) {
+      if (err) {
+        console.log('Error loading oculus rift.');
+        return;
+      }
       this.state = new vr.State();
-      this.detected = true;
+      if (this.state.present) {
+        this.detected = true;
+      }
     }, this);
     this.update = this.update.bind(this);
     this.game.hook(this.update);
@@ -53270,9 +53283,6 @@ s.LoadScreen = new Class( {
     }
 } );
 
-// This menu item is going to be 3D text floating in game in front of
-// the camera. It's more complicated but it'll be cool in the oculus.
-
 s.Menu = new Class({
 
   toString: 'Menu',
@@ -53316,7 +53326,7 @@ s.Menu = new Class({
     // this.camera.add( this.selectorHelper );
 
     if (this.oculus.detected) {
-      this.menuBox.position.setZ(-150);
+      this.menuBox.position.setZ(-50);
     }
   },
 
@@ -53977,18 +53987,18 @@ s.SatelliteGame = new Class( {
             game: this
         } );
 
+        if (this.oculus.detected) {
+            console.log('Activating oculus HUD');
+            this.HUD.canvas.style.display = 'none';
+            this.HUD.oculusCanvas.style.display = 'block';
+        }
+
         // Add menu
         this.menu = new s.Menu({
             game: this
         });
 
         this.menu.showInitialMenu();
-
-        if (this.oculus.detected) {
-            console.log('Activating oculus HUD');
-            this.HUD.canvas.style.display = 'none';
-            this.HUD.oculusCanvas.style.display = 'block';
-        }
 
         this.player = new s.Player( {
             HUD: this.HUD,
@@ -54367,23 +54377,9 @@ s.SatelliteGame = new Class( {
         if (!you) {
             return;
         }
-        if (this.hostPlayer) { clearInterval(this.botPositionInterval); }
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-        // var HUD = s.game.HUD;
-        // HUD.ctx.fillStyle = "rgba(0,0,0,0.5)";
-        // HUD.ctx.fillRect(0,0,HUD.canvas.width,HUD.canvas.height);
-        // HUD.ctx.drawImage(HUD.gameOver,HUD.canvas.width/2 - HUD.gameOver.width/2,HUD.canvas.height/2 - HUD.gameOver.height/2);
+        if (this.hostPlayer) clearInterval(this.botPositionInterval);
         this.menu.gameOver(killer);
         if (s.game.roomSelected) s.game.comm.died(you, killer);
-
-        // s.game.stop();
-=======
->>>>>>> 436a8df9519cc0e8c2bf0e31c856aaf129f32fcb
-        s.game.stop();
-        this.menu.gameOver(killer);
-        s.game.comm.died(you, killer);
 
         this.restartGame();
     },
@@ -54398,10 +54394,6 @@ s.SatelliteGame = new Class( {
             that.menu.close();
             that.restart();
         }, 6000);
-<<<<<<< HEAD
-=======
->>>>>>> d2ebd56795423c8d2a3efa05952771eda1a41a0e
->>>>>>> 436a8df9519cc0e8c2bf0e31c856aaf129f32fcb
     },
 
     shieldBoost: function(){
