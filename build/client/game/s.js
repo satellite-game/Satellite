@@ -52061,7 +52061,7 @@ s.Controls = new Class({
     }
 
     if (this.keyboard.pressed('tilde')) {
-
+      vr.resetHmdOrientation();
     }
 
 
@@ -53222,7 +53222,7 @@ s.Menu = new Class({
     this.camera.add( this.menuBox );
 
     if (this.oculus.detected) {
-      this.menuBox.position.setZ(-50);
+      this.menuBox.position.setZ(-150);
     }
   },
 
@@ -53372,8 +53372,8 @@ s.Menu = new Class({
         // items and moves hover up and down with head motion
         // todo: use ray casting to select items more accurately
 
-        var viewingAngle = Math.PI/4 * (this.oculus.quat.x - this.oculus.compensationX);
-        var tilt = ~~((this.menuItems.length/2 * this.oculus.quat.x - this.oculus.compensationX) * 6 + ~~(this.menuItems.length/2));
+        var viewingAngle = Math.PI/4 * (this.oculus.quat.x);
+        var tilt = ~~((this.menuItems.length/2 * this.oculus.quat.x) * 6 + ~~(this.menuItems.length/2));
         var hover = this.menuItems[tilt];
         this.hoverItem(hover);
 
@@ -53398,6 +53398,8 @@ s.Menu = new Class({
     this.menuScreen = 'init';
     this.displayed = true;
     this.menuBox.visible = true;
+    this.HUD.canvas.style.display = 'none';
+    this.HUD.oculusCanvas.style.display = 'none';
 
     this.addMenuItems([
       {text: 'JOIN GAME', size: 5, action: 'showRoomList'},
