@@ -50785,7 +50785,7 @@ s.Comm = new Class( {
     position: function ( ) {
       if(this.lastPosition === undefined) {
         this.lastPosition = s.game.player.getPositionPacket( );
-        this.lastTime = new Date().getTime;
+        this.lastTime = new Date().getTime();
       }
       var time = new Date( ).getTime( );
       var shipPosition = s.game.player.getPositionPacket( );
@@ -50815,7 +50815,7 @@ s.Comm = new Class( {
         }
         return results;
       }();
-
+      console.log(delta);
       if(delta === 'Invalid') {
         return;
       } else {
@@ -50831,7 +50831,7 @@ s.Comm = new Class( {
 
         s.game.comm.socket.emit( 'combat','move', packet );
         s.game.comm.lastMessageTime = time;
-        this.lastPosition = shipPosition.pos;
+        this.lastPosition = shipPosition;
         this.lastTime = time; 
       }
     },
