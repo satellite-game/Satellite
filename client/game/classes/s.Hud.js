@@ -281,9 +281,9 @@ s.HUD = new Class({
         this.ctx.fillText("Survivors: " + (enemiesLen + 1), width-128-36, 256+30 );
         this.ctx.fill();
 
-        this.screenTargets('moon', 'black');
-        this.screenTargets('spaceStation', 'blue');
-        this.screenTargets('moonBaseTall', 'yellow');
+        this.screenTargets(s.game.moon.root, 'black', 34, 550);
+        this.screenTargets(s.game.spaceStation.root, 'blue', 34, 5500);
+        this.screenTargets(s.game.moonBaseTall.root, 'yellow', 34, 5500);
 
 
         //////////////////////////////////////////
@@ -330,50 +330,7 @@ s.HUD = new Class({
 
             // TARGET HUD MARKING
             if ( this.target ) {
-                this.target = this.target.root;
-
-                var vTarget3D = this.target.position.clone();
-                var vTarget2D = s.projector.projectVector(vTarget3D, s.game.camera);
-
-                var distanceToTarget, v2D, size;
-
-                if ( Math.abs(vTarget2D.x) <= 0.95 && Math.abs(vTarget2D.y) <= 0.95 && vTarget2D.z < 1 ){
-                    targetInSight = true;
-                    distanceToTarget = self.position.distanceTo(this.target.position);
-                    size = Math.round((width - distanceToTarget/100)/26);
-                }
-
-                // Targeting box
-                if ( targetInSight ){
-
-                    v2D = vTarget2D.clone();
-                    v2D.x =  ( width  + v2D.x*width  )/2;
-                    v2D.y = -(-height + v2D.y*height )/2;
-
-                    this.ctx.strokeRect( v2D.x-size, v2D.y-size, size*2, size*2 );
-                    this.ctx.lineWidth = 1;
-                    this.ctx.strokeStyle = this.menu.color;
-
-                // Radial direction marker
-                } else {
-
-                    v2D = new THREE.Vector2(vTarget2D.x, vTarget2D.y);
-                    v2D.multiplyScalar(1/v2D.length()).multiplyScalar(this.subreticleBound.radius+12);
-
-                    this.ctx.beginPath();
-                    if (vTarget2D.z > 1)
-                        this.ctx.arc( -v2D.x+centerX, (-v2D.y+centerY), 10, 0, 2*this.PI, false);
-                    else
-                        this.ctx.arc( v2D.x+centerX, -(v2D.y-centerY), 10, 0, 2*this.PI, false);
-
-                    this.ctx.fillStyle = "rgba(256,0,0,0.5)";
-                    this.ctx.fill();
-                    this.ctx.lineWidth = 2;
-                    this.ctx.strokeStyle = this.menu.color;
-                    this.ctx.stroke();
-
-                }
-
+                 this.screenTargets(this.target.root, "rgba(256,0,0,0.5)", 12, 0);
 
                 /////////////////////////////////
                 // PREDICTIVE TARGETING SYSTEM //
@@ -486,24 +443,22 @@ s.HUD = new Class({
         this.oculusCtx.drawImage(this.canvas, this.oculusCanvas.width/2-50*1.08, -50, window.innerWidth/2, window.innerHeight/2);
     },
 
-    screenTargets: function (base, fillColor) {
+    screenTargets: function (base, fillColor, distanceFromRadius, maxBoxDistance) {
 
-        this[base] = s.game[base].root;
-
-        var vbase3D = this[base].position.clone();
+        var vbase3D = base.position.clone();
         var vbase2D = s.projector.projectVector( vbase3D, s.game.camera );
-        var baseInSight, distanceToBase, v2DBase;
+        var baseInSight, distanceToBase, v2DBase, size; 
 
         if ( Math.abs(vbase2D.x) <= 0.95 && Math.abs(vbase2D.y) <= 0.95 && vbase2D.z < 1 ) {
             baseInSight = true;
-            distanceToBase = this.game.player.root.position.distanceTo(this[base].position);
+            distanceToBase = this.game.player.root.position.distanceTo(base.position);
             size = Math.round((this.width - distanceToBase/100)/26);
         }
 
         // base targeting reticule and targeting box
         if ( !baseInSight ) {
             var base2D = new THREE.Vector2(vbase2D.x, vbase2D.y);
-            base2D.multiplyScalar(1/base2D.length()).multiplyScalar(this.subreticleBound.radius+34);
+            base2D.multiplyScalar(1/base2D.length()).multiplyScalar(this.subreticleBound.radius+distanceFromRadius);
 
             this.ctx.beginPath();
             if (vbase2D.z > 1)
@@ -518,8 +473,8 @@ s.HUD = new Class({
             this.ctx.strokeStyle = this.menu.color;
             this.ctx.stroke();
         }
-        if (base === 'moon') { return; }
-        if ( baseInSight && distanceToBase > 5500 ) {
+        if (base === s.game.moon.root) { return; }
+        if ( baseInSight && distanceToBase > maxBoxDistance ) {
             v2DBase = vbase2D.clone();
             v2DBase.x =  ( this.width  + v2DBase.x*this.width  )/2;
             v2DBase.y = -(-this.height + v2DBase.y*this.height )/2;
