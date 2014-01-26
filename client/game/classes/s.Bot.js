@@ -163,7 +163,7 @@ s.Bot = new Class( {
         if (this.moveStates.vTarget2D.y < 0) {
           this.moveStates.pitch = pitchSpeed / thrustScalar;
         } else if (this.moveStates.vTarget2D.y > 0) {
-          this.moveStates.pitch  = -1 * pitchSpeed / thrustScalar;
+          this.moveStates.pitch = -1 * pitchSpeed / thrustScalar;
         }
       }
 
