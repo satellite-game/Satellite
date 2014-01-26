@@ -227,7 +227,7 @@ s.Controls = new Class({
     }
 
     if (this.keyboard.pressed('tilde')) {
-
+      vr.resetHmdOrientation();
     }
 
 
