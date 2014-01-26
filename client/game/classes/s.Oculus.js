@@ -5,9 +5,15 @@ s.Oculus = new Class({
     this.detected = false;
     this.game = options.game;
 
-    vr.load(function () {
+    vr.load(function (err) {
+      if (err) {
+        console.log('Error loading oculus rift.');
+        return;
+      }
       this.state = new vr.State();
-      this.detected = true;
+      if (this.state.present) {
+        this.detected = true;
+      }
     }, this);
     this.update = this.update.bind(this);
     this.game.hook(this.update);
