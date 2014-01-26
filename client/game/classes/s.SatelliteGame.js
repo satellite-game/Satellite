@@ -159,7 +159,7 @@ s.SatelliteGame = new Class( {
         this.callsigns = this.callsigns || ["Apollo","Strobe","Sage","Polkadot","Moonglow","Steel","Vanguard","Prong","Uptight","Blackpony","Hawk","Ramrod","Dice","Falcon","Rap","Buckshot","Cobra","Magpie","Warhawk","Boxer","Devil","Hammer","Phantom","Sharkbait","Dusty","Icon","Blade","Pedro","Stinger","Yellow Jacket","Limit","Sabre","Misty","Whiskey","Dice","Antic","Arrow","Auto","Avalon","Bandit","Banshee","Blackjack","Bulldog","Caesar","Cajun","Challenger","Chuggs","Cindy","Cracker","Dagger","Dino","Esso","Express","Fangs","Fighting Freddie","Freight Train","Freemason","Fury","Gamma","Gear","Ghost","Ginger","Greasy","Havoc","Hornet","Husky","Jackal","Jaguar","Jedi","Jazz","Jester","Knife","Kitty Hawk","Knight","Knightrider","Koala","Komono","Lancer","Lexus","Lion","Levi","Lucid","Malty","Mail Truck","Magma","Magnet","Malibu","Medusa","Maul","Monster","Misfit","Moss","Moose","Mustang","Nail","Nasa","Nacho","Nighthawk","Ninja","Neptune","Odin","Occult","Nukem","Ozark","Pagan","Pageboy","Panther","Peachtree","Phenom","Polestar","Punisher","Ram","Rambo","Raider","Raven","Razor","Rupee","Sabre","Rust","Ruin","Sultan","Savor","Scandal","Scorpion","Shooter","Smokey","Sniper","Spartan","Thunder","Titus","Titan","Timber Wolf","Totem","Trump","Venom","Veil","Viper","Weasel","Warthog","Winter","Wiki","Wild","Yonder","Yogi","Yucca","Zeppelin","Zeus","Zesty"];
 
         this.pilot.name = this.callsigns[Math.floor(this.callsigns.length*Math.random())] + ' ' + ( new Date( ).getTime( ) % 100 );
-        
+
         // Add a hud
         this.HUD = new s.HUD( {
             game: this
@@ -187,7 +187,7 @@ s.SatelliteGame = new Class( {
             alliance: 'alliance',
             camera: this.camera
         } );
-        
+
         this.HUD.hp = this.player.hull;
 
         $(document).on('keyup', function(evt) {
@@ -215,103 +215,11 @@ s.SatelliteGame = new Class( {
             menu: this.menu
         } );
 
-        // /******************
-        //  Enemy setup
-        //  ******************/
-        // this.enemies = {
-        //     _list: [ ],
-        //     _map: {}, // new WeakMap()
-        //     get: function ( nameOrId ) {
-        //         if ( typeof nameOrId == 'string' ) {
-        //             return this._map[ nameOrId ]; // return enemies._map.get(nameOrId);
-        //         } else if ( typeof nameOrId == 'number' ) {
-        //             return this._list( nameOrId );
-        //         }
-        //     },
-        //     has: function ( nameOrId ) {
-        //         return !!this.get( nameOrId );
-        //     },
-        //     execute: function ( nameOrId, operation, args ) {
-        //         var enemy = this.get( nameOrId );
-        //         if ( enemy ) {
-        //             enemy[ operation ].apply( enemy, args );
-        //             return true;
-        //         }
-        //         return false;
-        //     },
-        //     forEach: function ( callback ) {
-        //         this._list.forEach( callback );
-        //     },
-        //     list: function ( ) {
-        //         return this._list;
-        //     },
-        //     delete: function ( nameOrId ) {
-        //         var enemy = this.get( nameOrId );
-        //         if ( enemy ) {
-        //             // Remove from map
-        //             delete this._map[ enemy.name ]; // this._map.delete(enemy.name);
-
-        //             // Remove from array
-        //             var enemyIndex = this._list.indexOf( enemy );
-        //             if ( ~enemyIndex )
-        //                 this._list.splice( enemyIndex, 1 );
-
-        //             // destroy
-        //             enemy.destruct( );
-
-        //             return true;
-        //         }
-        //         return false;
-        //     },
-        //     add: function ( enemyInfo, isBot ) {
-        //         if ( this.has( enemyInfo.name ) ) {
-        //             this.delete( enemyInfo.name );
-        //             console.error( 'Bug: Player %s added twice', enemyInfo.name );
-        //         } else {
-        //             if ( enemyInfo.name === null ) {
-        //                 console.error( 'Bug: enemyInfo contained null player name' );
-        //                 console.log( enemyInfo );
-        //                 console.trace( );
-        //             }
-        //             if (!isBot) { console.log( '%s has joined the fray', enemyInfo.name ); }
-        //         }
-
-        //         // TODO: include velocities?
-        //         var enemyShip;
-        //         if (isBot) {
-        //             enemyShip = new s.Bot( {
-        //                 game: that,
-        //                 shipClass: 'human_ship_heavy',
-        //                 name: enemyInfo.name,
-        //                 position: enemyInfo.position,
-        //                 rotation: enemyInfo.rotation,
-        //                 alliance: 'enemy'
-        //             } );
-        //         } else {
-        //             enemyShip = new s.Player( {
-        //                 game: that,
-        //                 shipClass: 'human_ship_heavy',
-        //                 name: enemyInfo.name,
-        //                 position: new THREE.Vector3( enemyInfo.pos[ 0 ], enemyInfo.pos[ 1 ], enemyInfo.pos[ 2 ] ),
-        //                 rotation: new THREE.Vector3( enemyInfo.rot[ 0 ], enemyInfo.rot[ 1 ], enemyInfo.rot[ 2 ] ),
-        //                 alliance: 'enemy'
-        //             } );
-        //         }
-
-        //         if (isBot) { console.log( '%s has joined the fray', enemyShip.name ); }
-
-        //         this._list.push( enemyShip );
-        //         this._map[ enemyShip.name ] = enemyShip; // this._map.set(enemyInfo.name, otherShip);
-        //     }
-        // };
-
         // Dependent on controls; needs to be below s.Controls
         this.radar = new s.Radar( {
             game: this
             //controls: this.controls
         } );
-
-
 
         window.addEventListener( 'mousemove', function ( e ) {
             that.HUD.targetX = e.pageX;
