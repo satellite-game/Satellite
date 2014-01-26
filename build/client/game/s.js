@@ -49735,6 +49735,11 @@ s.HUD = new Class({
         this.changeTarget = 0;
         this.currentTarget = 0;
 
+        this.nameMap = {
+            'space_station': 'Space Base',
+            'moon_base_tall': 'Moon Base'
+        };
+
 	},
 	update: function(){
             
@@ -49954,87 +49959,16 @@ s.HUD = new Class({
                     c2D.x =  ( width  + c2D.x*width  )/2;
                     c2D.y = -(-height + c2D.y*height )/2;
 
-                    this.ctx.fillStyle = this.menu.color;
-                    this.ctx.fillText( enemies[j].name, c2D.x-30, c2D.y+10);
-                    this.ctx.fill();
+                    this.writeName(enemies[j].name, c2D);
+                    // this.ctx.fillStyle = this.menu.color;
+                    // this.ctx.fillText( enemies[j].name, c2D.x-30, c2D.y+10);
+                    // this.ctx.fill();
                 }
             }
 
             // TARGET HUD MARKING
             if ( this.target ) {
                  this.findTargets(this.target.root, "rgba(256,0,0,0.5)", 12, 0, true, enemies[i]);
-
-                /////////////////////////////////
-                // PREDICTIVE TARGETING SYSTEM //
-                /////////////////////////////////
-
-                // PARAMETERS
-                // aV   = vector from target to self
-                // a    = distance between self and target
-                // eV   = enemy's current velocity vector
-                // e    = magnitude of eV
-                // pV   = players's velocity vector
-                // b    = magnitude of bV plus initial bullet speed
-                // angD = angular differential
-                // velD = velocity differential
-                // t    = quadratic solution for time at which player bullet and enemy ship will simultaneously reach a given location
-                // if ( enemies[i] && targetInSight ){
-
-                //     var aV = enemies[i].root.position.clone().add( self.position.clone().multiplyScalar(-1) );
-                //     var a  = aV.length();
-                //     var eV = this.target.getLinearVelocity();
-                //     var e  = eV.length();
-                //     var pV = self.getLinearVelocity();
-                //     var b = 5000+pV.length();
-
-                //     if (eV && b && aV){
-                //         var angD = aV.dot(eV);
-                //         var velD = (b*b - e*e);
-
-                //         var t = angD/velD + Math.sqrt( angD*angD + velD*a*a )/velD;
-
-                //         // Don't show the marker if the enemy is more than 4 seconds away
-                //         if (t < 4){
-
-                //             this.trailingPredictions.push(eV.multiplyScalar(t));
-                //             var pLen = this.trailingPredictions.length;
-
-                //             // If the previous frames had a prediction, tween the midpoint of all predictions and plot that
-                //             if (pLen > 3){
-                //                 var pX = 0, pY = 0;
-                //                 for (var p = 0; p < pLen; p++){
-
-                //                     // Project 3D coords onto 2D plane in perspective of the camera;
-                //                     // Scale predictions with current camera perspective
-                //                     var current = s.projector.projectVector(
-                //                         this.target.position.clone().add( this.trailingPredictions[p] ), s.game.camera );
-                //                     pX += (width + current.x*width)/2;
-                //                     pY += -(-height + current.y*height)/2;
-
-                //                 }
-                //                 var enemyV2D = new THREE.Vector2(pX/pLen, pY/pLen);
-
-                //                 if (enemyV2D.distanceTo(v2D) > size/3) {
-                //                     // Draw the prediction marker
-                //                     this.ctx.beginPath();
-                //                     this.ctx.arc(enemyV2D.x, enemyV2D.y, size/5, 0, 2*this.PI, false);
-                //                     this.ctx.fillStyle = "rgba(256,0,0,0.5)";
-                //                     this.ctx.fill();
-                //                     this.ctx.lineWidth = 2;
-                //                     this.ctx.strokeStyle = this.menu.color;
-                //                     this.ctx.stroke();
-                //                 }
-
-                //                 // remove the earliest trailing prediction
-                //                 this.trailingPredictions.shift();
-
-                //             }
-                //         }
-                //     }
-                // If the target is no longer on screen, but lastV2D is still assigned, set to null
-                // } else if ( this.trailingPredictions.length ) {
-                //     this.trailingPredictions = [];
-                // }
             }
 
         }
@@ -50080,6 +50014,12 @@ s.HUD = new Class({
         this.oculusCtx.drawImage(this.canvas, this.oculusCanvas.width/2-50*1.08, -50, window.innerWidth/2, window.innerHeight/2);
     },
 
+    writeName: function (name, clone) {
+        this.ctx.fillStyle = this.menu.color;
+        this.ctx.fillText( name, clone.x-30, clone.y+10);
+        this.ctx.fill();
+    },
+
     findTargets: function (circleTarget, fillColor, distanceFromRadius, maxBoxDistance, predictiveAnalytics, enemy) {
 
         var vcircleTarget3D = circleTarget.position.clone();
@@ -50119,6 +50059,10 @@ s.HUD = new Class({
             this.ctx.strokeRect( v2DcircleTarget.x-size, v2DcircleTarget.y-size, size*2, size*2 );
             this.ctx.lineWidth = 1;
             this.ctx.strokeStyle = this.menu.color;
+
+            if (this.nameMap[circleTarget.name]) {
+                this.writeName(this.nameMap[circleTarget.name], v2DcircleTarget);
+            }
         }
 
         //predictive targeting logic

@@ -98,6 +98,11 @@ s.HUD = new Class({
         this.changeTarget = 0;
         this.currentTarget = 0;
 
+        this.nameMap = {
+            'space_station': 'Space Base',
+            'moon_base_tall': 'Moon Base'
+        };
+
 	},
 	update: function(){
             
@@ -317,9 +322,7 @@ s.HUD = new Class({
                     c2D.x =  ( width  + c2D.x*width  )/2;
                     c2D.y = -(-height + c2D.y*height )/2;
 
-                    this.ctx.fillStyle = this.menu.color;
-                    this.ctx.fillText( enemies[j].name, c2D.x-30, c2D.y+10);
-                    this.ctx.fill();
+                    this.writeName(enemies[j].name, c2D);
                 }
             }
 
@@ -371,6 +374,12 @@ s.HUD = new Class({
         this.oculusCtx.drawImage(this.canvas, this.oculusCanvas.width/2-50*1.08, -50, window.innerWidth/2, window.innerHeight/2);
     },
 
+    writeName: function (name, clone) {
+        this.ctx.fillStyle = this.menu.color;
+        this.ctx.fillText( name, clone.x-30, clone.y+10);
+        this.ctx.fill();
+    },
+
     findTargets: function (circleTarget, fillColor, distanceFromRadius, maxBoxDistance, predictiveAnalytics, enemy) {
 
         var vcircleTarget3D = circleTarget.position.clone();
@@ -410,6 +419,10 @@ s.HUD = new Class({
             this.ctx.strokeRect( v2DcircleTarget.x-size, v2DcircleTarget.y-size, size*2, size*2 );
             this.ctx.lineWidth = 1;
             this.ctx.strokeStyle = this.menu.color;
+
+            if (this.nameMap[circleTarget.name]) {
+                this.writeName(this.nameMap[circleTarget.name], v2DcircleTarget);
+            }
         }
 
         //predictive targeting logic
