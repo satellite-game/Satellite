@@ -12,7 +12,8 @@ module.exports = function(config) {
         'tests/Function.prototype.bind_polyfill.js',
         'tests/client/preload.js',
         'tests/client/**/*.js',
-        { pattern: 'tests/mock/*.json', watched: true, served: true, included: false }
+        { pattern: 'tests/mock/models/*.json', watched: true, served: true, included: false },
+        { pattern: 'tests/mock/textures/**/*.png', watched: true, served: true, included: false }
       ]),
 
     // list of files to exclude
