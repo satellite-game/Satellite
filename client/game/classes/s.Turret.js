@@ -11,7 +11,8 @@ s.Turret = new Class({
         scale: new THREE.Vector3(50, 50, 1.0),
         color: {
             alliance: 0x00F2FF,
-            rebels: 0xFF0000
+            rebels: 0xFF0000,
+            enemy: 0xFF0000
         }
     },
 

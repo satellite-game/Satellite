@@ -21,21 +21,21 @@ Sync.prototype.setInit = function( socket, list, packet, shortcut ) {
     var thatio = io;
     var thatRoom = room;
     var that = this;
-    var thatDelay = that.cycle; 
+    var thatDelay = that.cycle;
 
     setTimeout(function() {
       //adjust(that.gamestate, that.cycle); This needs tweaking. We should enable this after predictive movement is fully in. 
       thatio.sockets.in(thatRoom).emit('sync', that.gamestate);
       that.sync( thatio, thatRoom);
     }, thatDelay);
-  }; 
+  };
 
   var adjust = function( gamestate, cycle ) {
     for(var i in gamestate) {
       for(var x = 0; x < 3; x++) {
         gamestate[i].pos[x] += gamestate[i].lVeloc[x] * (cycle/1000);
-      };
-    };
+      }
+    }
   };
   list.cycle = this.sync_cycle;
   list.sync = sync;
@@ -53,9 +53,6 @@ Sync.prototype.setMove = function( packet, target ) {
 
   return this.check(target, packet, calctime);
 };
-
-
-
 
 Sync.prototype.create = function(event, func) {
   Sync.prototype[event] = func;

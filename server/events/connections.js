@@ -1,3 +1,5 @@
+var db = require('../db/queries');
+
 module.exports = function (map, host, Sync, io) {
   return {
     join: function( socket, data ) {
@@ -13,6 +15,8 @@ module.exports = function (map, host, Sync, io) {
         Sync.setInit( socket.id, target, data );
       }
 
+      db.joinRoom(data.room, data.name);  // add to game in the db
+
       socket.emit('player list', target.playerList);
       socket.emit('map', map.mapItems);
       socket.join(data.room);
@@ -22,6 +26,9 @@ module.exports = function (map, host, Sync, io) {
     disconnect: function( socket ) {
       var room = host.sockets[socket.id].room;
       var name = host.sockets[socket.id].name;
+
+      db.leaveRoom(room, name); // boot from the game in the db
+
       socket.broadcast.to(room).emit('leave', {name: name});
       delete host.rooms[room].gamestate[name];
       delete host.rooms[room].playerList[name];
