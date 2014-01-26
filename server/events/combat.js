@@ -11,7 +11,7 @@ module.exports = function (host, sync) {
         for(var i in packet) {
           playerState[i] = packet[i];
         }
-        // socket.broadcast.to(room).emit('move', playerState);
+        socket.broadcast.to(room).emit('move', playerState);
       }
     },
 

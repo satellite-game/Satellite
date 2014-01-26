@@ -50796,9 +50796,9 @@ s.Comm = new Class( {
         var diff;
         var t_diff;
         for(var i = 0; i < 3; i++) {
-
           diff = Math.abs( shipPosition.lVeloc[i] - this.lastPosition.lVeloc[i]);
           t_diff = time - this.lastTime;
+
           if(t_diff === 0 || isNaN(t_diff) ) {
             return "Invalid";
           } else {
@@ -50832,7 +50832,7 @@ s.Comm = new Class( {
         s.game.comm.socket.emit( 'combat','move', packet );
         s.game.comm.lastMessageTime = time;
         this.lastPosition = shipPosition.pos;
-        this.lastTime = time;
+        this.lastTime = time; 
       }
     },
 
@@ -51845,64 +51845,63 @@ s.SatelliteGame = new Class( {
             console.log( '%s has left', message.name );
         }
     },
-    // handleMove: function ( message ) {
-    //     console.log("A player moved", message);
-    //     if ( message.name == this.pilot.name ) {
-    //         // server told us to move
-    //         console.log( 'Server reset position' );
 
-    //         // Return to center
-    //         s.game.player.setPosition( message.pos, message.rot, message.aVeloc, message.lVeloc, false ); // Never interpolate our own movement
-    //     } else {
-    //         // Enemy moved
-    //         if ( !s.game.enemies.execute( message.name, 'setPosition', [ message.pos, message.rot, message.aVeloc, message.lVeloc, message.interp ] ) ) {
-    //             s.game.enemies.add( message );
-    //         }
-    //     }
-    // },
-    handleSync: function ( pak ) {
-      var data = {};
-      for(var i in pak) {
-        data[i] = pak[i];
-      }
-      var whoAmI = s.game.pilot.name,
-          myData = pak[whoAmI];
+    handleMove: function ( message ) {
+        console.log("A player moved", message);
+        if ( message.name == this.pilot.name ) {
+            // server told us to move
+            console.log( 'Server reset position' );
 
-      var adjustPlayer = function( serverView ) {
-        var adjusted = [];
-
-        var myView = s.game.player.getPositionPacket();
-        for(var i = 0; i < serverView.lVeloc.length; i++) {
-          var pos = Math.abs(serverView.pos[i]) - Math.abs(myView.pos[i]);
-
-          if( pos >= 1700 ) {
-            console.log("Experiencing whiplash!", pos);
-            s.game.player.setPosition( serverView.pos, myView.rot, serverView.aVeloc, serverView.lVeloc, true );
-            return;
-          }
-
-          if(serverView.pos[i] >= 0) {
-            adjusted.push(serverView.lVeloc[i] + pos);
-          } else {
-            adjusted.push(serverView.lVeloc[i] - pos);
-          }
-
+            // Return to center
+            s.game.player.setPosition( message.pos, message.rot, message.aVeloc, message.lVeloc, false ); // Never interpolate our own movement
+        } else {
+            // Enemy moved
+            if ( !s.game.enemies.execute( message.name, 'setPosition', [ message.pos, message.rot, message.aVeloc, message.lVeloc, message.interp ] ) ) {
+                s.game.enemies.add( message );
+            }
         }
-
-        s.game.comm.position();
-        //s.game.player.setPosition( myView.pos, myView.rot, serverView.aVeloc, adjusted, false );
-      };
-
-      adjustPlayer(myData);
-      delete data[whoAmI];
-
-      for(var j in data ) {
-        if( !s.game.enemies.execute( data[j].name, 'setPosition', [ data[j].pos, data[j].rot, data[j].aVeloc, data[j].lVeloc, true ] ) ) {
-          s.game.enemies.add( data[j] );
-        }
-      }
-
     },
+    // handleSync: function ( pak ) {
+    //   var data = {};
+    //   for(var i in pak) {
+    //     data[i] = pak[i];
+    //   };
+    //   var whoAmI = s.game.pilot.name,
+    //       myData = pak[whoAmI];
+
+    //   var adjustPlayer = function( serverView ) {
+    //     var adjusted = [];
+
+    //     var myView = s.game.player.getPositionPacket();
+    //     for(var i = 0; i < serverView.lVeloc.length; i++) {
+    //       var pos = Math.abs(serverView.pos[i]) - Math.abs(myView.pos[i]);
+
+    //       if( pos >= 1700 ) {
+    //         console.log("Experiencing whiplash!", pos);
+    //         s.game.player.setPosition( serverView.pos, myView.rot, serverView.aVeloc, serverView.lVeloc, true );
+    //         return;
+    //       }
+
+    //       if(serverView.pos[i] >= 0) {
+    //         adjusted.push(serverView.lVeloc[i] + pos);
+    //       } else {
+    //         adjusted.push(serverView.lVeloc[i] - pos);
+    //       }
+
+    //     }
+    //     s.game.comm.position();
+    //     //s.game.player.setPosition( myView.pos, myView.rot, serverView.aVeloc, adjusted, false );
+    //   };
+
+    //   adjustPlayer(myData);
+    //   delete data[whoAmI];
+    //   for(var i in data ) {
+    //     if( !s.game.enemies.execute( data[i].name, 'setPosition', [ data[i].pos, data[i].rot, data[i].aVeloc, data[i].lVeloc, true ] ) ) {
+    //       s.game.enemies.add( data[i] );
+    //     }
+    //   }
+
+    // },
 
     handlePlayerList: function(message) {
         for (var otherPlayerName in message) {
