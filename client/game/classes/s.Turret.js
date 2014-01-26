@@ -11,8 +11,8 @@ s.Turret = new Class({
         scale: new THREE.Vector3(50, 50, 1.0),
         color: {
             alliance: 0x00F2FF,
-            rebels: 0xFF0000,
-            enemy: 0xFF0000
+            rebels: 0xFF4400,
+            enemy: 0xFF4400
         }
     },
 
@@ -33,7 +33,11 @@ s.Turret = new Class({
             color: this.color
         }));
 
-        sprite.scale.copy(this.options.scale);
+        if (s.game.oculus.detected) {
+            sprite.scale.set(20, 20, 1.0);
+        } else {
+            sprite.scale.copy(this.options.scale);
+        }
         this.root.add(sprite);
 
         // Position the projectile relative to the ship
