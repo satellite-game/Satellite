@@ -17,7 +17,7 @@ module.exports = function(host, Sync) {
       //   console.log("Success!");
         for (var i in packet) {
           playerState[i] = packet[i];
-        };
+        }
       // }
     }
 
