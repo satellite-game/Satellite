@@ -247,6 +247,11 @@ s.Game = new Class({
      requestAnimationFrame(this.render);
    },
 
+   restart: function() {
+    this.doRender = true;
+    requestAnimationFrame(this.render);
+   },
+
    // Stop rendering
    stop: function() {
      this.doRender = false;

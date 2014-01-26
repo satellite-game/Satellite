@@ -53741,6 +53741,11 @@ s.Game = new Class({
      requestAnimationFrame(this.render);
    },
 
+   restart: function() {
+    this.doRender = true;
+    requestAnimationFrame(this.render);
+   },
+
    // Stop rendering
    stop: function() {
      this.doRender = false;
@@ -54234,6 +54239,7 @@ s.SatelliteGame = new Class( {
             return;
         }
         if (this.hostPlayer) { clearInterval(this.botPositionInterval); }
+<<<<<<< HEAD
         // var HUD = s.game.HUD;
         // HUD.ctx.fillStyle = "rgba(0,0,0,0.5)";
         // HUD.ctx.fillRect(0,0,HUD.canvas.width,HUD.canvas.height);
@@ -54242,6 +54248,27 @@ s.SatelliteGame = new Class( {
         if (s.game.roomSelected) s.game.comm.died(you, killer);
 
         // s.game.stop();
+=======
+        s.game.stop();
+        var HUD = s.game.HUD;
+        HUD.ctx.fillStyle = "rgba(0,0,0,0.5)";
+        HUD.ctx.fillRect(0,0,HUD.canvas.width,HUD.canvas.height);
+        HUD.ctx.drawImage(HUD.gameOver,HUD.canvas.width/2 - HUD.gameOver.width/2,HUD.canvas.height/2 - HUD.gameOver.height/2);
+        s.game.comm.died(you, killer);
+
+        this.restartGame();
+    },
+
+    restartGame: function() {
+        var that = this;
+        setTimeout(function() {
+            that.player.shields = s.config.ship.shields;
+            that.player.hull = s.config.ship.hull;
+            that.player.setPosition([that.getRandomCoordinate(), that.getRandomCoordinate(), that.getRandomCoordinate()],[0,0,0],[0,0,0],[0,0,0]);
+            that.hostPlayer = false;
+            that.restart();
+        }, 6000);
+>>>>>>> d2ebd56795423c8d2a3efa05952771eda1a41a0e
     },
 
     shieldBoost: function(){
