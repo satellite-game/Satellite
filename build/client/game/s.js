@@ -51911,13 +51911,11 @@ s.Oculus = new Class({
     this.detected = false;
     this.game = options.game;
 
-    vr.load(function (err) {
-      if (err) {
-        console.log('Error loading oculus rift.');
-        return;
-      }
+    vr.load(function () {
       this.state = new vr.State();
-      if (this.state.present) {
+      console.log(this.state);
+      vr.pollState(this.state);
+      if (this.state.hmd.present) {
         this.detected = true;
       }
     }, this);
