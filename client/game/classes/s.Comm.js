@@ -152,21 +152,21 @@ s.Comm = new Class( {
           
           diff = Math.abs( shipPosition.lVeloc[i] - this.lastPosition.lVeloc[i]);
           t_diff = time - this.lastTime; 
-          if(t_diff === 0 || t_diff === NaN) {
+          if(t_diff === 0 || isNaN(t_diff)) {
             return "Invalid";
           } else {
             shipPosition.laccel.push(diff/t_diff);
-          };
+          }
 
           diff = Math.abs( shipPosition.aVeloc[i] - this.lastPosition.aVeloc[i]);
           t_diff = time - this.lastTime; 
-          if(t_diff === 0 || t_diff === NaN) {
+          if(t_diff === 0 || isNaN(t_diff)) {
             return "Invalid";
           } else {
             shipPosition.aAccel.push(diff/t_diff);
-          };
+          }
 
-        };
+        }
         return results;
       }();
       
@@ -187,7 +187,7 @@ s.Comm = new Class( {
         s.game.comm.lastMessageTime = time;
         this.lastPosition = shipPosition.pos;
         this.lastTime = time; 
-      };
+      }
     },
 
 
