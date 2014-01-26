@@ -7,7 +7,10 @@ s.SatelliteGame = new Class( {
 		'phobos_hifi',
 		'phobos_lofi',
         'human_ship_heavy',
-		'human_ship_light'
+		'human_ship_light',
+        'human_space_station',
+        'human_building_short',
+        'human_building_tall'
 	],
 
     textures: [
@@ -51,6 +54,13 @@ s.SatelliteGame = new Class( {
         this.moon = new s.Moon( {
             game: this
         } );
+
+        // Random building
+        this.building = new s.BuildingTall({
+            game: this,
+            position: new THREE.Vector3(-5211.99169921875, -1277.7318115234375, 3610.850830078125),
+            rotation: new THREE.Vector3(1.6990602929726026, 0.011873913392131176, 0.86412056066792210)
+        });
 
         this.pilot = {};
         this.callsigns = this.callsigns || ["Apollo","Strobe","Sage","Polkadot","Moonglow","Steel","Vanguard","Prong","Uptight","Blackpony","Hawk","Ramrod","Dice","Falcon","Rap","Buckshot","Cobra","Magpie","Warhawk","Boxer","Devil","Hammer","Phantom","Sharkbait","Dusty","Icon","Blade","Pedro","Stinger","Yellow Jacket","Limit","Sabre","Misty","Whiskey","Dice","Antic","Arrow","Auto","Avalon","Bandit","Banshee","Blackjack","Bulldog","Caesar","Cajun","Challenger","Chuggs","Cindy","Cracker","Dagger","Dino","Esso","Express","Fangs","Fighting Freddie","Freight Train","Freemason","Fury","Gamma","Gear","Ghost","Ginger","Greasy","Havoc","Hornet","Husky","Jackal","Jaguar","Jedi","Jazz","Jester","Knife","Kitty Hawk","Knight","Knightrider","Koala","Komono","Lancer","Lexus","Lion","Levi","Lucid","Malty","Mail Truck","Magma","Magnet","Malibu","Medusa","Maul","Monster","Misfit","Moss","Moose","Mustang","Nail","Nasa","Nacho","Nighthawk","Ninja","Neptune","Odin","Occult","Nukem","Ozark","Pagan","Pageboy","Panther","Peachtree","Phenom","Polestar","Punisher","Ram","Rambo","Raider","Raven","Razor","Rupee","Sabre","Rust","Ruin","Sultan","Savor","Scandal","Scorpion","Shooter","Smokey","Sniper","Spartan","Thunder","Titus","Titan","Timber Wolf","Totem","Trump","Venom","Veil","Viper","Weasel","Warthog","Winter","Wiki","Wild","Yonder","Yogi","Yucca","Zeppelin","Zeus","Zesty"];
@@ -452,15 +462,22 @@ s.SatelliteGame = new Class( {
         if (!you) {
             return;
         }
-        if (this.hostPlayer) { clearInterval(this.botPositionInterval); }
-        // var HUD = s.game.HUD;
-        // HUD.ctx.fillStyle = "rgba(0,0,0,0.5)";
-        // HUD.ctx.fillRect(0,0,HUD.canvas.width,HUD.canvas.height);
-        // HUD.ctx.drawImage(HUD.gameOver,HUD.canvas.width/2 - HUD.gameOver.width/2,HUD.canvas.height/2 - HUD.gameOver.height/2);
+        if (this.hostPlayer) clearInterval(this.botPositionInterval);
         this.menu.gameOver(killer);
         if (s.game.roomSelected) s.game.comm.died(you, killer);
 
-        // s.game.stop();
+        this.restartGame();
+    },
+
+    restartGame: function() {
+        var that = this;
+        setTimeout(function() {
+            that.player.shields = s.config.ship.shields;
+            that.player.hull = s.config.ship.hull;
+            that.player.setPosition([that.getRandomCoordinate(), that.getRandomCoordinate(), that.getRandomCoordinate()],[0,0,0],[0,0,0],[0,0,0]);
+            that.hostPlayer = false;
+            that.restart();
+        }, 6000);
     },
 
     shieldBoost: function(){
