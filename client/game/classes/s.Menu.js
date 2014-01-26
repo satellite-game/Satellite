@@ -1,6 +1,3 @@
-// This menu item is going to be 3D text floating in game in front of
-// the camera. It's more complicated but it'll be cool in the oculus.
-
 s.Menu = new Class({
 
   toString: 'Menu',
