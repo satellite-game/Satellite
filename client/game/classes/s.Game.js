@@ -20,11 +20,13 @@ s.Game = new Class({
     this.lastRender = 0;
     this.roomSelected = false;
 
-    // Oculus Rift setup
-    this.oculus = new s.Oculus();
-
     // Store functions that should be called before render
     this.hookedFuncs = [];
+
+    // Oculus Rift setup
+    this.oculus = new s.Oculus({
+      game: this
+    });
 
     // Bind render function permenantly
     this.render = this.render.bind(this);
