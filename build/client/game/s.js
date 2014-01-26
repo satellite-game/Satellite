@@ -48879,6 +48879,93 @@ s.Moon = new Class({
 	}
 });
 
+s.BuildingTall = new Class({
+	extend: s.GameObject,
+
+	construct: function(options){
+		// handle parameters
+		this.options = options = jQuery.extend({
+			position: options.position,
+			rotation: options.rotation
+		}, options);
+
+		var geometry = s.models.human_building_tall.geometry;
+		var materials = s.models.human_building_tall.materials;
+
+		// Setup physical properties
+		materials[0] = Physijs.createMaterial(
+			materials[0],
+			1, // high friction
+			0.4 // low restitution
+		);
+
+		this.root = new Physijs.ConvexMesh(geometry, new THREE.MeshFaceMaterial(materials), 0);
+
+        this.root.name = "building_tall";
+		this.root.position.copy(options.position);
+		this.root.rotation.copy(options.rotation);
+		// this.root.receiveShadow = true; // Causes shader error
+	}
+});
+
+s.BuildingShort = new Class({
+	extend: s.GameObject,
+
+	construct: function(options){
+		// handle parameters
+		this.options = options = jQuery.extend({
+			position: options.position,
+			rotation: options.rotation
+		}, options);
+
+		var geometry = s.models.human_building_short.geometry;
+		var materials = s.models.human_building_short.materials;
+
+		// Setup physical properties
+		materials[0] = Physijs.createMaterial(
+			materials[0],
+			1, // high friction
+			0.4 // low restitution
+		);
+
+		this.root = new Physijs.ConvexMesh(geometry, new THREE.MeshFaceMaterial(materials), 0);
+
+        this.root.name = "building_short";
+		this.root.position.copy(options.position);
+		this.root.rotation.copy(options.rotation);
+		// this.root.receiveShadow = true; // Causes shader error
+	}
+});
+
+s.SpaceStation = new Class({
+	extend: s.GameObject,
+
+	construct: function(options){
+		// handle parameters
+		this.options = options = jQuery.extend({
+			position: options.position,
+			rotation: options.rotation
+		}, options);
+
+		var geometry = s.models.human_space_station.geometry;
+		var materials = s.models.human_space_station.materials;
+
+		// Setup physical properties
+		materials[0] = Physijs.createMaterial(
+			materials[0],
+			1, // high friction
+			0.4 // low restitution
+		);
+
+		this.root = new Physijs.ConvexMesh(geometry, new THREE.MeshFaceMaterial(materials), 0);
+
+        this.root.name = "space_station";
+		this.root.position.copy(options.position);
+		this.root.rotation.copy(options.rotation);
+		// this.root.receiveShadow = true; // Causes shader error
+	}
+});
+
 s.Color = new Class({
 
 	toString: "color",
@@ -50874,34 +50961,32 @@ s.Menu = new Class({
     this.menuScreen = 'default';
 
     this.addMenuItems([
-      {text: 'JOIN GAME', size: 5, action: 'showRoomList'},
-      {text: 'DISCONECT', size: 5, action: 'disconnect'},
+      {text: 'CHANGE ROOM', size: 5, action: 'showRoomList'},
       {text: 'LEADERBOARD', size: 5, action: 'showScoreboard'},
-      {text: 'SAMPLE MENU', size: 5, action: 'showTestMenu'}
+      {text: 'SAMPLE MENU', size: 5, action: 'showTestMenu'},
+      {text: 'DISCONECT', size: 5, action: 'disconnect'}
     ]);
   },
 
   showRoomList: function () {
     this.menuScreen = 'rooms';
 
-    var rooms;
-
     $.get({
       url: '/rooms',
+      datatype: 'json',
       success: function (data) {
-        rooms = data;
+
+        var roomList = [{text: 'JOIN GAME', size: 5}];
+        for (var i = 0; i < data.length; i++) {
+          roomList.push({text: data[i].name + '...' + data[i].players, small: true, action: 'joinRoom', room: rooms[i].name});
+        }
+        roomList.push({text: '+ CREATE NEW ROOM +', small: true, action: 'createRoom'});
+        this.addMenuItems(roomList);
       },
       error: function (err) {
         throw new Error('Failed to get room list from /rooms');
       }
     });
-
-    var roomList = [{text: 'JOIN GAME', size: 5}];
-    for (var i = 0; i < rooms.length; i++) {
-      roomList.push({text: rooms[i].name + '...' + rooms[i].players, small: true, action: 'joinRoom', room: rooms[i].name});
-    }
-    roomList.push({text: '+ CREATE NEW ROOM +', small: true, action: 'createRoom'});
-    this.addMenuItems(roomList);
     // this.addMenuItems([
     //   {text: 'SELECT A ROOM', size: 5},
     //   {text: 'hey strong bad', small: true, action: 'joinRoom', room: 'asdf'},
@@ -50927,22 +51012,23 @@ s.Menu = new Class({
   showScoreboard: function () {
     this.menuScreen = 'scoreboard';
 
-    var scores;
     $.get({
-      url: '/scores/' + this.game.comm.room,
+      url: '/scores',
+      datatype: 'json',
+      data: {room: s.game.comm.room},
       success: function (data) {
-        scores = data;
+
+        var players = [{text: 'LEADERBOARD', size: 5}];
+        for (var i = 0; i < data.length; i++) {
+          players.push({text: data[i].name+'...'+data[i].score, small: true});
+        }
+        this.addMenuItems(players);
+
       },
       error: function (err) {
-        throw new Error('Failed to get player scores from /scores/' + this.game.comm.room);
+        throw new Error('Failed to get player scores from /' + this.game.comm.room);
       }
     });
-
-    var players = [{text: 'LEADERBOARD', size: 5}];
-    for (var i = 0; i < scores.length; i++) {
-      players.push({text: scores[i].name+'...'+scores[i].score, small: true});
-    }
-    this.addMenuItems(players);
   },
 
   showTestMenu: function () {
@@ -51277,7 +51363,10 @@ s.SatelliteGame = new Class( {
 		'phobos_hifi',
 		'phobos_lofi',
         'human_ship_heavy',
-		'human_ship_light'
+		'human_ship_light',
+        'human_space_station',
+        'human_building_short',
+        'human_building_tall'
 	],
 
     textures: [
@@ -51321,6 +51410,13 @@ s.SatelliteGame = new Class( {
         this.moon = new s.Moon( {
             game: this
         } );
+
+        // Random building
+        this.building = new s.BuildingTall({
+            game: this,
+            position: new THREE.Vector3(-5211.99169921875, -1277.7318115234375, 3610.850830078125),
+            rotation: new THREE.Vector3(1.6990602929726026, 0.011873913392131176, 0.86412056066792210)
+        });
 
         this.pilot = {};
         this.callsigns = this.callsigns || ["Apollo","Strobe","Sage","Polkadot","Moonglow","Steel","Vanguard","Prong","Uptight","Blackpony","Hawk","Ramrod","Dice","Falcon","Rap","Buckshot","Cobra","Magpie","Warhawk","Boxer","Devil","Hammer","Phantom","Sharkbait","Dusty","Icon","Blade","Pedro","Stinger","Yellow Jacket","Limit","Sabre","Misty","Whiskey","Dice","Antic","Arrow","Auto","Avalon","Bandit","Banshee","Blackjack","Bulldog","Caesar","Cajun","Challenger","Chuggs","Cindy","Cracker","Dagger","Dino","Esso","Express","Fangs","Fighting Freddie","Freight Train","Freemason","Fury","Gamma","Gear","Ghost","Ginger","Greasy","Havoc","Hornet","Husky","Jackal","Jaguar","Jedi","Jazz","Jester","Knife","Kitty Hawk","Knight","Knightrider","Koala","Komono","Lancer","Lexus","Lion","Levi","Lucid","Malty","Mail Truck","Magma","Magnet","Malibu","Medusa","Maul","Monster","Misfit","Moss","Moose","Mustang","Nail","Nasa","Nacho","Nighthawk","Ninja","Neptune","Odin","Occult","Nukem","Ozark","Pagan","Pageboy","Panther","Peachtree","Phenom","Polestar","Punisher","Ram","Rambo","Raider","Raven","Razor","Rupee","Sabre","Rust","Ruin","Sultan","Savor","Scandal","Scorpion","Shooter","Smokey","Sniper","Spartan","Thunder","Titus","Titan","Timber Wolf","Totem","Trump","Venom","Veil","Viper","Weasel","Warthog","Winter","Wiki","Wild","Yonder","Yogi","Yucca","Zeppelin","Zeus","Zesty"];
