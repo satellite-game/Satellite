@@ -153,9 +153,9 @@ s.Comm = new Class( {
         var diff;
         var t_diff;
         for(var i = 0; i < 3; i++) {
-
           diff = Math.abs( shipPosition.lVeloc[i] - this.lastPosition.lVeloc[i]);
           t_diff = time - this.lastTime;
+
           if(t_diff === 0 || isNaN(t_diff) ) {
             return "Invalid";
           } else {
@@ -189,7 +189,7 @@ s.Comm = new Class( {
         s.game.comm.socket.emit( 'combat','move', packet );
         s.game.comm.lastMessageTime = time;
         this.lastPosition = shipPosition.pos;
-        this.lastTime = time;
+        this.lastTime = time; 
       }
     },
 
