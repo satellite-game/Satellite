@@ -24,8 +24,7 @@ module.exports = function (map, host, Sync, io) {
       socket.broadcast.to(data.room).emit('join', data);
 
       // ************************************************************************ //
-      // doesn't account for rooms -- assumes that this is passed into closure.
-      console.log('\nJOINED-BEFORE:\n', globals);
+      // bot stuff
       globals.lastClient = socket.id;
       globals.clients[socket.id] = true;
       for (var key in globals.clients) {
@@ -35,7 +34,6 @@ module.exports = function (map, host, Sync, io) {
         break;
       }
       io.sockets.socket(globals.hostPlayer).emit("bot retrieval");
-      console.log('\nJOINED-AFTER:\n', globals);
       // ************************************************************************ //
     },
 
@@ -43,6 +41,8 @@ module.exports = function (map, host, Sync, io) {
       var room = host.sockets[socket.id].room;
       var name = host.sockets[socket.id].name;
 
+      // ************************************************************************ //
+      // bot stuff
       console.log('\nDISCONNECTED-BEFORE:\n', globals);
       db.leaveRoom(room, name); // boot from the game in the db
       delete globals.clients[socket.id];
@@ -54,6 +54,7 @@ module.exports = function (map, host, Sync, io) {
         }
       }
       console.log('\nDISCONNECTED-AFTER:\n', globals);
+      // ************************************************************************ //
 
       socket.broadcast.to(room).emit('leave', {name: name});
       delete host.rooms[room].gamestate[name];
