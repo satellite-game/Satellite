@@ -7,7 +7,6 @@ s.Oculus = new Class({
 
     vr.load(function () {
       this.state = new vr.State();
-      console.log(this.state);
       vr.pollState(this.state);
       if (this.state.hmd.present) {
         this.detected = true;
