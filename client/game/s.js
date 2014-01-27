@@ -27,8 +27,6 @@ var s = {
         // Create a model loader
         s.loader = new THREE.JSONLoader();
 
-        var room = prompt('room?');
         s.game = new s.SatelliteGame();
-        s.game.room = room;
     }
 };

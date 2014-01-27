@@ -1,5 +1,5 @@
 var db = require('../db/queries');
-var globals = require('../events/bots');
+var globals = require('./globals');
 
 module.exports = function (host, sync, io) {
   return {
@@ -14,6 +14,9 @@ module.exports = function (host, sync, io) {
       // change the playerStats
       db.incKillCount(room, deathNotification.killer);
       db.incDeathCount(room, deathNotification.killed);
+
+      // ************************************************************************ //
+      // bot stuff
       if (socket.id === globals.hostPlayer) {
         for (var key in globals.clients) {
           if (key !== globals.hostPlayer) { globals.hostPlayer = key; }
@@ -21,14 +24,19 @@ module.exports = function (host, sync, io) {
         }
       }
       io.sockets.socket(globals.hostPlayer).emit("bot retrieval");
+      // ************************************************************************ //
+
       socket.emit('killed', deathNotification);
       socket.broadcast.to(room).emit('killed', deathNotification);
     },
 
+    // ************************************************************************ //
+    // bot stuff
     // add rooms to all functions
     botInfo: function ( socket, packet) {
       // check this out: https://github.com/LearnBoost/socket.io/wiki/How-do-I-send-a-response-to-all-clients-except-sender%3F
-      io.sockets.socket(globals.lastClient).emit('bot positions', message);
+      console.log('globals.lastClient', globals.lastClient);
+      io.sockets.socket(globals.lastClient).emit('bot positions', packet);
     },
 
     botHit: function ( socket, packet) {
@@ -44,5 +52,6 @@ module.exports = function (host, sync, io) {
     botUpdate: function ( socket, packet) {
       socket.broadcast.emit('bot positions', packet);
     },
+    // ************************************************************************ //
   };
 };
