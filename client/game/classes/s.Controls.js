@@ -92,6 +92,8 @@ s.Controls = new Class({
 
   },
 
+  firstRender: true,
+
   update: function( time, delta ) {
     var mouseControls = false;
 
@@ -130,11 +132,18 @@ s.Controls = new Class({
 
     if (this.oculus.detected) {
       this.mouse.mouseType = 'oculus';
-      pitch = this.oculus.quat.x;
-      yaw = this.oculus.quat.y;
-      roll = this.oculus.quat.z;
-      if (this.menu.displayed) {
-        this.menu.updateHovered();
+
+      if (this.keyboard.pressed('e')) {
+        // var initialQuat = new THREE.Quaternion();
+        // var initialQuat.setFromEuler( THREE.Vector3(); );
+        this.camera.rotation.setEulerFromQuaternion(this.oculus.quat);
+      } else {
+        pitch = this.oculus.quat.x;
+        yaw = this.oculus.quat.y;
+        roll = this.oculus.quat.z;
+        if (this.menu.displayed) {
+          this.menu.updateHovered();
+        }
       }
     } else {
       this.mouse.mouseType = 'keyboard';
@@ -229,7 +238,6 @@ s.Controls = new Class({
     if (this.keyboard.pressed('tilde')) {
       vr.resetHmdOrientation();
     }
-
 
     //////////////////////////////
     // MOTION AND PHYSICS LOGIC //
