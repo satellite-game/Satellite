@@ -101,6 +101,21 @@ module.exports = {
     }], leaveCallback);
   },
 
+  getRooms: function (callback){
+    db.HGETALL('rooms', callback);
+  },
+
+  getRoomInfo: function (roomName, roomCallback) {
+    async.waterfall([function (callback){
+      db.HGETALL(roomName+'_KILLS', callback);
+    },
+    function(killsData, callback) {
+      db.HGETALL(roomName+'_DEATHS', function(err, deathsData){
+        callback(err, { kills: killsData, deaths: deathsData });
+      });
+    }], roomCallback);
+  },
+
   incKillCount: function (roomName, playerID) {
     db.HINCRBY(roomName+'_KILLS', playerID, 1, defaultCallback('incKillCount'));
   },
