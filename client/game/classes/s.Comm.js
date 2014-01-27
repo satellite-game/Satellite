@@ -140,10 +140,13 @@ s.Comm = new Class( {
 
 
     position: function ( ) {
+      // would this be better to put in the global scope so that we don't
+      // wind up making this check every single time.
       if(this.lastPosition === undefined) {
         this.lastPosition = s.game.player.getPositionPacket( );
         this.lastTime = new Date().getTime();
         this.movementThrottle = 0;
+        this.syncTimer = 0;
       }
       var time = new Date( ).getTime( );
       var shipPosition = s.game.player.getPositionPacket( );
@@ -173,31 +176,41 @@ s.Comm = new Class( {
         }
         return results;
       }();
+      var packet;
       // using Math.abs: http://jsperf.com/mathabs-vs-two-conditions
-      if(this.movementThrottle === 0 &&
-         Math.abs(shipPosition.aAccel[0]) > 0.000005 ||
-         Math.abs(shipPosition.aAccel[1]) > 0.000005 ||
-         Math.abs(shipPosition.aAccel[2]) > 0.000005 ||
-         Math.abs(shipPosition.lAccel[0]) > 0.005 ||
-         Math.abs(shipPosition.lAccel[1]) > 0.005 ||
-         Math.abs(shipPosition.lAccel[2]) > 0.005 ) {
-        var packet = {
-          time: time,
-          pos: shipPosition.pos,
-          rot: shipPosition.rot,
-          aVeloc: shipPosition.aVeloc,
-          lVeloc: shipPosition.lVeloc,
-          aAccel: shipPosition.aAccel,
-          lAccel: shipPosition.lAccel
-        };
-
-        s.game.comm.socket.emit( 'combat','move', packet );
-        s.game.comm.lastMessageTime = time;
-        this.lastPosition = shipPosition;
-        this.lastTime = time;
+      if(this.movementThrottle === 0){
+        if( this.syncTimer === 0 ||
+          Math.abs(shipPosition.aAccel[0]) > 0.000005 ||
+          Math.abs(shipPosition.aAccel[1]) > 0.000005 ||
+          Math.abs(shipPosition.aAccel[2]) > 0.000005 ||
+          Math.abs(shipPosition.lAccel[0]) > 0.005 ||
+          Math.abs(shipPosition.lAccel[1]) > 0.005 ||
+          Math.abs(shipPosition.lAccel[2]) > 0.005 ) {
+          packet = {
+            time: time,
+            pos: shipPosition.pos,
+            rot: shipPosition.rot,
+            aVeloc: shipPosition.aVeloc,
+            lVeloc: shipPosition.lVeloc,
+            aAccel: shipPosition.aAccel,
+            lAccel: shipPosition.lAccel
+          };
+          s.game.comm.socket.emit( 'combat','move', packet );
+          s.game.comm.lastMessageTime = time;
+          this.lastPosition = shipPosition;
+          this.lastTime = time;
+          if (this.syncTimer !== 0) {
+            console.log('ping');
+          } else {
+            console.log('SYNC');
+          }
+        }
       }
+      console.log('0');
       // throttle network emmissions by 80%
       this.movementThrottle = (this.movementThrottle + 1) % 5;
+      // sync the players every second (assuming the player runs every 60fps)
+      this.syncTimer = (this.syncTimer + 1) % 60;
     },
 
 
