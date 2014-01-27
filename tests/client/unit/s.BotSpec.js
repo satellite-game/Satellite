@@ -58,6 +58,8 @@ describe('Bot class', function () {
         expect(bot.botEnemyList.length).to.equal(2);
         expect(bot.botEnemyList[0].name).to.equal('Player one');
         expect(bot.botEnemyList[1].name).to.equal('Player two');
+
+        s.game.enemies.delete('Player two');
       };
 
       runAsync(specs, done);
