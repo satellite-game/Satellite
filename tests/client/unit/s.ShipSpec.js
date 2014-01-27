@@ -47,4 +47,49 @@ describe('Ship class', function () {
 
     runAsync(specs, done);
   });
+
+  describe('when fire', function () {
+    it('should create a left and right turret', function (done) {
+      var specs = function () {
+        var spy = sinon.spy(playerShip, 'makeTurret');
+        playerShip.fire('turret');
+        expect(spy.calledTwice).to.equal(true);
+      };
+
+      runAsync(specs, done);
+    });
+
+    it('should update last turret fire time', function (done) {
+      var specs = function () {
+        var lastTurretFire = playerShip.lastTurretFire;
+        playerShip.fire('turret');
+        expect(playerShip.lastTurretFire).to.not.equal(lastTurretFire);
+      };
+
+      runAsync(specs, done);
+    });
+
+    it('should play laser sound', function (done) {
+      var specs = function () {
+        var spy = sinon.spy(playerShip.game.sound, 'play');
+        playerShip.fire('turret');
+        expect(spy.called).to.equal(true);
+        spy.restore();
+      };
+
+      runAsync(specs, done);
+    });
+
+    it('should not play laser sound if it is a bot', function (done) {
+      var specs = function () {
+        var spy = sinon.spy(s.game.sound, 'play');
+        var bot = makeBot();
+        bot.fire('turret');
+        expect(spy.called).to.equal(false);
+        spy.restore();
+      };
+
+      runAsync(specs, done);
+    });
+  });
 });
