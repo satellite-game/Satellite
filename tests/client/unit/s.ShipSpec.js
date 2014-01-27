@@ -19,4 +19,20 @@ describe('Ship class', function () {
 
     runAsync(specs, done);
   });
+
+  it('should initialize ship properties', function (done) {
+    var specs = function () {
+      expect(playerShip).to.respondTo('initialize');
+      expect(playerShip).to.have.property('materials').and.to.not.equal(undefined);
+      expect(playerShip).to.have.property('root').and.to.not.equal(undefined);
+      expect(playerShip).to.have.property('lastTurretFire').and.to.not.equal(undefined);
+      expect(playerShip).to.have.property('lastMissileFire').and.to.not.equal(undefined);
+      expect(playerShip).to.have.property('alliance').and.to.equal('alliance');
+      expect(playerShip).to.have.property('hull').and.to.not.equal(undefined);
+      expect(playerShip).to.have.property('shields').and.to.not.equal(undefined);
+      expect(playerShip).to.have.property('lastTime').and.to.not.equal(undefined);
+    };
+
+    runAsync(specs, done);
+  });
 });
