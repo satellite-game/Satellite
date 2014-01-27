@@ -71,7 +71,7 @@ s.Game = new Class({
 
     // Handle window resizes
     $(window).on('resize', this.fitWindow.bind(this));
-    //this.fitWindow();
+    this.fitWindow();
 
     // Handle fullscreen state changes
     $(document).on('fullscreenchange mozfullscreenchange webkitfullscreenchange', this.handleFullscreenChange.bind(this));

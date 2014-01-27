@@ -146,23 +146,23 @@ s.Comm = new Class( {
       }
       var time = new Date( ).getTime( );
       var shipPosition = s.game.player.getPositionPacket( );
-          shipPosition.laccel = [];
+          shipPosition.lAccel = [];
           shipPosition.aAccel = [];
       var delta = function() {
         var results = {};
         var diff;
         var t_diff;
         for(var i = 0; i < 3; i++) {
-          diff = Math.abs( shipPosition.lVeloc[i] - this.lastPosition.lVeloc[i]);
+          diff = shipPosition.lVeloc[i] - this.lastPosition.lVeloc[i];
           t_diff = time - this.lastTime;
 
           if(t_diff === 0 || isNaN(t_diff) ) {
             return "Invalid";
           } else {
-            shipPosition.laccel.push(diff/t_diff);
+            shipPosition.lAccel.push(diff/t_diff);
           }
 
-          diff = Math.abs( shipPosition.aVeloc[i] - this.lastPosition.aVeloc[i]);
+          diff = shipPosition.aVeloc[i] - this.lastPosition.aVeloc[i];
           t_diff = time - this.lastTime;
           if(t_diff === 0 || isNaN(t_diff) ) {
             return "Invalid";
