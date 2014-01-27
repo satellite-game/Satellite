@@ -42,10 +42,8 @@ s.Comm = new Class({
     this.clockTick = this.clockTick.bind(this);
     this.timer = setInterval(this.clockTick,1000);
     this.time = 0;
-  },
 
-  connectSockets: function (server) {
-    this.socket = io.connect( 'http://' + server );
+    this.socket = io.connect( 'http://' + options.server );
 
     this.socket.on('failed', function ( message ) {
       // try to reconnect
@@ -60,6 +58,7 @@ s.Comm = new Class({
     this.socket.on('hit', this.makeTrigger('hit'));
     this.socket.on('bot retrieval', this.makeTrigger('bot retrieval'));
     this.socket.on('bot positions', this.makeTrigger('bot positions'));
+    this.socket.on('baseHit', this.makeTrigger( 'baseHit' ));
 
     this.game.hook( this.position );
 

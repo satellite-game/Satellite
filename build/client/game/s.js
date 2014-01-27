@@ -50908,13 +50908,8 @@ s.Turret = new Class({
         scale: new THREE.Vector3(50, 50, 1.0),
         color: {
             alliance: 0x00F2FF,
-<<<<<<< HEAD
             rebel: 0xFF0000,
             enemy: 0xFF0000
-=======
-            rebels: 0xFF4400,
-            enemy: 0xFF4400
->>>>>>> dev
         }
     },
 
@@ -51209,9 +51204,7 @@ s.Player = new Class({
   },
 
   update: function() {
-    // if (this.hull <= 0){
-    //   this.game.handleDie();
-    // }
+
     // Adjusts engine glow based on linear velosity
     this.trailGlow.intensity = this.root.getLinearVelocity().length()/100;
 
@@ -51527,8 +51520,8 @@ s.SpaceStation = new Class({
 	construct: function(options){
 		// handle parameters
 		this.options = options = jQuery.extend({
-			position: options.position,
-			rotation: options.rotation
+			position: new THREE.Vector3(20000, 20000, 20000),
+			rotation: new THREE.Vector3(0, 0, 0)
 		}, options);
 
 		var geometry = s.models.human_space_station.geometry;
@@ -51567,7 +51560,6 @@ s.MoonBaseTall = new Class({
 		var geometry = s.models.human_building_tall.geometry;
 		var materials = s.models.human_building_tall.materials;
 
-
 		// Setup physical properties
 		materials[0] = Physijs.createMaterial(
 			materials[0],
@@ -51579,11 +51571,14 @@ s.MoonBaseTall = new Class({
 
     this.root.name = "moonBaseTall";
 		this.root.team = 'rebel';
+
 		this.root.position.copy(options.position);
 		this.root.rotation.copy(options.rotation);
 
 		// this.root.receiveShadow = true; // Causes shader error
+
 		this.shields = s.config.base.shields;
+
 	}
 });
 
@@ -52637,9 +52632,9 @@ s.HUD = new Class({
         this.ctx.stroke();
 
         this.oculusCtx.clearRect(0, 0, this.oculusCanvas.width, this.oculusCanvas.height);
-<<<<<<< HEAD
-        this.oculusCtx.drawImage(this.canvas, 50*1.08, -50, window.innerWidth/2, window.innerHeight/2);
-        this.oculusCtx.drawImage(this.canvas, this.oculusCanvas.width/2-50*1.08, -50, window.innerWidth/2, window.innerHeight/2);
+
+        this.oculusCtx.drawImage(this.canvas, 50*1.07, -50, window.innerWidth/2, window.innerHeight/2);
+        this.oculusCtx.drawImage(this.canvas, this.oculusCanvas.width/2-50*1.07, -50, window.innerWidth/2, window.innerHeight/2);
     },
 
     writeName: function (name, clone) {
@@ -52744,11 +52739,6 @@ s.HUD = new Class({
                 if (pLen > 3){
                     var pX = 0, pY = 0;
                     for (var p = 0; p < pLen; p++){
-=======
-        this.oculusCtx.drawImage(this.canvas, 50*1.07, -50, window.innerWidth/2, window.innerHeight/2);
-        this.oculusCtx.drawImage(this.canvas, this.oculusCanvas.width/2-50*1.07, -50, window.innerWidth/2, window.innerHeight/2);
-    }
->>>>>>> dev
 
                         // Project 3D coords onto 2D plane in perspective of the camera;
                         // Scale predictions with current camera perspective
@@ -52773,6 +52763,7 @@ s.HUD = new Class({
 
                     // remove the earliest trailing prediction
                     this.trailingPredictions.shift();
+
 
                 }
             }
@@ -53172,10 +53163,8 @@ s.Comm = new Class({
     this.clockTick = this.clockTick.bind(this);
     this.timer = setInterval(this.clockTick,1000);
     this.time = 0;
-  },
 
-  connectSockets: function (server) {
-    this.socket = io.connect( 'http://' + server );
+    this.socket = io.connect( 'http://' + options.server );
 
     this.socket.on('failed', function ( message ) {
       // try to reconnect
@@ -53190,6 +53179,7 @@ s.Comm = new Class({
     this.socket.on('hit', this.makeTrigger('hit'));
     this.socket.on('bot retrieval', this.makeTrigger('bot retrieval'));
     this.socket.on('bot positions', this.makeTrigger('bot positions'));
+    this.socket.on('baseHit', this.makeTrigger( 'baseHit' ));
 
     this.game.hook( this.position );
 
@@ -53219,14 +53209,7 @@ s.Comm = new Class({
   position: function ( ) {
     var time = new Date( ).getTime( );
 
-<<<<<<< HEAD
-        this.socket.on('bot positions', this.makeTrigger( 'bot positions' ));
-        
-        this.socket.on('baseHit', this.makeTrigger( 'baseHit' ));
-        
-=======
     // Never send faster than server can handle
->>>>>>> dev
 
     if ( time - s.game.comm.lastMessageTime >= 15 ) {
 
@@ -53306,25 +53289,18 @@ s.Comm = new Class({
     });
   },
 
-<<<<<<< HEAD
-    botUpdate: function(enemies) {
-        this.socket.emit( 'botUpdate', enemies);
-    },
-
-    baseFire: function(baseName, pilotName) {
-        this.socket.emit( 'baseFire', {
-            baseName: baseName,
-            pilotName: pilotName
-        });
-    }
-
-} );
-=======
   botUpdate: function(enemies) {
     this.socket.emit( 'botUpdate', enemies);
+  },
+
+  baseFire: function(baseName, pilotName) {
+      this.socket.emit( 'baseFire', {
+          baseName: baseName,
+          pilotName: pilotName
+      });
   }
+
 });
->>>>>>> dev
 
 s.LoadScreen = new Class( {
 
@@ -53670,7 +53646,7 @@ s.Menu = new Class({
     console.log('Disconnecting...');
   },
 
-  gameOver: function (killer) {
+  gameOver: function (killer, baseDestroyed, message) {
     this.clearMenu();
     this.displayed = true;
     this.menuBox.visible = true;
@@ -53678,13 +53654,18 @@ s.Menu = new Class({
     this.HUD.oculusCanvas.style.display = 'none';
 
     this.menuScreen = 'dead';
-    this.addMenuItems([
+
+    var items = [
       {text: 'YOU DIED', size: 6},
       {text: 'YOU WERE KILLED BY '+killer.toUpperCase()},
       {text: 'RESPAWNING IN 6 SEC...'},
-      {text: ' '},
       {text: 'DISCONNECT', size: 5, action: 'disconnect'}
-    ]);
+    ];
+
+    if (baseDestroyed) {
+      items.splice(0, 2, {text: message, size: 6}, {text: baseDestroyed + ' destroyed'});
+    }
+    this.addMenuItems(items);
   }
 });
 
@@ -53991,10 +53972,7 @@ s.SatelliteGame = new Class( {
         'human_ship_heavy',
 		'human_ship_light',
         'human_space_station',
-<<<<<<< HEAD
-=======
         'human_building_short',
->>>>>>> dev
         'human_building_tall'
 	],
 
@@ -54046,7 +54024,6 @@ s.SatelliteGame = new Class( {
             game: this
         } );
 
-<<<<<<< HEAD
         // Add tall moon base
         this.moonBaseTall = new s.MoonBaseTall( {
             game: this
@@ -54056,15 +54033,6 @@ s.SatelliteGame = new Class( {
             'spaceStation': 'Space Base',
             'moonBaseTall': 'Moon Base'
         };
-
-=======
-        // Random building
-        this.building = new s.BuildingTall({
-            game: this,
-            position: new THREE.Vector3(-5211.99169921875, -1277.7318115234375, 3610.850830078125),
-            rotation: new THREE.Vector3(1.6990602929726026, 0.011873913392131176, 0.86412056066792210)
-        });
->>>>>>> dev
 
         this.pilot = {};
         this.callsigns = this.callsigns || ["Apollo","Strobe","Sage","Polkadot","Moonglow","Steel","Vanguard","Prong","Uptight","Blackpony","Hawk","Ramrod","Dice","Falcon","Rap","Buckshot","Cobra","Magpie","Warhawk","Boxer","Devil","Hammer","Phantom","Sharkbait","Dusty","Icon","Blade","Pedro","Stinger","Yellow Jacket","Limit","Sabre","Misty","Whiskey","Dice","Antic","Arrow","Auto","Avalon","Bandit","Banshee","Blackjack","Bulldog","Caesar","Cajun","Challenger","Chuggs","Cindy","Cracker","Dagger","Dino","Esso","Express","Fangs","Fighting Freddie","Freight Train","Freemason","Fury","Gamma","Gear","Ghost","Ginger","Greasy","Havoc","Hornet","Husky","Jackal","Jaguar","Jedi","Jazz","Jester","Knife","Kitty Hawk","Knight","Knightrider","Koala","Komono","Lancer","Lexus","Lion","Levi","Lucid","Malty","Mail Truck","Magma","Magnet","Malibu","Medusa","Maul","Monster","Misfit","Moss","Moose","Mustang","Nail","Nasa","Nacho","Nighthawk","Ninja","Neptune","Odin","Occult","Nukem","Ozark","Pagan","Pageboy","Panther","Peachtree","Phenom","Polestar","Punisher","Ram","Rambo","Raider","Raven","Razor","Rupee","Sabre","Rust","Ruin","Sultan","Savor","Scandal","Scorpion","Shooter","Smokey","Sniper","Spartan","Thunder","Titus","Titan","Timber Wolf","Totem","Trump","Venom","Veil","Viper","Weasel","Warthog","Winter","Wiki","Wild","Yonder","Yogi","Yucca","Zeppelin","Zeus","Zesty"];
@@ -54466,25 +54434,9 @@ s.SatelliteGame = new Class( {
     },
 
     handleDie: function(you, killer) {
-<<<<<<< HEAD
-        // if (!you) {
-        //     return;
-        // }
-        if (this.hostPlayer) { clearInterval(this.botPositionInterval); }
-        s.game.stop();
-        var HUD = s.game.HUD;
-        HUD.ctx.fillStyle = "rgba(0,0,0,0.5)";
-        HUD.ctx.fillRect(0,0,HUD.canvas.width,HUD.canvas.height);
-        HUD.ctx.drawImage(HUD.gameOver,HUD.canvas.width/2 - HUD.gameOver.width/2,HUD.canvas.height/2 - HUD.gameOver.height/2);
-        s.game.comm.died(you, killer);
-=======
-        if (!you) {
-            return;
-        }
         if (this.hostPlayer) clearInterval(this.botPositionInterval);
         this.menu.gameOver(killer);
-        if (s.game.roomSelected) s.game.comm.died(you, killer);
->>>>>>> dev
+        s.game.comm.died(you, killer);
 
         this.hostPlayer = false;
         this.restartGame();
@@ -54495,14 +54447,8 @@ s.SatelliteGame = new Class( {
         setTimeout(function() {
             that.player.shields = s.config.ship.shields;
             that.player.hull = s.config.ship.hull;
-<<<<<<< HEAD
             that.player.setPosition([23498, -25902, 24976],[0,0,0],[0,0,0],[0,0,0]);
-=======
-            that.player.setPosition([that.getRandomCoordinate(), that.getRandomCoordinate(), that.getRandomCoordinate()],[0,0,0],[0,0,0],[0,0,0]);
-            that.hostPlayer = false;
             that.menu.close();
->>>>>>> dev
-            that.restart();
         }, 6000);
     },
 
@@ -54624,9 +54570,17 @@ s.SatelliteGame = new Class( {
 
     handleBaseDeath: function(base) {
         setTimeout(function() {
+            var message;
+
             s.game.moonBaseTall.shields = s.config.base.shields;
             s.game.spaceStation.shields = s.config.base.shields;
-            s.game.stop();
+
+            if (base === 'spaceStation') {
+                message = 'alliance wins';
+            } else {
+                message = "rebels win";
+            }
+            s.game.menu.gameOver('temp', s.game.baseNameMap[base], message);
             s.game.restartGame();
         }, 3000);
 

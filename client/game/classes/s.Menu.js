@@ -318,7 +318,7 @@ s.Menu = new Class({
     console.log('Disconnecting...');
   },
 
-  gameOver: function (killer) {
+  gameOver: function (killer, baseDestroyed, message) {
     this.clearMenu();
     this.displayed = true;
     this.menuBox.visible = true;
@@ -326,12 +326,17 @@ s.Menu = new Class({
     this.HUD.oculusCanvas.style.display = 'none';
 
     this.menuScreen = 'dead';
-    this.addMenuItems([
+
+    var items = [
       {text: 'YOU DIED', size: 6},
       {text: 'YOU WERE KILLED BY '+killer.toUpperCase()},
       {text: 'RESPAWNING IN 6 SEC...'},
-      {text: ' '},
       {text: 'DISCONNECT', size: 5, action: 'disconnect'}
-    ]);
+    ];
+
+    if (baseDestroyed) {
+      items.splice(0, 2, {text: message, size: 6}, {text: baseDestroyed + ' destroyed'});
+    }
+    this.addMenuItems(items);
   }
 });
