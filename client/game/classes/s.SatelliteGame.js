@@ -481,6 +481,7 @@ s.SatelliteGame = new Class( {
             that.player.hull = s.config.ship.hull;
             that.player.setPosition([that.getRandomCoordinate(), that.getRandomCoordinate(), that.getRandomCoordinate()],[0,0,0],[0,0,0],[0,0,0]);
             that.hostPlayer = false;
+            that.menu.close();
             that.restart();
         }, 6000);
     },
