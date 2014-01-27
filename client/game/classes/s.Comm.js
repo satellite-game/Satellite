@@ -176,7 +176,6 @@ s.Comm = new Class( {
         }
         return results;
       }();
-      var packet;
       // using Math.abs: http://jsperf.com/mathabs-vs-two-conditions
       if(this.movementThrottle === 0){
         if( this.syncTimer === 0 ||
@@ -186,7 +185,7 @@ s.Comm = new Class( {
           Math.abs(shipPosition.lAccel[0]) > 0.005 ||
           Math.abs(shipPosition.lAccel[1]) > 0.005 ||
           Math.abs(shipPosition.lAccel[2]) > 0.005 ) {
-          packet = {
+          var packet = {
             time: time,
             pos: shipPosition.pos,
             rot: shipPosition.rot,
@@ -199,14 +198,8 @@ s.Comm = new Class( {
           s.game.comm.lastMessageTime = time;
           this.lastPosition = shipPosition;
           this.lastTime = time;
-          if (this.syncTimer !== 0) {
-            console.log('ping');
-          } else {
-            console.log('SYNC');
-          }
         }
       }
-      console.log('0');
       // throttle network emmissions by 80%
       this.movementThrottle = (this.movementThrottle + 1) % 5;
       // sync the players every second (assuming the player runs every 60fps)
