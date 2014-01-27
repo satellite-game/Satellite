@@ -15,12 +15,12 @@ module.exports = {
     db.hgetall('rooms', function(err, data){
       if (err) throw 'addRoom error: ' + err;
       if (!data || !data[roomName]){
-        console.log('room DNE');
+        console.log(roomName, 'DNE: creating...');
         db.HSET('rooms', roomName, 1, function(err, data){
           callback(err, data);
         });
       } else {
-        console.log('room exists');
+        console.log(roomName, 'exists: joining...');
         db.HINCRBY('rooms', roomName, 1, function(err, data){
           callback(err, data);
         });
@@ -32,14 +32,17 @@ module.exports = {
     callback = callback || defaultCallback('deleteRooms');
     async.waterfall([function (callback) {
       db.HDEL('rooms', roomName, function(err, data){
+        console.log(roomName+' deleted from rooms');
         callback(null, data);
       });
     }, function (data, callback) {
       db.DEL(roomName+'_KILLS', function(err, data){
+        console.log(roomName+'_KILLS deleted');
         callback(null, data);
       });
     }, function (data, callback) {
       db.DEL(roomName+'_DEATHS', function(err, data){
+        console.log(roomName+'_DEATHS deleted');
         callback(null, data);
       });
     }], callback);
@@ -54,11 +57,13 @@ module.exports = {
     },
     function(resultData, callback) {
       db.HSET(roomName+'_KILLS', playerID, 0, function(err, data){
+        console.log(playerID + '\tjoined\t' + roomName+'_KILLS');
         callback(null, data);
       });
     },
     function(resultData, callback) {
       db.HSET(roomName+'_DEATHS', playerID, 0, function(err, data){
+        console.log(playerID + '\tjoined\t' + roomName+'_DEATHS');
         callback(null, data);
       });
     }], joinCallback);
@@ -70,16 +75,19 @@ module.exports = {
 
     async.waterfall([function (callback){
       db.HDEL(roomName+'_KILLS', playerID, function(err, data){
+        console.log(playerID + '\tleft\t' + roomName+'_KILLS');
         callback(null, data);
       });
     },
     function(resultData, callback) {
       db.HDEL(roomName+'_DEATHS', playerID, function(err, data){
+        console.log(playerID + '\tleft\t' + roomName+'_DEATHS');
         callback(null, data);
       });
     },
     function(resultData, callback) {
       db.HINCRBY('rooms', roomName, -1, function(err, playersInRoom){
+        console.log('rooms removed one player from '+ roomName);
         callback(null, playersInRoom);
       });
     },
@@ -91,6 +99,21 @@ module.exports = {
         callback(null, playersInRoom);
       }
     }], leaveCallback);
+  },
+
+  getRooms: function (callback){
+    db.HGETALL('rooms', callback);
+  },
+
+  getRoomInfo: function (roomName, roomCallback) {
+    async.waterfall([function (callback){
+      db.HGETALL(roomName+'_KILLS', callback);
+    },
+    function(killsData, callback) {
+      db.HGETALL(roomName+'_DEATHS', function(err, deathsData){
+        callback(err, { kills: killsData, deaths: deathsData });
+      });
+    }], roomCallback);
   },
 
   incKillCount: function (roomName, playerID) {

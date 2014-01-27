@@ -1,18 +1,18 @@
 module.exports = function (host, sync) {
+
   return {
     move: function( socket, packet ) {
       var room = host.sockets[socket.id].room;
       var shipName = host.sockets[socket.id].name;
-      // console.log(room, shipName);
-      // console.log('=====================');
-      // console.log(host.rooms[room], host.rooms[room].gamestate);
       var playerState = host.rooms[room].gamestate[shipName];
-      if(sync.setMove(packet, playerState)) {
-        for(var i in packet) {
-          playerState[i] = packet[i];
-        }
-        socket.broadcast.to(room).emit('move', playerState);
+      // copy over the packet data into the canonical state
+      for(var i in packet) {
+        playerState[i] = packet[i];
       }
+      console.log(packet);
+      // emit the canonical state to everyone else
+      socket.broadcast.to(room).emit('move', playerState);
+
     },
 
     fire: function( socket, packet ) {

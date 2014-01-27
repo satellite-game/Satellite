@@ -140,57 +140,64 @@ s.Comm = new Class( {
 
 
     position: function ( ) {
+      // would this be better to put in the global scope so that we don't
+      // wind up making this check every single time. Currently these are
+      // all happening in the global scope anyways...
       if(this.lastPosition === undefined) {
         this.lastPosition = s.game.player.getPositionPacket( );
-        this.lastTime = new Date().getTime;
+        this.lastTime = new Date().getTime();
+        this.movementThrottle = 0;
+        this.syncTimer = 0;
       }
       var time = new Date( ).getTime( );
       var shipPosition = s.game.player.getPositionPacket( );
-          shipPosition.laccel = [];
-          shipPosition.aAccel = [];
-      var delta = function() {
-        var results = {};
-        var diff;
-        var t_diff;
-        for(var i = 0; i < 3; i++) {
-          diff = Math.abs( shipPosition.lVeloc[i] - this.lastPosition.lVeloc[i]);
-          t_diff = time - this.lastTime;
+          shipPosition.lAccel = [0,0,0];
+          shipPosition.aAccel = [0,0,0];
+      var t_diff = time - this.lastTime;
 
-          if(t_diff === 0 || isNaN(t_diff) ) {
-            return "Invalid";
-          } else {
-            shipPosition.laccel.push(diff/t_diff);
-          }
+      // benchmarked this against other variants for 96% efficency.
+      // http://jsperf.com/delta-function-or-raw-calculation
+      if (t_diff !== 0) {
+        shipPosition.lAccel[0] = (shipPosition.lVeloc[0] - this.lastPosition.lVeloc[0]) / t_diff;
+        shipPosition.aAccel[0] = (shipPosition.aVeloc[0] - this.lastPosition.aVeloc[0]) / t_diff;
 
-          diff = Math.abs( shipPosition.aVeloc[i] - this.lastPosition.aVeloc[i]);
-          t_diff = time - this.lastTime;
-          if(t_diff === 0 || isNaN(t_diff) ) {
-            return "Invalid";
-          } else {
-            shipPosition.aAccel.push(diff/t_diff);
+        shipPosition.lAccel[1] = (shipPosition.lVeloc[1] - this.lastPosition.lVeloc[1]) / t_diff;
+        shipPosition.aAccel[1] = (shipPosition.aVeloc[1] - this.lastPosition.aVeloc[1]) / t_diff;
+
+        shipPosition.lAccel[2] = (shipPosition.lVeloc[2] - this.lastPosition.lVeloc[2]) / t_diff;
+        shipPosition.aAccel[2] = (shipPosition.aVeloc[2] - this.lastPosition.aVeloc[2]) / t_diff;
+
+        // using Math.abs: http://jsperf.com/mathabs-vs-two-conditions
+        if(this.movementThrottle === 0){
+          if( this.syncTimer === 0 ||
+            Math.abs(shipPosition.aAccel[0]) > 0.000005 ||
+            Math.abs(shipPosition.aAccel[1]) > 0.000005 ||
+            Math.abs(shipPosition.aAccel[2]) > 0.000005 ||
+            Math.abs(shipPosition.lAccel[0]) > 0.005 ||
+            Math.abs(shipPosition.lAccel[1]) > 0.005 ||
+            Math.abs(shipPosition.lAccel[2]) > 0.005 ) {
+            var packet = {
+              time: time, // is this nessecary?
+              pos: shipPosition.pos,
+              rot: shipPosition.rot,
+              aVeloc: shipPosition.aVeloc,
+              lVeloc: shipPosition.lVeloc,
+              // not sure if we need to send this to the
+              // server except for testing purposes.
+              aAccel: shipPosition.aAccel,
+              lAccel: shipPosition.lAccel
+            };
+            s.game.comm.socket.emit( 'combat','move', packet );
+            s.game.comm.lastMessageTime = time;
+            this.lastPosition = shipPosition;
+            this.lastTime = time;
           }
         }
-        return results;
-      }();
-
-      if(delta === 'Invalid') {
-        return;
-      } else {
-        var packet = {
-          time: time,
-          pos: shipPosition.pos,
-          rot: shipPosition.rot,
-          aVeloc: shipPosition.aVeloc,
-          lVeloc: shipPosition.lVeloc,
-          aAccel: shipPosition.aAccel,
-          lAccel: shipPosition.lAccel
-        };
-
-        s.game.comm.socket.emit( 'combat','move', packet );
-        s.game.comm.lastMessageTime = time;
-        this.lastPosition = shipPosition.pos;
-        this.lastTime = time; 
       }
+      // throttle network emmissions by 80%
+      this.movementThrottle = (this.movementThrottle + 1) % 5;
+      // sync players every second (assuming the player runs every 60fps)
+      this.syncTimer = (this.syncTimer + 1) % 60;
     },
 
 
