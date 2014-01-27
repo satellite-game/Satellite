@@ -48,9 +48,7 @@ s.Player = new Class({
   },
 
   update: function() {
-    // if (this.hull <= 0){
-    //   this.game.handleDie();
-    // }
+
     // Adjusts engine glow based on linear velosity
     this.trailGlow.intensity = this.root.getLinearVelocity().length()/100;
 
