@@ -50897,8 +50897,8 @@ s.Turret = new Class({
         scale: new THREE.Vector3(50, 50, 1.0),
         color: {
             alliance: 0x00F2FF,
-            rebels: 0xFF0000,
-            enemy: 0xFF0000
+            rebels: 0xFF4400,
+            enemy: 0xFF4400
         }
     },
 
@@ -50919,7 +50919,11 @@ s.Turret = new Class({
             color: this.color
         }));
 
-        sprite.scale.copy(this.options.scale);
+        if (s.game.oculus.detected) {
+            sprite.scale.set(20, 20, 1.0);
+        } else {
+            sprite.scale.copy(this.options.scale);
+        }
         this.root.add(sprite);
 
         // Position the projectile relative to the ship
@@ -50971,8 +50975,8 @@ s.Ship = new Class({
         leftTurretOffset: new THREE.Vector3(35, 0, -200),
         rightTurretOffset: new THREE.Vector3(-35, 0, -200),
         missileOffset: new THREE.Vector3(0, 0, -120),
-        turretFireTime: 200,
-        botTurretFireTime: 1700,
+        turretFireTime: 150,
+        botTurretFireTime: 1000,
         missileFireTime: 1000
     },
 
@@ -50999,6 +51003,7 @@ s.Ship = new Class({
         this.shields = s.config.ship.shields;
 
         this.lastTime = new Date( ).getTime( );
+        this. alternateFire = false;
     },
 
     getOffset: function(offset) {
@@ -51026,15 +51031,17 @@ s.Ship = new Class({
             turretFireTime = this.options.turretFireTime;
             bullet.HUD = this.HUD;
         }
-
         // Turrets
         if (weapon === 'turret'){
             if (now - this.lastTurretFire > turretFireTime){
-                // Left bullet
-                this.makeTurret(bullet, this.options.leftTurretOffset);
-
-                // Right bullet
-                this.makeTurret(bullet, this.options.rightTurretOffset);
+                if ( this.alternateFire ) {
+                    // Left bullet
+                    this.makeTurret(bullet, this.options.leftTurretOffset);
+                } else {
+                    // Right bullet
+                    this.makeTurret(bullet, this.options.rightTurretOffset);
+                }
+                this.alternateFire = !this.alternateFire;
 
                 this.lastTurretFire = now;
                 if (!this.isBot) { this.game.sound.play('laser', 0.5); }
@@ -51504,8 +51511,8 @@ s.SpaceStation = new Class({
 	construct: function(options){
 		// handle parameters
 		this.options = options = jQuery.extend({
-			position: new THREE.Vector3(20000, 20000, 20000),
-			rotation: new THREE.Vector3(0, 0, 0)
+			position: options.position,
+			rotation: options.rotation
 		}, options);
 
 		var geometry = s.models.human_space_station.geometry;
@@ -51520,7 +51527,7 @@ s.SpaceStation = new Class({
 
 		this.root = new Physijs.ConvexMesh(geometry, new THREE.MeshFaceMaterial(materials), 0);
 
-    this.root.name = "space_station";
+        this.root.name = "space_station";
 		this.root.position.copy(options.position);
 		this.root.rotation.copy(options.rotation);
 		// this.root.receiveShadow = true; // Causes shader error
@@ -51906,7 +51913,11 @@ s.Oculus = new Class({
 
     vr.load(function () {
       this.state = new vr.State();
-      this.detected = true;
+      console.log(this.state);
+      vr.pollState(this.state);
+      if (this.state.hmd.present) {
+        this.detected = true;
+      }
     }, this);
     this.update = this.update.bind(this);
     this.game.hook(this.update);
@@ -53319,22 +53330,24 @@ s.LoadScreen = new Class( {
     }
 } );
 
-// This menu item is going to be 3D text floating in game in front of
-// the camera. It's more complicated but it'll be cool in the oculus.
-
 s.Menu = new Class({
 
   toString: 'Menu',
 
   construct: function ( options ) {
     this.displayed = false;
+    this.game = options.game;
     this.camera = options.game.camera;
     this.HUD = options.game.HUD;
     this.oculus = options.game.oculus;
+
     this.menuItems = [];
     this.menuScreen = 'none';
     this.cursorPosition = 0;
     this.hoveredItem = null;
+
+    this.selectorRay = new THREE.Raycaster(new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,1), 0, 300);
+    // this.selectorHelper = new THREE.ArrowHelper(new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,-0.3), 50, 0xFF00FF);
 
     // PlaneGeometry would be better than a cube for this but harder to write because 
     // it would need to be rotated and all it's child objects would need to be rotated back.
@@ -53356,6 +53369,8 @@ s.Menu = new Class({
     this.menuBox.visible = false;
 
     this.camera.add( this.menuBox );
+    this.camera.add( this.selectorRay );
+    // this.camera.add( this.selectorHelper );
 
     if (this.oculus.detected) {
       this.menuBox.position.setZ(-50);
@@ -53514,6 +53529,7 @@ s.Menu = new Class({
         this.hoverItem(hover);
 
         this.menuBox.position.setY((-150*Math.sin(viewingAngle))/Math.sin(Math.PI/4)/2+4); // ...ish
+        // console.log(this.selectorRay.intersectObjects(this.menuBox.children));
       } else {
         // todo: skip over items with no action property
         if (direction === 'up' && this.cursorPosition < this.menuItems.length-1) {
@@ -53549,30 +53565,38 @@ s.Menu = new Class({
     this.menuScreen = 'default';
 
     this.addMenuItems([
-      {text: 'JOIN GAME', size: 5, action: 'showRoomList'},
-      {text: 'DISCONECT', size: 5, action: 'disconnect'},
+      {text: 'CHANGE ROOM', size: 5, action: 'showRoomList'},
       {text: 'LEADERBOARD', size: 5, action: 'showScoreboard'},
-      {text: 'SAMPLE MENU', size: 5, action: 'showTestMenu'}
+      {text: 'SAMPLE MENU', size: 5, action: 'showTestMenu'},
+      {text: 'DISCONECT', size: 5, action: 'disconnect'}
     ]);
   },
 
   showRoomList: function () {
     this.menuScreen = 'rooms';
 
-    // var roomNames = [];
-    // // some database stuff to get list of existing rooms and order them by player count
-    // var rooms = [{text: 'JOIN GAME', size: 5}];
-    // for (var i = 0; i < roomNames.length; i++) {
-    //   rooms.push({text: roomNames[i], small: true, action: 'joinRoom', room: someRoomVar});
-    // }
-    // rooms.push({text: '+ CREATE NEW ROOM +', small: true, action: 'createRoom'});
-    // this.addMenuItems(rooms);
-    this.addMenuItems([
-      {text: 'SELECT A ROOM', size: 5},
-      {text: 'hey strong bad', small: true, action: 'joinRoom'},
-      {text: 'you jumped over', small: true, action: 'joinRoom'},
-      {text: 'some a muh busses', small: true, action: 'joinRoom'}
-    ]);
+    $.get({
+      url: '/rooms',
+      datatype: 'json',
+      success: function (data) {
+
+        var roomList = [{text: 'JOIN GAME', size: 5}];
+        for (var i = 0; i < data.length; i++) {
+          roomList.push({text: data[i].name + '...' + data[i].players, small: true, action: 'joinRoom', room: rooms[i].name});
+        }
+        roomList.push({text: '+ CREATE NEW ROOM +', small: true, action: 'createRoom'});
+        this.addMenuItems(roomList);
+      },
+      error: function (err) {
+        throw new Error('Failed to get room list from /rooms');
+      }
+    });
+    // this.addMenuItems([
+    //   {text: 'SELECT A ROOM', size: 5},
+    //   {text: 'hey strong bad', small: true, action: 'joinRoom', room: 'asdf'},
+    //   {text: 'you jumped over', small: true, action: 'joinRoom', room: 'test'},
+    //   {text: 'some a muh busses', small: true, action: 'joinRoom', room: 'puh fuh fuh'}
+    // ]);
   },
 
   joinRoom: function () {
@@ -53585,14 +53609,30 @@ s.Menu = new Class({
     this.close();
   },
 
+  createRoom: function () {
+    console.log('No.');
+  },
+
   showScoreboard: function () {
     this.menuScreen = 'scoreboard';
-    // // some database stuff to get list of players and order them by score
-    // var players = [{text: 'LEADERBOARD', size: 5}];
-    // for (var i = 0; i < database.length; i++) {
-    //   players.push({text: database[i].name+'...'+database[i].score, small: true});
-    // }
-    // this.addMenuItems(players);
+
+    $.get({
+      url: '/scores',
+      datatype: 'json',
+      data: {room: s.game.comm.room},
+      success: function (data) {
+
+        var players = [{text: 'LEADERBOARD', size: 5}];
+        for (var i = 0; i < data.length; i++) {
+          players.push({text: data[i].name+'...'+data[i].score, small: true});
+        }
+        this.addMenuItems(players);
+
+      },
+      error: function (err) {
+        throw new Error('Failed to get player scores from /' + this.game.comm.room);
+      }
+    });
   },
 
   showTestMenu: function () {
@@ -54403,6 +54443,7 @@ s.SatelliteGame = new Class( {
             that.player.hull = s.config.ship.hull;
             that.player.setPosition([that.getRandomCoordinate(), that.getRandomCoordinate(), that.getRandomCoordinate()],[0,0,0],[0,0,0],[0,0,0]);
             that.hostPlayer = false;
+            that.menu.close();
             that.restart();
         }, 6000);
     },
