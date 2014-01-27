@@ -11,7 +11,6 @@ s.MoonBaseTall = new Class({
 		var geometry = s.models.human_building_tall.geometry;
 		var materials = s.models.human_building_tall.materials;
 
-
 		// Setup physical properties
 		materials[0] = Physijs.createMaterial(
 			materials[0],
@@ -23,10 +22,13 @@ s.MoonBaseTall = new Class({
 
     this.root.name = "moonBaseTall";
 		this.root.team = 'rebel';
+
 		this.root.position.copy(options.position);
 		this.root.rotation.copy(options.rotation);
 
 		// this.root.receiveShadow = true; // Causes shader error
+
 		this.shields = s.config.base.shields;
+
 	}
 });
