@@ -1,5 +1,5 @@
 s.Ship = new Class({
-	extend: s.GameObject,
+    extend: s.GameObject,
 
     options: {
         leftTurretOffset: new THREE.Vector3(35, 0, -200),
@@ -35,8 +35,8 @@ s.Ship = new Class({
         return offset.clone().applyMatrix4(this.root.matrixWorld);
     },
 
-	fire: function(weapon){
-		var now = new Date().getTime();
+    fire: function(weapon){
+        var now = new Date().getTime();
         var rotation = this.root.rotation.clone();
         var initialVelocity = this.root.getLinearVelocity().clone();
 
