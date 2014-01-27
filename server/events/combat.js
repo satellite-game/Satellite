@@ -31,7 +31,6 @@ module.exports = function (host, sync) {
         zappedName: packet.otherPlayerName,
         killerName: packet.yourName
       };
-      console.log('hit!!!');
       socket.broadcast.to(room).emit('hit', response);
       socket.emit('hit', response);
     },
