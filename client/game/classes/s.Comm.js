@@ -172,9 +172,12 @@ s.Comm = new Class( {
         }
         return results;
       }();
-      if(delta === 'Invalid') {
-        return;
-      } else {
+      if(Math.abs(shipPosition.aAccel[0]) > 0.000000000000005 ||
+         Math.abs(shipPosition.aAccel[1]) > 0.000000000000005 ||
+         Math.abs(shipPosition.aAccel[2]) > 0.000000000000005 ||
+         Math.abs(shipPosition.lAccel[0]) > 0.00005 ||
+         Math.abs(shipPosition.lAccel[1]) > 0.00005 ||
+         Math.abs(shipPosition.lAccel[2]) > 0.00005 ) {
         var packet = {
           time: time,
           pos: shipPosition.pos,
@@ -188,7 +191,7 @@ s.Comm = new Class( {
         s.game.comm.socket.emit( 'combat','move', packet );
         s.game.comm.lastMessageTime = time;
         this.lastPosition = shipPosition;
-        this.lastTime = time; 
+        this.lastTime = time;
       }
     },
 
