@@ -53166,6 +53166,8 @@ s.Comm = new Class({
 
     this.socket = io.connect( 'http://' + options.server );
 
+
+//COMMENT OUT BELOW WHEN NEW SERVER IS WORKING
     this.socket.on('failed', function ( message ) {
       // try to reconnect
       that.connected();
@@ -53185,6 +53187,30 @@ s.Comm = new Class({
 
     this.connected();
   },
+
+
+//UNCOMMENT BELOW WHEN NEW SERVER IS WORKING
+  // connectSockets: function (server) {
+  //   this.socket = io.connect( 'http://' + server );
+
+  //   this.socket.on('failed', function ( message ) {
+  //     // try to reconnect
+  //     that.connected();
+  //   });
+  //   this.socket.on('join', this.makeTrigger('join'));
+  //   this.socket.on('player list', this.makeTrigger('player list'));
+  //   this.socket.on('leave', this.makeTrigger('leave'));
+  //   this.socket.on('move', this.makeTrigger('move'));
+  //   this.socket.on('killed', this.makeTrigger('killed'));
+  //   this.socket.on('fire', this.makeTrigger('fire'));
+  //   this.socket.on('hit', this.makeTrigger('hit'));
+  //   this.socket.on('bot retrieval', this.makeTrigger('bot retrieval'));
+  //   this.socket.on('bot positions', this.makeTrigger('bot positions'));
+
+  //   this.game.hook( this.position );
+
+  //   this.connected();
+  // },
 
   connected: function ( ) {
     var time = new Date( ).getTime( );
@@ -54062,7 +54088,7 @@ s.SatelliteGame = new Class( {
             game: this,
             shipClass: 'human_ship_heavy',
             // position: new THREE.Vector3(this.getRandomCoordinate(),this.getRandomCoordinate(),this.getRandomCoordinate()),
-            position: new THREE.Vector3(23498, -25902, 24976),
+            position: new THREE.Vector3(19232, 19946, 20311),
             name: this.pilot.name,
             rotation: new THREE.Vector3( 0, Math.PI/2, 0 ),
             alliance: 'alliance',
@@ -54447,7 +54473,7 @@ s.SatelliteGame = new Class( {
         setTimeout(function() {
             that.player.shields = s.config.ship.shields;
             that.player.hull = s.config.ship.hull;
-            that.player.setPosition([23498, -25902, 24976],[0,0,0],[0,0,0],[0,0,0]);
+            that.player.setPosition([19232, 19946, 20311],[0,0,0],[0,0,0],[0,0,0]);
             that.menu.close();
         }, 6000);
     },
@@ -54576,9 +54602,9 @@ s.SatelliteGame = new Class( {
             s.game.spaceStation.shields = s.config.base.shields;
 
             if (base === 'spaceStation') {
-                message = 'alliance wins';
+                message = 'rebels wins';
             } else {
-                message = "rebels win";
+                message = "alliance win";
             }
             s.game.menu.gameOver('temp', s.game.baseNameMap[base], message);
             s.game.restartGame();
