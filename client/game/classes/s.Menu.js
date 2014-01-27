@@ -273,7 +273,8 @@ s.Menu = new Class({
     // then basically just remove the player and respawn
     // sim-fuckin-ple.
     this.game.roomSelected = true;
-    this.game.comm.connectSockets(room);
+    this.game.comm.room = room;
+    this.game.comm.connectSockets();
     this.close();
   },
 

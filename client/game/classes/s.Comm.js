@@ -46,9 +46,11 @@ s.Comm = new Class({
     this.clockTick = this.clockTick.bind(this);
     this.timer = setInterval(this.clockTick,1000);
     this.time = 0;
+    this.connectSockets();
+    this.connected();
   },
 
-  connectSockets: function (room) {
+  connectSockets: function ( ) {
     // this takes in a room to join - where do we send the roomname we are getting on invokation?
     this.socket = io.connect( this.server );
 

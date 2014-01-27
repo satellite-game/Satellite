@@ -5,7 +5,7 @@ var connectionFlow = require('../events/connections');
 var movement       = require('../events/movement');
 var combat         = require('../events/combat');
 var player         = require('../events/player');
-var globals        = require('../events/bots');
+var globals        = require('../events/globals');
 
 var Events = function( init ) {
   var sync = new Sync();
@@ -18,7 +18,7 @@ var Events = function( init ) {
   this.player   = player(host, sync, io);
   this.combat   = combat(host, sync);
   this.movement = movement(host, sync);
-  this.bots     = player(host, sync, io);
+  this.bot      = player(host, sync, io);
 };
 
 module.exports = Events;

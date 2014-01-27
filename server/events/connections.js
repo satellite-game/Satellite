@@ -1,5 +1,5 @@
 var db = require('../db/queries');
-var globals = require('../events/bots');
+var globals = require('./globals');
 
 module.exports = function (map, host, Sync, io) {
   return {

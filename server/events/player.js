@@ -1,5 +1,5 @@
 var db = require('../db/queries');
-var globals = require('../events/bots');
+var globals = require('./globals');
 
 module.exports = function (host, sync, io) {
   return {
@@ -28,7 +28,7 @@ module.exports = function (host, sync, io) {
     // add rooms to all functions
     botInfo: function ( socket, packet) {
       // check this out: https://github.com/LearnBoost/socket.io/wiki/How-do-I-send-a-response-to-all-clients-except-sender%3F
-      io.sockets.socket(globals.lastClient).emit('bot positions', message);
+      io.sockets.socket(globals.lastClient).emit('bot positions', packet);
     },
 
     botHit: function ( socket, packet) {
