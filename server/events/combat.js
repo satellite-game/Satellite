@@ -1,14 +1,17 @@
 module.exports = function (host, sync) {
+
   return {
     move: function( socket, packet ) {
       var room = host.sockets[socket.id].room;
       var shipName = host.sockets[socket.id].name;
       var playerState = host.rooms[room].gamestate[shipName];
-      console.log(packet);
+      // copy over the packet data into the canonical state
       for(var i in packet) {
         playerState[i] = packet[i];
       }
+      // emit the canonical state to everyone else
       socket.broadcast.to(room).emit('move', playerState);
+
     },
 
     fire: function( socket, packet ) {
