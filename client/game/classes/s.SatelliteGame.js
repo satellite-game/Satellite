@@ -213,8 +213,6 @@ s.SatelliteGame = new Class( {
             }
         };
 
-        this.enemies = new s.Enemies({ game: this });
-
         // Dependent on controls; needs to be below s.Controls
         this.radar = new s.Radar( {
             game: this
