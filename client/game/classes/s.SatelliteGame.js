@@ -213,8 +213,6 @@ s.SatelliteGame = new Class( {
             }
         };
 
-        this.enemies = new s.Enemies({ game: this });
-
         // Dependent on controls; needs to be below s.Controls
         this.radar = new s.Radar( {
             game: this
@@ -246,7 +244,7 @@ s.SatelliteGame = new Class( {
             player: this.player,
             server: window.location.hostname + ':' + window.location.port
         } );
-        
+
         this.comm.on('fire', that.handleEnemyFire);
         this.comm.on('hit', that.handleHit);
         this.comm.on('player list', that.handlePlayerList);
@@ -264,6 +262,8 @@ s.SatelliteGame = new Class( {
         this.player.root.addEventListener('ready', function(){
             s.game.start();
         });
+
+        s.game.menu.joinRoom();
 	},
 
 	render: function(_super, time) {
@@ -590,9 +590,10 @@ s.SatelliteGame = new Class( {
                 that.game.updatePlayersWithBots('botUpdate');
             }, 2500);
         }
-
         this.game.hostPlayer = true;
+        console.log(this.game.hostPlayer);
         if (this.game.botCount === 0) {
+            console.log(true);
             // Create a new bot
             this.game.enemies.add( {}, 'bot');
         }

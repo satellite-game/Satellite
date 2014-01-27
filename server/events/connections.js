@@ -1,5 +1,5 @@
 var db = require('../db/queries');
-var globals = require('../events/bots');
+var globals = require('./globals');
 
 module.exports = function (map, host, Sync, io) {
   return {
@@ -16,8 +16,15 @@ module.exports = function (map, host, Sync, io) {
         Sync.setInit( socket.id, target, data );
       }
 
+      db.joinRoom(data.room, data.name);  // add to game in the db
+
+      socket.emit('player list', target.playerList);
+      socket.emit('map', map.mapItems);
+      socket.join(data.room);
+      socket.broadcast.to(data.room).emit('join', data);
+
       // ************************************************************************ //
-      // doesn't account for rooms -- assumes that this is passed into closure.
+      // bot stuff
       globals.lastClient = socket.id;
       globals.clients[socket.id] = true;
       for (var key in globals.clients) {
@@ -28,19 +35,15 @@ module.exports = function (map, host, Sync, io) {
       }
       io.sockets.socket(globals.hostPlayer).emit("bot retrieval");
       // ************************************************************************ //
-
-      db.joinRoom(data.room, data.name);  // add to game in the db
-
-      socket.emit('player list', target.playerList);
-      socket.emit('map', map.mapItems);
-      socket.join(data.room);
-      socket.broadcast.to(data.room).emit('join', data);
     },
 
     disconnect: function( socket ) {
       var room = host.sockets[socket.id].room;
       var name = host.sockets[socket.id].name;
 
+      // ************************************************************************ //
+      // bot stuff
+      console.log('\nDISCONNECTED-BEFORE:\n', globals);
       db.leaveRoom(room, name); // boot from the game in the db
       delete globals.clients[socket.id];
       if (globals.hostPlayer === socket.id) {
@@ -50,6 +53,8 @@ module.exports = function (map, host, Sync, io) {
           break;
         }
       }
+      console.log('\nDISCONNECTED-AFTER:\n', globals);
+      // ************************************************************************ //
 
       socket.broadcast.to(room).emit('leave', {name: name});
       delete host.rooms[room].gamestate[name];
