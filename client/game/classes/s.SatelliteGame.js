@@ -471,9 +471,6 @@ s.SatelliteGame = new Class( {
     },
 
     handleDie: function(you, killer) {
-        // if (!you) {
-        //     return;
-        // }
         if (this.hostPlayer) clearInterval(this.botPositionInterval);
         this.menu.gameOver(killer);
         s.game.comm.died(you, killer);
@@ -610,9 +607,17 @@ s.SatelliteGame = new Class( {
 
     handleBaseDeath: function(base) {
         setTimeout(function() {
+            var message;
+
             s.game.moonBaseTall.shields = s.config.base.shields;
             s.game.spaceStation.shields = s.config.base.shields;
-            s.game.stop();
+
+            if (base === 'spaceStation') {
+                message = 'rebels wins';
+            } else {
+                message = "alliance win";
+            }
+            s.game.menu.gameOver('temp', s.game.baseNameMap[base], message);
             s.game.restartGame();
         }, 3000);
 
