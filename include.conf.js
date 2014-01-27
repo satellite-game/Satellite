@@ -23,6 +23,7 @@ module.exports = [
   "./client/game/classes/s.Ship.js",
   "./client/game/classes/s.Player.js",
   "./client/game/classes/s.Bot.js",
+  "./client/game/classes/s.Enemies.js",
   "./client/game/classes/s.Moon.js",
   "./client/game/classes/s.BuildingTall.js",
   "./client/game/classes/s.BuildingShort.js",

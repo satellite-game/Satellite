@@ -30,7 +30,6 @@ var s = {
         // Create a model loader
         s.loader = new THREE.JSONLoader();
 
-        // Create game
         s.game = new s.SatelliteGame();
     }
 };
