@@ -1,4 +1,5 @@
 var db = require('../db/queries');
+var globals = require('../events/bots');
 
 module.exports = function (map, host, Sync, io) {
   return {
@@ -15,6 +16,19 @@ module.exports = function (map, host, Sync, io) {
         Sync.setInit( socket.id, target, data );
       }
 
+      // ************************************************************************ //
+      // doesn't account for rooms -- assumes that this is passed into closure.
+      globals.lastClient = socket.id;
+      globals.clients[socket.id] = true;
+      for (var key in globals.clients) {
+        if (!globals.hostPlayer) {
+          globals.hostPlayer = key;
+        }
+        break;
+      }
+      io.sockets.socket(globals.hostPlayer).emit("bot retrieval");
+      // ************************************************************************ //
+
       db.joinRoom(data.room, data.name);  // add to game in the db
 
       socket.emit('player list', target.playerList);
@@ -28,6 +42,14 @@ module.exports = function (map, host, Sync, io) {
       var name = host.sockets[socket.id].name;
 
       db.leaveRoom(room, name); // boot from the game in the db
+      delete globals.clients[socket.id];
+      if (globals.hostPlayer === socket.id) {
+        for (var key in globals.clients) {
+          globals.hostPlayer = key;
+          io.sockets.socket(globals.hostPlayer).emit("bot retrieval");
+          break;
+        }
+      }
 
       socket.broadcast.to(room).emit('leave', {name: name});
       delete host.rooms[room].gamestate[name];
@@ -37,79 +59,3 @@ module.exports = function (map, host, Sync, io) {
 
   };
 };
-
-// LEGACY CODE: not removed because I didn't write this module.
-////////////////////////////////////////////////////////////////
-
-  // // Setup message handlers
-  // socket.on('join', function(message) {
-  //     console.dir(message);
-  //     if (players[message.name] !== undefined && ip === players[message.name].ip) {
-  //         console.warn('Error: '+message.name+' tried to join twice!');
-  //         return;
-  //     }
-
-  //     if (!message.name) {
-  //         console.error('Error: Cannot join, player name was null!');
-  //         socket.emit('failed');
-  //         return false;
-  //     }
-
-  //     console.log('Player joined: '+message.name);
-
-  //     // Send list of players
-  //     socket.emit('player list', players);
-
-  //     // Send the map to the players
-  //     socket.emit('map', mapItems);
-
-  //     var pos = getRandomPosition();
-
-  //     socket.set('name', message.name, function() {
-  //         // Store client info
-  //         players[message.name] = {
-  //             name: message.name,
-  //             pos: message.pos,
-  //             rot: message.rot,
-  //             aVeloc: message.aVeloc,
-  //             lVeloc: message.lVeloc,
-  //             lastMove: getTime(),
-  //             ip: ip
-  //         };
-
-  //         var packet = {
-  //             name: message.name,
-  //             pos: message.pos,
-  //             rot: [0, 0, 0],
-  //             aVeloc: [0, 0, 0],
-  //             lVeloc: [0, 0, 0],
-  //             interp: false // Not really necessary here, we're telling the client itself to move
-  //         };
-
-  //         socket.emit('move', packet);
-
-  //         // Notify players of new challenger
-  //         socket.broadcast.emit('join', {
-  //             name: message.name,
-  //             pos: message.pos,
-  //             rot: message.rot,
-  //             aVeloc: message.aVeloc,
-  //             lVeloc: message.lVeloc
-  //         });
-  //     });
-  // });
-
-
-  // socket.on('disconnect', function() {
-  //     // socket.get('name', function (err, name) {
-  //     //     console.log(name+' dropped');
-
-  //     //     // Remove from client list
-  //     //     delete players[name];
-
-  //     //     // Notify players
-  //     //     socket.broadcast.emit('leave', {
-  //     //         name: name
-  //     //     });
-  //     // });
-  // });

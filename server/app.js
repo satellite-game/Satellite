@@ -41,6 +41,7 @@ app.get('/rooms', function (req, res) {
         res.json(rooms);
     });
 });
+
 // serves player stats for in-game menu
 app.get('/rooms/:id', function (req, res) {
     db.getRoomInfo(req.param('id'), function(err, roomInfo){
@@ -51,6 +52,9 @@ app.get('/rooms/:id', function (req, res) {
 
 // Holds players
 var players = {};
+
+/*===== what's up with this stuff: ====*/
+/*===== above is client changes made to server side - figure out what's going on. ====*/
 
 var mapItems = [
     { type: 'Alien Space Station', pos: [0, 1000], rot: 0, hp: 100 },

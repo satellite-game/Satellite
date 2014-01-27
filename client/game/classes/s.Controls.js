@@ -2,7 +2,6 @@ s.Controls = new Class({
 
   toString: 'Controls',
 
-
   options: {
 
     rotationSpeed: Math.PI/2,
@@ -132,9 +131,9 @@ s.Controls = new Class({
 
     if (this.oculus.detected) {
       this.mouse.mouseType = 'oculus';
-      pitch = this.oculus.quat.x - this.oculus.compensationX;
-      yaw = this.oculus.quat.y - this.oculus.compensationY;
-      roll = this.oculus.quat.z - this.oculus.compensationZ;
+      pitch = this.oculus.quat.x;
+      yaw = this.oculus.quat.y;
+      roll = this.oculus.quat.z;
       if (this.menu.displayed) {
         this.menu.updateHovered();
       }
@@ -227,9 +226,7 @@ s.Controls = new Class({
     }
 
     if (this.keyboard.pressed('tilde')) {
-      this.oculus.compensationX = this.oculus.quat.x;
-      this.oculus.compensationY = this.oculus.quat.y;
-      this.oculus.compensationZ = this.oculus.quat.z;
+      vr.resetHmdOrientation();
     }
 
 
