@@ -98,11 +98,6 @@ s.HUD = new Class({
         this.changeTarget = 0;
         this.currentTarget = 0;
 
-        this.nameMap = {
-            'space_station': 'Space Base',
-            'moon_base_tall': 'Moon Base'
-        };
-
 	},
 	update: function(){
             
@@ -420,8 +415,8 @@ s.HUD = new Class({
             this.ctx.lineWidth = 1;
             this.ctx.strokeStyle = this.menu.color;
 
-            if (this.nameMap[circleTarget.name]) {
-                this.writeName(this.nameMap[circleTarget.name], v2DcircleTarget);
+            if (this.game.baseNameMap[circleTarget.name]) {
+                this.writeName(this.game.baseNameMap[circleTarget.name], v2DcircleTarget);
             }
         }
 

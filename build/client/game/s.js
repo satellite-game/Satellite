@@ -47732,6 +47732,9 @@ var s = {
             shields: 80,
             maxSpeed: 1500
         },
+        base: {
+            shields: 1000
+        },
         sound: {
             enabled: true,
             silentDistance: 10000,
@@ -48265,6 +48268,7 @@ s.Projectile = new Class({
         this.game = options.game;
         this.pilot = options.pilot;
         this.isBot = options.isBot;
+        this.team = options.team;
         // handle parameters
         this.initialVelocity = options.initialVelocity;
         var that = this;
@@ -48280,10 +48284,10 @@ s.Projectile = new Class({
     },
 
     handleCollision: function(mesh, position){
-        //check if your turret hit someone
+        //check if your turret hit someone or an enemy base
         //else if check if you got hit by a bot
         if (this.pilot === this.game.pilot.name){
-            if (mesh.instance.alliance && mesh.instance.alliance === "enemy"){
+            if (mesh.instance.alliance && mesh.instance.alliance === "rebel"){
                 this.HUD.menu.animate({
                 color: this.HUD.hit,
                 frames: 30
@@ -48295,6 +48299,9 @@ s.Projectile = new Class({
                     });
                 }
                 this.comm.hit(mesh.name,this.game.pilot.name);
+            }
+            if (mesh.team !== this.game.player.alliance && mesh.name !== 'moon') {
+                this.comm.baseFire(mesh.name, this.pilot);
             }
         } else if (mesh.name === this.game.pilot.name && this.isBot ) {
             this.comm.botHit(mesh.name, this.pilot);
@@ -48336,7 +48343,7 @@ s.Turret = new Class({
         scale: new THREE.Vector3(50, 50, 1.0),
         color: {
             alliance: 0x00F2FF,
-            rebels: 0xFF0000,
+            rebel: 0xFF0000,
             enemy: 0xFF0000
         }
     },
@@ -48892,6 +48899,7 @@ s.SpaceStation = new Class({
 		var geometry = s.models.human_space_station.geometry;
 		var materials = s.models.human_space_station.materials;
 
+
 		// Setup physical properties
 		materials[0] = Physijs.createMaterial(
 			materials[0],
@@ -48901,10 +48909,13 @@ s.SpaceStation = new Class({
 
 		this.root = new Physijs.ConvexMesh(geometry, new THREE.MeshFaceMaterial(materials), 0);
 
-    this.root.name = "space_station";
+    this.root.name = "spaceStation";
+		this.root.team = 'alliance';
 		this.root.position.copy(options.position);
 		this.root.rotation.copy(options.rotation);
 		// this.root.receiveShadow = true; // Causes shader error
+
+		this.shields = s.config.base.shields;
 	}
 });
 
@@ -48921,6 +48932,7 @@ s.MoonBaseTall = new Class({
 		var geometry = s.models.human_building_tall.geometry;
 		var materials = s.models.human_building_tall.materials;
 
+
 		// Setup physical properties
 		materials[0] = Physijs.createMaterial(
 			materials[0],
@@ -48930,11 +48942,13 @@ s.MoonBaseTall = new Class({
 
 		this.root = new Physijs.ConvexMesh(geometry, new THREE.MeshFaceMaterial(materials), 0);
 
-    this.root.name = "moon_base_tall";
+    this.root.name = "moonBaseTall";
+		this.root.team = 'rebel';
 		this.root.position.copy(options.position);
 		this.root.rotation.copy(options.rotation);
 
 		// this.root.receiveShadow = true; // Causes shader error
+		this.shields = s.config.base.shields;
 	}
 });
 
@@ -49735,11 +49749,6 @@ s.HUD = new Class({
         this.changeTarget = 0;
         this.currentTarget = 0;
 
-        this.nameMap = {
-            'space_station': 'Space Base',
-            'moon_base_tall': 'Moon Base'
-        };
-
 	},
 	update: function(){
             
@@ -49960,9 +49969,6 @@ s.HUD = new Class({
                     c2D.y = -(-height + c2D.y*height )/2;
 
                     this.writeName(enemies[j].name, c2D);
-                    // this.ctx.fillStyle = this.menu.color;
-                    // this.ctx.fillText( enemies[j].name, c2D.x-30, c2D.y+10);
-                    // this.ctx.fill();
                 }
             }
 
@@ -50060,8 +50066,8 @@ s.HUD = new Class({
             this.ctx.lineWidth = 1;
             this.ctx.strokeStyle = this.menu.color;
 
-            if (this.nameMap[circleTarget.name]) {
-                this.writeName(this.nameMap[circleTarget.name], v2DcircleTarget);
+            if (this.game.baseNameMap[circleTarget.name]) {
+                this.writeName(this.game.baseNameMap[circleTarget.name], v2DcircleTarget);
             }
         }
 
@@ -50588,6 +50594,8 @@ s.Comm = new Class( {
 
         this.socket.on('bot positions', this.makeTrigger( 'bot positions' ));
         
+        this.socket.on('baseHit', this.makeTrigger( 'baseHit' ));
+        
 
 
 
@@ -50754,7 +50762,15 @@ s.Comm = new Class( {
 
     botUpdate: function(enemies) {
         this.socket.emit( 'botUpdate', enemies);
+    },
+
+    baseFire: function(baseName, pilotName) {
+        this.socket.emit( 'baseFire', {
+            baseName: baseName,
+            pilotName: pilotName
+        });
     }
+
 } );
 
 s.LoadScreen = new Class( {
@@ -51387,6 +51403,12 @@ s.SatelliteGame = new Class( {
             game: this
         } );
 
+        this.baseNameMap = {
+            'spaceStation': 'Space Base',
+            'moonBaseTall': 'Moon Base'
+        };
+
+
         this.pilot = {};
         this.callsigns = this.callsigns || ["Apollo","Strobe","Sage","Polkadot","Moonglow","Steel","Vanguard","Prong","Uptight","Blackpony","Hawk","Ramrod","Dice","Falcon","Rap","Buckshot","Cobra","Magpie","Warhawk","Boxer","Devil","Hammer","Phantom","Sharkbait","Dusty","Icon","Blade","Pedro","Stinger","Yellow Jacket","Limit","Sabre","Misty","Whiskey","Dice","Antic","Arrow","Auto","Avalon","Bandit","Banshee","Blackjack","Bulldog","Caesar","Cajun","Challenger","Chuggs","Cindy","Cracker","Dagger","Dino","Esso","Express","Fangs","Fighting Freddie","Freight Train","Freemason","Fury","Gamma","Gear","Ghost","Ginger","Greasy","Havoc","Hornet","Husky","Jackal","Jaguar","Jedi","Jazz","Jester","Knife","Kitty Hawk","Knight","Knightrider","Koala","Komono","Lancer","Lexus","Lion","Levi","Lucid","Malty","Mail Truck","Magma","Magnet","Malibu","Medusa","Maul","Monster","Misfit","Moss","Moose","Mustang","Nail","Nasa","Nacho","Nighthawk","Ninja","Neptune","Odin","Occult","Nukem","Ozark","Pagan","Pageboy","Panther","Peachtree","Phenom","Polestar","Punisher","Ram","Rambo","Raider","Raven","Razor","Rupee","Sabre","Rust","Ruin","Sultan","Savor","Scandal","Scorpion","Shooter","Smokey","Sniper","Spartan","Thunder","Titus","Titan","Timber Wolf","Totem","Trump","Venom","Veil","Viper","Weasel","Warthog","Winter","Wiki","Wild","Yonder","Yogi","Yucca","Zeppelin","Zeus","Zesty"];
 
@@ -51517,10 +51539,10 @@ s.SatelliteGame = new Class( {
                         name: enemyInfo.name,
                         position: enemyInfo.position,
                         rotation: enemyInfo.rotation,
-                        alliance: 'enemy'
+                        alliance: 'rebel'
                     } );
                 } else {
-                    var alliance = 'enemy';
+                    var alliance = 'rebel';
                     if (s.game.teamMode) { alliance = 'alliance'; }
                     enemyShip = new s.Player( {
                         game: that,
@@ -51579,6 +51601,7 @@ s.SatelliteGame = new Class( {
         this.comm.on( 'move', that.handleMove );
         this.comm.on( 'bot retrieval', that.handleBotInfo );
         this.comm.on( 'bot positions', that.handleBotPositions );
+        this.comm.on( 'baseHit', that.baseHit );
 
         this.HUD.controls = this.controls;
 
@@ -51915,6 +51938,12 @@ s.SatelliteGame = new Class( {
                 this.game.enemies.add(message[bot], 'bot');
             }
         }
+    },
+
+    baseHit: function(message) {
+        this.game[message.baseName].shields--;
+        var shields = this.game[message.baseName].shields;
+        console.log(this.game.baseNameMap[message.baseName] + ' was hit by ' + message.pilotName + '. Shields at ' + shields);
     }
 
 } );
