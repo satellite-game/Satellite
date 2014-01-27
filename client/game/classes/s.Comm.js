@@ -175,9 +175,9 @@ s.Comm = new Class( {
       if(Math.abs(shipPosition.aAccel[0]) > 0.00005 ||
          Math.abs(shipPosition.aAccel[1]) > 0.00005 ||
          Math.abs(shipPosition.aAccel[2]) > 0.00005 ||
-         Math.abs(shipPosition.lAccel[0]) > 0.00005 ||
-         Math.abs(shipPosition.lAccel[1]) > 0.00005 ||
-         Math.abs(shipPosition.lAccel[2]) > 0.00005 ) {
+         Math.abs(shipPosition.lAccel[0]) > 0.005 ||
+         Math.abs(shipPosition.lAccel[1]) > 0.005 ||
+         Math.abs(shipPosition.lAccel[2]) > 0.005 ) {
         var packet = {
           time: time,
           pos: shipPosition.pos,
