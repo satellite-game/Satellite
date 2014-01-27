@@ -244,7 +244,7 @@ s.SatelliteGame = new Class( {
             player: this.player,
             server: window.location.hostname + ':' + window.location.port
         } );
-        
+
         this.comm.on('fire', that.handleEnemyFire);
         this.comm.on('hit', that.handleHit);
         this.comm.on('player list', that.handlePlayerList);
@@ -262,6 +262,8 @@ s.SatelliteGame = new Class( {
         this.player.root.addEventListener('ready', function(){
             s.game.start();
         });
+
+        s.game.menu.joinRoom();
 	},
 
 	render: function(_super, time) {

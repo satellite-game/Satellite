@@ -9,10 +9,8 @@ module.exports = function (host, sync) {
       for(var i in packet) {
         playerState[i] = packet[i];
       }
-      console.log(packet);
       // emit the canonical state to everyone else
       socket.broadcast.to(room).emit('move', playerState);
-
     },
 
     fire: function( socket, packet ) {
@@ -33,6 +31,7 @@ module.exports = function (host, sync) {
         zappedName: packet.otherPlayerName,
         killerName: packet.yourName
       };
+      console.log('hit!!!');
       socket.broadcast.to(room).emit('hit', response);
       socket.emit('hit', response);
     },

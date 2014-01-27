@@ -10,7 +10,7 @@ module.exports = function (host, sync, io) {
         killed: packet.you,
         killer: packet.killer
       };
-
+      console.log('\nKILLED-BEFORE:\n', globals);
       // change the playerStats
       db.incKillCount(room, deathNotification.killer);
       db.incDeathCount(room, deathNotification.killed);
@@ -23,11 +23,13 @@ module.exports = function (host, sync, io) {
       io.sockets.socket(globals.hostPlayer).emit("bot retrieval");
       socket.emit('killed', deathNotification);
       socket.broadcast.to(room).emit('killed', deathNotification);
+      console.log('\nKILLED-AFTER:\n', globals);
     },
 
     // add rooms to all functions
     botInfo: function ( socket, packet) {
       // check this out: https://github.com/LearnBoost/socket.io/wiki/How-do-I-send-a-response-to-all-clients-except-sender%3F
+      console.log('globals.lastClient', globals.lastClient);
       io.sockets.socket(globals.lastClient).emit('bot positions', packet);
     },
 
