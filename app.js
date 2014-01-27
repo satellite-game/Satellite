@@ -248,6 +248,10 @@ io.sockets.on('connection', function (socket) {
         socket.broadcast.emit('bot positions', message);
     });
 
+    socket.on('baseFire', function(message) {
+        socket.emit('baseHit', message);
+    });
+
 });
 
 
