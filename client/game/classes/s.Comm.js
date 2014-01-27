@@ -45,6 +45,8 @@ s.Comm = new Class({
 
     this.socket = io.connect( 'http://' + options.server );
 
+
+//COMMENT OUT BELOW WHEN NEW SERVER IS WORKING
     this.socket.on('failed', function ( message ) {
       // try to reconnect
       that.connected();
@@ -64,6 +66,30 @@ s.Comm = new Class({
 
     this.connected();
   },
+
+
+//UNCOMMENT BELOW WHEN NEW SERVER IS WORKING
+  // connectSockets: function (server) {
+  //   this.socket = io.connect( 'http://' + server );
+
+  //   this.socket.on('failed', function ( message ) {
+  //     // try to reconnect
+  //     that.connected();
+  //   });
+  //   this.socket.on('join', this.makeTrigger('join'));
+  //   this.socket.on('player list', this.makeTrigger('player list'));
+  //   this.socket.on('leave', this.makeTrigger('leave'));
+  //   this.socket.on('move', this.makeTrigger('move'));
+  //   this.socket.on('killed', this.makeTrigger('killed'));
+  //   this.socket.on('fire', this.makeTrigger('fire'));
+  //   this.socket.on('hit', this.makeTrigger('hit'));
+  //   this.socket.on('bot retrieval', this.makeTrigger('bot retrieval'));
+  //   this.socket.on('bot positions', this.makeTrigger('bot positions'));
+
+  //   this.game.hook( this.position );
+
+  //   this.connected();
+  // },
 
   connected: function ( ) {
     var time = new Date( ).getTime( );
