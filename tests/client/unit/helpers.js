@@ -38,11 +38,9 @@ beforeEach(function () {
     });
   };
 
-  runSpecs = function (specs, done) {
+  runAsync = function (cb, done) {
     setTimeout(function () {
-      s.game.player = makePlayer('Player one');
-      var bot = makeBot();
-      specs(bot);
+      cb();
       done();
     }, 400);
   };
