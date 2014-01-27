@@ -143,6 +143,7 @@ s.Comm = new Class( {
       if(this.lastPosition === undefined) {
         this.lastPosition = s.game.player.getPositionPacket( );
         this.lastTime = new Date().getTime();
+        this.movementThrottle = 0;
       }
       var time = new Date( ).getTime( );
       var shipPosition = s.game.player.getPositionPacket( );
@@ -172,9 +173,11 @@ s.Comm = new Class( {
         }
         return results;
       }();
-      if(Math.abs(shipPosition.aAccel[0]) > 0.00005 ||
-         Math.abs(shipPosition.aAccel[1]) > 0.00005 ||
-         Math.abs(shipPosition.aAccel[2]) > 0.00005 ||
+      // using Math.abs: http://jsperf.com/mathabs-vs-two-conditions
+      if(this.movementThrottle === 0 &&
+         Math.abs(shipPosition.aAccel[0]) > 0.000005 ||
+         Math.abs(shipPosition.aAccel[1]) > 0.000005 ||
+         Math.abs(shipPosition.aAccel[2]) > 0.000005 ||
          Math.abs(shipPosition.lAccel[0]) > 0.005 ||
          Math.abs(shipPosition.lAccel[1]) > 0.005 ||
          Math.abs(shipPosition.lAccel[2]) > 0.005 ) {
@@ -193,6 +196,8 @@ s.Comm = new Class( {
         this.lastPosition = shipPosition;
         this.lastTime = time;
       }
+      // throttle network emmissions by 80%
+      this.movementThrottle = (this.movementThrottle + 1) % 5;
     },
 
 
