@@ -35,8 +35,8 @@ s.HUD = new Class({
         // end Oculus canvases
 
 
-		this.gameOver = new Image();
-        this.gameOver.src = 'game/textures/Game-Over-1.png';
+		// this.gameOver = new Image();
+        // this.gameOver.src = 'game/textures/Game-Over-1.png';
 
 		this.targetX = 0;
 		this.targetY = 0;
@@ -137,11 +137,11 @@ s.HUD = new Class({
         this.ctx.stroke();
 
 
-        if (this.cursorVector.length() > this.subreticleBound.radius) {
-            this.cursorVector.normalize().multiplyScalar(this.subreticleBound.radius);
-            this.targetX = this.cursorVector.x+centerX;
-            this.targetY = this.cursorVector.y+centerY;
-        }
+        // if (this.cursorVector.length() > this.subreticleBound.radius) {
+        //     this.cursorVector.normalize().multiplyScalar(this.subreticleBound.radius);
+        //     this.targetX = this.cursorVector.x+centerX;
+        //     this.targetY = this.cursorVector.y+centerY;
+        // }
 
         this.ctx.fillStyle = this.menu.color;
         this.ctx.strokeStyle = this.menu.color;
@@ -266,7 +266,7 @@ s.HUD = new Class({
         this.ctx.fillText("Shields",throttleEndX - 45,throttleEndY + 30);
         this.ctx.beginPath();
         this.ctx.fillStyle = this.menu.color;
-        this.ctx.arc(this.targetX, this.targetY, 5, 0, 2 * this.PI, false);
+        //this.ctx.arc(this.targetX, this.targetY, 5, 0, 2 * this.PI, false);
         this.ctx.fill();
 
 
@@ -500,14 +500,14 @@ s.HUD = new Class({
         }
 
 
-        this.ctx.lineWidth = 1;
-        this.ctx.fillStyle = this.menu.color;
-        this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, 3, 0, 2 * this.PI, false);
-        this.ctx.fill();
-        this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, 15, 0, 2 * this.PI, false);
-        this.ctx.stroke();
+        // this.ctx.lineWidth = 1;
+        // this.ctx.fillStyle = this.menu.color;
+        // this.ctx.beginPath();
+        // this.ctx.arc(centerX, centerY, 3, 0, 2 * this.PI, false);
+        // this.ctx.fill();
+        // this.ctx.beginPath();
+        // this.ctx.arc(centerX, centerY, 15, 0, 2 * this.PI, false);
+        // this.ctx.stroke();
 
         this.oculusCtx.clearRect(0, 0, this.oculusCanvas.width, this.oculusCanvas.height);
         this.oculusCtx.drawImage(this.canvas, 50*1.07, -50, window.innerWidth/2, window.innerHeight/2);

@@ -52050,10 +52050,10 @@ s.Controls = new Class({
     ///////////////////////
 
     var yawSpeed = this.options.yawSpeed,
-      pitchSpeed = this.options.pitchSpeed,
-      cursor = this.HUD.cursorVector,
-      radius = this.HUD.subreticleBound.radius,
-      crosshairs = {width: 30, height: 30};
+      pitchSpeed = this.options.pitchSpeed;
+      // cursor = this.HUD.cursorVector,
+      // radius = this.HUD.subreticleBound.radius,
+      // crosshairs = {width: 30, height: 30};
 
     ///////////////////////
     // KEYBOARD COMMANDS //
@@ -52101,20 +52101,20 @@ s.Controls = new Class({
     //  MOUSE CONTROLS   //
     ///////////////////////
 
-    var mouseUpdate = this.mouse.update({
-        centerX: centerX,
-        crosshairs: crosshairs,
-        yaw: yaw,
-        radius: radius,
-        yawSpeed: yawSpeed,
-        thrustScalar: thrustScalar,
-        centerY: centerY,
-        pitch: pitch,
-        pitchSpeed: pitchSpeed
-    });
+    // var mouseUpdate = this.mouse.update({
+    //     centerX: centerX,
+    //     crosshairs: crosshairs,
+    //     yaw: yaw,
+    //     radius: radius,
+    //     yawSpeed: yawSpeed,
+    //     thrustScalar: thrustScalar,
+    //     centerY: centerY,
+    //     pitch: pitch,
+    //     pitchSpeed: pitchSpeed
+    // });
 
-    pitch = mouseUpdate.pitch || pitch;
-    yaw = mouseUpdate.yaw || yaw;
+    // pitch = mouseUpdate.pitch || pitch;
+    // yaw = mouseUpdate.yaw || yaw;
 
     ///////////////////////
     // GAMEPAD CONTROLS  //
@@ -52151,9 +52151,15 @@ s.Controls = new Class({
     if (this.oculus.detected) {
       this.mouse.mouseType = 'oculus';
       this.camera.rotation.setEulerFromQuaternion(this.oculus.quat);
-      pitch += this.oculus.quat.x/2;
-      yaw += this.oculus.quat.y/8;
-      roll += this.oculus.quat.z/2;
+      if (hasGamepad) {
+        pitch += this.oculus.quat.x/2;
+        yaw += this.oculus.quat.y/2;
+        roll += this.oculus.quat.z/2;
+      } else {
+        pitch += this.oculus.quat.x;
+        yaw += this.oculus.quat.y;
+        roll += this.oculus.quat.z;
+      }
       if (this.menu.displayed) {
         this.menu.updateHovered();
       }
@@ -52253,8 +52259,8 @@ s.HUD = new Class({
         // end Oculus canvases
 
 
-		this.gameOver = new Image();
-        this.gameOver.src = 'game/textures/Game-Over-1.png';
+		// this.gameOver = new Image();
+        // this.gameOver.src = 'game/textures/Game-Over-1.png';
 
 		this.targetX = 0;
 		this.targetY = 0;
@@ -52355,11 +52361,11 @@ s.HUD = new Class({
         this.ctx.stroke();
 
 
-        if (this.cursorVector.length() > this.subreticleBound.radius) {
-            this.cursorVector.normalize().multiplyScalar(this.subreticleBound.radius);
-            this.targetX = this.cursorVector.x+centerX;
-            this.targetY = this.cursorVector.y+centerY;
-        }
+        // if (this.cursorVector.length() > this.subreticleBound.radius) {
+        //     this.cursorVector.normalize().multiplyScalar(this.subreticleBound.radius);
+        //     this.targetX = this.cursorVector.x+centerX;
+        //     this.targetY = this.cursorVector.y+centerY;
+        // }
 
         this.ctx.fillStyle = this.menu.color;
         this.ctx.strokeStyle = this.menu.color;
@@ -52484,7 +52490,7 @@ s.HUD = new Class({
         this.ctx.fillText("Shields",throttleEndX - 45,throttleEndY + 30);
         this.ctx.beginPath();
         this.ctx.fillStyle = this.menu.color;
-        this.ctx.arc(this.targetX, this.targetY, 5, 0, 2 * this.PI, false);
+        //this.ctx.arc(this.targetX, this.targetY, 5, 0, 2 * this.PI, false);
         this.ctx.fill();
 
 
@@ -52718,14 +52724,14 @@ s.HUD = new Class({
         }
 
 
-        this.ctx.lineWidth = 1;
-        this.ctx.fillStyle = this.menu.color;
-        this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, 3, 0, 2 * this.PI, false);
-        this.ctx.fill();
-        this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, 15, 0, 2 * this.PI, false);
-        this.ctx.stroke();
+        // this.ctx.lineWidth = 1;
+        // this.ctx.fillStyle = this.menu.color;
+        // this.ctx.beginPath();
+        // this.ctx.arc(centerX, centerY, 3, 0, 2 * this.PI, false);
+        // this.ctx.fill();
+        // this.ctx.beginPath();
+        // this.ctx.arc(centerX, centerY, 15, 0, 2 * this.PI, false);
+        // this.ctx.stroke();
 
         this.oculusCtx.clearRect(0, 0, this.oculusCanvas.width, this.oculusCanvas.height);
         this.oculusCtx.drawImage(this.canvas, 50*1.07, -50, window.innerWidth/2, window.innerHeight/2);
@@ -54022,8 +54028,6 @@ s.SatelliteGame = new Class( {
 
         this.currentTarget = null;
 
-
-
         this.HUD.hp = this.player.hull;
 
         $(document).on('keyup', function(evt) {
@@ -54143,6 +54147,8 @@ s.SatelliteGame = new Class( {
             }
         };
 
+
+
         // Dependent on controls; needs to be below s.Controls
         this.radar = new s.Radar( {
             game: this
@@ -54151,10 +54157,10 @@ s.SatelliteGame = new Class( {
 
 
 
-        window.addEventListener( 'mousemove', function ( e ) {
-            that.HUD.targetX = e.pageX;
-            that.HUD.targetY = e.pageY;
-        } );
+        // window.addEventListener( 'mousemove', function ( e ) {
+        //     that.HUD.targetX = e.pageX;
+        //     that.HUD.targetY = e.pageY;
+        // } );
         window.addEventListener( 'mousedown', function ( ) {
             that.controls.firing = true;
         } );
