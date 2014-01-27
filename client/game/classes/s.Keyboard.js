@@ -19,14 +19,33 @@ s.Keyboard = new Class({
     'tilde'   : 192
   },
 
+  keysInv: {
+    37  : 'left',
+    38  : 'up',
+    39  : 'right',
+    40  : 'down',
+    32  : 'space',
+    33  : 'pageup',
+    34  : 'pagedown',
+    9   : 'tab',
+    87  : 'w',
+    65  : 'a',
+    83  : 's',
+    68  : 'd',
+    192 : 'tilde',
+    16  : 'shift',
+  },
+
   modifiers: ['shift', 'ctrl', 'alt', 'meta'],
 
   construct: function(game, player) {
+    var self = this;
     this.keyCodes = {};
 
     // Listen to key events
     window.addEventListener('keydown', this.handleKeyChange.bind(this, true), false);
     window.addEventListener('keyup', this.handleKeyChange.bind(this, false), false);
+
   },
 
   destruct: function() {
