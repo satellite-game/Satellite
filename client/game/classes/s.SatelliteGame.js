@@ -345,7 +345,7 @@ s.SatelliteGame = new Class( {
     },
 
     handleMove: function ( message ) {
-        console.log("A player moved", message);
+//        console.log("A player moved", message);
         if ( message.name == this.pilot.name ) {
             // server told us to move
             console.log( 'Server reset position' );

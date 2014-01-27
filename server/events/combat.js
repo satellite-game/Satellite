@@ -3,17 +3,12 @@ module.exports = function (host, sync) {
     move: function( socket, packet ) {
       var room = host.sockets[socket.id].room;
       var shipName = host.sockets[socket.id].name;
-      // console.log(room, shipName);
-      // console.log('=====================');
-      // console.log(host.rooms[room], host.rooms[room].gamestate);
       var playerState = host.rooms[room].gamestate[shipName];
-      // console.log(sync.setMove(packet, playerState));
-      // if(sync.setMove(packet, playerState)) {
-        for(var i in packet) {
-          playerState[i] = packet[i];
-        }
-        socket.broadcast.to(room).emit('move', playerState);
-      // }
+      console.log(packet);
+      for(var i in packet) {
+        playerState[i] = packet[i];
+      }
+      socket.broadcast.to(room).emit('move', playerState);
     },
 
     fire: function( socket, packet ) {
