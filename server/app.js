@@ -34,14 +34,14 @@ app.use(express.static(path.join(__dirname, '../build/client')));
 app.get('/', function (req, res) {
     res.sendfile(path.join(__dirname, '../build/client/index.html'));
 });
-
+// serves basic room details
 app.get('/rooms', function (req, res) {
     db.getRooms(function(err, rooms){
         if (err) { res.send(403, err); throw err; }
         res.json(rooms);
     });
 });
-
+// serves player stats for in-game menu
 app.get('/rooms/:id', function (req, res) {
     db.getRoomInfo(req.param('id'), function(err, roomInfo){
         if (err) { res.send(403, err); throw err; }
