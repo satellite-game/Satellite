@@ -8,7 +8,7 @@ var io           = require('socket.io').listen(server);
 process.env.PORT = process.env.PORT || 1337;
 var path         = require('path');
 var url          = 'http://localhost:' + process.env.PORT + '/';
-var db           = require('db/queries');
+var db           = require('./db/queries');
 
 
 /* We can access nodejitsu enviroment variables from process.env */
