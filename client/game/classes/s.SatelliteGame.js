@@ -108,8 +108,6 @@ s.SatelliteGame = new Class( {
 
         this.currentTarget = null;
 
-
-
         this.HUD.hp = this.player.hull;
 
         $(document).on('keyup', function(evt) {
@@ -229,6 +227,8 @@ s.SatelliteGame = new Class( {
             }
         };
 
+
+
         // Dependent on controls; needs to be below s.Controls
         this.radar = new s.Radar( {
             game: this
@@ -237,10 +237,10 @@ s.SatelliteGame = new Class( {
 
 
 
-        window.addEventListener( 'mousemove', function ( e ) {
-            that.HUD.targetX = e.pageX;
-            that.HUD.targetY = e.pageY;
-        } );
+        // window.addEventListener( 'mousemove', function ( e ) {
+        //     that.HUD.targetX = e.pageX;
+        //     that.HUD.targetY = e.pageY;
+        // } );
         window.addEventListener( 'mousedown', function ( ) {
             that.controls.firing = true;
         } );

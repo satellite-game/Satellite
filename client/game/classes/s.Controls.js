@@ -117,10 +117,10 @@ s.Controls = new Class({
     ///////////////////////
 
     var yawSpeed = this.options.yawSpeed,
-      pitchSpeed = this.options.pitchSpeed,
-      cursor = this.HUD.cursorVector,
-      radius = this.HUD.subreticleBound.radius,
-      crosshairs = {width: 30, height: 30};
+      pitchSpeed = this.options.pitchSpeed;
+      // cursor = this.HUD.cursorVector,
+      // radius = this.HUD.subreticleBound.radius,
+      // crosshairs = {width: 30, height: 30};
 
     ///////////////////////
     // KEYBOARD COMMANDS //
@@ -168,20 +168,20 @@ s.Controls = new Class({
     //  MOUSE CONTROLS   //
     ///////////////////////
 
-    var mouseUpdate = this.mouse.update({
-        centerX: centerX,
-        crosshairs: crosshairs,
-        yaw: yaw,
-        radius: radius,
-        yawSpeed: yawSpeed,
-        thrustScalar: thrustScalar,
-        centerY: centerY,
-        pitch: pitch,
-        pitchSpeed: pitchSpeed
-    });
+    // var mouseUpdate = this.mouse.update({
+    //     centerX: centerX,
+    //     crosshairs: crosshairs,
+    //     yaw: yaw,
+    //     radius: radius,
+    //     yawSpeed: yawSpeed,
+    //     thrustScalar: thrustScalar,
+    //     centerY: centerY,
+    //     pitch: pitch,
+    //     pitchSpeed: pitchSpeed
+    // });
 
-    pitch = mouseUpdate.pitch || pitch;
-    yaw = mouseUpdate.yaw || yaw;
+    // pitch = mouseUpdate.pitch || pitch;
+    // yaw = mouseUpdate.yaw || yaw;
 
     ///////////////////////
     // GAMEPAD CONTROLS  //
