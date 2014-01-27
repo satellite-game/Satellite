@@ -92,4 +92,48 @@ describe('Ship class', function () {
       runAsync(specs, done);
     });
   });
+
+  describe('when setPosition', function () {
+    beforeEach(function (done) {
+      var setDefaultValues = function () {
+        newPositions = [12, 34, 56];
+        newRotations = [0.5, 0.5, 0.5];
+        aVeloc = [1, 1, 1];
+      };
+
+      runAsync(setDefaultValues, done);
+    });
+
+    it('should be able to set its position', function (done) {
+      var specs = function () {
+        var oldPositionsX = playerShip.root.position.x;
+        var oldPositionsY = playerShip.root.position.y;
+        var oldPositionsZ = playerShip.root.position.z;
+
+        playerShip.setPosition(newPositions);
+
+        expect(playerShip.root.position.x).to.not.equal(oldPositionsX);
+        expect(playerShip.root.position.y).to.not.equal(oldPositionsY);
+        expect(playerShip.root.position.z).to.not.equal(oldPositionsZ);
+      };
+
+      runAsync(specs, done);
+    });
+
+    it('should be able to set its rotation', function (done) {
+      var specs = function () {
+        var oldX = playerShip.root.rotation.x;
+        var oldY = playerShip.root.rotation.y;
+        var oldZ = playerShip.root.rotation.z;
+
+        playerShip.setPosition(newPositions, newRotations);
+
+        expect(playerShip.root.rotation.x).to.not.equal(oldX);
+        expect(playerShip.root.rotation.y).to.not.equal(oldY);
+        expect(playerShip.root.rotation.z).to.not.equal(oldZ);
+      };
+
+      runAsync(specs, done);
+    });
+  });
 });
