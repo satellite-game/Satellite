@@ -123,20 +123,45 @@ s.Controls = new Class({
       crosshairs = {width: 30, height: 30};
 
     ///////////////////////
-    //  OCULUS CONTROLS  //
+    // KEYBOARD COMMANDS //
     ///////////////////////
 
-    if (this.oculus.detected) {
-      this.mouse.mouseType = 'oculus';
-      this.camera.rotation.setEulerFromQuaternion(this.oculus.quat);
-      pitch = this.oculus.quat.x;
-      yaw = this.oculus.quat.y;
-      roll = this.oculus.quat.z;
-      if (this.menu.displayed) {
-        this.menu.updateHovered();
-      }
-    } else {
-      this.mouse.mouseType = 'keyboard';
+    if (this.keyboard.pressed('left')) {
+      yaw = yawSpeed / thrustScalar;
+    }
+    else if (this.keyboard.pressed('right')) {
+      yaw = -1*yawSpeed / thrustScalar;
+    }
+
+    if (this.keyboard.pressed('up')) {
+      // Pitch down
+      pitch = -1*pitchSpeed / thrustScalar;
+    }
+    else if (this.keyboard.pressed('down')) {
+      // Pitch up
+      pitch = pitchSpeed / thrustScalar;
+    }
+
+    if (this.keyboard.pressed('w')) {
+      thrust = 1;
+    }
+    else if (this.keyboard.pressed('s')) {
+      brakes = 1;
+    }
+
+    if (this.keyboard.pressed('a')) {
+      roll = this.options.rotationSpeed;
+    }
+    else if (this.keyboard.pressed('d')) {
+      roll = -1*this.options.rotationSpeed;
+    }
+
+    if (this.keyboard.pressed('space') || this.firing){
+      this.player.fire('turret');
+    }
+
+    if (this.keyboard.pressed('tilde')) {
+      vr.resetHmdOrientation();
     }
 
     ///////////////////////
@@ -187,46 +212,26 @@ s.Controls = new Class({
     }
 
     ///////////////////////
-    // KEYBOARD COMMANDS //
+    //  OCULUS CONTROLS  //
     ///////////////////////
 
-    if (this.keyboard.pressed('left')) {
-      yaw = yawSpeed / thrustScalar;
-
-    }
-    else if (this.keyboard.pressed('right')) {
-      yaw = -1*yawSpeed / thrustScalar;
-    }
-
-    if (this.keyboard.pressed('up')) {
-      // Pitch down
-      pitch = -1*pitchSpeed / thrustScalar;
-    }
-    else if (this.keyboard.pressed('down')) {
-      // Pitch up
-      pitch = pitchSpeed / thrustScalar;
-    }
-
-    if (this.keyboard.pressed('w')) {
-      thrust = 1;
-    }
-    else if (this.keyboard.pressed('s')) {
-      brakes = 1;
-    }
-
-    if (this.keyboard.pressed('a')) {
-      roll = this.options.rotationSpeed;
-    }
-    else if (this.keyboard.pressed('d')) {
-      roll = -1*this.options.rotationSpeed;
-    }
-
-    if (this.keyboard.pressed('space') || this.firing){
-      this.player.fire('turret');
-    }
-
-    if (this.keyboard.pressed('tilde')) {
-      vr.resetHmdOrientation();
+    if (this.oculus.detected) {
+      this.mouse.mouseType = 'oculus';
+      this.camera.rotation.setEulerFromQuaternion(this.oculus.quat);
+      if (hasGamepad) {
+        pitch += this.oculus.quat.x/2;
+        yaw += this.oculus.quat.y/2;
+        roll += this.oculus.quat.z/2;
+      } else {
+        pitch += this.oculus.quat.x;
+        yaw += this.oculus.quat.y;
+        roll += this.oculus.quat.z;
+      }
+      if (this.menu.displayed) {
+        this.menu.updateHovered();
+      }
+    } else {
+      this.mouse.mouseType = 'keyboard';
     }
 
     //////////////////////////////
