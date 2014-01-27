@@ -470,9 +470,9 @@ s.SatelliteGame = new Class( {
     },
 
     handleDie: function(you, killer) {
-        if (!you) {
-            return;
-        }
+        // if (!you) {
+        //     return;
+        // }
         if (this.hostPlayer) { clearInterval(this.botPositionInterval); }
         s.game.stop();
         var HUD = s.game.HUD;
@@ -481,6 +481,7 @@ s.SatelliteGame = new Class( {
         HUD.ctx.drawImage(HUD.gameOver,HUD.canvas.width/2 - HUD.gameOver.width/2,HUD.canvas.height/2 - HUD.gameOver.height/2);
         s.game.comm.died(you, killer);
 
+        this.hostPlayer = false;
         this.restartGame();
     },
 
@@ -489,8 +490,7 @@ s.SatelliteGame = new Class( {
         setTimeout(function() {
             that.player.shields = s.config.ship.shields;
             that.player.hull = s.config.ship.hull;
-            that.player.setPosition([that.getRandomCoordinate(), that.getRandomCoordinate(), that.getRandomCoordinate()],[0,0,0],[0,0,0],[0,0,0]);
-            that.hostPlayer = false;
+            that.player.setPosition([23498, -25902, 24976],[0,0,0],[0,0,0],[0,0,0]);
             that.restart();
         }, 6000);
     },
@@ -606,6 +606,19 @@ s.SatelliteGame = new Class( {
         this.game[message.baseName].shields--;
         var shields = this.game[message.baseName].shields;
         console.log(this.game.baseNameMap[message.baseName] + ' was hit by ' + message.pilotName + '. Shields at ' + shields);
+        if (this.game[message.baseName].shields < 0) {
+            this.game.handleBaseDeath(message.baseName);
+        }
+    },
+
+    handleBaseDeath: function(base) {
+        setTimeout(function() {
+            s.game.moonBaseTall.shields = s.config.base.shields;
+            s.game.spaceStation.shields = s.config.base.shields;
+            s.game.stop();
+            s.game.restartGame();
+        }, 3000);
+
     }
 
 } );
