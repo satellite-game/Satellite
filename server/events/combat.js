@@ -30,8 +30,8 @@ module.exports = function (host, sync) {
     hit: function( socket, packet ) {
       var room = host.sockets[socket.id].room;
       var response = {
-        otherPlayerName: packet.otherPlayerName,
-        yourName: packet.yourName
+        zappedName: packet.otherPlayerName,
+        killerName: packet.yourName
       };
       socket.broadcast.to(room).emit('hit', response);
       socket.emit('hit', response);

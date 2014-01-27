@@ -4,8 +4,8 @@ s.SpaceStation = new Class({
 	construct: function(options){
 		// handle parameters
 		this.options = options = jQuery.extend({
-			position: new THREE.Vector3(0, 0, 0),
-			rotation: new THREE.Vector3(0, 0, 0)
+			position: options.position,
+			rotation: options.rotation
 		}, options);
 
 		var geometry = s.models.human_space_station.geometry;
