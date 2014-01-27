@@ -96,7 +96,20 @@ s.SatelliteGame = new Class( {
             alliance: 'alliance',
             camera: this.camera
         } );
-        
+
+        // Targeting square around targeted enemy.
+
+        var targetingGeo = new THREE.PlaneGeometry(100, 100);
+        var targetingMat = new THREE.MeshBasicMaterial({color: 0x00FF00, wireframe: true});
+
+        this.targeting = new THREE.Mesh(targetingGeo, targetingMat);
+
+        this.scene.add( this.targeting );
+
+        this.currentTarget = null;
+
+
+
         this.HUD.hp = this.player.hull;
 
         $(document).on('keyup', function(evt) {
@@ -206,6 +219,8 @@ s.SatelliteGame = new Class( {
                         alliance: 'enemy'
                     } );
                 }
+
+                that.currentTarget = enemyShip;
                 
                 if (isBot) { console.log( '%s has joined the fray', enemyShip.name ); }
 
@@ -232,6 +247,9 @@ s.SatelliteGame = new Class( {
         window.addEventListener( 'mouseup', function ( ) {
             that.controls.firing = false;
         } );
+
+        // Add this back in later with new targeting system.
+
         window.addEventListener( 'keydown', function(e) {
             // Cycle through targets; extra logic guarding to prevent rapid cycling while the key is pressed
             e = e.which;
@@ -266,6 +284,8 @@ s.SatelliteGame = new Class( {
 	render: function(_super, time) {
 		_super.call(this, time);
 		this.controls.update();
+        this.targeting.lookAt(this.player.root.position);
+        if (this.currentTarget) this.targeting.position.set(this.currentTarget.root.position);
 	},
 
 	addSkybox: function() {

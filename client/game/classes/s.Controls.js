@@ -87,9 +87,7 @@ s.Controls = new Class({
   },
 
   destruct: function( ) {
-
-    game.unhook( this.update );
-
+    this.game.unhook( this.update );
   },
 
   update: function( time, delta ) {
@@ -130,6 +128,7 @@ s.Controls = new Class({
 
     if (this.oculus.detected) {
       this.mouse.mouseType = 'oculus';
+      this.camera.rotation.setEulerFromQuaternion(this.oculus.quat);
       pitch = this.oculus.quat.x;
       yaw = this.oculus.quat.y;
       roll = this.oculus.quat.z;
@@ -229,7 +228,6 @@ s.Controls = new Class({
     if (this.keyboard.pressed('tilde')) {
       vr.resetHmdOrientation();
     }
-
 
     //////////////////////////////
     // MOTION AND PHYSICS LOGIC //

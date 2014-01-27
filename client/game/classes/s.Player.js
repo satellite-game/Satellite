@@ -12,7 +12,7 @@ s.Player = new Class({
     this.root.castShadow = true;
 
     // Moon facing initilization
-    //this.player.root.lookAt(this.moon.root.position);
+    this.root.lookAt(this.game.moon.root.position);
 
     // Root camera to the player's position
     this.root.add( this.camera );
