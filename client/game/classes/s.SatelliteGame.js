@@ -590,9 +590,10 @@ s.SatelliteGame = new Class( {
                 that.game.updatePlayersWithBots('botUpdate');
             }, 2500);
         }
-
         this.game.hostPlayer = true;
+        console.log(this.game.hostPlayer);
         if (this.game.botCount === 0) {
+            console.log(true);
             // Create a new bot
             this.game.enemies.add( {}, 'bot');
         }

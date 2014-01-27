@@ -16,6 +16,13 @@ module.exports = function (map, host, Sync, io) {
         Sync.setInit( socket.id, target, data );
       }
 
+      db.joinRoom(data.room, data.name);  // add to game in the db
+
+      socket.emit('player list', target.playerList);
+      socket.emit('map', map.mapItems);
+      socket.join(data.room);
+      socket.broadcast.to(data.room).emit('join', data);
+
       // ************************************************************************ //
       // doesn't account for rooms -- assumes that this is passed into closure.
       globals.lastClient = socket.id;
@@ -28,13 +35,6 @@ module.exports = function (map, host, Sync, io) {
       }
       io.sockets.socket(globals.hostPlayer).emit("bot retrieval");
       // ************************************************************************ //
-
-      db.joinRoom(data.room, data.name);  // add to game in the db
-
-      socket.emit('player list', target.playerList);
-      socket.emit('map', map.mapItems);
-      socket.join(data.room);
-      socket.broadcast.to(data.room).emit('join', data);
     },
 
     disconnect: function( socket ) {
