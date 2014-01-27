@@ -53,9 +53,6 @@ app.get('/rooms/:id', function (req, res) {
 // Holds players
 var players = {};
 
-/*===== what's up with this stuff: ====*/
-/*===== above is client changes made to server side - figure out what's going on. ====*/
-
 var mapItems = [
     { type: 'Alien Space Station', pos: [0, 1000], rot: 0, hp: 100 },
     { type: 'Human Space Station',  pos: [0, -1000], rot: Math.PI*2, hp: 100 }
