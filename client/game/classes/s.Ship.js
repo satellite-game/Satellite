@@ -10,10 +10,6 @@ s.Ship = new Class({
         missileFireTime: 1000
     },
 
-	construct: function(options) {
-        this.game = options.game;
-	},
-
     initialize: function(options) {
         var geometry = s.models[options.shipClass].geometry;
         this.materials = s.models[options.shipClass].materials[0];

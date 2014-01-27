@@ -3,7 +3,6 @@ s.Player = new Class({
   construct: function(options) {
 
     this.camera = options.camera;
-    this.game = options.game;
     this.HUD = options.HUD;
     this.firstPerson = false;
     this.name = options.name || '';
@@ -21,7 +20,7 @@ s.Player = new Class({
     this.trailGlow.intensity = 0;
     this.root.add( this.trailGlow );
     this.trailGlow.position.set(0, 0, 35);
-    
+
     this.game.hook(this.update);
 
     // Setup camera: Cockpit view; COMMENT OUT FOR CHASE CAM
