@@ -8,6 +8,7 @@ var io           = require('socket.io').listen(server);
 process.env.PORT = process.env.PORT || 1337;
 var path         = require('path');
 var url          = 'http://localhost:' + process.env.PORT + '/';
+var db           = require('./db/queries');
 
 
 /* We can access nodejitsu enviroment variables from process.env */
@@ -32,6 +33,20 @@ app.use(express.static(path.join(__dirname, '../build/client')));
 // http://localhost:1337
 app.get('/', function (req, res) {
     res.sendfile(path.join(__dirname, '../build/client/index.html'));
+});
+// serves basic room details
+app.get('/rooms', function (req, res) {
+    db.getRooms(function(err, rooms){
+        if (err) { res.send(403, err); throw err; }
+        res.json(rooms);
+    });
+});
+// serves player stats for in-game menu
+app.get('/rooms/:id', function (req, res) {
+    db.getRoomInfo(req.param('id'), function(err, roomInfo){
+        if (err) { res.send(403, err); throw err; }
+        res.json(roomInfo);
+    });
 });
 
 // Holds players
