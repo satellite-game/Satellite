@@ -35,4 +35,16 @@ describe('Ship class', function () {
 
     runAsync(specs, done);
   });
+
+  it('should getOffset positions', function (done) {
+    var specs = function () {
+      var offSet = playerShip.getOffset(new THREE.Vector3(10, 0, 10));
+      expect(offSet).to.be.an('object');
+      expect(offSet).to.have.property('x').and.to.not.equal(undefined);
+      expect(offSet).to.have.property('y').and.to.not.equal(undefined);
+      expect(offSet).to.have.property('z').and.to.not.equal(undefined);
+    };
+
+    runAsync(specs, done);
+  });
 });
