@@ -99,7 +99,7 @@ s.SatelliteGame = new Class( {
             game: this,
             shipClass: 'human_ship_heavy',
             // position: new THREE.Vector3(this.getRandomCoordinate(),this.getRandomCoordinate(),this.getRandomCoordinate()),
-            position: new THREE.Vector3(23498, -25902, 24976),
+            position: new THREE.Vector3(19232, 19946, 20311),
             name: this.pilot.name,
             rotation: new THREE.Vector3( 0, Math.PI/2, 0 ),
             alliance: 'alliance',
@@ -484,7 +484,7 @@ s.SatelliteGame = new Class( {
         setTimeout(function() {
             that.player.shields = s.config.ship.shields;
             that.player.hull = s.config.ship.hull;
-            that.player.setPosition([23498, -25902, 24976],[0,0,0],[0,0,0],[0,0,0]);
+            that.player.setPosition([19232, 19946, 20311],[0,0,0],[0,0,0],[0,0,0]);
             that.menu.close();
         }, 6000);
     },
