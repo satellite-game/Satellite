@@ -10,6 +10,9 @@ var s = {
             shields: 80,
             maxSpeed: 1500
         },
+        base: {
+            shields: 1000
+        },
         sound: {
             enabled: true,
             silentDistance: 10000,
