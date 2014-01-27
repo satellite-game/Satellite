@@ -31,9 +31,20 @@ app.use(express.static(path.join(__dirname, '/build/client')));
 app.get('/', function (req, res) {
     res.sendfile(path.join(__dirname, '/build/client/index.html'));
 });
+app.get('/rooms', function (req, res) {
+    // make database query to get all existing rooms
+    // respond with json containing room names and player count
+});
+app.get('/scores', function (req, res) {
+    // make database query to get players from req.data.room
+    // respond with json containing player names for room and
+});
 
 // Holds players
 var players = {};
+var clients = {};
+var hostPlayer;
+var lastClient;
 
 var mapItems = [
     { type: 'Alien Space Station', pos: [0, 1000], rot: 0, hp: 100 },
@@ -60,7 +71,9 @@ io.sockets.on('connection', function (socket) {
     var ip = socket.handshake.address.address;
     console.log("New connection from " + address.address + ":" + process.env.PORT);
 
-
+    console.log('new socket ID: ', socket.id);
+    clients[socket.id] = true;
+    lastClient = socket.id;
 
     // Setup message handlers
     socket.on('join', function(message) {
@@ -98,6 +111,7 @@ io.sockets.on('connection', function (socket) {
                 ip: ip
             };
 
+
             var packet = {
                 name: message.name,
                 pos: message.pos,
@@ -117,12 +131,28 @@ io.sockets.on('connection', function (socket) {
                 aVeloc: message.aVeloc,
                 lVeloc: message.lVeloc
             });
+            for (var key in clients) {
+                if (!hostPlayer) {
+                    hostPlayer = key;
+                }
+                break;
+            }
+            io.sockets.socket(hostPlayer).emit("bot retrieval");
         });
     });
 
     socket.on('disconnect', function() {
         socket.get('name', function (err, name) {
             console.log(name+' dropped');
+
+            delete clients[socket.id];
+            if (hostPlayer === socket.id) {
+                for (var key in clients) {
+                    hostPlayer = key;
+                    io.sockets.socket(hostPlayer).emit("bot retrieval");
+                    break;
+                }
+            }
 
             // Remove from client list
             delete players[name];
@@ -173,11 +203,29 @@ io.sockets.on('connection', function (socket) {
             });
     });
 
-    socket.on('killed', function(message) {
-            socket.broadcast.emit('killed', {
-                killed: message.you,
-                killer: message.killer
+    socket.on('botHit', function(message) {
+        socket.broadcast.emit('hit', {
+            otherPlayerName: message.yourName,
+            yourName: message.botName
         });
+        socket.emit('hit', {
+            otherPlayerName: message.yourName,
+            yourName: message.botName
+        });
+    });
+
+    socket.on('killed', function(message) {
+        socket.broadcast.emit('killed', {
+            killed: message.you,
+            killer: message.killer
+        });
+        if (socket.id === hostPlayer) {
+            for (var key in clients) {
+                if (key !== hostPlayer) { hostPlayer = key; }
+                break;
+            }
+        }
+        io.sockets.socket(hostPlayer).emit("bot retrieval");
     });
 
     socket.on('fire', function(message) {
@@ -190,6 +238,16 @@ io.sockets.on('connection', function (socket) {
             });
         });
     });
+
+    socket.on('botInfo', function(message) {
+        io.sockets.socket(lastClient).emit('bot positions', message);
+    });
+
+
+    socket.on('botUpdate', function(message) {
+        socket.broadcast.emit('bot positions', message);
+    });
+
 });
 
 

@@ -2,14 +2,14 @@ s.Game = new Class({
   extend: s.EventEmitter,
 
   construct: function(options) {
-        // Display load screen
-        this.loadScreen = new s.LoadScreen();
+    // Display load screen
+    this.loadScreen = new s.LoadScreen();
 
     var self = this;
 
     /*===============================================
-    =             Comms Handler Binding            =
-    ===================================================*/
+    =              Comms Handler Binding            =
+    =================================================*/
 
     // Communication
 
@@ -18,12 +18,15 @@ s.Game = new Class({
 
     this.doRender = false;
     this.lastRender = 0;
-
-    // Oculus Rift setup
-    this.oculus = new s.Oculus();
+    this.roomSelected = false;
 
     // Store functions that should be called before render
     this.hookedFuncs = [];
+
+    // Oculus Rift setup
+    this.oculus = new s.Oculus({
+      game: this
+    });
 
     // Bind render function permenantly
     this.render = this.render.bind(this);
@@ -64,7 +67,7 @@ s.Game = new Class({
     // this.oculus.detected = true;
 
     // TODO: abstract key listening
-    $(document).on('keydown', function(evt) {
+    $(document).on('keyup', function(evt) {
       if (evt.which === 13)
         self.toggleFullScreen();
     });
@@ -162,123 +165,127 @@ s.Game = new Class({
       this.el.requestPointerLock = this.el.requestPointerLock ||
                                          this.el.mozRequestPointerLock ||
                                          this.el.webkitRequestPointerLock;
-      this.el.requestPointerLock();
-    }
-    else {
-      console.log('Full screen mode exited!');
-    }
-  },
+       this.el.requestPointerLock();
+     } else {
+       console.log('Full screen mode exited!');
+     }
+   },
 
-  toggleFullScreen: function() {
-    if (!this.isFullScreen()) {
-      if (document.documentElement.requestFullScreen) {
-        document.documentElement.requestFullScreen();
-      }
-      else if (document.documentElement.mozRequestFullScreen) {
-        document.documentElement.mozRequestFullScreen();
-      }
-      else if (document.documentElement.webkitRequestFullScreen) {
-        document.documentElement.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-      }
-    }
-    else {
-      if (document.cancelFullScreen) {
-        document.cancelFullScreen();
-      }
-      else if (document.mozCancelFullScreen) {
-        document.mozCancelFullScreen();
-      }
-      else if (document.webkitCancelFullScreen) {
-        document.webkitCancelFullScreen();
-      }
-    }
-  },
+   toggleFullScreen: function() {
+     if (!this.isFullScreen()) {
+       if (document.documentElement.requestFullScreen) {
+         document.documentElement.requestFullScreen();
+       }
+       else if (document.documentElement.mozRequestFullScreen) {
+         document.documentElement.mozRequestFullScreen();
+       }
+       else if (document.documentElement.webkitRequestFullScreen) {
+         document.documentElement.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+       }
+     }
+     else {
+       if (document.cancelFullScreen) {
+         document.cancelFullScreen();
+       }
+       else if (document.mozCancelFullScreen) {
+         document.mozCancelFullScreen();
+       }
+       else if (document.webkitCancelFullScreen) {
+         document.webkitCancelFullScreen();
+       }
+     }
+   },
 
-  handlePointerLockChange: function() {
-    if (document.mozPointerLockElement === this.el || document.webkitPointerLockElement === this.el) {
-      console.log('Pointer Lock was successful.');
-      this.pointerLocked = true;
-    }
-    else {
-      console.log('Pointer Lock was lost.');
-      this.pointerLocked = false;
-    }
-  },
+   handlePointerLockChange: function() {
+     if (document.mozPointerLockElement === this.el || document.webkitPointerLockElement === this.el) {
+       console.log('Pointer Lock was successful.');
+       this.pointerLocked = true;
+     }
+     else {
+       console.log('Pointer Lock was lost.');
+       this.pointerLocked = false;
+     }
+   },
 
-  handlePointerLockError: function() {
-    console.log('Error while locking pointer.');
-    this.pointerLocked = false;
-  },
+   handlePointerLockError: function() {
+     console.log('Error while locking pointer.');
+     this.pointerLocked = false;
+   },
 
-  // Size the renderer to fit the window
-  fitWindow: function() {
-    this.setSize(window.innerWidth, window.innerHeight);
-  },
+   // Size the renderer to fit the window
+   fitWindow: function() {
+     this.setSize(window.innerWidth, window.innerHeight);
+   },
 
-  // Set the size of the renderer
-  setSize: function(width, height) {
-    this.width = width;
-    this.height = height;
-    this.renderer.setSize(width, height);
-    if (this.camera) {
-      this.camera.aspect = width/height;
-      this.camera.updateProjectionMatrix();
-    }
-  },
+   // Set the size of the renderer
+   setSize: function(width, height) {
+     this.width = width;
+     this.height = height;
+     this.renderer.setSize(width, height);
+     if (this.camera) {
+       this.camera.aspect = width/height;
+       this.camera.updateProjectionMatrix();
+     }
+   },
 
-  // Add a callback to the rendering loop
-  hook: function(callback) {
-    this.hookedFuncs.push(callback);
-  },
+   // Add a callback to the rendering loop
+   hook: function(callback) {
+     this.hookedFuncs.push(callback);
+   },
 
-  // Remove a callback from the rendering loop
-  unhook: function(callback) {
-    var index = this.hookedFuncs.indexOf(callback);
-    if (~index)
-      this.hookedFuncs.splice(index, 1);
-  },
+   // Remove a callback from the rendering loop
+   unhook: function(callback) {
+     var index = this.hookedFuncs.indexOf(callback);
+     if (~index)
+       this.hookedFuncs.splice(index, 1);
+   },
 
-  // Start rendering
-  start: function() {
-    this.loadScreen.remove();
+   // Start rendering
+   start: function() {
+     this.loadScreen.remove();
+     this.doRender = true;
+     requestAnimationFrame(this.render);
+   },
+
+   restart: function() {
     this.doRender = true;
     requestAnimationFrame(this.render);
-  },
+   },
 
-  // Stop rendering
-  stop: function() {
-    this.doRender = false;
-  },
+   // Stop rendering
+   stop: function() {
+     this.doRender = false;
+   },
 
-  // Perform render
-  render: function(now) {
-    if (this.doRender) {
-      // Simulate physics
-      this.scene.simulate();
+   // Perform render
+   render: function(now) {
+     if (this.doRender) {
+       // Simulate physics
+       this.scene.simulate();
 
-      // Calculate the time since the last frame was rendered
-      var delta = now - this.lastRender;
-      this.lastRender = now;
-      // Run each hooked function before rendering
-      // This may need to happen BEFORE physics simulation
-      this.hookedFuncs.forEach(function(func) {
-        func(now, delta);
-      });
+       // Calculate the time since the last frame was rendered
+       var delta = now - this.lastRender;
+       this.lastRender = now;
+       // Run each hooked function before rendering
+       // This may need to happen BEFORE physics simulation
+       this.hookedFuncs.forEach(function(func) {
+         func(now, delta);
+       });
 
-      // Render main scene for Oculus if one is detected
-      // otherwise render scene and radar normally.
-      if (this.oculus.detected) {
-        this.riftCam.render( this.scene, this.camera );
-        this.riftRadar.render( this.radarScene, this.radarCamera );
-      } else {
-        this.renderer.render( this.scene, this.camera );
-        this.radarRenderer.render( this.radarScene, this.radarCamera );
-      }
+       // Render main scene for Oculus if one is detected
+       // otherwise render scene and radar normally.
+       if (this.oculus.detected) {
+         this.riftCam.render( this.scene, this.camera );
+         this.riftRadar.render( this.radarScene, this.radarCamera );
+       } else {
+         this.renderer.render( this.scene, this.camera );
+         this.radarRenderer.render( this.radarScene, this.radarCamera );
+       }
 
-      // Request the next frame to be rendered
-      requestAnimationFrame(this.render);
+       // Request the next frame to be rendered
+       requestAnimationFrame(this.render);
 
-      this.render_stats.update();
-    }
-  }
+       this.render_stats.update();
+     }
+   }
 });

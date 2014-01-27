@@ -2,7 +2,6 @@ s.Controls = new Class({
 
   toString: 'Controls',
 
-
   options: {
 
     rotationSpeed: Math.PI/2,
@@ -22,6 +21,7 @@ s.Controls = new Class({
     this.game = options.game;
     this.player = options.player;
     this.camera = options.camera;
+    this.menu = options.menu;
 
     // Create interpreters for controllers
     this.keyboard = new s.Keyboard( );
@@ -30,11 +30,7 @@ s.Controls = new Class({
     this.gamepad = new Gamepad();
 
     // Oculus Rift interface
-    this.oculus = new s.Oculus();
-
-    this.oculusCompensationX = 0;
-    this.oculusCompensationY = 0;
-    this.oculusCompensationZ = 0;
+    this.oculus = this.game.oculus;
 
     // Mouse interface - mice options are: 'keyboard', 'none', 'oculus'
     this.mouse = new s.Mouse('keyboard', options);
@@ -65,6 +61,29 @@ s.Controls = new Class({
 
     this.lastTime = new Date( ).getTime( );
 
+    var that = this;
+
+    $(document).keyup(function (e) {
+      if (e.which === 81) {
+        if (that.menu.displayed) {
+          that.menu.close();
+        } else {
+          that.menu.open();
+        }
+      } else {
+        if (that.menu.displayed) {
+          if (e.which === 32) {
+            that.menu.selectItem();
+          }
+          if (e.which === 38) {
+            that.menu.updateHovered('up');
+          }
+          if (e.which === 40) {
+            that.menu.updateHovered('down');
+          }
+        }
+      }
+    });
   },
 
   destruct: function( ) {
@@ -76,7 +95,7 @@ s.Controls = new Class({
   firstRender: true,
 
   update: function( time, delta ) {
-    var mouseControls = true;
+    var mouseControls = false;
 
     var gamepadYaw = false;
     var hasGamepad = !!this.gamepad.gamepads.length;
@@ -114,25 +133,18 @@ s.Controls = new Class({
     if (this.oculus.detected) {
       this.mouse.mouseType = 'oculus';
 
-      if (this.firstRender){
-        this.oculus.compensationX = this.oculus.quat.x;
-        this.oculus.compensationY = this.oculus.quat.y;
-        this.oculus.compensationZ = this.oculus.quat.z;
-        this.oculus.compensationW = this.oculus.quat.w;
-        this.firstRender = false;
-      }
-
       if (this.keyboard.pressed('e')) {
-        var initialQuat = new THREE.Quaternion();
-        var initialQuat.setFromEuler( THREE.Vector3(); );
+        // var initialQuat = new THREE.Quaternion();
+        // var initialQuat.setFromEuler( THREE.Vector3(); );
         this.camera.rotation.setEulerFromQuaternion(this.oculus.quat);
       } else {
-        this.camera.rotation = new THREE.Vector3();
-        pitch = this.oculus.quat.x - this.oculus.compensationX;
-        yaw = this.oculus.quat.y - this.oculus.compensationY;
-        roll = this.oculus.quat.z - this.oculus.compensationZ;
+        pitch = this.oculus.quat.x;
+        yaw = this.oculus.quat.y;
+        roll = this.oculus.quat.z;
+        if (this.menu.displayed) {
+          this.menu.updateHovered();
+        }
       }
-
     } else {
       this.mouse.mouseType = 'keyboard';
     }
@@ -155,38 +167,34 @@ s.Controls = new Class({
 
     pitch = mouseUpdate.pitch || pitch;
     yaw = mouseUpdate.yaw || yaw;
-    roll = mouseUpdate.roll || roll;
-
-    brakes = mouseUpdate.brakes || brakes;
-    thrust = mouseUpdate.thrust || thrust;
 
     ///////////////////////
     // GAMEPAD CONTROLS  //
     ///////////////////////
 
-    // if (hasGamepad) {
-    //   var gamepadState = this.gamepad.gamepads[0].state;
+    if (hasGamepad) {
+      var gamepadState = this.gamepad.gamepads[0].state;
 
-    //   // TODO: Handle inverted option
-    //   pitch = gamepadState.LEFT_STICK_Y;
+      // TODO: Handle inverted option
+      pitch = gamepadState.LEFT_STICK_Y;
 
-    //   if (gamepadYaw) {
-    //     yaw = gamepadState.LEFT_STICK_X*-1;
-    //   }
-    //   else {
-    //     roll = gamepadState.LEFT_STICK_X*-1 * this.options.rotationSpeed;
-    //   }
+      if (gamepadYaw) {
+        yaw = gamepadState.LEFT_STICK_X*-1;
+      }
+      else {
+        roll = gamepadState.LEFT_STICK_X*-1 * this.options.rotationSpeed;
+      }
 
-    //   if (gamepadState.RB || gamepadState.X || gamepadState.FACE_1)
-    //     this.firing = true;
-    //   else
-    //     this.firing = false;
+      if (gamepadState.RB || gamepadState.X || gamepadState.FACE_1)
+        this.firing = true;
+      else
+        this.firing = false;
 
-    //   var gamepadThrust = (gamepadState.RIGHT_STICK_X*-1 + 1)/2;
+      var gamepadThrust = (gamepadState.RIGHT_STICK_X*-1 + 1)/2;
 
-    //   // Set thrust
-    //   this.options.thrustImpulse = gamepadThrust * s.config.ship.maxSpeed;
-    // }
+      // Set thrust
+      this.options.thrustImpulse = gamepadThrust * s.config.ship.maxSpeed;
+    }
 
     ///////////////////////
     // KEYBOARD COMMANDS //
@@ -228,9 +236,7 @@ s.Controls = new Class({
     }
 
     if (this.keyboard.pressed('tilde')) {
-      this.oculus.compensationX = this.oculus.quat.x;
-      this.oculus.compensationY = this.oculus.quat.y;
-      this.oculus.compensationZ = this.oculus.quat.z;
+      vr.resetHmdOrientation();
     }
 
     //////////////////////////////
