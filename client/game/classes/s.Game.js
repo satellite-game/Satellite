@@ -18,12 +18,15 @@ s.Game = new Class({
 
     this.doRender = false;
     this.lastRender = 0;
-
-    // Oculus Rift setup
-    this.oculus = new s.Oculus();
+    this.roomSelected = false;
 
     // Store functions that should be called before render
     this.hookedFuncs = [];
+
+    // Oculus Rift setup
+    this.oculus = new s.Oculus({
+      game: this
+    });
 
     // Bind render function permenantly
     this.render = this.render.bind(this);
@@ -146,7 +149,7 @@ s.Game = new Class({
 
   // Attempt to start the game (if models and physics have begun)
   tryInitialize: function() {
-    if (this.modelsLoaded && this.physicsStarted && !this.initialized) { // && this.roomSelected) {
+    if (this.modelsLoaded && this.physicsStarted && !this.initialized) {
       this.initialize();
     }
   },

@@ -33,7 +33,11 @@ s.Turret = new Class({
             color: this.color
         }));
 
-        sprite.scale.copy(this.options.scale);
+        if (s.game.oculus.detected) {
+            sprite.scale.set(20, 20, 1.0);
+        } else {
+            sprite.scale.copy(this.options.scale);
+        }
         this.root.add(sprite);
 
         // Position the projectile relative to the ship
