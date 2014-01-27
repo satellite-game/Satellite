@@ -25,7 +25,7 @@ s.Projectile = new Class({
 
     handleCollision: function(mesh, position){
         //check if your turret hit someone or an enemy base
-        //else if check if you got hit by a bot
+        //else if check if you got hit by a bot or if a bot hit your base
         if (this.pilot === this.game.pilot.name){
             if (mesh.instance.alliance && mesh.instance.alliance === "rebel"){
                 this.HUD.menu.animate({
@@ -40,12 +40,16 @@ s.Projectile = new Class({
                 }
                 this.comm.hit(mesh.name,this.game.pilot.name);
             }
-            if (mesh.team !== this.game.player.alliance && mesh.name !== 'moon') {
+            if (mesh.name === 'moonBaseTall') {
                 this.comm.baseFire(mesh.name, this.pilot);
             }
-        } else if (mesh.name === this.game.pilot.name && this.isBot ) {
-            this.comm.botHit(mesh.name, this.pilot);
-        }
+        } else if (this.isBot) {
+            if (mesh.name === this.game.pilot.name) {
+                this.comm.botHit(mesh.name, this.pilot);
+            } else if (mesh.name === 'spaceStation' && this.game.hostPlayer) {
+                this.comm.baseFire(mesh.name, this.pilot);
+            }
+        } 
         this.destruct();
     },
 
