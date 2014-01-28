@@ -51247,14 +51247,16 @@ s.Bot = new Class( {
     this.maxDistance = 8000;
     this.minDistance = 1000;
 
+    this.evasiveManeuvers = false;
+    this.evade = {};
+    this.evade.pitchSign = 1;
+    this.evade.yawSign = 1;
+
     //set a hook on the bot controls.
     //unhook is necessary when bot dies and new bot is created
     //need to refactor when multiple bots on screen
     var hookName = ('control' + this.name).split(' ').join('');
     this[hookName] = this.controlBot.bind(this);
-    // if (this.game.botHooks) {
-    //   this.game.unhook (this.game.botHooks);
-    // }
 
     this.game.hook( this[hookName] );
     // this.game.botHooks = this.controlBot;
@@ -51303,14 +51305,42 @@ s.Bot = new Class( {
     }
   },
 
-  evasiveManeuvers: function() {
+  target2d: function () {
+    // TARGET HUD MARKING
+    var vTarget3D, vTarget2D;
+    if ( this.target ) {
+      this.target = this.target.root;
 
+      vTarget3D = this.target.position.clone();
+      vTarget2D = s.projector.projectVector(vTarget3D, this.camera);
+    }
+    return vTarget2D;
+  },
+
+  dodgeBullet: function(now) {
+    var
+      yawSpeed     = this.botOptions.yawSpeed,
+      pitchSpeed   = this.botOptions.pitchSpeed;
+
+    var thrustScalar = this.botOptions.thrustImpulse/s.config.ship.maxSpeed + 1;
+
+    var yaw  = this.evade.yawSign * yawSpeed / thrustScalar;
+    var pitch  = this.evade.pitchSign * pitchSpeed / thrustScalar;
+    var roll = 0;
+
+    var vTarget2D = this.target2d();
+
+    var difference = now - this.lastTime;
+
+    //thrust unless at max speed
+    if (this.botOptions.thrustImpulse < s.config.ship.maxSpeed){
+      this.botOptions.thrustImpulse += difference;
+    }
+
+    return  [pitch, yaw, roll, vTarget2D];
   },
 
   determineDirection: function() {
-    var vTarget3D;
-    var vTarget2D;
-
     var pitch = 0;
     var yaw = 0;
     var roll = 0;
@@ -51321,13 +51351,8 @@ s.Bot = new Class( {
 
     var thrustScalar = this.botOptions.thrustImpulse/s.config.ship.maxSpeed + 1;
 
-    // TARGET HUD MARKING
-    if ( this.target ) {
-      this.target = this.target.root;
-
-      vTarget3D = this.target.position.clone();
-      vTarget2D = s.projector.projectVector(vTarget3D, this.camera);
-    }
+    
+    var vTarget2D = this.target2d();
 
     if (vTarget2D.z < 1) {
         //go left; else if go right
@@ -51413,12 +51438,15 @@ s.Bot = new Class( {
     this.getEnemyList();
     this.getClosestDistance();
 
-    //// THRUST/BREAK LOGIC ////
     var now = new Date( ).getTime( );
-    this.thrustAndBreaks(now);
 
-    // LEFT/RIGHT/UP/DOWN LOGIC //
-    var direction = this.determineDirection();
+    var direction;
+    if (this.evasiveManeuvers) {
+      direction = this.dodgeBullet();
+    } else {
+      this.thrustAndBreaks(now); //// THRUST/BREAK LOGIC ////
+      direction = this.determineDirection(); // LEFT/RIGHT/UP/DOWN LOGIC //
+    }
     var pitch = direction[0], yaw = direction[1], roll = direction[2], vTarget2D = direction[3];
 
     // MOTION AND PHYSICS LOGIC //
@@ -51430,6 +51458,10 @@ s.Bot = new Class( {
     if (this.game.gameFire && Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && this.closestDistance < this.maxDistance) {
       this.fire('turret');
     }
+
+    //flip yaw and pitch direction for evading bullets
+    this.evade.yawSign = this.evade.yawSign * -1;
+    this.evade.pitchSign = this.evade.pitchSign * -1;
 
   }
 
@@ -54536,9 +54568,12 @@ s.SatelliteGame = new Class( {
                 s.game.handleDie(zapped, killer);
             }
         } else {
-            // if (zappedEnemy.isBot) {
-            //     zappedEnemy.evasiveManeuvers();
-            // }
+            if (zappedEnemy.isBot) {
+                zappedEnemy.evasiveManeuvers = true;
+                setTimeout(function() {
+                    zappedEnemy.evasiveManeuvers = false;
+                }, 3000);
+            }
             if (zappedEnemy.shields > 0){
                 zappedEnemy.shields -= 20;
                 console.log(zapped, ' shield is now: ', zappedEnemy.shields);
