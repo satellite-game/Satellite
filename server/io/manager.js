@@ -2,6 +2,9 @@ var Events = require('./events.js');
 var Host = require('./rooms.js'),
     host = new Host();
 
+// manager needs a function that does this 
+// upon exception, emit an event called 'error' which causes the client to disconnect to prevent further issues. 
+// mahybe it's socket.disconnect(true) -- I'll try that. 
 
 var Manager = function( context, io ) {
   var events = new Events({context: context, host: host, io: io});
