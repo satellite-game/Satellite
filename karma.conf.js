@@ -7,7 +7,14 @@ module.exports = function(config) {
     frameworks: ['mocha','sinon-chai'],
 
     // list of files / patterns to load in the browser
-    files: require('./include.conf').concat(['tests/Function.prototype.bind_polyfill.js','tests/client/**/*.js']),
+    files: require('./include.conf')
+      .concat([
+        'tests/Function.prototype.bind_polyfill.js',
+        'tests/client/preload.js',
+        'tests/client/**/*.js',
+        { pattern: 'tests/mock/models/*.json', watched: true, served: true, included: false },
+        { pattern: 'tests/mock/textures/**/*.png', watched: true, served: true, included: false }
+      ]),
 
     // list of files to exclude
     exclude: [
