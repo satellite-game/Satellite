@@ -26,7 +26,7 @@ var s = {
 
         // Create a model loader
         s.loader = new THREE.JSONLoader();
-
+        var room = prompt("You'll have to input this twice and not screw up due to the loader");
         s.game = new s.SatelliteGame();
     }
 };
