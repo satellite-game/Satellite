@@ -1,6 +1,6 @@
 {
   "name": "Satellite",
-  "main": "app.js",
+  "main": "server/app.js",
   "version": "0.0.0-1",
   "private": true,
   "homepage": "https://lazd.github.com/Satellite",
@@ -37,7 +37,8 @@
     "socket.io-client": "~0.9.16",
     "grunt-mocha-chai-sinon": "0.0.7",
     "karma-phantomjs-launcher": "~0.1.1",
-    "karma-sauce-launcher": "~0.1.7"
+    "karma-sauce-launcher": "~0.1.7",
+    "redis": "~0.10.0"
   },
   "engines": {
     "node": "*",
@@ -51,11 +52,13 @@
   "dependencies": {
     "socket.io": "~0.9.16",
     "express": "~3.3.5",
-    "path": "~0.4.9"
+    "path": "~0.4.9",
+    "async": "~0.2.10",
+    "redis": "~0.10.0"
   },
   "scripts": {
-    "start": "node app.js",
-    "test": "grunt travisCI --single-run"
+    "start": "node server/app.js",
+    "test": "grunt travisCI --force"
   },
   "subdomain": "lockon"
 }

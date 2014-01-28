@@ -31,10 +31,14 @@ s.Comm = new Class({
   },
 
   construct: function ( options ) {
+    //binding the game's context
     this.game = options.game;
+    // Prepend http. Doing this so that you can customize the server before finalizing the string.
     this.player = options.player;
     this.ship = options.ship;
+    this.server = 'http://' + options.server;
     this.pilot = options.pilot;
+    this.room = options.room;
 
     var that = this;
 
@@ -42,10 +46,13 @@ s.Comm = new Class({
     this.clockTick = this.clockTick.bind(this);
     this.timer = setInterval(this.clockTick,1000);
     this.time = 0;
+
+    this.connectSockets();
   },
 
-  connectSockets: function (server) {
-    this.socket = io.connect( 'http://' + server );
+  connectSockets: function ( ) {
+    // this takes in a room to join - where do we send the roomname we are getting on invokation?
+    this.socket = io.connect( this.server );
 
     this.socket.on('failed', function ( message ) {
       // try to reconnect
@@ -56,6 +63,7 @@ s.Comm = new Class({
     this.socket.on('leave', this.makeTrigger('leave'));
     this.socket.on('move', this.makeTrigger('move'));
     this.socket.on('killed', this.makeTrigger('killed'));
+    this.socket.on('sync', this.makeTrigger('sync'));
     this.socket.on('fire', this.makeTrigger('fire'));
     this.socket.on('hit', this.makeTrigger('hit'));
     this.socket.on('bot retrieval', this.makeTrigger('bot retrieval'));
@@ -73,6 +81,7 @@ s.Comm = new Class({
 
     var packet = {
       evt: 'joined',
+      room: this.room,
       name: this.pilot.name,
       time: time,
       pos: shipPosition.pos,
@@ -82,59 +91,82 @@ s.Comm = new Class({
     };
 
     // Broadcast position
-
     this.socket.emit( 'join', packet );
   },
 
   position: function ( ) {
+    // would this be better to put in the global scope so that we don't
+    // wind up making this check every single time. Currently these are
+    // all happening in the global scope anyways...
+    if(this.lastPosition === undefined) {
+      this.lastPosition = s.game.player.getPositionPacket( );
+      this.lastTime = new Date().getTime();
+      this.movementThrottle = 0;
+      this.syncTimer = 0;
+    }
     var time = new Date( ).getTime( );
+    var shipPosition = s.game.player.getPositionPacket( );
+        shipPosition.lAccel = [0,0,0];
+        shipPosition.aAccel = [0,0,0];
+    var t_diff = time - this.lastTime;
 
-    // Never send faster than server can handle
+    // benchmarked this against other variants for 96% efficency.
+    // http://jsperf.com/delta-function-or-raw-calculation
+    if (t_diff !== 0) {
+      shipPosition.lAccel[0] = (shipPosition.lVeloc[0] - this.lastPosition.lVeloc[0]) / t_diff;
+      shipPosition.aAccel[0] = (shipPosition.aVeloc[0] - this.lastPosition.aVeloc[0]) / t_diff;
 
-    if ( time - s.game.comm.lastMessageTime >= 15 ) {
+      shipPosition.lAccel[1] = (shipPosition.lVeloc[1] - this.lastPosition.lVeloc[1]) / t_diff;
+      shipPosition.aAccel[1] = (shipPosition.aVeloc[1] - this.lastPosition.aVeloc[1]) / t_diff;
 
-      var shipPosition = s.game.player.getPositionPacket( );
+      shipPosition.lAccel[2] = (shipPosition.lVeloc[2] - this.lastPosition.lVeloc[2]) / t_diff;
+      shipPosition.aAccel[2] = (shipPosition.aVeloc[2] - this.lastPosition.aVeloc[2]) / t_diff;
 
-      // TODO: Figure out if ship or turret actually moved
-      // If ship moved, send packet
-
-      if ( this.lastPosition !== shipPosition.pos ) {
-
-        // Build packet
-
-        this.time = 0;
-
-        var packet = {
-          time: time,
-          pos: shipPosition.pos,
-          rot: shipPosition.rot,
-          aVeloc: shipPosition.aVeloc,
-          lVeloc: shipPosition.lVeloc
-        };
-
-        // Broadcast position
-
-        s.game.comm.socket.emit( 'move', packet );
-
-        s.game.comm.lastMessageTime = time;
-
-        this.lastPosition = shipPosition.pos;
+      // using Math.abs: http://jsperf.com/mathabs-vs-two-conditions
+      if(this.movementThrottle === 0){
+        if( this.syncTimer === 0 ||
+          Math.abs(shipPosition.aAccel[0]) > 0.000005 ||
+          Math.abs(shipPosition.aAccel[1]) > 0.000005 ||
+          Math.abs(shipPosition.aAccel[2]) > 0.000005 ||
+          Math.abs(shipPosition.lAccel[0]) > 0.005 ||
+          Math.abs(shipPosition.lAccel[1]) > 0.005 ||
+          Math.abs(shipPosition.lAccel[2]) > 0.005 ) {
+          var packet = {
+            time: time, // is this nessecary?
+            pos: shipPosition.pos,
+            rot: shipPosition.rot,
+            aVeloc: shipPosition.aVeloc,
+            lVeloc: shipPosition.lVeloc,
+            // not sure if we need to send this to the
+            // server except for testing purposes.
+            aAccel: shipPosition.aAccel,
+            lAccel: shipPosition.lAccel
+          };
+          s.game.comm.socket.emit( 'combat','move', packet );
+          s.game.comm.lastMessageTime = time;
+          this.lastPosition = shipPosition;
+          this.lastTime = time;
+        }
       }
     }
+    // throttle network emmissions by 80%
+    this.movementThrottle = (this.movementThrottle + 1) % 5;
+    // sync players every second (assuming the player runs every 60fps)
+    this.syncTimer = (this.syncTimer + 1) % 60;
   },
 
   fire: function( pos, rot, velocity ) {
     this.time = 0;
 
-    this.socket.emit( 'fire', {
-      position: pos,
-      rotation: rot,
-      initialVelocity: velocity
+    this.socket.emit('combat', 'fire', {
+        position: pos,
+        rotation: rot,
+        initialVelocity: velocity
     });
   },
 
   died: function( you, killer ) {
-    this.socket.emit( 'killed',{
+    this.socket.emit('player', 'killed',{
       you: you,
       killer: killer
     });
@@ -143,7 +175,7 @@ s.Comm = new Class({
   hit: function( otherPlayerName, yourName ) {
     this.time = 0;
 
-    this.socket.emit( 'hit', {
+    this.socket.emit('combat', 'hit', {
       otherPlayerName: otherPlayerName,
       yourName: yourName
     });
@@ -151,25 +183,26 @@ s.Comm = new Class({
 
   clockTick: function( ){
     this.time += 1;
+
     // if ( this.time >= 60 ){
     //     window.location.href = "http://satellite-game.com";
     // }
   },
 
   botInfo: function(message) {
-    this.socket.emit('botInfo', message);
+      this.socket.emit('bot', 'botInfo', message);
   },
 
   botHit: function( yourName, botName ) {
     this.time = 0;
 
-    this.socket.emit( 'botHit', {
+    this.socket.emit('bot', 'botHit', {
       yourName: yourName,
       botName: botName
     });
   },
 
   botUpdate: function(enemies) {
-    this.socket.emit( 'botUpdate', enemies);
+    this.socket.emit('bot', 'botUpdate', enemies);
   }
 });
