@@ -99,16 +99,18 @@ s.SatelliteGame = new Class( {
                         name: enemyInfo.name,
                         position: enemyInfo.position,
                         rotation: enemyInfo.rotation,
-                        alliance: 'enemy'
+                        alliance: 'rebel'
                     } );
                 } else {
+                    var alliance = 'rebel';
+                    if (s.game.teamMode) { alliance = 'alliance'; }
                     enemyShip = new s.Player( {
                         game: s.game,
                         shipClass: 'human_ship_heavy',
                         name: enemyInfo.name,
                         position: new THREE.Vector3( enemyInfo.pos[ 0 ], enemyInfo.pos[ 1 ], enemyInfo.pos[ 2 ] ),
                         rotation: new THREE.Vector3( enemyInfo.rot[ 0 ], enemyInfo.rot[ 1 ], enemyInfo.rot[ 2 ] ),
-                        alliance: 'enemy'
+                        alliance: alliance
                     } );
                 }
 
@@ -128,9 +130,9 @@ s.SatelliteGame = new Class( {
 
     initialize: function() {
         var that = this;
-
         this.IDs = [];
         this.hostPlayer = false;
+        this.teamMode = true;
 
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
         // No gravity
@@ -150,16 +152,23 @@ s.SatelliteGame = new Class( {
             game: this
         } );
 
-        // Random building
-        this.building = new s.BuildingTall({
-            game: this,
-            position: new THREE.Vector3(-5211.99169921875, -1277.7318115234375, 3610.850830078125),
-            rotation: new THREE.Vector3(1.6990602929726026, 0.011873913392131176, 0.86412056066792210)
-        });
+        // Add spacestation
+        this.spaceStation = new s.SpaceStation( {
+            game: this
+        } );
+
+        // Add tall moon base
+        this.moonBaseTall = new s.MoonBaseTall( {
+            game: this
+        } );
+
+        this.baseNameMap = {
+            'spaceStation': 'Space Base',
+            'moonBaseTall': 'Moon Base'
+        };
 
         this.pilot = {};
         this.callsigns = this.callsigns || ["Apollo","Strobe","Sage","Polkadot","Moonglow","Steel","Vanguard","Prong","Uptight","Blackpony","Hawk","Ramrod","Dice","Falcon","Rap","Buckshot","Cobra","Magpie","Warhawk","Boxer","Devil","Hammer","Phantom","Sharkbait","Dusty","Icon","Blade","Pedro","Stinger","Yellow Jacket","Limit","Sabre","Misty","Whiskey","Dice","Antic","Arrow","Auto","Avalon","Bandit","Banshee","Blackjack","Bulldog","Caesar","Cajun","Challenger","Chuggs","Cindy","Cracker","Dagger","Dino","Esso","Express","Fangs","Fighting Freddie","Freight Train","Freemason","Fury","Gamma","Gear","Ghost","Ginger","Greasy","Havoc","Hornet","Husky","Jackal","Jaguar","Jedi","Jazz","Jester","Knife","Kitty Hawk","Knight","Knightrider","Koala","Komono","Lancer","Lexus","Lion","Levi","Lucid","Malty","Mail Truck","Magma","Magnet","Malibu","Medusa","Maul","Monster","Misfit","Moss","Moose","Mustang","Nail","Nasa","Nacho","Nighthawk","Ninja","Neptune","Odin","Occult","Nukem","Ozark","Pagan","Pageboy","Panther","Peachtree","Phenom","Polestar","Punisher","Ram","Rambo","Raider","Raven","Razor","Rupee","Sabre","Rust","Ruin","Sultan","Savor","Scandal","Scorpion","Shooter","Smokey","Sniper","Spartan","Thunder","Titus","Titan","Timber Wolf","Totem","Trump","Venom","Veil","Viper","Weasel","Warthog","Winter","Wiki","Wild","Yonder","Yogi","Yucca","Zeppelin","Zeus","Zesty"];
-
         this.pilot.name = this.callsigns[Math.floor(this.callsigns.length*Math.random())] + ' ' + ( new Date( ).getTime( ) % 100 );
 
         // Add a hud
@@ -184,8 +193,7 @@ s.SatelliteGame = new Class( {
             HUD: this.HUD,
             game: this,
             shipClass: 'human_ship_heavy',
-            // position: new THREE.Vector3(this.getRandomCoordinate(),this.getRandomCoordinate(),this.getRandomCoordinate()),
-            position: new THREE.Vector3(23498, -25902, 24976),
+            position: new THREE.Vector3(19232, 19946, 20311),
             name: this.pilot.name,
             rotation: new THREE.Vector3( 0, Math.PI/2, 0 ),
             alliance: 'alliance',
@@ -242,6 +250,7 @@ s.SatelliteGame = new Class( {
         } );
 
         this.comm = new s.Comm( {
+            room: this.room,
             game: that,
             pilot: that.pilot,
             player: this.player,
@@ -255,8 +264,10 @@ s.SatelliteGame = new Class( {
         this.comm.on( 'join', that.handleJoin );
         this.comm.on( 'leave', that.handleLeave );
         this.comm.on( 'move', that.handleMove );
+        this.comm.on( 'sync', that.handleSync);
         this.comm.on( 'bot retrieval', that.handleBotInfo );
         this.comm.on( 'bot positions', that.handleBotPositions );
+        this.comm.on( 'baseHit', that.baseHit );
 
         this.HUD.controls = this.controls;
 
@@ -264,6 +275,8 @@ s.SatelliteGame = new Class( {
         this.player.root.addEventListener('ready', function(){
             s.game.start();
         });
+
+        s.game.menu.joinRoom();
     },
 
     render: function(_super, time) {
@@ -345,6 +358,7 @@ s.SatelliteGame = new Class( {
     },
 
     handleJoin: function ( message ) {
+           console.log("Received a join");
            s.game.enemies.add( message );
     },
     handleLeave: function ( message ) {
@@ -352,6 +366,7 @@ s.SatelliteGame = new Class( {
             console.log( '%s has left', message.name );
         }
     },
+
     handleMove: function ( message ) {
         if ( message.name == this.pilot.name ) {
             // server told us to move
@@ -378,6 +393,7 @@ s.SatelliteGame = new Class( {
     },
 
     handleKill: function(message) {
+        console.log(message);
         // get enemy position
         var position = s.game.enemies.get(message.killed).root.position;
         new s.Explosion({
@@ -404,16 +420,16 @@ s.SatelliteGame = new Class( {
                 position: bulletPosition,
                 rotation: bulletRotation,
                 initialVelocity: initialVelocity,
-                team: 'rebels'
+                team: 'alliance'
             });
 
     },
 
     handleHit: function(message) {
-        var zappedName = message.otherPlayerName;
-        var killer = message.yourName;
-        var zappedEnemy = s.game.enemies.get(zappedName);
-        if (zappedName === s.game.pilot.name){
+        var zapped = message.zappedName;
+        var killer = message.killerName;
+        var zappedEnemy = s.game.enemies.get(zapped);
+        if (zapped === s.game.pilot.name){
             s.game.stopShields();
             s.game.rechargeShields();
             if (s.game.player.shields > 0){
@@ -436,22 +452,22 @@ s.SatelliteGame = new Class( {
             console.log('You were hit with a laser by %s! Your HP: %d', killer, s.game.player.hull);
 
             if (s.game.player.hull <= 0) {
-                s.game.handleDie(zappedName, killer);
+                s.game.handleDie(zapped, killer);
             }
         } else {
             if (zappedEnemy.shields > 0){
                 zappedEnemy.shields -= 20;
-                console.log(zappedName, ' shield is now: ', zappedEnemy.shields);
+                console.log(zapped, ' shield is now: ', zappedEnemy.shields);
                 setTimeout(function() {
                     s.game.replenishEnemyShield(zappedEnemy);
                 }, 7000);
             } else {
                 zappedEnemy.hull -= 20;
-                console.log(zappedName, ' hull is now: ', zappedEnemy.hull);
+                console.log(zapped, ' hull is now: ', zappedEnemy.hull);
             }
             if (zappedEnemy.hull <= 0 && zappedEnemy.isBot) {
-                console.log(zappedName, ' has died');
-                s.game.handleKill.call(s, { killed: zappedName, killer: killer });
+                console.log(zapped, ' has died');
+                s.game.handleKill.call(s, { killed: zapped, killer: killer });
                 s.game.enemies.add( {position: [ 23498, -25902, 24976 ]}, 'bot' );
             }
         }
@@ -462,24 +478,23 @@ s.SatelliteGame = new Class( {
     },
 
     handleDie: function(you, killer) {
-        if (!you) {
-            return;
-        }
         if (this.hostPlayer) clearInterval(this.botPositionInterval);
         this.menu.gameOver(killer);
-        if (s.game.roomSelected) s.game.comm.died(you, killer);
+        s.game.comm.died(you, killer);
 
+        this.hostPlayer = false;
         this.restartGame();
     },
 
     restartGame: function() {
         var that = this;
+        this.gameOverBoolean = true;
         setTimeout(function() {
             that.player.shields = s.config.ship.shields;
             that.player.hull = s.config.ship.hull;
-            that.player.setPosition([that.getRandomCoordinate(), that.getRandomCoordinate(), that.getRandomCoordinate()],[0,0,0],[0,0,0],[0,0,0]);
-            that.hostPlayer = false;
-            that.restart();
+            that.player.setPosition([19232, 19946, 20311],[0,0,0],[0,0,0],[0,0,0]);
+            that.menu.close();
+            that.gameOverBoolean = false;
         }, 6000);
     },
 
@@ -538,9 +553,10 @@ s.SatelliteGame = new Class( {
                 that.game.updatePlayersWithBots('botUpdate');
             }, 2500);
         }
-
         this.game.hostPlayer = true;
+        console.log(this.game.hostPlayer);
         if (this.game.botCount === 0) {
+            console.log(true);
             // Create a new bot
             this.game.enemies.add( {}, 'bot');
         }
@@ -588,6 +604,33 @@ s.SatelliteGame = new Class( {
                 this.game.enemies.add(message[bot], 'bot');
             }
         }
+    },
+
+    baseHit: function(message) {
+        this.game[message.baseName].shields--;
+        var shields = this.game[message.baseName].shields;
+        console.log(this.game.baseNameMap[message.baseName] + ' was hit by ' + message.pilotName + '. Shields at ' + shields);
+        if (this.game[message.baseName].shields < 0) {
+            this.game.handleBaseDeath(message.baseName);
+        }
+    },
+
+    handleBaseDeath: function(base) {
+        setTimeout(function() {
+            var message;
+
+            s.game.moonBaseTall.shields = s.config.base.shields;
+            s.game.spaceStation.shields = s.config.base.shields;
+
+            if (base === 'spaceStation') {
+                message = 'rebels wins';
+            } else {
+                message = "alliance win";
+            }
+            s.game.menu.gameOver('temp', s.game.baseNameMap[base], message);
+            s.game.restartGame();
+        }, 3000);
+
     }
 
 } );

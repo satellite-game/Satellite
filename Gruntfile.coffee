@@ -78,7 +78,7 @@ module.exports = (grunt) ->
       options:
         jshintrc: '.jshintrc'
       gruntfile: ['Gruntfile.js']
-      server: ['app.js']
+      server: ['server/**/*.js']
       client: ['client/**/*.js', '!**/models/**', '!**/lib/**']
       tests: ['tests/**/*.js', '!tests/oculus-testing-playground/**/*.js']
 
@@ -101,7 +101,7 @@ module.exports = (grunt) ->
         options:
           livereload: true
       server:
-        files: ['app.js']
+        files: ['server/**/*.js']
         tasks: ['server']
         options:
           livereload: true

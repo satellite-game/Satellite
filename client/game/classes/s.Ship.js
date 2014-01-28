@@ -5,8 +5,8 @@ s.Ship = new Class({
         leftTurretOffset: new THREE.Vector3(35, 0, -200),
         rightTurretOffset: new THREE.Vector3(-35, 0, -200),
         missileOffset: new THREE.Vector3(0, 0, -120),
-        turretFireTime: 200,
-        botTurretFireTime: 1700,
+        turretFireTime: 150,
+        botTurretFireTime: 1000,
         missileFireTime: 1000
     },
 
@@ -29,6 +29,7 @@ s.Ship = new Class({
         this.shields = s.config.ship.shields;
 
         this.lastTime = new Date( ).getTime( );
+        this. alternateFire = false;
     },
 
     getOffset: function(offset) {
@@ -56,15 +57,17 @@ s.Ship = new Class({
             turretFireTime = this.options.turretFireTime;
             bullet.HUD = this.HUD;
         }
-
         // Turrets
         if (weapon === 'turret'){
             if (now - this.lastTurretFire > turretFireTime){
-                // Left bullet
-                this.makeTurret(bullet, this.options.leftTurretOffset);
-
-                // Right bullet
-                this.makeTurret(bullet, this.options.rightTurretOffset);
+                if ( this.alternateFire ) {
+                    // Left bullet
+                    this.makeTurret(bullet, this.options.leftTurretOffset);
+                } else {
+                    // Right bullet
+                    this.makeTurret(bullet, this.options.rightTurretOffset);
+                }
+                this.alternateFire = !this.alternateFire;
 
                 this.lastTurretFire = now;
                 if (!this.isBot) { this.game.sound.play('laser', 0.5); }

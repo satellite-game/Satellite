@@ -31,6 +31,14 @@ app.use(express.static(path.join(__dirname, '/build/client')));
 app.get('/', function (req, res) {
     res.sendfile(path.join(__dirname, '/build/client/index.html'));
 });
+app.get('/rooms', function (req, res) {
+    // make database query to get all existing rooms
+    // respond with json containing room names and player count
+});
+app.get('/scores', function (req, res) {
+    // make database query to get players from req.data.room
+    // respond with json containing player names for room and
+});
 
 // Holds players
 var players = {};
@@ -238,6 +246,10 @@ io.sockets.on('connection', function (socket) {
 
     socket.on('botUpdate', function(message) {
         socket.broadcast.emit('bot positions', message);
+    });
+
+    socket.on('baseFire', function(message) {
+        socket.emit('baseHit', message);
     });
 
 });
