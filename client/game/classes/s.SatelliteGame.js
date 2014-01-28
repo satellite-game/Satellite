@@ -114,7 +114,7 @@ s.SatelliteGame = new Class( {
         // this.scene.add( this.targeting );
 
         // this.currentTarget = null;
-        
+
         this.HUD.hp = this.player.hull;
 
         $(document).on('keyup', function(evt) {
@@ -228,11 +228,8 @@ s.SatelliteGame = new Class( {
                     } );
                 }
 
-<<<<<<< HEAD
                 that.currentTarget = enemyShip;
-                
-=======
->>>>>>> dev
+
                 if (isBot) { console.log( '%s has joined the fray', enemyShip.name ); }
 
                 this._list.push( enemyShip );
@@ -295,8 +292,6 @@ s.SatelliteGame = new Class( {
         this.player.root.addEventListener('ready', function(){
             s.game.start();
         });
-
-<<<<<<< HEAD
         // Engine glow and flame trail on your player only.
 
         this.flames = [];
@@ -320,9 +315,6 @@ s.SatelliteGame = new Class( {
         this.trailGlow.position.set(0, 0, 35);
 
         this.ocuScale = this.oculus.detected ? 0.2 : 1;
-=======
-        s.game.menu.joinRoom();
->>>>>>> dev
 	},
 
 	render: function(_super, time) {
