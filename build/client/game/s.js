@@ -51161,11 +51161,6 @@ s.Player = new Class({
 
     // Root camera to the player's position
     this.root.add( this.camera );
-
-    this.trailGlow = new THREE.PointLight(0x00FFFF, 5, 20);
-    this.trailGlow.intensity = 0;
-    this.root.add( this.trailGlow );
-    this.trailGlow.position.set(0, 0, 35);
     
     this.game.hook(this.update);
 
@@ -51174,39 +51169,12 @@ s.Player = new Class({
 
     // Setup camera: Chase view
     this.game.camera.position.set(0,35,250);
-
-    // Create particle objects for engine trail.
-    this.flames = [];
-
-    for (var i = 0; i < 5; i++) {
-      var sprite = new THREE.Sprite(new THREE.SpriteMaterial({
-        map: s.textures.particle,
-        useScreenCoordinates: false,
-        blending: THREE.AdditiveBlending,
-        color: 0x00FFFF
-      }));
-
-      this.flames.push(sprite);
-      sprite.position.set(0, 0, (i*10)+40);
-      this.root.add(sprite);
-    }
   },
 
   update: function() {
     if (this.hull <= 0){
       this.game.handleDie();
     }
-    // Adjusts engine glow based on linear velosity
-    this.trailGlow.intensity = this.root.getLinearVelocity().length()/100;
-
-    var ocuScale = this.game.oculus.detected ? 0.2 : 1;
-    var flameScaler = (Math.random()*0.1 + 1)*ocuScale;
-
-    this.flames[0].scale.set(2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler);
-    this.flames[1].scale.set(3*this.trailGlow.intensity*flameScaler, 3*this.trailGlow.intensity*flameScaler, 3*this.trailGlow.intensity*flameScaler);
-    this.flames[2].scale.set(2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler);
-    this.flames[3].scale.set(1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler);
-    this.flames[4].scale.set(1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler);
   }
 });
 
@@ -52229,6 +52197,7 @@ s.HUD = new Class({
 
 		this.game = options.game;
 		this.controls = options.controls;
+        this.oculus = options.game.oculus;
 
         this.PI = Math.PI;
 
@@ -52320,8 +52289,8 @@ s.HUD = new Class({
         // changeTarget modified by key commands to cycle through targets; currentTarget represents index of targeted enemy
         this.changeTarget = 0;
         this.currentTarget = 0;
-
 	},
+
 	update: function(){
             
         ////////////////////////
@@ -52624,6 +52593,8 @@ s.HUD = new Class({
         //         }
 
 
+        //         // Fully just crashing on oculus view
+
         //         /////////////////////////////////
         //         // PREDICTIVE TARGETING SYSTEM //
         //         /////////////////////////////////
@@ -52638,7 +52609,7 @@ s.HUD = new Class({
         //         // angD = angular differential
         //         // velD = velocity differential
         //         // t    = quadratic solution for time at which player bullet and enemy ship will simultaneously reach a given location
-        //         if ( enemies[i] && targetInSight ){
+        //         if ( enemies[i] && targetInSight && !this.oculus.detected ){
 
         //             var aV = enemies[i].root.position.clone().add( self.position.clone().multiplyScalar(-1) );
         //             var a  = aV.length();
@@ -52699,8 +52670,6 @@ s.HUD = new Class({
 
         // }
 
-        // Damn that felt good.
-
         /////////////////////////////////
         // PLAYER SHIELD/HEALTH STATUS //
         /////////////////////////////////
@@ -52733,9 +52702,14 @@ s.HUD = new Class({
         // this.ctx.arc(centerX, centerY, 15, 0, 2 * this.PI, false);
         // this.ctx.stroke();
 
+        ///////////////////////
+        ///   CROSSHAIRS    ///
+        ///////////////////////
+
         this.oculusCtx.clearRect(0, 0, this.oculusCanvas.width, this.oculusCanvas.height);
         this.oculusCtx.drawImage(this.canvas, 50*1.07, -50, window.innerWidth/2, window.innerHeight/2);
         this.oculusCtx.drawImage(this.canvas, this.oculusCanvas.width/2-50*1.07, -50, window.innerWidth/2, window.innerHeight/2);
+
     }
 
 });
@@ -53481,12 +53455,14 @@ s.Menu = new Class({
         // items and moves hover up and down with head motion
         // todo: use ray casting to select items more accurately
 
-        var viewingAngle = Math.PI/4 * (this.oculus.quat.x);
+        var viewingAngleX = Math.PI/4 * (this.oculus.quat.x);
+        var viewingAngleY = Math.PI/4 * (this.oculus.quat.y);
         var tilt = ~~((this.menuItems.length/2 * this.oculus.quat.x) * 6 + ~~(this.menuItems.length/2));
         var hover = this.menuItems[tilt];
         this.hoverItem(hover);
 
-        this.menuBox.position.setY((-150*Math.sin(viewingAngle))/Math.sin(Math.PI/4)/2+4); // ...ish
+        this.menuBox.position.setY((-150*Math.sin(viewingAngleX))/Math.sin(Math.PI/4));
+        this.menuBox.position.setX((150*Math.sin(viewingAngleY))/Math.sin(Math.PI/4));
         // console.log(this.selectorRay.intersectObjects(this.menuBox.children));
       } else {
         // todo: skip over items with no action property
@@ -53620,7 +53596,6 @@ s.Menu = new Class({
       {text: 'YOU DIED', size: 6},
       {text: 'YOU WERE KILLED BY '+killer.toUpperCase()},
       {text: 'RESPAWNING IN 6 SEC...'},
-      {text: ' '},
       {text: 'DISCONNECT', size: 5, action: 'disconnect'}
     ]);
   }
@@ -53935,7 +53910,8 @@ s.SatelliteGame = new Class( {
 
     textures: [
         'particle.png',
-        'explosion.png'
+        'explosion.png',
+        'crosshairs.png'
     ],
 
     getRandomCoordinate: function(){
@@ -54199,6 +54175,43 @@ s.SatelliteGame = new Class( {
         this.player.root.addEventListener('ready', function(){
             s.game.start();
         });
+
+        // Engine glow and flame trail on your player only.
+
+        this.flames = [];
+
+        for (var i = 0; i < 5; i++) {
+          var sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: s.textures.particle,
+            useScreenCoordinates: false,
+            blending: THREE.AdditiveBlending,
+            color: 0x00FFFF
+          }));
+
+          this.flames.push(sprite);
+          this.player.root.add(sprite);
+          sprite.position.set(0, 0, (i*10)+40);
+        }
+
+        this.trailGlow = new THREE.PointLight(0x00FFFF, 5, 20);
+        this.trailGlow.intensity = 0;
+        this.player.root.add( this.trailGlow );
+        this.trailGlow.position.set(0, 0, 35);
+
+        this.ocuScale = this.oculus.detected ? 0.2 : 1;
+
+        // crosshairs
+
+        this.crosshairs = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: s.textures.crosshairs,
+            useScreenCoordinates: false,
+            blending: THREE.AdditiveBlending,
+            color: 0x00FF00
+        }));
+
+        this.game.player.root.add( this.crosshairs );
+
+        this.crosshairs.position.setZ(150);
 	},
 
 	render: function(_super, time) {
@@ -54206,6 +54219,17 @@ s.SatelliteGame = new Class( {
 		this.controls.update();
         this.targeting.lookAt(this.player.root.position);
         if (this.currentTarget) this.targeting.position.set(this.currentTarget.root.position);
+
+        // Adjusts engine glow based on linear velosity
+        this.trailGlow.intensity = this.player.root.getLinearVelocity().length()/100;
+
+        var flameScaler = (Math.random()*0.1 + 1)*this.ocuScale;
+
+        this.flames[0].scale.set(2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler);
+        this.flames[1].scale.set(3*this.trailGlow.intensity*flameScaler, 3*this.trailGlow.intensity*flameScaler, 3*this.trailGlow.intensity*flameScaler);
+        this.flames[2].scale.set(2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler);
+        this.flames[3].scale.set(1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler);
+        this.flames[4].scale.set(1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler);
 	},
 
 	addSkybox: function() {
