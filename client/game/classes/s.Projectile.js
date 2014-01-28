@@ -24,8 +24,12 @@ s.Projectile = new Class({
     },
 
     handleCollision: function(mesh, position){
+        
+        if (!this.game.gameFire) { return; }
+
         //check if your turret hit someone or an enemy base
         //else if check if you got hit by a bot or if a bot hit your base
+
         if (this.pilot === this.game.pilot.name){
             if (mesh.instance.alliance && mesh.instance.alliance === "rebel"){
                 this.HUD.menu.animate({

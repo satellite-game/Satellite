@@ -53,3 +53,4 @@ coverage
 /tests/oculus-testing-playground
 test-mocha
 build
+dump.rdb
