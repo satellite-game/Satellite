@@ -51388,31 +51388,7 @@ s.Bot = new Class( {
     }
   },
 
-  controlBot: function() {
-
-    //get closest enemy
-    this.getEnemyList();
-    this.getClosestDistance();
-
-    //////////////////////////////
-    //// THRUST/BREAK LOGIC ////
-    //////////////////////////////    
-
-    var now = new Date( ).getTime( );
-    this.thrustAndBreaks(now);
-
-    //////////////////////////////
-    // LEFT/RIGHT/UP/DOWN LOGIC //
-    //////////////////////////////       
-    
-    var direction = this.determineDirection();
-    var pitch = direction[0], yaw = direction[1], roll = direction[2], vTarget2D = direction[3];
-
-    //////////////////////////////
-    // MOTION AND PHYSICS LOGIC //
-    //////////////////////////////
-
-
+  motionAndPhysics: function(pitch, yaw, roll, vTarget2D) {
     var linearVelocity = this.root.getLinearVelocity().clone();
     var angularVelocity = this.root.getAngularVelocity().clone();
     var rotationMatrix = new THREE.Matrix4();
@@ -51429,13 +51405,28 @@ s.Bot = new Class( {
 
     var getForceVector = new THREE.Vector3(0,0, -1*this.botOptions.thrustImpulse).applyMatrix4(rotationMatrix);
     this.root.applyCentralImpulse(getForceVector);
+  },
+
+  controlBot: function() {
+
+    //get closest enemy
+    this.getEnemyList();
+    this.getClosestDistance();
+
+    //// THRUST/BREAK LOGIC ////
+    var now = new Date( ).getTime( );
+    this.thrustAndBreaks(now);
+
+    // LEFT/RIGHT/UP/DOWN LOGIC //
+    var direction = this.determineDirection();
+    var pitch = direction[0], yaw = direction[1], roll = direction[2], vTarget2D = direction[3];
+
+    // MOTION AND PHYSICS LOGIC //
+    this.motionAndPhysics(pitch, yaw, roll, vTarget2D);
 
     this.lastTime = now;
 
-    //////////////////////////////
     ///////  FIRING LOGIC ////////
-    //////////////////////////////
-
     if (this.game.gameFire && Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && this.closestDistance < this.maxDistance) {
       this.fire('turret');
     }
