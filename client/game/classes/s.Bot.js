@@ -218,11 +218,16 @@ s.Bot = new Class( {
 
     var direction;
     if (this.evasiveManeuvers) {
-      direction = this.dodgeBullet();
+      direction = this.dodgeBullet(now); ///DODGE BULLET LOGIC ///
     } else {
       this.thrustAndBreaks(now); //// THRUST/BREAK LOGIC ////
       direction = this.determineDirection(); // LEFT/RIGHT/UP/DOWN LOGIC //
+
+      //flip yaw and pitch direction for evading bullets
+      this.evade.yawSign = this.evade.yawSign * -1;
+      this.evade.pitchSign = this.evade.pitchSign * -1;
     }
+
     var pitch = direction[0], yaw = direction[1], roll = direction[2], vTarget2D = direction[3];
 
     // MOTION AND PHYSICS LOGIC //
@@ -234,10 +239,6 @@ s.Bot = new Class( {
     if (this.game.gameFire && Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && this.closestDistance < this.maxDistance) {
       this.fire('turret');
     }
-
-    //flip yaw and pitch direction for evading bullets
-    this.evade.yawSign = this.evade.yawSign * -1;
-    this.evade.pitchSign = this.evade.pitchSign * -1;
 
   }
 
