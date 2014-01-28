@@ -269,13 +269,20 @@ s.Menu = new Class({
     // ]);
   },
 
-  joinRoom: function () {
-    var room = this.hoveredItem.room;
+  joinRoom: function (roomToJoin) {
+    var room;
+    if (this.hoveredItem) {
+      room = this.hoveredItem.room;
+    } else {
+      room = prompt('roomToJoin:');
+    }
     // some socket changing stuff.
     // then basically just remove the player and respawn
     // sim-fuckin-ple.
     this.game.roomSelected = true;
-    this.game.comm.connectSockets(room);
+    // this.game.comm.room = room;
+    this.game.room = room;
+    this.game.comm.connectSockets();
     this.close();
   },
 
@@ -320,7 +327,7 @@ s.Menu = new Class({
     console.log('Disconnecting...');
   },
 
-  gameOver: function (killer) {
+  gameOver: function (killer, baseDestroyed, message) {
     this.clearMenu();
     this.displayed = true;
     this.menuBox.visible = true;
@@ -328,11 +335,17 @@ s.Menu = new Class({
     this.HUD.oculusCanvas.style.display = 'none';
 
     this.menuScreen = 'dead';
-    this.addMenuItems([
+
+    var items = [
       {text: 'YOU DIED', size: 6},
       {text: 'YOU WERE KILLED BY '+killer.toUpperCase()},
       {text: 'RESPAWNING IN 6 SEC...'},
       {text: 'DISCONNECT', size: 5, action: 'disconnect'}
-    ]);
+    ];
+
+    if (baseDestroyed) {
+      items.splice(0, 2, {text: message, size: 6}, {text: baseDestroyed + ' destroyed'});
+    }
+    this.addMenuItems(items);
   }
 });

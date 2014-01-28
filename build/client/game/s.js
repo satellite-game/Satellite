@@ -50293,6 +50293,9 @@ var s = {
             shields: 80,
             maxSpeed: 1500
         },
+        base: {
+            shields: 50
+        },
         sound: {
             enabled: true,
             silentDistance: 10000,
@@ -50310,7 +50313,6 @@ var s = {
         // Create a model loader
         s.loader = new THREE.JSONLoader();
 
-        // Create game
         s.game = new s.SatelliteGame();
     }
 };
@@ -50826,6 +50828,7 @@ s.Projectile = new Class({
         this.game = options.game;
         this.pilot = options.pilot;
         this.isBot = options.isBot;
+        this.team = options.team;
         // handle parameters
         this.initialVelocity = options.initialVelocity;
         var that = this;
@@ -50841,10 +50844,10 @@ s.Projectile = new Class({
     },
 
     handleCollision: function(mesh, position){
-        //check if your turret hit someone
-        //else if check if you got hit by a bot
+        //check if your turret hit someone or an enemy base
+        //else if check if you got hit by a bot or if a bot hit your base
         if (this.pilot === this.game.pilot.name){
-            if (mesh.instance.alliance && mesh.instance.alliance === "enemy"){
+            if (mesh.instance.alliance && mesh.instance.alliance === "rebel"){
                 this.HUD.menu.animate({
                 color: this.HUD.hit,
                 frames: 30
@@ -50857,9 +50860,16 @@ s.Projectile = new Class({
                 }
                 this.comm.hit(mesh.name,this.game.pilot.name);
             }
-        } else if (mesh.name === this.game.pilot.name && this.isBot ) {
-            this.comm.botHit(mesh.name, this.pilot);
-        }
+            if (mesh.name === 'moonBaseTall') {
+                this.comm.baseFire(mesh.name, this.pilot);
+            }
+        } else if (this.isBot) {
+            if (mesh.name === this.game.pilot.name) {
+                this.comm.botHit(mesh.name, this.pilot);
+            } else if (mesh.name === 'spaceStation' && this.game.hostPlayer) {
+                this.comm.baseFire(mesh.name, this.pilot);
+            }
+        } 
         this.destruct();
     },
 
@@ -50897,8 +50907,8 @@ s.Turret = new Class({
         scale: new THREE.Vector3(50, 50, 1.0),
         color: {
             alliance: 0x00F2FF,
-            rebels: 0xFF4400,
-            enemy: 0xFF4400
+            rebel: 0xFF0000,
+            enemy: 0xFF0000
         }
     },
 
@@ -51172,9 +51182,24 @@ s.Player = new Class({
   },
 
   update: function() {
+<<<<<<< HEAD
     if (this.hull <= 0){
       this.game.handleDie();
     }
+=======
+
+    // Adjusts engine glow based on linear velosity
+    this.trailGlow.intensity = this.root.getLinearVelocity().length()/100;
+
+    var ocuScale = this.game.oculus.detected ? 0.2 : 1;
+    var flameScaler = (Math.random()*0.1 + 1)*ocuScale;
+
+    this.flames[0].scale.set(2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler);
+    this.flames[1].scale.set(3*this.trailGlow.intensity*flameScaler, 3*this.trailGlow.intensity*flameScaler, 3*this.trailGlow.intensity*flameScaler);
+    this.flames[2].scale.set(2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler);
+    this.flames[3].scale.set(1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler);
+    this.flames[4].scale.set(1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler);
+>>>>>>> dev
   }
 });
 
@@ -51479,12 +51504,13 @@ s.SpaceStation = new Class({
 	construct: function(options){
 		// handle parameters
 		this.options = options = jQuery.extend({
-			position: options.position,
-			rotation: options.rotation
+			position: new THREE.Vector3(20000, 20000, 20000),
+			rotation: new THREE.Vector3(0, 0, 0)
 		}, options);
 
 		var geometry = s.models.human_space_station.geometry;
 		var materials = s.models.human_space_station.materials;
+
 
 		// Setup physical properties
 		materials[0] = Physijs.createMaterial(
@@ -51495,10 +51521,48 @@ s.SpaceStation = new Class({
 
 		this.root = new Physijs.ConvexMesh(geometry, new THREE.MeshFaceMaterial(materials), 0);
 
-        this.root.name = "space_station";
+    this.root.name = "spaceStation";
+		this.root.team = 'alliance';
 		this.root.position.copy(options.position);
 		this.root.rotation.copy(options.rotation);
 		// this.root.receiveShadow = true; // Causes shader error
+
+		this.shields = s.config.base.shields;
+	}
+});
+
+s.MoonBaseTall = new Class({
+	extend: s.GameObject,
+
+	construct: function(options){
+		// handle parameters
+		this.options = options = jQuery.extend({
+			position: new THREE.Vector3(-6516.61181640625, 334.5599060058594, -99.58238220214844),
+			rotation: new THREE.Vector3(0,-0.25,1.45)
+		}, options);
+
+		var geometry = s.models.human_building_tall.geometry;
+		var materials = s.models.human_building_tall.materials;
+
+		// Setup physical properties
+		materials[0] = Physijs.createMaterial(
+			materials[0],
+			1, // high friction
+			0.4 // low restitution
+		);
+
+		this.root = new Physijs.ConvexMesh(geometry, new THREE.MeshFaceMaterial(materials), 0);
+
+    this.root.name = "moonBaseTall";
+		this.root.team = 'rebel';
+
+		this.root.position.copy(options.position);
+		this.root.rotation.copy(options.rotation);
+
+		// this.root.receiveShadow = true; // Causes shader error
+
+		this.shields = s.config.base.shields;
+
 	}
 });
 
@@ -51747,9 +51811,27 @@ s.Keyboard = new Class({
     'tilde'   : 192
   },
 
+  keysInv: {
+    37  : 'left',
+    38  : 'up',
+    39  : 'right',
+    40  : 'down',
+    32  : 'space',
+    33  : 'pageup',
+    34  : 'pagedown',
+    9   : 'tab',
+    87  : 'w',
+    65  : 'a',
+    83  : 's',
+    68  : 'd',
+    192 : 'tilde',
+    16  : 'shift',
+  },
+
   modifiers: ['shift', 'ctrl', 'alt', 'meta'],
 
   construct: function(game, player) {
+    var self = this;
     this.keyCodes = {};
 
     // Listen to key events
@@ -51934,7 +52016,8 @@ s.Controls = new Class({
     this.oculus = this.game.oculus;
 
     // Mouse interface - mice options are: 'keyboard', 'none', 'oculus'
-    this.mouse = new s.Mouse('keyboard', options);
+    // this.mouse = new s.Mouse('keyboard', options);
+    this.mouse = new s.Mouse('none', options);
 
     console.log('Initialized gamepad...');
 
@@ -52018,10 +52101,78 @@ s.Controls = new Class({
     ///////////////////////
 
     var yawSpeed = this.options.yawSpeed,
+<<<<<<< HEAD
       pitchSpeed = this.options.pitchSpeed;
       // cursor = this.HUD.cursorVector,
       // radius = this.HUD.subreticleBound.radius,
       // crosshairs = {width: 30, height: 30};
+=======
+      pitchSpeed = this.options.pitchSpeed,
+      cursor = this.HUD.cursorVector,
+      radius = this.HUD.subreticleBound.radius,
+      crosshairs = {width: 30, height: 30};
+
+    ///////////////////////
+    //  OCULUS CONTROLS  //
+    ///////////////////////
+
+    if (this.oculus.detected) {
+      this.mouse.mouseType = 'oculus';
+      pitch = this.oculus.quat.x;
+      yaw = this.oculus.quat.y;
+      roll = this.oculus.quat.z;
+      if (this.menu.displayed) {
+        this.menu.updateHovered();
+      }
+    }
+
+    ///////////////////////
+    //  MOUSE CONTROLS   //
+    ///////////////////////
+
+    var mouseUpdate = this.mouse.update({
+        centerX: centerX,
+        crosshairs: crosshairs,
+        yaw: yaw,
+        radius: radius,
+        yawSpeed: yawSpeed,
+        thrustScalar: thrustScalar,
+        centerY: centerY,
+        pitch: pitch,
+        pitchSpeed: pitchSpeed
+    });
+
+    pitch = mouseUpdate.pitch || pitch;
+    yaw = mouseUpdate.yaw || yaw;
+
+    ///////////////////////
+    // GAMEPAD CONTROLS  //
+    ///////////////////////
+
+    if (hasGamepad) {
+      var gamepadState = this.gamepad.gamepads[0].state;
+
+      // TODO: Handle inverted option
+      pitch = gamepadState.LEFT_STICK_Y;
+
+      if (gamepadYaw) {
+        yaw = gamepadState.LEFT_STICK_X*-1;
+      }
+      else {
+        roll = gamepadState.LEFT_STICK_X*-1 * this.options.rotationSpeed;
+      }
+
+      if (gamepadState.RB || gamepadState.X || gamepadState.FACE_1)
+        this.firing = true;
+      else
+        this.firing = false;
+
+      var gamepadThrust = (gamepadState.RIGHT_STICK_X*-1 + 1)/2;
+
+      // Set thrust
+      this.options.thrustImpulse = gamepadThrust * s.config.ship.maxSpeed;
+    }
+>>>>>>> dev
 
     ///////////////////////
     // KEYBOARD COMMANDS //
@@ -52297,11 +52448,11 @@ s.HUD = new Class({
         // TURNING SUBRETICLE //
         ////////////////////////
 
-        var velocity = this.controls.options.thrustImpulse,
-            height = window.innerHeight,
-            width = window.innerWidth,
-            centerX = width/2,
-            centerY = height/2;
+        var velocity = this.controls.options.thrustImpulse;
+        this.height = height = window.innerHeight,
+        this.width = width = window.innerWidth;
+        this.centerX = centerX = width/2,
+        this.centerY = centerY = height/2;
 
         if (this.canvas.height !== height){
             this.canvas.height = height;
@@ -52473,37 +52624,6 @@ s.HUD = new Class({
         this.ctx.fillText("Survivors: " + (enemiesLen + 1), width-128-36, 256+30 );
         this.ctx.fill();
 
-
-        ///////////////////////////
-        // MOON TARGETING SYSTEM //
-        ///////////////////////////
-
-        this.moon = s.game.moon.root;
-
-        var vMoon3D = this.moon.position.clone();
-        var vMoon2D = s.projector.projectVector( vMoon3D, s.game.camera );
-        var moonInSight = !!( Math.abs(vMoon2D.x) <= 0.95 && Math.abs(vMoon2D.y) <= 0.95 && vMoon2D.z < 1 );
-
-        // Moon targeting reticule
-        if ( !moonInSight ) {
-
-            var moon2D = new THREE.Vector2(vMoon2D.x, vMoon2D.y);
-            moon2D.multiplyScalar(1/moon2D.length()).multiplyScalar(this.subreticleBound.radius+34);
-
-            this.ctx.beginPath();
-            if (vMoon2D.z > 1)
-                this.ctx.arc( -moon2D.x+centerX, (-moon2D.y+centerY), 10, 0, 2*this.PI, false );
-            else
-                this.ctx.arc( moon2D.x+centerX, -(moon2D.y-centerY), 10, 0, 2*this.PI, false );
-
-            this.ctx.fillStyle = "black";
-            this.ctx.fill();
-            this.ctx.lineWidth = 2;
-            this.ctx.strokeStyle = this.menu.color;
-            this.ctx.stroke();
-        }
-
-
         //////////////////////////////////////////
         // ENEMY TARGETING AND CALLSIGN DISPLAY //
         //////////////////////////////////////////
@@ -52540,6 +52660,7 @@ s.HUD = new Class({
         //             c2D.x =  ( width  + c2D.x*width  )/2;
         //             c2D.y = -(-height + c2D.y*height )/2;
 
+<<<<<<< HEAD
         //             this.ctx.fillStyle = this.menu.color;
         //             this.ctx.fillText( enemies[j].name, c2D.x-30, c2D.y+10);
         //             this.ctx.fill();
@@ -52670,11 +52791,28 @@ s.HUD = new Class({
 
         // }
 
+=======
+                    this.writeName(enemies[j].name, c2D);
+                }
+            }
+
+            // TARGET HUD MARKING
+            if ( this.target ) {
+                 this.findTargets(this.target.root, "rgba(256,0,0,0.5)", 12, 0, true, enemies[i]);
+            }
+
+        }
+
+        this.findTargets(s.game.moon.root, 'black', 34, 550);
+        this.findTargets(s.game.spaceStation.root, 'blue', 34, 5500);
+        this.findTargets(s.game.moonBaseTall.root, 'yellow', 34, 5500);
+        
+>>>>>>> dev
         /////////////////////////////////
         // PLAYER SHIELD/HEALTH STATUS //
         /////////////////////////////////
 
-        if (this.hp !== s.config.ship.hull){
+        if (this.hp !== s.config.ship.hull && !this.game.gameOverBoolean){
             var grd = this.ctx.createRadialGradient(centerX,centerY,width/12,centerX,centerY,this.health);
             grd.addColorStop(0,"rgba(0,0,0,0)");
             grd.addColorStop(1,"rgba(256,0,0,0.75)");
@@ -52707,11 +52845,148 @@ s.HUD = new Class({
         ///////////////////////
 
         this.oculusCtx.clearRect(0, 0, this.oculusCanvas.width, this.oculusCanvas.height);
+
         this.oculusCtx.drawImage(this.canvas, 50*1.07, -50, window.innerWidth/2, window.innerHeight/2);
         this.oculusCtx.drawImage(this.canvas, this.oculusCanvas.width/2-50*1.07, -50, window.innerWidth/2, window.innerHeight/2);
+<<<<<<< HEAD
 
     }
+=======
+    },
 
+    writeName: function (name, clone) {
+        this.ctx.fillStyle = this.menu.color;
+        this.ctx.fillText( name, clone.x-30, clone.y+10);
+        this.ctx.fill();
+    },
+>>>>>>> dev
+
+    findTargets: function (circleTarget, fillColor, distanceFromRadius, maxBoxDistance, predictiveAnalytics, enemy) {
+
+        var vcircleTarget3D = circleTarget.position.clone();
+        var vcircleTarget2D = s.projector.projectVector( vcircleTarget3D, s.game.camera );
+        var circleTargetInSight, distanceTocircleTarget, v2DcircleTarget, size; 
+
+        if ( Math.abs(vcircleTarget2D.x) <= 0.95 && Math.abs(vcircleTarget2D.y) <= 0.95 && vcircleTarget2D.z < 1 ) {
+            circleTargetInSight = true;
+            distanceTocircleTarget = this.game.player.root.position.distanceTo(circleTarget.position);
+            size = Math.round((this.width - distanceTocircleTarget/100)/26);
+        }
+
+        // circleTarget targeting reticule and targeting box
+        if ( !circleTargetInSight ) {
+            var circleTarget2D = new THREE.Vector2(vcircleTarget2D.x, vcircleTarget2D.y);
+            circleTarget2D.multiplyScalar(1/circleTarget2D.length()).multiplyScalar(this.subreticleBound.radius+distanceFromRadius);
+
+            this.ctx.beginPath();
+            if (vcircleTarget2D.z > 1)
+                this.ctx.arc( -circleTarget2D.x+this.centerX, (-circleTarget2D.y+this.centerY), 10, 0, 2*this.PI, false );
+            else
+                this.ctx.arc( circleTarget2D.x+this.centerX, -(circleTarget2D.y-this.centerY), 10, 0, 2*this.PI, false );
+
+
+            this.ctx.fillStyle = fillColor;
+            this.ctx.fill();
+            this.ctx.lineWidth = 2;
+            this.ctx.strokeStyle = this.menu.color;
+            this.ctx.stroke();
+        }
+        if (circleTarget === s.game.moon.root) { return; } //moon has no green square rectangle surroundig it
+        if ( circleTargetInSight && distanceTocircleTarget > maxBoxDistance ) {
+            v2DcircleTarget = vcircleTarget2D.clone();
+            v2DcircleTarget.x =  ( this.width  + v2DcircleTarget.x*this.width  )/2;
+            v2DcircleTarget.y = -(-this.height + v2DcircleTarget.y*this.height )/2;
+
+            this.ctx.strokeRect( v2DcircleTarget.x-size, v2DcircleTarget.y-size, size*2, size*2 );
+            this.ctx.lineWidth = 1;
+            this.ctx.strokeStyle = this.menu.color;
+
+            if (this.game.baseNameMap[circleTarget.name]) {
+                this.writeName(this.game.baseNameMap[circleTarget.name], v2DcircleTarget);
+            }
+        }
+
+        //predictive targeting logic
+        if (predictiveAnalytics) {
+           if ( circleTargetInSight && enemy ) {
+                this.predictiveTargetingSystem(enemy, size, v2DcircleTarget);
+            }
+            // If the target is no longer on screen, but lastV2D is still assigned, set to null
+            else if ( this.trailingPredictions.length ) {
+                this.trailingPredictions = [];
+            }
+        }
+    },
+
+    predictiveTargetingSystem: function(enemy, size, v2D) {
+
+        // PARAMETERS
+        // aV   = vector from target to self
+        // a    = distance between self and target
+        // eV   = enemy's current velocity vector
+        // e    = magnitude of eV
+        // pV   = players's velocity vector
+        // b    = magnitude of bV plus initial bullet speed
+        // angD = angular differential
+        // velD = velocity differential
+        // t    = quadratic solution for time at which player bullet and enemy ship will simultaneously reach a given location
+        
+        this.target = this.target.root;
+        var self = s.game.player.root;
+        
+        var aV = enemy.root.position.clone().add( self.position.clone().multiplyScalar(-1) );
+        var a  = aV.length();
+        var eV = this.target.getLinearVelocity();
+        var e  = eV.length();
+        var pV = self.getLinearVelocity();
+        var b = 5000+pV.length();
+
+        if (eV && b && aV){
+            var angD = aV.dot(eV);
+            var velD = (b*b - e*e);
+
+            var t = angD/velD + Math.sqrt( angD*angD + velD*a*a )/velD;
+
+            // Don't show the marker if the enemy is more than 4 seconds away
+            if (t < 4){
+
+                this.trailingPredictions.push(eV.multiplyScalar(t));
+                var pLen = this.trailingPredictions.length;
+
+                // If the previous frames had a prediction, tween the midpoint of all predictions and plot that
+                if (pLen > 3){
+                    var pX = 0, pY = 0;
+                    for (var p = 0; p < pLen; p++){
+
+                        // Project 3D coords onto 2D plane in perspective of the camera;
+                        // Scale predictions with current camera perspective
+                        var current = s.projector.projectVector(
+                            this.target.position.clone().add( this.trailingPredictions[p] ), s.game.camera );
+                        pX += (width + current.x*width)/2;
+                        pY += -(-height + current.y*height)/2;
+
+                    }
+                    var enemyV2D = new THREE.Vector2(pX/pLen, pY/pLen);
+
+                    if (enemyV2D.distanceTo(v2D) > size/3) {
+                        // Draw the prediction marker
+                        this.ctx.beginPath();
+                        this.ctx.arc(enemyV2D.x, enemyV2D.y, size/5, 0, 2*this.PI, false);
+                        this.ctx.fillStyle = "rgba(256,0,0,0.5)";
+                        this.ctx.fill();
+                        this.ctx.lineWidth = 2;
+                        this.ctx.strokeStyle = this.menu.color;
+                        this.ctx.stroke();
+                    }
+
+                    // remove the earliest trailing prediction
+                    this.trailingPredictions.shift();
+
+
+                }
+            }
+        }
+    }
 });
 
 s.Radar = new Class({
@@ -53095,10 +53370,14 @@ s.Comm = new Class({
   },
 
   construct: function ( options ) {
+    //binding the game's context
     this.game = options.game;
+    // Prepend http. Doing this so that you can customize the server before finalizing the string.
     this.player = options.player;
     this.ship = options.ship;
+    this.server = 'http://' + options.server;
     this.pilot = options.pilot;
+    this.room = options.room;
 
     var that = this;
 
@@ -53106,10 +53385,13 @@ s.Comm = new Class({
     this.clockTick = this.clockTick.bind(this);
     this.timer = setInterval(this.clockTick,1000);
     this.time = 0;
+
+    this.connectSockets();
   },
 
-  connectSockets: function (server) {
-    this.socket = io.connect( 'http://' + server );
+  connectSockets: function ( ) {
+    // this takes in a room to join - where do we send the roomname we are getting on invokation?
+    this.socket = io.connect( this.server );
 
     this.socket.on('failed', function ( message ) {
       // try to reconnect
@@ -53120,10 +53402,12 @@ s.Comm = new Class({
     this.socket.on('leave', this.makeTrigger('leave'));
     this.socket.on('move', this.makeTrigger('move'));
     this.socket.on('killed', this.makeTrigger('killed'));
+    this.socket.on('sync', this.makeTrigger('sync'));
     this.socket.on('fire', this.makeTrigger('fire'));
     this.socket.on('hit', this.makeTrigger('hit'));
     this.socket.on('bot retrieval', this.makeTrigger('bot retrieval'));
     this.socket.on('bot positions', this.makeTrigger('bot positions'));
+    this.socket.on('baseHit', this.makeTrigger( 'baseHit' ));
 
     this.game.hook( this.position );
 
@@ -53137,6 +53421,7 @@ s.Comm = new Class({
 
     var packet = {
       evt: 'joined',
+      room: this.room,
       name: this.pilot.name,
       time: time,
       pos: shipPosition.pos,
@@ -53146,59 +53431,82 @@ s.Comm = new Class({
     };
 
     // Broadcast position
-
     this.socket.emit( 'join', packet );
   },
 
   position: function ( ) {
+    // would this be better to put in the global scope so that we don't
+    // wind up making this check every single time. Currently these are
+    // all happening in the global scope anyways...
+    if(this.lastPosition === undefined) {
+      this.lastPosition = s.game.player.getPositionPacket( );
+      this.lastTime = new Date().getTime();
+      this.movementThrottle = 0;
+      this.syncTimer = 0;
+    }
     var time = new Date( ).getTime( );
+    var shipPosition = s.game.player.getPositionPacket( );
+        shipPosition.lAccel = [0,0,0];
+        shipPosition.aAccel = [0,0,0];
+    var t_diff = time - this.lastTime;
 
-    // Never send faster than server can handle
+    // benchmarked this against other variants for 96% efficency.
+    // http://jsperf.com/delta-function-or-raw-calculation
+    if (t_diff !== 0) {
+      shipPosition.lAccel[0] = (shipPosition.lVeloc[0] - this.lastPosition.lVeloc[0]) / t_diff;
+      shipPosition.aAccel[0] = (shipPosition.aVeloc[0] - this.lastPosition.aVeloc[0]) / t_diff;
 
-    if ( time - s.game.comm.lastMessageTime >= 15 ) {
+      shipPosition.lAccel[1] = (shipPosition.lVeloc[1] - this.lastPosition.lVeloc[1]) / t_diff;
+      shipPosition.aAccel[1] = (shipPosition.aVeloc[1] - this.lastPosition.aVeloc[1]) / t_diff;
 
-      var shipPosition = s.game.player.getPositionPacket( );
+      shipPosition.lAccel[2] = (shipPosition.lVeloc[2] - this.lastPosition.lVeloc[2]) / t_diff;
+      shipPosition.aAccel[2] = (shipPosition.aVeloc[2] - this.lastPosition.aVeloc[2]) / t_diff;
 
-      // TODO: Figure out if ship or turret actually moved
-      // If ship moved, send packet
-
-      if ( this.lastPosition !== shipPosition.pos ) {
-
-        // Build packet
-
-        this.time = 0;
-
-        var packet = {
-          time: time,
-          pos: shipPosition.pos,
-          rot: shipPosition.rot,
-          aVeloc: shipPosition.aVeloc,
-          lVeloc: shipPosition.lVeloc
-        };
-
-        // Broadcast position
-
-        s.game.comm.socket.emit( 'move', packet );
-
-        s.game.comm.lastMessageTime = time;
-
-        this.lastPosition = shipPosition.pos;
+      // using Math.abs: http://jsperf.com/mathabs-vs-two-conditions
+      if(this.movementThrottle === 0){
+        if( this.syncTimer === 0 ||
+          Math.abs(shipPosition.aAccel[0]) > 0.000005 ||
+          Math.abs(shipPosition.aAccel[1]) > 0.000005 ||
+          Math.abs(shipPosition.aAccel[2]) > 0.000005 ||
+          Math.abs(shipPosition.lAccel[0]) > 0.005 ||
+          Math.abs(shipPosition.lAccel[1]) > 0.005 ||
+          Math.abs(shipPosition.lAccel[2]) > 0.005 ) {
+          var packet = {
+            time: time, // is this nessecary?
+            pos: shipPosition.pos,
+            rot: shipPosition.rot,
+            aVeloc: shipPosition.aVeloc,
+            lVeloc: shipPosition.lVeloc,
+            // not sure if we need to send this to the
+            // server except for testing purposes.
+            aAccel: shipPosition.aAccel,
+            lAccel: shipPosition.lAccel
+          };
+          s.game.comm.socket.emit( 'combat','move', packet );
+          s.game.comm.lastMessageTime = time;
+          this.lastPosition = shipPosition;
+          this.lastTime = time;
+        }
       }
     }
+    // throttle network emmissions by 80%
+    this.movementThrottle = (this.movementThrottle + 1) % 5;
+    // sync players every second (assuming the player runs every 60fps)
+    this.syncTimer = (this.syncTimer + 1) % 60;
   },
 
   fire: function( pos, rot, velocity ) {
     this.time = 0;
 
-    this.socket.emit( 'fire', {
-      position: pos,
-      rotation: rot,
-      initialVelocity: velocity
+    this.socket.emit('combat', 'fire', {
+        position: pos,
+        rotation: rot,
+        initialVelocity: velocity
     });
   },
 
   died: function( you, killer ) {
-    this.socket.emit( 'killed',{
+    this.socket.emit('player', 'killed',{
       you: you,
       killer: killer
     });
@@ -53207,7 +53515,7 @@ s.Comm = new Class({
   hit: function( otherPlayerName, yourName ) {
     this.time = 0;
 
-    this.socket.emit( 'hit', {
+    this.socket.emit('combat', 'hit', {
       otherPlayerName: otherPlayerName,
       yourName: yourName
     });
@@ -53215,27 +53523,36 @@ s.Comm = new Class({
 
   clockTick: function( ){
     this.time += 1;
+
     // if ( this.time >= 60 ){
     //     window.location.href = "http://satellite-game.com";
     // }
   },
 
   botInfo: function(message) {
-    this.socket.emit('botInfo', message);
+      this.socket.emit('bot', 'botInfo', message);
   },
 
   botHit: function( yourName, botName ) {
     this.time = 0;
 
-    this.socket.emit( 'botHit', {
+    this.socket.emit('bot', 'botHit', {
       yourName: yourName,
       botName: botName
     });
   },
 
   botUpdate: function(enemies) {
-    this.socket.emit( 'botUpdate', enemies);
+    this.socket.emit('bot', 'botUpdate', enemies);
+  },
+
+  baseFire: function(baseName, pilotName) {
+    this.socket.emit('bot', 'baseFire', {
+        baseName: baseName,
+        pilotName: pilotName
+    });
   }
+
 });
 
 s.LoadScreen = new Class( {
@@ -53533,13 +53850,20 @@ s.Menu = new Class({
     // ]);
   },
 
-  joinRoom: function () {
-    var room = this.hoveredItem.room;
+  joinRoom: function (roomToJoin) {
+    var room;
+    if (this.hoveredItem) {
+      room = this.hoveredItem.room;
+    } else {
+      room = prompt('roomToJoin:');
+    }
     // some socket changing stuff.
     // then basically just remove the player and respawn
     // sim-fuckin-ple.
     this.game.roomSelected = true;
-    this.game.comm.connectSockets(room);
+    // this.game.comm.room = room;
+    this.game.room = room;
+    this.game.comm.connectSockets();
     this.close();
   },
 
@@ -53584,7 +53908,7 @@ s.Menu = new Class({
     console.log('Disconnecting...');
   },
 
-  gameOver: function (killer) {
+  gameOver: function (killer, baseDestroyed, message) {
     this.clearMenu();
     this.displayed = true;
     this.menuBox.visible = true;
@@ -53592,12 +53916,18 @@ s.Menu = new Class({
     this.HUD.oculusCanvas.style.display = 'none';
 
     this.menuScreen = 'dead';
-    this.addMenuItems([
+
+    var items = [
       {text: 'YOU DIED', size: 6},
       {text: 'YOU WERE KILLED BY '+killer.toUpperCase()},
       {text: 'RESPAWNING IN 6 SEC...'},
       {text: 'DISCONNECT', size: 5, action: 'disconnect'}
-    ]);
+    ];
+
+    if (baseDestroyed) {
+      items.splice(0, 2, {text: message, size: 6}, {text: baseDestroyed + ' destroyed'});
+    }
+    this.addMenuItems(items);
   }
 });
 
@@ -53924,10 +54254,10 @@ s.SatelliteGame = new Class( {
 
 	initialize: function() {
 		var that = this;
-
         this.IDs = [];
         this.botCount = 0;
         this.hostPlayer = false;
+        this.teamMode = true;
 
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
 		// No gravity
@@ -53951,18 +54281,25 @@ s.SatelliteGame = new Class( {
             game: this
         } );
 
-        // Random building
-        this.building = new s.BuildingTall({
-            game: this,
-            position: new THREE.Vector3(-5211.99169921875, -1277.7318115234375, 3610.850830078125),
-            rotation: new THREE.Vector3(1.6990602929726026, 0.011873913392131176, 0.86412056066792210)
-        });
+        // Add spacestation
+        this.spaceStation = new s.SpaceStation( {
+            game: this
+        } );
+
+        // Add tall moon base
+        this.moonBaseTall = new s.MoonBaseTall( {
+            game: this
+        } );
+
+        this.baseNameMap = {
+            'spaceStation': 'Space Base',
+            'moonBaseTall': 'Moon Base'
+        };
 
         this.pilot = {};
         this.callsigns = this.callsigns || ["Apollo","Strobe","Sage","Polkadot","Moonglow","Steel","Vanguard","Prong","Uptight","Blackpony","Hawk","Ramrod","Dice","Falcon","Rap","Buckshot","Cobra","Magpie","Warhawk","Boxer","Devil","Hammer","Phantom","Sharkbait","Dusty","Icon","Blade","Pedro","Stinger","Yellow Jacket","Limit","Sabre","Misty","Whiskey","Dice","Antic","Arrow","Auto","Avalon","Bandit","Banshee","Blackjack","Bulldog","Caesar","Cajun","Challenger","Chuggs","Cindy","Cracker","Dagger","Dino","Esso","Express","Fangs","Fighting Freddie","Freight Train","Freemason","Fury","Gamma","Gear","Ghost","Ginger","Greasy","Havoc","Hornet","Husky","Jackal","Jaguar","Jedi","Jazz","Jester","Knife","Kitty Hawk","Knight","Knightrider","Koala","Komono","Lancer","Lexus","Lion","Levi","Lucid","Malty","Mail Truck","Magma","Magnet","Malibu","Medusa","Maul","Monster","Misfit","Moss","Moose","Mustang","Nail","Nasa","Nacho","Nighthawk","Ninja","Neptune","Odin","Occult","Nukem","Ozark","Pagan","Pageboy","Panther","Peachtree","Phenom","Polestar","Punisher","Ram","Rambo","Raider","Raven","Razor","Rupee","Sabre","Rust","Ruin","Sultan","Savor","Scandal","Scorpion","Shooter","Smokey","Sniper","Spartan","Thunder","Titus","Titan","Timber Wolf","Totem","Trump","Venom","Veil","Viper","Weasel","Warthog","Winter","Wiki","Wild","Yonder","Yogi","Yucca","Zeppelin","Zeus","Zesty"];
-
         this.pilot.name = this.callsigns[Math.floor(this.callsigns.length*Math.random())] + ' ' + ( new Date( ).getTime( ) % 100 );
-        
+
         // Add a hud
         this.HUD = new s.HUD( {
             game: this
@@ -53985,14 +54322,14 @@ s.SatelliteGame = new Class( {
             HUD: this.HUD,
             game: this,
             shipClass: 'human_ship_heavy',
-            // position: new THREE.Vector3(this.getRandomCoordinate(),this.getRandomCoordinate(),this.getRandomCoordinate()),
-            position: new THREE.Vector3(23498, -25902, 24976),
+            position: new THREE.Vector3(19232, 19946, 20311),
             name: this.pilot.name,
             rotation: new THREE.Vector3( 0, Math.PI/2, 0 ),
             alliance: 'alliance',
             camera: this.camera
         } );
 
+<<<<<<< HEAD
         // Targeting square around targeted enemy.
 
         var targetingGeo = new THREE.PlaneGeometry(100, 100);
@@ -54004,6 +54341,8 @@ s.SatelliteGame = new Class( {
 
         this.currentTarget = null;
 
+=======
+>>>>>>> dev
         this.HUD.hp = this.player.hull;
 
         $(document).on('keyup', function(evt) {
@@ -54079,6 +54418,7 @@ s.SatelliteGame = new Class( {
                 }
                 return false;
             },
+
             add: function ( enemyInfo, isBot ) {
                 if ( this.has( enemyInfo.name ) ) {
                     this.delete( enemyInfo.name );
@@ -54101,21 +54441,26 @@ s.SatelliteGame = new Class( {
                         name: enemyInfo.name,
                         position: enemyInfo.position,
                         rotation: enemyInfo.rotation,
-                        alliance: 'enemy'
+                        alliance: 'rebel'
                     } );
                 } else {
+                    var alliance = 'rebel';
+                    if (s.game.teamMode) { alliance = 'alliance'; }
                     enemyShip = new s.Player( {
                         game: that,
                         shipClass: 'human_ship_heavy',
                         name: enemyInfo.name,
                         position: new THREE.Vector3( enemyInfo.pos[ 0 ], enemyInfo.pos[ 1 ], enemyInfo.pos[ 2 ] ),
                         rotation: new THREE.Vector3( enemyInfo.rot[ 0 ], enemyInfo.rot[ 1 ], enemyInfo.rot[ 2 ] ),
-                        alliance: 'enemy'
+                        alliance: alliance
                     } );
                 }
 
+<<<<<<< HEAD
                 that.currentTarget = enemyShip;
                 
+=======
+>>>>>>> dev
                 if (isBot) { console.log( '%s has joined the fray', enemyShip.name ); }
 
                 this._list.push( enemyShip );
@@ -54153,12 +54498,13 @@ s.SatelliteGame = new Class( {
         } );
 
         this.comm = new s.Comm( {
+            room: this.room,
             game: that,
             pilot: that.pilot,
             player: this.player,
             server: window.location.hostname + ':' + window.location.port
         } );
-        
+
         this.comm.on('fire', that.handleEnemyFire);
         this.comm.on('hit', that.handleHit);
         this.comm.on('player list', that.handlePlayerList);
@@ -54166,8 +54512,10 @@ s.SatelliteGame = new Class( {
         this.comm.on( 'join', that.handleJoin );
         this.comm.on( 'leave', that.handleLeave );
         this.comm.on( 'move', that.handleMove );
+        this.comm.on( 'sync', that.handleSync);
         this.comm.on( 'bot retrieval', that.handleBotInfo );
         this.comm.on( 'bot positions', that.handleBotPositions );
+        this.comm.on( 'baseHit', that.baseHit );
 
         this.HUD.controls = this.controls;
 
@@ -54176,6 +54524,7 @@ s.SatelliteGame = new Class( {
             s.game.start();
         });
 
+<<<<<<< HEAD
         // Engine glow and flame trail on your player only.
 
         this.flames = [];
@@ -54212,6 +54561,9 @@ s.SatelliteGame = new Class( {
         this.game.player.root.add( this.crosshairs );
 
         this.crosshairs.position.setZ(150);
+=======
+        s.game.menu.joinRoom();
+>>>>>>> dev
 	},
 
 	render: function(_super, time) {
@@ -54306,6 +54658,7 @@ s.SatelliteGame = new Class( {
     },
 
     handleJoin: function ( message ) {
+           console.log("Received a join");
            s.game.enemies.add( message );
     },
     handleLeave: function ( message ) {
@@ -54313,7 +54666,15 @@ s.SatelliteGame = new Class( {
             console.log( '%s has left', message.name );
         }
     },
+
     handleMove: function ( message ) {
+        // message.aAccel
+        // message.lAccel
+        // message.pos
+        // message.rot
+        // message.aVeloc
+        // message.lVeloc
+
         if ( message.name == this.pilot.name ) {
             // server told us to move
             console.log( 'Server reset position' );
@@ -54327,6 +54688,47 @@ s.SatelliteGame = new Class( {
             }
         }
     },
+    // handleSync: function ( pak ) {
+    //   var data = {};
+    //   for(var i in pak) {
+    //     data[i] = pak[i];
+    //   };
+    //   var whoAmI = s.game.pilot.name,
+    //       myData = pak[whoAmI];
+
+    //   var adjustPlayer = function( serverView ) {
+    //     var adjusted = [];
+
+    //     var myView = s.game.player.getPositionPacket();
+    //     for(var i = 0; i < serverView.lVeloc.length; i++) {
+    //       var pos = Math.abs(serverView.pos[i]) - Math.abs(myView.pos[i]);
+
+    //       if( pos >= 1700 ) {
+    //         console.log("Experiencing whiplash!", pos);
+    //         s.game.player.setPosition( serverView.pos, myView.rot, serverView.aVeloc, serverView.lVeloc, true );
+    //         return;
+    //       }
+
+    //       if(serverView.pos[i] >= 0) {
+    //         adjusted.push(serverView.lVeloc[i] + pos);
+    //       } else {
+    //         adjusted.push(serverView.lVeloc[i] - pos);
+    //       }
+
+    //     }
+    //     s.game.comm.position();
+    //     //s.game.player.setPosition( myView.pos, myView.rot, serverView.aVeloc, adjusted, false );
+    //   };
+
+    //   adjustPlayer(myData);
+    //   delete data[whoAmI];
+    //   for(var i in data ) {
+    //     if( !s.game.enemies.execute( data[i].name, 'setPosition', [ data[i].pos, data[i].rot, data[i].aVeloc, data[i].lVeloc, true ] ) ) {
+    //       s.game.enemies.add( data[i] );
+    //     }
+    //   }
+
+    // },
 
     handlePlayerList: function(message) {
         for (var otherPlayerName in message) {
@@ -54339,6 +54741,7 @@ s.SatelliteGame = new Class( {
     },
 
     handleKill: function(message) {
+        console.log(message);
         // get enemy position
         var position = s.game.enemies.get(message.killed).root.position;
         new s.Explosion({
@@ -54365,16 +54768,16 @@ s.SatelliteGame = new Class( {
                 position: bulletPosition,
                 rotation: bulletRotation,
                 initialVelocity: initialVelocity,
-                team: 'rebels'
+                team: 'alliance'
             });
 
     },
 
     handleHit: function(message) {
-        var zappedName = message.otherPlayerName;
-        var killer = message.yourName;
-        var zappedEnemy = s.game.enemies.get(zappedName);
-        if (zappedName === s.game.pilot.name){
+        var zapped = message.zappedName;
+        var killer = message.killerName;
+        var zappedEnemy = s.game.enemies.get(zapped);
+        if (zapped === s.game.pilot.name){
             s.game.stopShields();
             s.game.rechargeShields();
             if (s.game.player.shields > 0){
@@ -54397,22 +54800,22 @@ s.SatelliteGame = new Class( {
             console.log('You were hit with a laser by %s! Your HP: %d', killer, s.game.player.hull);
 
             if (s.game.player.hull <= 0) {
-                s.game.handleDie(zappedName, killer);
+                s.game.handleDie(zapped, killer);
             }
         } else {
             if (zappedEnemy.shields > 0){
                 zappedEnemy.shields -= 20;
-                console.log(zappedName, ' shield is now: ', zappedEnemy.shields);
+                console.log(zapped, ' shield is now: ', zappedEnemy.shields);
                 setTimeout(function() {
                     s.game.replenishEnemyShield(zappedEnemy);
                 }, 7000);
             } else {
                 zappedEnemy.hull -= 20;
-                console.log(zappedName, ' hull is now: ', zappedEnemy.hull);
+                console.log(zapped, ' hull is now: ', zappedEnemy.hull);
             }
             if (zappedEnemy.hull <= 0 && zappedEnemy.isBot) {
-                console.log(zappedName, ' has died');
-                s.game.handleKill.call(s, { killed: zappedName, killer: killer });
+                console.log(zapped, ' has died');
+                s.game.handleKill.call(s, { killed: zapped, killer: killer });
                 s.game.enemies.add( {position: [ 23498, -25902, 24976 ]}, 'bot' );
             }
         }
@@ -54423,25 +54826,23 @@ s.SatelliteGame = new Class( {
     },
 
     handleDie: function(you, killer) {
-        if (!you) {
-            return;
-        }
         if (this.hostPlayer) clearInterval(this.botPositionInterval);
         this.menu.gameOver(killer);
-        if (s.game.roomSelected) s.game.comm.died(you, killer);
+        s.game.comm.died(you, killer);
 
+        this.hostPlayer = false;
         this.restartGame();
     },
 
     restartGame: function() {
         var that = this;
+        this.gameOverBoolean = true;
         setTimeout(function() {
             that.player.shields = s.config.ship.shields;
             that.player.hull = s.config.ship.hull;
-            that.player.setPosition([that.getRandomCoordinate(), that.getRandomCoordinate(), that.getRandomCoordinate()],[0,0,0],[0,0,0],[0,0,0]);
-            that.hostPlayer = false;
+            that.player.setPosition([19232, 19946, 20311],[0,0,0],[0,0,0],[0,0,0]);
             that.menu.close();
-            that.restart();
+            that.gameOverBoolean = false;
         }, 6000);
     },
 
@@ -54500,12 +54901,13 @@ s.SatelliteGame = new Class( {
                 that.game.updatePlayersWithBots('botUpdate');
             }, 2500);
         }
-
         this.game.hostPlayer = true;
+        console.log(this.game.hostPlayer);
         if (this.game.botCount === 0) {
+            console.log(true);
             // Create a new bot
             this.game.enemies.add( {}, 'bot');
-        }        
+        }
         that.game.updatePlayersWithBots('botInfo');
     },
 
@@ -54519,7 +54921,7 @@ s.SatelliteGame = new Class( {
         };
 
         enemiesSocketInfo = {};
-        var enemiesList = this.enemies._list;  
+        var enemiesList = this.enemies._list;
         for (var i = 0; i < enemiesList.length; i++) {
             if (enemiesList[i].isBot){
                 var root = enemiesList[i].root;
@@ -54527,7 +54929,7 @@ s.SatelliteGame = new Class( {
                 //if there is a angular and linear velocity fnc, call it. else create a new 3 vector
                 var angularVeloc = (root.getAngularVelocity && root.getAngularVelocity()) || new THREE.Vector3();
                 var linearVeloc = (root.getLinearVelocity && root.getLinearVelocity()) || new THREE.Vector3();
-                
+
                 enemiesSocketInfo[name] = {
                     position: makeArray(root.position),
                     rotation: makeArray(root.rotation),
@@ -54550,6 +54952,33 @@ s.SatelliteGame = new Class( {
                 this.game.enemies.add(message[bot], 'bot');
             }
         }
+    },
+
+    baseHit: function(message) {
+        this.game[message.baseName].shields--;
+        var shields = this.game[message.baseName].shields;
+        console.log(this.game.baseNameMap[message.baseName] + ' was hit by ' + message.pilotName + '. Shields at ' + shields);
+        if (this.game[message.baseName].shields < 0) {
+            this.game.handleBaseDeath(message.baseName);
+        }
+    },
+
+    handleBaseDeath: function(base) {
+        setTimeout(function() {
+            var message;
+
+            s.game.moonBaseTall.shields = s.config.base.shields;
+            s.game.spaceStation.shields = s.config.base.shields;
+
+            if (base === 'spaceStation') {
+                message = 'rebels wins';
+            } else {
+                message = "alliance win";
+            }
+            s.game.menu.gameOver('temp', s.game.baseNameMap[base], message);
+            s.game.restartGame();
+        }, 3000);
+
     }
 
 } );
