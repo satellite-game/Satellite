@@ -326,7 +326,7 @@ s.HUD = new Class({
                     c2D = call2D.clone();
                     c2D.x =  ( width  + c2D.x*width  )/2;
                     c2D.y = -(-height + c2D.y*height )/2;
-                    
+
                     this.writeName(enemies[j].name, c2D);
                 }
             }
@@ -342,7 +342,6 @@ s.HUD = new Class({
         this.findTargets(s.game.spaceStation.root, 'blue', 34, 5500);
         this.findTargets(s.game.moonBaseTall.root, 'yellow', 34, 5500);
         
->>>>>>> dev
         /////////////////////////////////
         // PLAYER SHIELD/HEALTH STATUS //
         /////////////////////////////////
