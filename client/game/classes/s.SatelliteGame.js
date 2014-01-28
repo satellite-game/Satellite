@@ -2,16 +2,16 @@ s.SatelliteGame = new Class( {
     toString: 'SatelliteGame',
     extend: s.Game,
 
-	// Models that should be loaded
-	models: [
-		'phobos_hifi',
-		'phobos_lofi',
+    // Models that should be loaded
+    models: [
+        'phobos_hifi',
+        'phobos_lofi',
         'human_ship_heavy',
-		'human_ship_light',
+        'human_ship_light',
         'human_space_station',
         'human_building_short',
         'human_building_tall'
-	],
+    ],
 
     textures: [
         'particle.png',
@@ -94,21 +94,23 @@ s.SatelliteGame = new Class( {
                 var enemyShip;
                 if (isBot) {
                     enemyShip = new s.Bot( {
-                        game: s.game,
+                        game: that,
                         shipClass: 'human_ship_heavy',
                         name: enemyInfo.name,
                         position: enemyInfo.position,
                         rotation: enemyInfo.rotation,
-                        alliance: 'enemy'
+                        alliance: 'rebel'
                     } );
                 } else {
+                    var alliance = 'rebel';
+                    if (s.game.teamMode) { alliance = 'alliance'; }
                     enemyShip = new s.Player( {
-                        game: s.game,
+                        game: that,
                         shipClass: 'human_ship_heavy',
                         name: enemyInfo.name,
                         position: new THREE.Vector3( enemyInfo.pos[ 0 ], enemyInfo.pos[ 1 ], enemyInfo.pos[ 2 ] ),
                         rotation: new THREE.Vector3( enemyInfo.rot[ 0 ], enemyInfo.rot[ 1 ], enemyInfo.rot[ 2 ] ),
-                        alliance: 'enemy'
+                        alliance: alliance
                     } );
                 }
 
@@ -124,6 +126,7 @@ s.SatelliteGame = new Class( {
         var that = this;
         this.IDs = [];
         this.hostPlayer = false;
+        this.teamMode = true;
 
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
         // No gravity
@@ -147,12 +150,20 @@ s.SatelliteGame = new Class( {
             game: this
         } );
 
-        // Random building
-        this.building = new s.BuildingTall({
-            game: this,
-            position: new THREE.Vector3(-5211.99169921875, -1277.7318115234375, 3610.850830078125),
-            rotation: new THREE.Vector3(1.6990602929726026, 0.011873913392131176, 0.86412056066792210)
-        });
+        // Add spacestation
+        this.spaceStation = new s.SpaceStation( {
+            game: this
+        } );
+
+        // Add tall moon base
+        this.moonBaseTall = new s.MoonBaseTall( {
+            game: this
+        } );
+
+        this.baseNameMap = {
+            'spaceStation': 'Space Base',
+            'moonBaseTall': 'Moon Base'
+        };
 
         this.pilot = {};
         this.callsigns = this.callsigns || ["Apollo","Strobe","Sage","Polkadot","Moonglow","Steel","Vanguard","Prong","Uptight","Blackpony","Hawk","Ramrod","Dice","Falcon","Rap","Buckshot","Cobra","Magpie","Warhawk","Boxer","Devil","Hammer","Phantom","Sharkbait","Dusty","Icon","Blade","Pedro","Stinger","Yellow Jacket","Limit","Sabre","Misty","Whiskey","Dice","Antic","Arrow","Auto","Avalon","Bandit","Banshee","Blackjack","Bulldog","Caesar","Cajun","Challenger","Chuggs","Cindy","Cracker","Dagger","Dino","Esso","Express","Fangs","Fighting Freddie","Freight Train","Freemason","Fury","Gamma","Gear","Ghost","Ginger","Greasy","Havoc","Hornet","Husky","Jackal","Jaguar","Jedi","Jazz","Jester","Knife","Kitty Hawk","Knight","Knightrider","Koala","Komono","Lancer","Lexus","Lion","Levi","Lucid","Malty","Mail Truck","Magma","Magnet","Malibu","Medusa","Maul","Monster","Misfit","Moss","Moose","Mustang","Nail","Nasa","Nacho","Nighthawk","Ninja","Neptune","Odin","Occult","Nukem","Ozark","Pagan","Pageboy","Panther","Peachtree","Phenom","Polestar","Punisher","Ram","Rambo","Raider","Raven","Razor","Rupee","Sabre","Rust","Ruin","Sultan","Savor","Scandal","Scorpion","Shooter","Smokey","Sniper","Spartan","Thunder","Titus","Titan","Timber Wolf","Totem","Trump","Venom","Veil","Viper","Weasel","Warthog","Winter","Wiki","Wild","Yonder","Yogi","Yucca","Zeppelin","Zeus","Zesty"];
@@ -180,8 +191,7 @@ s.SatelliteGame = new Class( {
             HUD: this.HUD,
             game: this,
             shipClass: 'human_ship_heavy',
-            position: new THREE.Vector3(this.getRandomCoordinate(),this.getRandomCoordinate(),this.getRandomCoordinate()),
-            // position: new THREE.Vector3(23498, -25902, 24976),
+            position: new THREE.Vector3(19232, 19946, 20311),
             name: this.pilot.name,
             rotation: new THREE.Vector3( 0, Math.PI/2, 0 ),
             alliance: 'alliance',
@@ -255,6 +265,7 @@ s.SatelliteGame = new Class( {
         this.comm.on( 'sync', that.handleSync);
         this.comm.on( 'bot retrieval', that.handleBotInfo );
         this.comm.on( 'bot positions', that.handleBotPositions );
+        this.comm.on( 'baseHit', that.baseHit );
 
         this.HUD.controls = this.controls;
 
@@ -264,22 +275,22 @@ s.SatelliteGame = new Class( {
         });
 
         s.game.menu.joinRoom();
-	},
+    },
 
-	render: function(_super, time) {
-		_super.call(this, time);
-		this.controls.update();
-	},
+    render: function(_super, time) {
+        _super.call(this, time);
+        this.controls.update();
+    },
 
-	addSkybox: function() {
-		var urlPrefix = "game/textures/skybox/Purple_Nebula_";
-		var urls = [
-			urlPrefix + "right1.png", urlPrefix + "left2.png",
-			urlPrefix + "top3.png", urlPrefix + "bottom4.png",
-			urlPrefix + "front5.png", urlPrefix + "back6.png"
-		];
+    addSkybox: function() {
+        var urlPrefix = "game/textures/skybox/Purple_Nebula_";
+        var urls = [
+            urlPrefix + "right1.png", urlPrefix + "left2.png",
+            urlPrefix + "top3.png", urlPrefix + "bottom4.png",
+            urlPrefix + "front5.png", urlPrefix + "back6.png"
+        ];
 
-		THREE.ImageUtils.loadTextureCube(urls, {}, function(textureCube) {
+        THREE.ImageUtils.loadTextureCube(urls, {}, function(textureCube) {
             textureCube.format = THREE.RGBFormat;
             var shader = THREE.ShaderLib.cube;
 
@@ -296,23 +307,23 @@ s.SatelliteGame = new Class( {
             this.skyboxMesh = new THREE.Mesh( new THREE.CubeGeometry( 200000, 200000, 200000, 1, 1, 1, null, true ), material );
             this.scene.add( this.skyboxMesh );
         }.bind(this));
-	},
+    },
 
-	addDust: function() {
-		var starSprite = THREE.ImageUtils.loadTexture('game/textures/particle.png');
-		var geometry = new THREE.Geometry();
+    addDust: function() {
+        var starSprite = THREE.ImageUtils.loadTexture('game/textures/particle.png');
+        var geometry = new THREE.Geometry();
 
-		// Set to false for "dust", true for stars
-		var outer = true;
+        // Set to false for "dust", true for stars
+        var outer = true;
 
-		// Spec size
-		var radius = 100000;
-		var size = 100;
-		var count = 1000;
+        // Spec size
+        var radius = 100000;
+        var size = 100;
+        var count = 1000;
 
-		for (var i = 0; i < count; i ++ ) {
+        for (var i = 0; i < count; i ++ ) {
 
-			var vertex = new THREE.Vector3( );
+            var vertex = new THREE.Vector3( );
 
             if ( outer ) {
                 // Distribute "stars" on the outer bounds of far space
@@ -329,9 +340,9 @@ s.SatelliteGame = new Class( {
 
             geometry.vertices.push( vertex );
 
-		}
+        }
 
-		var material = new THREE.ParticleBasicMaterial( {
+        var material = new THREE.ParticleBasicMaterial( {
             size: size,
             map: starSprite,
             blending: THREE.AdditiveBlending,
@@ -407,7 +418,7 @@ s.SatelliteGame = new Class( {
                 position: bulletPosition,
                 rotation: bulletRotation,
                 initialVelocity: initialVelocity,
-                team: 'rebels'
+                team: 'alliance'
             });
 
     },
@@ -465,25 +476,23 @@ s.SatelliteGame = new Class( {
     },
 
     handleDie: function(you, killer) {
-        if (!you) {
-            return;
-        }
         if (this.hostPlayer) clearInterval(this.botPositionInterval);
         this.menu.gameOver(killer);
-        if (s.game.roomSelected) s.game.comm.died(you, killer);
+        s.game.comm.died(you, killer);
 
+        this.hostPlayer = false;
         this.restartGame();
     },
 
     restartGame: function() {
         var that = this;
+        this.gameOverBoolean = true;
         setTimeout(function() {
             that.player.shields = s.config.ship.shields;
             that.player.hull = s.config.ship.hull;
-            that.player.setPosition([that.getRandomCoordinate(), that.getRandomCoordinate(), that.getRandomCoordinate()],[0,0,0],[0,0,0],[0,0,0]);
-            that.hostPlayer = false;
+            that.player.setPosition([19232, 19946, 20311],[0,0,0],[0,0,0],[0,0,0]);
             that.menu.close();
-            that.restart();
+            that.gameOverBoolean = false;
         }, 6000);
     },
 
@@ -593,6 +602,33 @@ s.SatelliteGame = new Class( {
                 this.game.enemies.add(message[bot], 'bot');
             }
         }
+    },
+
+    baseHit: function(message) {
+        this.game[message.baseName].shields--;
+        var shields = this.game[message.baseName].shields;
+        console.log(this.game.baseNameMap[message.baseName] + ' was hit by ' + message.pilotName + '. Shields at ' + shields);
+        if (this.game[message.baseName].shields < 0) {
+            this.game.handleBaseDeath(message.baseName);
+        }
+    },
+
+    handleBaseDeath: function(base) {
+        setTimeout(function() {
+            var message;
+
+            s.game.moonBaseTall.shields = s.config.base.shields;
+            s.game.spaceStation.shields = s.config.base.shields;
+
+            if (base === 'spaceStation') {
+                message = 'rebels wins';
+            } else {
+                message = "alliance win";
+            }
+            s.game.menu.gameOver('temp', s.game.baseNameMap[base], message);
+            s.game.restartGame();
+        }, 3000);
+
     }
 
 } );
