@@ -534,11 +534,13 @@ s.SatelliteGame = new Class( {
 
     restartGame: function() {
         var that = this;
+        this.gameOverBoolean = true;
         setTimeout(function() {
             that.player.shields = s.config.ship.shields;
             that.player.hull = s.config.ship.hull;
             that.player.setPosition([19232, 19946, 20311],[0,0,0],[0,0,0],[0,0,0]);
             that.menu.close();
+            that.gameOverBoolean = false;
         }, 6000);
     },
 
