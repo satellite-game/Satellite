@@ -28,6 +28,7 @@ module.exports = [
   "./client/game/classes/s.BuildingTall.js",
   "./client/game/classes/s.BuildingShort.js",
   "./client/game/classes/s.SpaceStation.js",
+  "./client/game/classes/s.MoonBaseTall.js",
   "./client/game/classes/s.Color.js",
   "./client/game/classes/s.Keyboard.js",
   "./client/game/classes/s.Mouse.js",
