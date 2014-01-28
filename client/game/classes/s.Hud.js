@@ -5,6 +5,7 @@ s.HUD = new Class({
 
 		this.game = options.game;
 		this.controls = options.controls;
+        this.oculus = options.game.oculus;
 
         this.PI = Math.PI;
 
@@ -35,8 +36,8 @@ s.HUD = new Class({
         // end Oculus canvases
 
 
-		this.gameOver = new Image();
-        this.gameOver.src = 'game/textures/Game-Over-1.png';
+		// this.gameOver = new Image();
+        // this.gameOver.src = 'game/textures/Game-Over-1.png';
 
 		this.targetX = 0;
 		this.targetY = 0;
@@ -97,6 +98,16 @@ s.HUD = new Class({
         this.changeTarget = 0;
         this.currentTarget = 0;
 
+        this.crosshairs = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: s.textures.crosshairs,
+            useScreenCoordinates: false,
+            blending: THREE.AdditiveBlending,
+            color: 0x00FF00
+        }));
+
+        this.game.camera.add( this.crosshairs );
+
+        this.crosshairs.position.setZ(-30);
 	},
 	update: function(){
             
@@ -105,9 +116,9 @@ s.HUD = new Class({
         ////////////////////////
 
         var velocity = this.controls.options.thrustImpulse;
-        this.height = height = window.innerHeight,
+        this.height = height = window.innerHeight;
         this.width = width = window.innerWidth;
-        this.centerX = centerX = width/2,
+        this.centerX = centerX = width/2;
         this.centerY = centerY = height/2;
 
         if (this.canvas.height !== height){
@@ -137,11 +148,11 @@ s.HUD = new Class({
         this.ctx.stroke();
 
 
-        if (this.cursorVector.length() > this.subreticleBound.radius) {
-            this.cursorVector.normalize().multiplyScalar(this.subreticleBound.radius);
-            this.targetX = this.cursorVector.x+centerX;
-            this.targetY = this.cursorVector.y+centerY;
-        }
+        // if (this.cursorVector.length() > this.subreticleBound.radius) {
+        //     this.cursorVector.normalize().multiplyScalar(this.subreticleBound.radius);
+        //     this.targetX = this.cursorVector.x+centerX;
+        //     this.targetY = this.cursorVector.y+centerY;
+        // }
 
         this.ctx.fillStyle = this.menu.color;
         this.ctx.strokeStyle = this.menu.color;
@@ -266,7 +277,7 @@ s.HUD = new Class({
         this.ctx.fillText("Shields",throttleEndX - 45,throttleEndY + 30);
         this.ctx.beginPath();
         this.ctx.fillStyle = this.menu.color;
-        this.ctx.arc(this.targetX, this.targetY, 5, 0, 2 * this.PI, false);
+        //this.ctx.arc(this.targetX, this.targetY, 5, 0, 2 * this.PI, false);
         this.ctx.fill();
 
 
@@ -354,14 +365,23 @@ s.HUD = new Class({
         }
 
 
-        this.ctx.lineWidth = 1;
-        this.ctx.fillStyle = this.menu.color;
-        this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, 3, 0, 2 * this.PI, false);
-        this.ctx.fill();
-        this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, 15, 0, 2 * this.PI, false);
-        this.ctx.stroke();
+        // this.ctx.lineWidth = 1;
+        // this.ctx.fillStyle = this.menu.color;
+        // this.ctx.beginPath();
+        // this.ctx.arc(centerX, centerY, 3, 0, 2 * this.PI, false);
+        // this.ctx.fill();
+        // this.ctx.beginPath();
+        // this.ctx.arc(centerX, centerY, 15, 0, 2 * this.PI, false);
+        // this.ctx.stroke();
+
+        ///////////////////////
+        ///   CROSSHAIRS    ///
+        ///////////////////////
+
+        var viewingAngleX = Math.PI/4 * (this.oculus.quat.x);
+        var viewingAngleY = Math.PI/4 * (this.oculus.quat.y);
+        this.crosshairs.position.setY(-60*Math.tan(viewingAngleX)*1.5);
+        this.crosshairs.position.setX(60*Math.tan(viewingAngleY)*1.5);
 
         this.oculusCtx.clearRect(0, 0, this.oculusCanvas.width, this.oculusCanvas.height);
 
