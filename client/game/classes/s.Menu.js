@@ -91,13 +91,14 @@ s.Menu = new Class({
         }
       }
 
-      var menuItemGeo = new THREE.TextGeometry(items[items.length-i-1].text, {font: font, size: size, height: size, weight: bold, bevelEnabled: bevelEnabled, bevelThickness: bevel, bevelSize: bevel});
+      var menuItemGeo = new THREE.TextGeometry(items[items.length-i-1].text, {font: font, size: size, height: size/2, weight: bold, bevelEnabled: bevelEnabled, bevelThickness: bevel, bevelSize: bevel});
       var menuItemMaterial = new THREE[mat]({color: 0x00CC00, ambient: 0x00FF00, specular: 0x33FF33, shininess: 5});
       var menuItem = new THREE.Mesh(menuItemGeo, menuItemMaterial);
 
       menuItem.position.setY((currentHeight)-(menuHeight/2)+(size/2)); // MATH?
       menuItem.position.setX(menuItem.geometry.boundingSphere.radius*-0.5);
       menuItem.menuItemSelectCallback = items[items.length-i-1].action || null;
+      menuItem.theRoomYouWillJoin = items[items.length-i-1].room;
 
       this.menuBox.add( menuItem );
       this.menuItems.push( menuItem );
@@ -131,6 +132,8 @@ s.Menu = new Class({
   },
 
   close: function () {
+    if (!this.game.room) return;
+
     this.displayed = false;
     this.menuBox.visible = false;
     this.cursorPosition = 0;
@@ -226,7 +229,6 @@ s.Menu = new Class({
     this.addMenuItems([
       {text: 'JOIN GAME', size: 5, action: 'showRoomList'},
       {text: 'CREATE GAME', size: 5, action: 'createRoom'},
-      {text: 'SAMPLE MENU', size: 5, action: 'showTestMenu'},
       {text: 'QUIT', size: 5, action: 'disconnect'}
     ]);
   },
@@ -235,52 +237,32 @@ s.Menu = new Class({
     this.menuScreen = 'default';
 
     this.addMenuItems([
-      {text: 'CHANGE ROOM', size: 5, action: 'showRoomList'},
+      {text: 'JOIN ROOM', size: 5, action: 'showRoomList'},
       {text: 'LEADERBOARD', size: 5, action: 'showScoreboard'},
-      {text: 'SAMPLE MENU', size: 5, action: 'showTestMenu'},
-      {text: 'DISCONECT', size: 5, action: 'disconnect'}
+      {text: 'QUIT', size: 5, action: 'disconnect'}
     ]);
   },
 
   showRoomList: function () {
     this.menuScreen = 'rooms';
+    var that = this;
 
-    $.get({
-      url: '/rooms',
-      datatype: 'json',
-      success: function (data) {
-
-        var roomList = [{text: 'JOIN GAME', size: 5}];
-        for (var i = 0; i < data.length; i++) {
-          roomList.push({text: data[i].name + '...' + data[i].players, small: true, action: 'joinRoom', room: rooms[i].name});
-        }
-        roomList.push({text: '+ CREATE NEW ROOM +', small: true, action: 'createRoom'});
-        this.addMenuItems(roomList);
-      },
-      error: function (err) {
-        throw new Error('Failed to get room list from /rooms');
+    $.get('/rooms', function (data) {
+      var roomList = [{text: 'JOIN GAME', size: 5},{text:'name      players', size: 3, flat: true}];
+      for (var room in data) {
+        roomList.push({text: room + ' . . . ' + data[room], small: true, action: 'joinRoom', room: room});
       }
+      if (that.game.room) {
+        roomList.push({text: 'BACK', size: 3, action: 'showDefaultMenu'});
+      } else {
+        roomList.push({text: 'BACK', size: 3, action: 'showInitialMenu'});
+      }
+      that.addMenuItems(roomList);
     });
-    // this.addMenuItems([
-    //   {text: 'SELECT A ROOM', size: 5},
-    //   {text: 'hey strong bad', small: true, action: 'joinRoom', room: 'asdf'},
-    //   {text: 'you jumped over', small: true, action: 'joinRoom', room: 'test'},
-    //   {text: 'some a muh busses', small: true, action: 'joinRoom', room: 'puh fuh fuh'}
-    // ]);
   },
 
-  joinRoom: function (roomToJoin) {
-    var room;
-    if (this.hoveredItem) {
-      room = this.hoveredItem.room;
-    } else {
-      room = prompt('roomToJoin:');
-    }
-    // some socket changing stuff.
-    // then basically just remove the player and respawn
-    // sim-fuckin-ple.
-    this.game.roomSelected = true;
-    // this.game.comm.room = room;
+  joinRoom: function () {
+    var room = this.hoveredItem.theRoomYouWillJoin;
     this.game.room = room;
     this.game.comm.connectSockets();
     this.close();
@@ -292,23 +274,14 @@ s.Menu = new Class({
 
   showScoreboard: function () {
     this.menuScreen = 'scoreboard';
+    var that = this;
 
-    $.get({
-      url: '/scores',
-      datatype: 'json',
-      data: {room: s.game.comm.room},
-      success: function (data) {
-
-        var players = [{text: 'LEADERBOARD', size: 5}];
-        for (var i = 0; i < data.length; i++) {
-          players.push({text: data[i].name+'...'+data[i].score, small: true});
-        }
-        this.addMenuItems(players);
-
-      },
-      error: function (err) {
-        throw new Error('Failed to get player scores from /' + this.game.comm.room);
+    $.get('/rooms/'+this.game.room, function (data) {
+      var players = [{text: 'LEADERBOARD', size: 5}];
+      for (var name in data) {
+        players.push({text: name+' . . . '+data[name], small: true});
       }
+      that.addMenuItems(players);
     });
   },
 
