@@ -12,11 +12,7 @@ describe('Satellite game', function () {
     expect(s).to.have.deep.property('config.ship.maxSpeed');
   });
 
-  it('should init the game', function () {
-    var spy = sinon.spy(s, 'init');
-    s.init();
-    expect(spy.called).to.equal(true);
-
+  it('should init game variables', function () {
     expect(s).to.have.property('projector').and.to.be.an('object');
     expect(s).to.have.property('loader').and.to.be.an('object');
     expect(s).to.have.property('game').and.to.be.an('object');
