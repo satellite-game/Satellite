@@ -23,13 +23,14 @@ s.Bot = new Class( {
     //set a hook on the bot controls.
     //unhook is necessary when bot dies and new bot is created
     //need to refactor when multiple bots on screen
-    this.controlBot = this.controlBot.bind(this);
-    if (this.game.lastBotCallBack) {
-      this.game.unhook (this.game.lastBotCallBack);
-    }
+    var hookName = ('control' + this.name).split(' ').join('');
+    this[hookName] = this.controlBot.bind(this);
+    // if (this.game.botHooks) {
+    //   this.game.unhook (this.game.botHooks);
+    // }
 
-    this.game.hook( this.controlBot );
-    this.game.lastBotCallBack = this.controlBot;
+    this.game.hook( this[hookName] );
+    // this.game.botHooks = this.controlBot;
 
     this.lastTime = new Date( ).getTime( );
 
@@ -43,7 +44,7 @@ s.Bot = new Class( {
 
 
     //CAMERA SETUP COMES AFER INITALIZE SO ROOT IS ALREADY SET UP
-    //Create a camera for the bot
+    //Create a camera for the bot - used for radial direction mark
     this.camera = new THREE.PerspectiveCamera(35, 1, 1, 300000);
 
     // Root camera to the bot's position

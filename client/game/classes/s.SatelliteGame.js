@@ -30,6 +30,8 @@ s.SatelliteGame = new Class( {
 		var that = this;
         this.IDs = [];
         this.botCount = 0;
+        this.botHooks = [];
+
         this.hostPlayer = false;
         this.teamMode = true;
 
@@ -439,7 +441,6 @@ s.SatelliteGame = new Class( {
     },
 
     handleKill: function(message) {
-        console.log(message);
         // get enemy position
         var position = s.game.enemies.get(message.killed).root.position;
         new s.Explosion({
@@ -514,6 +515,9 @@ s.SatelliteGame = new Class( {
             if (zappedEnemy.hull <= 0 && zappedEnemy.isBot) {
                 console.log(zapped, ' has died');
                 s.game.handleKill.call(s, { killed: zapped, killer: killer });
+                var hookName = ('control' + zapped).split(' ').join('');
+                s.game.unhook( zappedEnemy[hookName] );
+
                 s.game.enemies.add( {position: [ 23498, -25902, 24976 ]}, 'bot' );
             }
         }
@@ -602,8 +606,8 @@ s.SatelliteGame = new Class( {
         this.game.hostPlayer = true;
         console.log(this.game.hostPlayer);
         if (this.game.botCount === 0) {
-            console.log(true);
             // Create a new bot
+            this.game.enemies.add( {}, 'bot');
             this.game.enemies.add( {}, 'bot');
         }
         that.game.updatePlayersWithBots('botInfo');

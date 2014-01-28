@@ -50986,7 +50986,7 @@ s.Ship = new Class({
         rightTurretOffset: new THREE.Vector3(-35, 0, -200),
         missileOffset: new THREE.Vector3(0, 0, -120),
         turretFireTime: 150,
-        botTurretFireTime: 1000,
+        botTurretFireTime: 3000,
         missileFireTime: 1000
     },
 
@@ -51243,13 +51243,14 @@ s.Bot = new Class( {
     //set a hook on the bot controls.
     //unhook is necessary when bot dies and new bot is created
     //need to refactor when multiple bots on screen
-    this.controlBot = this.controlBot.bind(this);
-    if (this.game.lastBotCallBack) {
-      this.game.unhook (this.game.lastBotCallBack);
-    }
+    var hookName = ('control' + this.name).split(' ').join('');
+    this[hookName] = this.controlBot.bind(this);
+    // if (this.game.botHooks) {
+    //   this.game.unhook (this.game.botHooks);
+    // }
 
-    this.game.hook( this.controlBot );
-    this.game.lastBotCallBack = this.controlBot;
+    this.game.hook( this[hookName] );
+    // this.game.botHooks = this.controlBot;
 
     this.lastTime = new Date( ).getTime( );
 
@@ -51263,7 +51264,7 @@ s.Bot = new Class( {
 
 
     //CAMERA SETUP COMES AFER INITALIZE SO ROOT IS ALREADY SET UP
-    //Create a camera for the bot
+    //Create a camera for the bot - used for radial direction mark
     this.camera = new THREE.PerspectiveCamera(35, 1, 1, 300000);
 
     // Root camera to the bot's position
@@ -54052,6 +54053,8 @@ s.SatelliteGame = new Class( {
 		var that = this;
         this.IDs = [];
         this.botCount = 0;
+        this.botHooks = [];
+
         this.hostPlayer = false;
         this.teamMode = true;
 
@@ -54461,7 +54464,6 @@ s.SatelliteGame = new Class( {
     },
 
     handleKill: function(message) {
-        console.log(message);
         // get enemy position
         var position = s.game.enemies.get(message.killed).root.position;
         new s.Explosion({
@@ -54536,6 +54538,9 @@ s.SatelliteGame = new Class( {
             if (zappedEnemy.hull <= 0 && zappedEnemy.isBot) {
                 console.log(zapped, ' has died');
                 s.game.handleKill.call(s, { killed: zapped, killer: killer });
+                var hookName = ('control' + zapped).split(' ').join('');
+                s.game.unhook( zappedEnemy[hookName] );
+
                 s.game.enemies.add( {position: [ 23498, -25902, 24976 ]}, 'bot' );
             }
         }
@@ -54624,8 +54629,8 @@ s.SatelliteGame = new Class( {
         this.game.hostPlayer = true;
         console.log(this.game.hostPlayer);
         if (this.game.botCount === 0) {
-            console.log(true);
             // Create a new bot
+            this.game.enemies.add( {}, 'bot');
             this.game.enemies.add( {}, 'bot');
         }
         that.game.updatePlayersWithBots('botInfo');
