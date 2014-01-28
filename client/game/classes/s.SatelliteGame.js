@@ -517,7 +517,7 @@ s.SatelliteGame = new Class( {
                 var hookName = ('control' + zapped).split(' ').join('');
                 s.game.unhook( zappedEnemy[hookName] );
 
-                s.game.enemies.add( {position: [ 23498, -25902, 24976 ]}, 'bot' );
+                s.game.enemies.add( {}, 'bot' );
             }
         }
     },
@@ -537,7 +537,6 @@ s.SatelliteGame = new Class( {
 
     restartGame: function() {
         var that = this;
-        this.gameOverBoolean = true;
         setTimeout(function() {
             that.player.shields = s.config.ship.shields;
             that.player.hull = s.config.ship.hull;
@@ -676,6 +675,7 @@ s.SatelliteGame = new Class( {
             } else {
                 message = "alliance win";
             }
+            s.game.gameOverBoolean = true;
             s.game.menu.gameOver('temp', s.game.baseNameMap[base], message);
             s.game.restartGame();
         }, 3000);

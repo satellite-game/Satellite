@@ -51223,7 +51223,7 @@ s.Bot = new Class( {
   extend: s.Ship,
 
   construct: function( options ) {
-    var position = options.position || [22498, -25902, 24976];
+    var position = options.position || [-6879, 210, 406];
     var rotation = options.rotation || [0, Math.PI / 2, 0];
 
     // Generating a new bot with properties
@@ -52621,7 +52621,7 @@ s.HUD = new Class({
         // PLAYER SHIELD/HEALTH STATUS //
         /////////////////////////////////
 
-        if (this.hp !== s.config.ship.hull && !this.game.gameOverBoolean){
+        if (this.hp !== s.config.ship.hull && this.health > -10){
             var grd = this.ctx.createRadialGradient(centerX,centerY,width/12,centerX,centerY,this.health);
             grd.addColorStop(0,"rgba(0,0,0,0)");
             grd.addColorStop(1,"rgba(256,0,0,0.75)");
@@ -53557,7 +53557,7 @@ s.Menu = new Class({
   selectItem: function () {
     // todo: cache menu screens during game load
     // currently recreating text mesh on every screen switch.
-    if (this.hoveredItem.menuItemSelectCallback) {
+    if (!this.game.gameOverBoolean && this.hoveredItem.menuItemSelectCallback) {
       this.clearMenu();
       this[this.hoveredItem.menuItemSelectCallback]();
       this.cursorPosition = 0;
@@ -54053,7 +54053,6 @@ s.SatelliteGame = new Class( {
 		var that = this;
         this.IDs = [];
         this.botCount = 0;
-        this.botHooks = [];
 
         this.hostPlayer = false;
         this.teamMode = true;
@@ -54541,7 +54540,7 @@ s.SatelliteGame = new Class( {
                 var hookName = ('control' + zapped).split(' ').join('');
                 s.game.unhook( zappedEnemy[hookName] );
 
-                s.game.enemies.add( {position: [ 23498, -25902, 24976 ]}, 'bot' );
+                s.game.enemies.add( {}, 'bot' );
             }
         }
     },
@@ -54561,7 +54560,6 @@ s.SatelliteGame = new Class( {
 
     restartGame: function() {
         var that = this;
-        this.gameOverBoolean = true;
         setTimeout(function() {
             that.player.shields = s.config.ship.shields;
             that.player.hull = s.config.ship.hull;
@@ -54700,6 +54698,7 @@ s.SatelliteGame = new Class( {
             } else {
                 message = "alliance win";
             }
+            s.game.gameOverBoolean = true;
             s.game.menu.gameOver('temp', s.game.baseNameMap[base], message);
             s.game.restartGame();
         }, 3000);
