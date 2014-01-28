@@ -53,5 +53,10 @@ module.exports = function (host, sync, io) {
       socket.broadcast.emit('bot positions', packet);
     },
     // ************************************************************************ //
+    
+    baseFire: function (socket, packet) {
+      socket.emit('baseHit', packet);
+    }
+
   };
 };

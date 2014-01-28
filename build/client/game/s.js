@@ -50313,7 +50313,6 @@ var s = {
         // Create a model loader
         s.loader = new THREE.JSONLoader();
 
-        // Create game
         s.game = new s.SatelliteGame();
     }
 };
@@ -51826,14 +51825,33 @@ s.Keyboard = new Class({
     'tilde'   : 192
   },
 
+  keysInv: {
+    37  : 'left',
+    38  : 'up',
+    39  : 'right',
+    40  : 'down',
+    32  : 'space',
+    33  : 'pageup',
+    34  : 'pagedown',
+    9   : 'tab',
+    87  : 'w',
+    65  : 'a',
+    83  : 's',
+    68  : 'd',
+    192 : 'tilde',
+    16  : 'shift',
+  },
+
   modifiers: ['shift', 'ctrl', 'alt', 'meta'],
 
   construct: function(game, player) {
+    var self = this;
     this.keyCodes = {};
 
     // Listen to key events
     window.addEventListener('keydown', this.handleKeyChange.bind(this, true), false);
     window.addEventListener('keyup', this.handleKeyChange.bind(this, false), false);
+
   },
 
   destruct: function() {
@@ -52013,7 +52031,8 @@ s.Controls = new Class({
     this.oculus = this.game.oculus;
 
     // Mouse interface - mice options are: 'keyboard', 'none', 'oculus'
-    this.mouse = new s.Mouse('keyboard', options);
+    // this.mouse = new s.Mouse('keyboard', options);
+    this.mouse = new s.Mouse('none', options);
 
     console.log('Initialized gamepad...');
 
@@ -52116,8 +52135,6 @@ s.Controls = new Class({
       if (this.menu.displayed) {
         this.menu.updateHovered();
       }
-    } else {
-      this.mouse.mouseType = 'keyboard';
     }
 
     ///////////////////////
@@ -53152,10 +53169,14 @@ s.Comm = new Class({
   },
 
   construct: function ( options ) {
+    //binding the game's context
     this.game = options.game;
+    // Prepend http. Doing this so that you can customize the server before finalizing the string.
     this.player = options.player;
     this.ship = options.ship;
+    this.server = 'http://' + options.server;
     this.pilot = options.pilot;
+    this.room = options.room;
 
     var that = this;
 
@@ -53164,10 +53185,13 @@ s.Comm = new Class({
     this.timer = setInterval(this.clockTick,1000);
     this.time = 0;
 
-    this.socket = io.connect( 'http://' + options.server );
+    this.connectSockets();
+  },
 
+  connectSockets: function ( ) {
+    // this takes in a room to join - where do we send the roomname we are getting on invokation?
+    this.socket = io.connect( this.server );
 
-//COMMENT OUT BELOW WHEN NEW SERVER IS WORKING
     this.socket.on('failed', function ( message ) {
       // try to reconnect
       that.connected();
@@ -53177,6 +53201,7 @@ s.Comm = new Class({
     this.socket.on('leave', this.makeTrigger('leave'));
     this.socket.on('move', this.makeTrigger('move'));
     this.socket.on('killed', this.makeTrigger('killed'));
+    this.socket.on('sync', this.makeTrigger('sync'));
     this.socket.on('fire', this.makeTrigger('fire'));
     this.socket.on('hit', this.makeTrigger('hit'));
     this.socket.on('bot retrieval', this.makeTrigger('bot retrieval'));
@@ -53188,30 +53213,6 @@ s.Comm = new Class({
     this.connected();
   },
 
-
-//UNCOMMENT BELOW WHEN NEW SERVER IS WORKING
-  // connectSockets: function (server) {
-  //   this.socket = io.connect( 'http://' + server );
-
-  //   this.socket.on('failed', function ( message ) {
-  //     // try to reconnect
-  //     that.connected();
-  //   });
-  //   this.socket.on('join', this.makeTrigger('join'));
-  //   this.socket.on('player list', this.makeTrigger('player list'));
-  //   this.socket.on('leave', this.makeTrigger('leave'));
-  //   this.socket.on('move', this.makeTrigger('move'));
-  //   this.socket.on('killed', this.makeTrigger('killed'));
-  //   this.socket.on('fire', this.makeTrigger('fire'));
-  //   this.socket.on('hit', this.makeTrigger('hit'));
-  //   this.socket.on('bot retrieval', this.makeTrigger('bot retrieval'));
-  //   this.socket.on('bot positions', this.makeTrigger('bot positions'));
-
-  //   this.game.hook( this.position );
-
-  //   this.connected();
-  // },
-
   connected: function ( ) {
     var time = new Date( ).getTime( );
 
@@ -53219,6 +53220,7 @@ s.Comm = new Class({
 
     var packet = {
       evt: 'joined',
+      room: this.room,
       name: this.pilot.name,
       time: time,
       pos: shipPosition.pos,
@@ -53228,59 +53230,82 @@ s.Comm = new Class({
     };
 
     // Broadcast position
-
     this.socket.emit( 'join', packet );
   },
 
   position: function ( ) {
+    // would this be better to put in the global scope so that we don't
+    // wind up making this check every single time. Currently these are
+    // all happening in the global scope anyways...
+    if(this.lastPosition === undefined) {
+      this.lastPosition = s.game.player.getPositionPacket( );
+      this.lastTime = new Date().getTime();
+      this.movementThrottle = 0;
+      this.syncTimer = 0;
+    }
     var time = new Date( ).getTime( );
+    var shipPosition = s.game.player.getPositionPacket( );
+        shipPosition.lAccel = [0,0,0];
+        shipPosition.aAccel = [0,0,0];
+    var t_diff = time - this.lastTime;
 
-    // Never send faster than server can handle
+    // benchmarked this against other variants for 96% efficency.
+    // http://jsperf.com/delta-function-or-raw-calculation
+    if (t_diff !== 0) {
+      shipPosition.lAccel[0] = (shipPosition.lVeloc[0] - this.lastPosition.lVeloc[0]) / t_diff;
+      shipPosition.aAccel[0] = (shipPosition.aVeloc[0] - this.lastPosition.aVeloc[0]) / t_diff;
 
-    if ( time - s.game.comm.lastMessageTime >= 15 ) {
+      shipPosition.lAccel[1] = (shipPosition.lVeloc[1] - this.lastPosition.lVeloc[1]) / t_diff;
+      shipPosition.aAccel[1] = (shipPosition.aVeloc[1] - this.lastPosition.aVeloc[1]) / t_diff;
 
-      var shipPosition = s.game.player.getPositionPacket( );
+      shipPosition.lAccel[2] = (shipPosition.lVeloc[2] - this.lastPosition.lVeloc[2]) / t_diff;
+      shipPosition.aAccel[2] = (shipPosition.aVeloc[2] - this.lastPosition.aVeloc[2]) / t_diff;
 
-      // TODO: Figure out if ship or turret actually moved
-      // If ship moved, send packet
-
-      if ( this.lastPosition !== shipPosition.pos ) {
-
-        // Build packet
-
-        this.time = 0;
-
-        var packet = {
-          time: time,
-          pos: shipPosition.pos,
-          rot: shipPosition.rot,
-          aVeloc: shipPosition.aVeloc,
-          lVeloc: shipPosition.lVeloc
-        };
-
-        // Broadcast position
-
-        s.game.comm.socket.emit( 'move', packet );
-
-        s.game.comm.lastMessageTime = time;
-
-        this.lastPosition = shipPosition.pos;
+      // using Math.abs: http://jsperf.com/mathabs-vs-two-conditions
+      if(this.movementThrottle === 0){
+        if( this.syncTimer === 0 ||
+          Math.abs(shipPosition.aAccel[0]) > 0.000005 ||
+          Math.abs(shipPosition.aAccel[1]) > 0.000005 ||
+          Math.abs(shipPosition.aAccel[2]) > 0.000005 ||
+          Math.abs(shipPosition.lAccel[0]) > 0.005 ||
+          Math.abs(shipPosition.lAccel[1]) > 0.005 ||
+          Math.abs(shipPosition.lAccel[2]) > 0.005 ) {
+          var packet = {
+            time: time, // is this nessecary?
+            pos: shipPosition.pos,
+            rot: shipPosition.rot,
+            aVeloc: shipPosition.aVeloc,
+            lVeloc: shipPosition.lVeloc,
+            // not sure if we need to send this to the
+            // server except for testing purposes.
+            aAccel: shipPosition.aAccel,
+            lAccel: shipPosition.lAccel
+          };
+          s.game.comm.socket.emit( 'combat','move', packet );
+          s.game.comm.lastMessageTime = time;
+          this.lastPosition = shipPosition;
+          this.lastTime = time;
+        }
       }
     }
+    // throttle network emmissions by 80%
+    this.movementThrottle = (this.movementThrottle + 1) % 5;
+    // sync players every second (assuming the player runs every 60fps)
+    this.syncTimer = (this.syncTimer + 1) % 60;
   },
 
   fire: function( pos, rot, velocity ) {
     this.time = 0;
 
-    this.socket.emit( 'fire', {
-      position: pos,
-      rotation: rot,
-      initialVelocity: velocity
+    this.socket.emit('combat', 'fire', {
+        position: pos,
+        rotation: rot,
+        initialVelocity: velocity
     });
   },
 
   died: function( you, killer ) {
-    this.socket.emit( 'killed',{
+    this.socket.emit('player', 'killed',{
       you: you,
       killer: killer
     });
@@ -53289,7 +53314,7 @@ s.Comm = new Class({
   hit: function( otherPlayerName, yourName ) {
     this.time = 0;
 
-    this.socket.emit( 'hit', {
+    this.socket.emit('combat', 'hit', {
       otherPlayerName: otherPlayerName,
       yourName: yourName
     });
@@ -53297,33 +53322,34 @@ s.Comm = new Class({
 
   clockTick: function( ){
     this.time += 1;
+
     // if ( this.time >= 60 ){
     //     window.location.href = "http://satellite-game.com";
     // }
   },
 
   botInfo: function(message) {
-    this.socket.emit('botInfo', message);
+      this.socket.emit('bot', 'botInfo', message);
   },
 
   botHit: function( yourName, botName ) {
     this.time = 0;
 
-    this.socket.emit( 'botHit', {
+    this.socket.emit('bot', 'botHit', {
       yourName: yourName,
       botName: botName
     });
   },
 
   botUpdate: function(enemies) {
-    this.socket.emit( 'botUpdate', enemies);
+    this.socket.emit('bot', 'botUpdate', enemies);
   },
 
   baseFire: function(baseName, pilotName) {
-      this.socket.emit( 'baseFire', {
-          baseName: baseName,
-          pilotName: pilotName
-      });
+    this.socket.emit('bot', 'baseFire', {
+        baseName: baseName,
+        pilotName: pilotName
+    });
   }
 
 });
@@ -53621,13 +53647,20 @@ s.Menu = new Class({
     // ]);
   },
 
-  joinRoom: function () {
-    var room = this.hoveredItem.room;
+  joinRoom: function (roomToJoin) {
+    var room;
+    if (this.hoveredItem) {
+      room = this.hoveredItem.room;
+    } else {
+      room = prompt('roomToJoin:');
+    }
     // some socket changing stuff.
     // then basically just remove the player and respawn
     // sim-fuckin-ple.
     this.game.roomSelected = true;
-    this.game.comm.connectSockets(room);
+    // this.game.comm.room = room;
+    this.game.room = room;
+    this.game.comm.connectSockets();
     this.close();
   },
 
@@ -54017,7 +54050,6 @@ s.SatelliteGame = new Class( {
 
 	initialize: function() {
 		var that = this;
-
         this.IDs = [];
         this.botCount = 0;
         this.hostPlayer = false;
@@ -54062,9 +54094,8 @@ s.SatelliteGame = new Class( {
 
         this.pilot = {};
         this.callsigns = this.callsigns || ["Apollo","Strobe","Sage","Polkadot","Moonglow","Steel","Vanguard","Prong","Uptight","Blackpony","Hawk","Ramrod","Dice","Falcon","Rap","Buckshot","Cobra","Magpie","Warhawk","Boxer","Devil","Hammer","Phantom","Sharkbait","Dusty","Icon","Blade","Pedro","Stinger","Yellow Jacket","Limit","Sabre","Misty","Whiskey","Dice","Antic","Arrow","Auto","Avalon","Bandit","Banshee","Blackjack","Bulldog","Caesar","Cajun","Challenger","Chuggs","Cindy","Cracker","Dagger","Dino","Esso","Express","Fangs","Fighting Freddie","Freight Train","Freemason","Fury","Gamma","Gear","Ghost","Ginger","Greasy","Havoc","Hornet","Husky","Jackal","Jaguar","Jedi","Jazz","Jester","Knife","Kitty Hawk","Knight","Knightrider","Koala","Komono","Lancer","Lexus","Lion","Levi","Lucid","Malty","Mail Truck","Magma","Magnet","Malibu","Medusa","Maul","Monster","Misfit","Moss","Moose","Mustang","Nail","Nasa","Nacho","Nighthawk","Ninja","Neptune","Odin","Occult","Nukem","Ozark","Pagan","Pageboy","Panther","Peachtree","Phenom","Polestar","Punisher","Ram","Rambo","Raider","Raven","Razor","Rupee","Sabre","Rust","Ruin","Sultan","Savor","Scandal","Scorpion","Shooter","Smokey","Sniper","Spartan","Thunder","Titus","Titan","Timber Wolf","Totem","Trump","Venom","Veil","Viper","Weasel","Warthog","Winter","Wiki","Wild","Yonder","Yogi","Yucca","Zeppelin","Zeus","Zesty"];
-
         this.pilot.name = this.callsigns[Math.floor(this.callsigns.length*Math.random())] + ' ' + ( new Date( ).getTime( ) % 100 );
-        
+
         // Add a hud
         this.HUD = new s.HUD( {
             game: this
@@ -54087,14 +54118,13 @@ s.SatelliteGame = new Class( {
             HUD: this.HUD,
             game: this,
             shipClass: 'human_ship_heavy',
-            // position: new THREE.Vector3(this.getRandomCoordinate(),this.getRandomCoordinate(),this.getRandomCoordinate()),
             position: new THREE.Vector3(19232, 19946, 20311),
             name: this.pilot.name,
             rotation: new THREE.Vector3( 0, Math.PI/2, 0 ),
             alliance: 'alliance',
             camera: this.camera
         } );
-        
+
         this.HUD.hp = this.player.hull;
 
         $(document).on('keyup', function(evt) {
@@ -54170,6 +54200,7 @@ s.SatelliteGame = new Class( {
                 }
                 return false;
             },
+
             add: function ( enemyInfo, isBot ) {
                 if ( this.has( enemyInfo.name ) ) {
                     this.delete( enemyInfo.name );
@@ -54206,7 +54237,7 @@ s.SatelliteGame = new Class( {
                         alliance: alliance
                     } );
                 }
-                
+
                 if (isBot) { console.log( '%s has joined the fray', enemyShip.name ); }
 
                 this._list.push( enemyShip );
@@ -54239,12 +54270,13 @@ s.SatelliteGame = new Class( {
         } );
 
         this.comm = new s.Comm( {
+            room: this.room,
             game: that,
             pilot: that.pilot,
             player: this.player,
             server: window.location.hostname + ':' + window.location.port
         } );
-        
+
         this.comm.on('fire', that.handleEnemyFire);
         this.comm.on('hit', that.handleHit);
         this.comm.on('player list', that.handlePlayerList);
@@ -54252,6 +54284,7 @@ s.SatelliteGame = new Class( {
         this.comm.on( 'join', that.handleJoin );
         this.comm.on( 'leave', that.handleLeave );
         this.comm.on( 'move', that.handleMove );
+        this.comm.on( 'sync', that.handleSync);
         this.comm.on( 'bot retrieval', that.handleBotInfo );
         this.comm.on( 'bot positions', that.handleBotPositions );
         this.comm.on( 'baseHit', that.baseHit );
@@ -54262,6 +54295,8 @@ s.SatelliteGame = new Class( {
         this.player.root.addEventListener('ready', function(){
             s.game.start();
         });
+
+        s.game.menu.joinRoom();
 	},
 
 	render: function(_super, time) {
@@ -54343,6 +54378,7 @@ s.SatelliteGame = new Class( {
     },
 
     handleJoin: function ( message ) {
+           console.log("Received a join");
            s.game.enemies.add( message );
     },
     handleLeave: function ( message ) {
@@ -54350,7 +54386,15 @@ s.SatelliteGame = new Class( {
             console.log( '%s has left', message.name );
         }
     },
+
     handleMove: function ( message ) {
+        // message.aAccel
+        // message.lAccel
+        // message.pos
+        // message.rot
+        // message.aVeloc
+        // message.lVeloc
+
         if ( message.name == this.pilot.name ) {
             // server told us to move
             console.log( 'Server reset position' );
@@ -54364,6 +54408,47 @@ s.SatelliteGame = new Class( {
             }
         }
     },
+    // handleSync: function ( pak ) {
+    //   var data = {};
+    //   for(var i in pak) {
+    //     data[i] = pak[i];
+    //   };
+    //   var whoAmI = s.game.pilot.name,
+    //       myData = pak[whoAmI];
+
+    //   var adjustPlayer = function( serverView ) {
+    //     var adjusted = [];
+
+    //     var myView = s.game.player.getPositionPacket();
+    //     for(var i = 0; i < serverView.lVeloc.length; i++) {
+    //       var pos = Math.abs(serverView.pos[i]) - Math.abs(myView.pos[i]);
+
+    //       if( pos >= 1700 ) {
+    //         console.log("Experiencing whiplash!", pos);
+    //         s.game.player.setPosition( serverView.pos, myView.rot, serverView.aVeloc, serverView.lVeloc, true );
+    //         return;
+    //       }
+
+    //       if(serverView.pos[i] >= 0) {
+    //         adjusted.push(serverView.lVeloc[i] + pos);
+    //       } else {
+    //         adjusted.push(serverView.lVeloc[i] - pos);
+    //       }
+
+    //     }
+    //     s.game.comm.position();
+    //     //s.game.player.setPosition( myView.pos, myView.rot, serverView.aVeloc, adjusted, false );
+    //   };
+
+    //   adjustPlayer(myData);
+    //   delete data[whoAmI];
+    //   for(var i in data ) {
+    //     if( !s.game.enemies.execute( data[i].name, 'setPosition', [ data[i].pos, data[i].rot, data[i].aVeloc, data[i].lVeloc, true ] ) ) {
+    //       s.game.enemies.add( data[i] );
+    //     }
+    //   }
+
+    // },
 
     handlePlayerList: function(message) {
         for (var otherPlayerName in message) {
@@ -54376,6 +54461,7 @@ s.SatelliteGame = new Class( {
     },
 
     handleKill: function(message) {
+        console.log(message);
         // get enemy position
         var position = s.game.enemies.get(message.killed).root.position;
         new s.Explosion({
@@ -54408,10 +54494,10 @@ s.SatelliteGame = new Class( {
     },
 
     handleHit: function(message) {
-        var zappedName = message.otherPlayerName;
-        var killer = message.yourName;
-        var zappedEnemy = s.game.enemies.get(zappedName);
-        if (zappedName === s.game.pilot.name){
+        var zapped = message.zappedName;
+        var killer = message.killerName;
+        var zappedEnemy = s.game.enemies.get(zapped);
+        if (zapped === s.game.pilot.name){
             s.game.stopShields();
             s.game.rechargeShields();
             if (s.game.player.shields > 0){
@@ -54434,22 +54520,22 @@ s.SatelliteGame = new Class( {
             console.log('You were hit with a laser by %s! Your HP: %d', killer, s.game.player.hull);
 
             if (s.game.player.hull <= 0) {
-                s.game.handleDie(zappedName, killer);
+                s.game.handleDie(zapped, killer);
             }
         } else {
             if (zappedEnemy.shields > 0){
                 zappedEnemy.shields -= 20;
-                console.log(zappedName, ' shield is now: ', zappedEnemy.shields);
+                console.log(zapped, ' shield is now: ', zappedEnemy.shields);
                 setTimeout(function() {
                     s.game.replenishEnemyShield(zappedEnemy);
                 }, 7000);
             } else {
                 zappedEnemy.hull -= 20;
-                console.log(zappedName, ' hull is now: ', zappedEnemy.hull);
+                console.log(zapped, ' hull is now: ', zappedEnemy.hull);
             }
             if (zappedEnemy.hull <= 0 && zappedEnemy.isBot) {
-                console.log(zappedName, ' has died');
-                s.game.handleKill.call(s, { killed: zappedName, killer: killer });
+                console.log(zapped, ' has died');
+                s.game.handleKill.call(s, { killed: zapped, killer: killer });
                 s.game.enemies.add( {position: [ 23498, -25902, 24976 ]}, 'bot' );
             }
         }
@@ -54533,12 +54619,13 @@ s.SatelliteGame = new Class( {
                 that.game.updatePlayersWithBots('botUpdate');
             }, 2500);
         }
-
         this.game.hostPlayer = true;
+        console.log(this.game.hostPlayer);
         if (this.game.botCount === 0) {
+            console.log(true);
             // Create a new bot
             this.game.enemies.add( {}, 'bot');
-        }        
+        }
         that.game.updatePlayersWithBots('botInfo');
     },
 
@@ -54552,7 +54639,7 @@ s.SatelliteGame = new Class( {
         };
 
         enemiesSocketInfo = {};
-        var enemiesList = this.enemies._list;  
+        var enemiesList = this.enemies._list;
         for (var i = 0; i < enemiesList.length; i++) {
             if (enemiesList[i].isBot){
                 var root = enemiesList[i].root;
@@ -54560,7 +54647,7 @@ s.SatelliteGame = new Class( {
                 //if there is a angular and linear velocity fnc, call it. else create a new 3 vector
                 var angularVeloc = (root.getAngularVelocity && root.getAngularVelocity()) || new THREE.Vector3();
                 var linearVeloc = (root.getLinearVelocity && root.getLinearVelocity()) || new THREE.Vector3();
-                
+
                 enemiesSocketInfo[name] = {
                     position: makeArray(root.position),
                     rotation: makeArray(root.rotation),
