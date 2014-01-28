@@ -93,7 +93,7 @@ s.Bot = new Class( {
     var thrust = 0;
     var brakes = 0;
 
-    var  maxDistance = 4100, minDistance = 1500;
+    var  maxDistance = 8000, minDistance = 1000;
 
     if (this.closestDistance > maxDistance) {
       thrust = 1;
