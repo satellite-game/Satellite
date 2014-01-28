@@ -524,6 +524,11 @@ s.HUD = new Class({
         ///   CROSSHAIRS    ///
         ///////////////////////
 
+        var viewingAngleX = Math.PI/4 * (this.oculus.quat.x);
+        var viewingAngleY = Math.PI/4 * (this.oculus.quat.y);
+        this.crosshairs.position.setY(-60*Math.tan(viewingAngleX)*1.5);
+        this.crosshairs.position.setX(60*Math.tan(viewingAngleY)*1.5);
+
         this.oculusCtx.clearRect(0, 0, this.oculusCanvas.width, this.oculusCanvas.height);
         this.oculusCtx.drawImage(this.canvas, 50*1.07, -50, window.innerWidth/2, window.innerHeight/2);
         this.oculusCtx.drawImage(this.canvas, this.oculusCanvas.width/2-50*1.07, -50, window.innerWidth/2, window.innerHeight/2);
