@@ -51244,6 +51244,9 @@ s.Bot = new Class( {
       rotationFadeFactor: 4
     };
 
+    this.maxDistance = 8000;
+    this.minDistance = 1000;
+
     //set a hook on the bot controls.
     //unhook is necessary when bot dies and new bot is created
     //need to refactor when multiple bots on screen
@@ -51356,23 +51359,13 @@ s.Bot = new Class( {
       return [pitch, yaw, roll, vTarget2D];
   },
 
-  controlBot: function() {
-
-    //get closest enemy
-    this.getEnemyList();
-    this.getClosestDistance();
-
-    //////////////////////////////
-    //// THRUST/BREAK LOGIC ////
-    //////////////////////////////    
-
-    var now = new Date( ).getTime( );
+  thrustAndBreaks: function(now) {
     var difference = now - this.lastTime;
 
     var thrust = 0;
     var brakes = 0;
 
-    var  maxDistance = 8000, minDistance = 1000;
+    var  maxDistance = this.maxDistance, minDistance = this.minDistance;
 
     if (this.closestDistance > maxDistance) {
       thrust = 1;
@@ -51393,7 +51386,20 @@ s.Bot = new Class( {
     if (brakes && this.botOptions.thrustImpulse > 0){
       this.botOptions.thrustImpulse -= difference;
     }
+  },
 
+  controlBot: function() {
+
+    //get closest enemy
+    this.getEnemyList();
+    this.getClosestDistance();
+
+    //////////////////////////////
+    //// THRUST/BREAK LOGIC ////
+    //////////////////////////////    
+
+    var now = new Date( ).getTime( );
+    this.thrustAndBreaks(now);
 
     //////////////////////////////
     // LEFT/RIGHT/UP/DOWN LOGIC //
@@ -51430,7 +51436,7 @@ s.Bot = new Class( {
     ///////  FIRING LOGIC ////////
     //////////////////////////////
 
-    if (this.game.gameFire && Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && this.closestDistance < maxDistance) {
+    if (this.game.gameFire && Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && this.closestDistance < this.maxDistance) {
       this.fire('turret');
     }
 
