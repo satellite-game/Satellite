@@ -9,7 +9,7 @@ s.Bot = new Class( {
     // Generating a new bot with properties
     this.name = options.name || 'bot ' + (++this.game.botCount);
     this.isBot = true;
-    
+
     this.botOptions = {
       rotationSpeed: Math.PI/2,
       pitchSpeed: Math.PI/4,
@@ -125,36 +125,35 @@ s.Bot = new Class( {
       yawSpeed     = this.botOptions.yawSpeed,
       pitchSpeed   = this.botOptions.pitchSpeed;
 
-    var thrustScalar = this.botOptions.thrustImpulse/s.config.ship.maxSpeed + 1;
-
+    var thrustScalar = this.botOptions.thrustImpulse / s.config.ship.maxSpeed + 1;
     
     var vTarget2D = this.target2d();
 
-    if (vTarget2D.z < 1) {
+    if (this.moveStates.vTarget2D.z < 1) {
         //go left; else if go right
-        if (vTarget2D.x < -0.15) {
-          yaw = yawSpeed / thrustScalar;
-        } else if (vTarget2D.x > 0.15) {
-          yaw = -1 * yawSpeed / thrustScalar;
+        if (this.moveStates.vTarget2D.x < -0.15) {
+          this.moveStates.yaw = yawSpeed / thrustScalar;
+        } else if (this.moveStates.vTarget2D.x > 0.15) {
+          this.moveStates.yaw = -1 * yawSpeed / thrustScalar;
         }
         //do down; else if go up
-        if (vTarget2D.y < -0.15) {
-          pitch = -1*pitchSpeed / thrustScalar;
-        } else if (vTarget2D.y > 0.15) {
-          pitch  = pitchSpeed / thrustScalar;
+        if (this.moveStates.vTarget2D.y < -0.15) {
+          this.moveStates.pitch = -1 * pitchSpeed / thrustScalar;
+        } else if (this.moveStates.vTarget2D.y > 0.15) {
+          this.moveStates.pitch  = pitchSpeed / thrustScalar;
         }
       } else {
         //go right; else if go left
-        if (vTarget2D.x < 0) {
-          yaw = -1* yawSpeed / thrustScalar;
-        } else if (vTarget2D.x >= 0) {
-          yaw = yawSpeed / thrustScalar;
+        if (this.moveStates.vTarget2D.x < 0) {
+          this.moveStates.yaw = -1 * yawSpeed / thrustScalar;
+        } else if (this.moveStates.vTarget2D.x >= 0) {
+          this.moveStates.yaw = yawSpeed / thrustScalar;
         }
         //do up; else if go down
-        if (vTarget2D.y < 0) {
-          pitch = pitchSpeed / thrustScalar;
-        } else if (vTarget2D.y > 0) {
-          pitch  = -1 * pitchSpeed / thrustScalar;
+        if (this.moveStates.vTarget2D.y < 0) {
+          this.moveStates.pitch = pitchSpeed / thrustScalar;
+        } else if (this.moveStates.vTarget2D.y > 0) {
+          this.moveStates.pitch = -1 * pitchSpeed / thrustScalar;
         }
       }
       return [pitch, yaw, roll, vTarget2D];
@@ -198,7 +197,7 @@ s.Bot = new Class( {
     angularVelocity = angularVelocity.clone().divideScalar(this.botOptions.rotationFadeFactor);
     this.root.setAngularVelocity(angularVelocity);
 
-    var newAngularVelocity = new THREE.Vector3(pitch, yaw, roll).applyMatrix4(rotationMatrix).add(angularVelocity);
+    var newAngularVelocity = new THREE.Vector3(this.moveStates.pitch, this.moveStates.yaw, this.moveStates.roll).applyMatrix4(rotationMatrix).add(angularVelocity);
     this.root.setAngularVelocity(newAngularVelocity);
 
     var impulse = linearVelocity.clone().negate();
@@ -209,6 +208,14 @@ s.Bot = new Class( {
   },
 
   controlBot: function() {
+
+    this.moveStates = {
+      thrust: 0,
+      brakes: 0,
+      pitch: 0,
+      roll: 0,
+      yaw: 0
+    };
 
     //get closest enemy
     this.getEnemyList();
