@@ -4,17 +4,16 @@ s.Oculus = new Class({
     this.quat = new THREE.Quaternion();
     this.detected = false;
     this.game = options.game;
+    this.update = this.update.bind(this);
 
     vr.load(function () {
       this.state = new vr.State();
-      console.log(this.state);
       vr.pollState(this.state);
       if (this.state.hmd.present) {
         this.detected = true;
+        this.game.hook(this.update);
       }
     }, this);
-    this.update = this.update.bind(this);
-    this.game.hook(this.update);
   },
   update: function () {
     vr.pollState(this.state);

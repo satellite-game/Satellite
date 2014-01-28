@@ -191,12 +191,14 @@ s.Menu = new Class({
         // items and moves hover up and down with head motion
         // todo: use ray casting to select items more accurately
 
-        var viewingAngle = Math.PI/4 * (this.oculus.quat.x);
+        var viewingAngleX = Math.PI/4 * (this.oculus.quat.x);
+        var viewingAngleY = Math.PI/4 * (this.oculus.quat.y);
         var tilt = ~~((this.menuItems.length/2 * this.oculus.quat.x) * 6 + ~~(this.menuItems.length/2));
         var hover = this.menuItems[tilt];
         this.hoverItem(hover);
 
-        this.menuBox.position.setY((-150*Math.sin(viewingAngle))/Math.sin(Math.PI/4)/2+4); // ...ish
+        this.menuBox.position.setY((-150*Math.sin(viewingAngleX))/Math.sin(Math.PI/4));
+        this.menuBox.position.setX((150*Math.sin(viewingAngleY))/Math.sin(Math.PI/4));
         // console.log(this.selectorRay.intersectObjects(this.menuBox.children));
       } else {
         // todo: skip over items with no action property

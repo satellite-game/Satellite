@@ -15,7 +15,8 @@ s.SatelliteGame = new Class( {
 
     textures: [
         'particle.png',
-        'explosion.png'
+        'explosion.png',
+        'crosshairs.png'
     ],
 
     getRandomCoordinate: function(){
@@ -102,6 +103,17 @@ s.SatelliteGame = new Class( {
             alliance: 'alliance',
             camera: this.camera
         } );
+
+        // Targeting square around targeted enemy.
+
+        // var targetingGeo = new THREE.PlaneGeometry(100, 100);
+        // var targetingMat = new THREE.MeshBasicMaterial({color: 0x00FF00, wireframe: true});
+
+        // this.targeting = new THREE.Mesh(targetingGeo, targetingMat);
+
+        // this.scene.add( this.targeting );
+
+        // this.currentTarget = null;
 
         this.HUD.hp = this.player.hull;
 
@@ -216,12 +228,16 @@ s.SatelliteGame = new Class( {
                     } );
                 }
 
+                that.currentTarget = enemyShip;
+
                 if (isBot) { console.log( '%s has joined the fray', enemyShip.name ); }
 
                 this._list.push( enemyShip );
                 this._map[ enemyShip.name ] = enemyShip; // this._map.set(enemyInfo.name, otherShip);
             }
         };
+
+
 
         // Dependent on controls; needs to be below s.Controls
         this.radar = new s.Radar( {
@@ -231,16 +247,19 @@ s.SatelliteGame = new Class( {
 
 
 
-        window.addEventListener( 'mousemove', function ( e ) {
-            that.HUD.targetX = e.pageX;
-            that.HUD.targetY = e.pageY;
-        } );
+        // window.addEventListener( 'mousemove', function ( e ) {
+        //     that.HUD.targetX = e.pageX;
+        //     that.HUD.targetY = e.pageY;
+        // } );
         window.addEventListener( 'mousedown', function ( ) {
             that.controls.firing = true;
         } );
         window.addEventListener( 'mouseup', function ( ) {
             that.controls.firing = false;
         } );
+
+        // Add this back in later with new targeting system.
+
         window.addEventListener( 'keydown', function(e) {
             // Cycle through targets; extra logic guarding to prevent rapid cycling while the key is pressed
             e = e.which;
@@ -273,13 +292,47 @@ s.SatelliteGame = new Class( {
         this.player.root.addEventListener('ready', function(){
             s.game.start();
         });
+        
+        // Engine glow and flame trail on your player only.
 
-        s.game.menu.joinRoom();
+        this.flames = [];
+
+        for (var i = 0; i < 5; i++) {
+          var sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: s.textures.particle,
+            useScreenCoordinates: false,
+            blending: THREE.AdditiveBlending,
+            color: 0x00FFFF
+          }));
+
+          this.flames.push(sprite);
+          this.player.root.add(sprite);
+          sprite.position.set(0, 0, (i*10)+40);
+        }
+
+        this.trailGlow = new THREE.PointLight(0x00FFFF, 5, 20);
+        this.player.root.add( this.trailGlow );
+        this.trailGlow.position.set(0, 0, 35);
+
+        this.ocuScale = this.oculus.detected ? 0.2 : 1;
 	},
 
 	render: function(_super, time) {
 		_super.call(this, time);
 		this.controls.update();
+        // this.targeting.lookAt(this.player.root.position);
+        // if (this.currentTarget) this.targeting.position.set(this.currentTarget.root.position);
+
+        // Adjusts engine glow based on linear velosity
+        this.trailGlow.intensity = this.player.root.getLinearVelocity().length()/100;
+
+        var flameScaler = (Math.random()*0.1 + 1)*this.ocuScale;
+
+        this.flames[0].scale.set(2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler);
+        this.flames[1].scale.set(3*this.trailGlow.intensity*flameScaler, 3*this.trailGlow.intensity*flameScaler, 3*this.trailGlow.intensity*flameScaler);
+        this.flames[2].scale.set(2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler);
+        this.flames[3].scale.set(1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler);
+        this.flames[4].scale.set(1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler);
 	},
 
 	addSkybox: function() {
