@@ -18,7 +18,9 @@ var Manager = function( context, io ) {
     socket.on('disconnect', function( args ) {
       events.flow.disconnect(socket, args);
     });
-
+    socket.on('flow', function( type, args ) {
+      events.flow[type](socket, args);
+    });
     // Player Namespace: 'killed'
     // TODO: scores, everything about a player outside of combat.
     socket.on('player', function( type, args ) {

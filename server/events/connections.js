@@ -47,6 +47,7 @@ module.exports = function (map, host, Sync, io) {
       var target = host.rooms[room].bot; 
      
       if(room === undefined || name === undefined || target === undefined) {
+        socket.disconnect(true);
         return console.log("Something is undefined on line 50, aborting.");
       }
       
@@ -63,10 +64,25 @@ module.exports = function (map, host, Sync, io) {
       
 
       socket.broadcast.to(room).emit('leave', {name: name});
+      socket.leave(room);
       delete host.rooms[room].gamestate[name];
       delete host.rooms[room].playerList[name];
       delete host.sockets[socket.id];
     },
+
+    change: function( socket, room ) {
+      if(host.sockets[socket.id] === undefined) {
+        socket.disconnect(true);
+        return console.log("There was an error in changing rooms, aborting, please reconnect!");
+      }
+      var myData = {};
+      for(var i in host.sockets[socket.id]) {
+        myData[i] = host.sockets[socket.id][i];
+      };
+
+      this.disconnect(socket);
+      this.join( socket, room );
+    }
 
   };
 };
