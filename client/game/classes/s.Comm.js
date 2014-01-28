@@ -204,14 +204,14 @@ s.Comm = new Class({
   },
 
   botUpdate: function(enemies) {
-    this.socket.emit( 'botUpdate', enemies);
+    this.socket.emit('bot', 'botUpdate', enemies);
   },
 
   baseFire: function(baseName, pilotName) {
-      this.socket.emit( 'baseFire', {
-          baseName: baseName,
-          pilotName: pilotName
-      });
+    this.socket.emit('bot', 'baseFire', {
+        baseName: baseName,
+        pilotName: pilotName
+    });
   }
 
 });
