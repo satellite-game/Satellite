@@ -33,7 +33,8 @@ s.Controls = new Class({
     this.oculus = this.game.oculus;
 
     // Mouse interface - mice options are: 'keyboard', 'none', 'oculus'
-    this.mouse = new s.Mouse('keyboard', options);
+    // this.mouse = new s.Mouse('keyboard', options);
+    this.mouse = new s.Mouse('none', options);
 
     console.log('Initialized gamepad...');
 
@@ -136,8 +137,6 @@ s.Controls = new Class({
       if (this.menu.displayed) {
         this.menu.updateHovered();
       }
-    } else {
-      this.mouse.mouseType = 'keyboard';
     }
 
     ///////////////////////

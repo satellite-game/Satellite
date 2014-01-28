@@ -10,6 +10,9 @@ var s = {
             shields: 80,
             maxSpeed: 1500
         },
+        base: {
+            shields: 50
+        },
         sound: {
             enabled: true,
             silentDistance: 10000,
@@ -27,7 +30,6 @@ var s = {
         // Create a model loader
         s.loader = new THREE.JSONLoader();
 
-        // Create game
         s.game = new s.SatelliteGame();
     }
 };

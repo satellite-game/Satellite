@@ -7,7 +7,11 @@ s.Oculus = new Class({
 
     vr.load(function () {
       this.state = new vr.State();
-      this.detected = true;
+      console.log(this.state);
+      vr.pollState(this.state);
+      if (this.state.hmd.present) {
+        this.detected = true;
+      }
     }, this);
     this.update = this.update.bind(this);
     this.game.hook(this.update);
