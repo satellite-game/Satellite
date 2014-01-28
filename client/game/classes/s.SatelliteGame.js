@@ -132,8 +132,10 @@ s.SatelliteGame = new Class( {
     initialize: function() {
         var that = this;
         this.IDs = [];
+
         this.hostPlayer = false;
         this.teamMode = true;
+        this.gameFire = true;
 
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
         // No gravity
@@ -444,7 +446,6 @@ s.SatelliteGame = new Class( {
     },
 
     handleKill: function(message) {
-        console.log(message);
         // get enemy position
         var position = s.game.enemies.get(message.killed).root.position;
         new s.Explosion({
@@ -506,6 +507,12 @@ s.SatelliteGame = new Class( {
                 s.game.handleDie(zapped, killer);
             }
         } else {
+            if (zappedEnemy.isBot) {
+                zappedEnemy.evasiveManeuvers = true;
+                setTimeout(function() {
+                    zappedEnemy.evasiveManeuvers = false;
+                }, 4000);
+            }
             if (zappedEnemy.shields > 0){
                 zappedEnemy.shields -= 20;
                 console.log(zapped, ' shield is now: ', zappedEnemy.shields);
@@ -519,7 +526,10 @@ s.SatelliteGame = new Class( {
             if (zappedEnemy.hull <= 0 && zappedEnemy.isBot) {
                 console.log(zapped, ' has died');
                 s.game.handleKill.call(s, { killed: zapped, killer: killer });
-                s.game.enemies.add( {position: [ 23498, -25902, 24976 ]}, 'bot' );
+                var hookName = ('control' + zapped).split(' ').join('');
+                s.game.unhook( zappedEnemy[hookName] );
+
+                s.game.enemies.add( {}, 'bot' );
             }
         }
     },
@@ -539,14 +549,23 @@ s.SatelliteGame = new Class( {
 
     restartGame: function() {
         var that = this;
-        this.gameOverBoolean = true;
         setTimeout(function() {
             that.player.shields = s.config.ship.shields;
             that.player.hull = s.config.ship.hull;
             that.player.setPosition([19232, 19946, 20311],[0,0,0],[0,0,0],[0,0,0]);
+            that.setBotsOnRestart();
             that.menu.close();
             that.gameOverBoolean = false;
+            that.gameFire = true;
         }, 6000);
+    },
+
+    setBotsOnRestart: function () {
+        for (var i = 0; i < this.enemies._list.length; i++) {
+            if (this.enemies._list[i].isBot) {
+                this.enemies._list[i].setPosition([-6879, 210, 406],[0,0,0],[0,0,0],[0,0,0]);
+            }
+        }
     },
 
     shieldBoost: function(){
@@ -607,8 +626,8 @@ s.SatelliteGame = new Class( {
         this.game.hostPlayer = true;
         console.log(this.game.hostPlayer);
         if (this.game.botCount === 0) {
-            console.log(true);
             // Create a new bot
+            this.game.enemies.add( {}, 'bot');
             this.game.enemies.add( {}, 'bot');
         }
         that.game.updatePlayersWithBots('botInfo');
@@ -662,6 +681,7 @@ s.SatelliteGame = new Class( {
         var shields = this.game[message.baseName].shields;
         console.log(this.game.baseNameMap[message.baseName] + ' was hit by ' + message.pilotName + '. Shields at ' + shields);
         if (this.game[message.baseName].shields < 0) {
+            this.game.gameFire = false;
             this.game.handleBaseDeath(message.baseName);
         }
     },
@@ -678,6 +698,7 @@ s.SatelliteGame = new Class( {
             } else {
                 message = "alliance win";
             }
+            s.game.gameOverBoolean = true;
             s.game.menu.gameOver('temp', s.game.baseNameMap[base], message);
             s.game.restartGame();
         }, 3000);

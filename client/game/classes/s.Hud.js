@@ -346,7 +346,7 @@ s.HUD = new Class({
         // PLAYER SHIELD/HEALTH STATUS //
         /////////////////////////////////
 
-        if (this.hp !== s.config.ship.hull && !this.game.gameOverBoolean){
+        if (this.hp !== s.config.ship.hull && this.health > -10){
             var grd = this.ctx.createRadialGradient(centerX,centerY,width/12,centerX,centerY,this.health);
             grd.addColorStop(0,"rgba(0,0,0,0)");
             grd.addColorStop(1,"rgba(256,0,0,0.75)");
