@@ -236,7 +236,7 @@ s.SatelliteGame = new Class( {
             e = e.which;
             that.HUD.changeTarget = (e === 69 ? 1 : e === 81 ? -1 : 0);
         } );
-
+        console.log("LOOLOLOL LOOK AT ME I AM A ROOM", this.room);
         this.comm = new s.Comm( {
             room: this.room,
             game: that,
