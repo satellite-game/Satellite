@@ -120,6 +120,12 @@ s.SatelliteGame = new Class( {
                 this._map[ enemyShip.name ] = enemyShip; // this._map.set(enemyInfo.name, otherShip);
             }
         };
+
+        // Create sound object
+        this.sound = new s.Sound({
+            enabled: s.config.sound.enabled,
+            sounds: s.config.sound.sounds
+        });
     },
 
     initialize: function() {
@@ -140,10 +146,6 @@ s.SatelliteGame = new Class( {
         this.light = new THREE.DirectionalLight( 0xEEEEEE, 2 );
         this.light.position.set( -100000, 0, 0 );
         this.scene.add( this.light );
-        this.sound = new s.Sound({
-            enabled: s.config.sound.enabled,
-            sounds: s.config.sound.sounds
-        });
 
         // Add moon
         this.moon = new s.Moon( {

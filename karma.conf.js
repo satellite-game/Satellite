@@ -11,6 +11,7 @@ module.exports = function(config) {
       .concat([
         'tests/Function.prototype.bind_polyfill.js',
         'tests/client/preload.js',
+        'tests/client/unit/helpers.js',
         'tests/client/**/*.js',
         { pattern: 'tests/mock/models/*.json', watched: true, served: true, included: false },
         { pattern: 'tests/mock/textures/**/*.png', watched: true, served: true, included: false }
