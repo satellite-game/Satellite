@@ -68,6 +68,7 @@ s.Comm = new Class({
     this.socket.on('hit', this.makeTrigger('hit'));
     this.socket.on('bot retrieval', this.makeTrigger('bot retrieval'));
     this.socket.on('bot positions', this.makeTrigger('bot positions'));
+    this.socket.on('baseHit', this.makeTrigger( 'baseHit' ));
 
     this.game.hook( this.position );
 
@@ -204,5 +205,13 @@ s.Comm = new Class({
 
   botUpdate: function(enemies) {
     this.socket.emit('bot', 'botUpdate', enemies);
+  },
+
+  baseFire: function(baseName, pilotName) {
+    this.socket.emit('bot', 'baseFire', {
+        baseName: baseName,
+        pilotName: pilotName
+    });
   }
+
 });
