@@ -38,7 +38,7 @@ s.Comm = new Class({
     this.ship = options.ship;
     this.server = 'http://' + options.server;
     this.pilot = options.pilot;
-    this.room = options.room;
+    this.room = 'sa'; // PLEASE PAY ATTENTION TO THIS. ROOMS ARE HARD CODED LOL. 
 
     var that = this;
 
