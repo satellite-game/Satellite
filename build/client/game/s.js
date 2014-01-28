@@ -50844,11 +50844,12 @@ s.Projectile = new Class({
     },
 
     handleCollision: function(mesh, position){
+        
+        if (!this.game.gameFire) { return; }
+
         //check if your turret hit someone or an enemy base
         //else if check if you got hit by a bot or if a bot hit your base
-        console.log(this.game.gameFire);
-        if (!this.game.gameFire) { return; }
-        console.log(this.game.gameFire);
+
         if (this.pilot === this.game.pilot.name){
             if (mesh.instance.alliance && mesh.instance.alliance === "rebel"){
                 this.HUD.menu.animate({
@@ -51316,7 +51317,7 @@ s.Bot = new Class( {
     var thrust = 0;
     var brakes = 0;
 
-    var  maxDistance = 4100, minDistance = 1500;
+    var  maxDistance = 8000, minDistance = 1000;
 
     if (this.closestDistance > maxDistance) {
       thrust = 1;
@@ -51419,7 +51420,7 @@ s.Bot = new Class( {
     ///////  FIRING LOGIC ////////
     //////////////////////////////
 
-    if (Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && this.closestDistance < maxDistance) {
+    if (this.game.gameFire && Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && this.closestDistance < maxDistance) {
       this.fire('turret');
     }
 
