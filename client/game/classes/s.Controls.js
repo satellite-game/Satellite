@@ -221,7 +221,7 @@ s.Controls = new Class({
       roll = -1*this.options.rotationSpeed;
     }
 
-    if (this.keyboard.pressed('space') || this.firing){
+    if (this.game.gameFire && this.keyboard.pressed('space') || this.firing){
       this.player.fire('turret');
     }
 

@@ -33,6 +33,7 @@ s.SatelliteGame = new Class( {
 
         this.hostPlayer = false;
         this.teamMode = true;
+        this.gameFire = true;
 
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
 		// No gravity
@@ -541,9 +542,19 @@ s.SatelliteGame = new Class( {
             that.player.shields = s.config.ship.shields;
             that.player.hull = s.config.ship.hull;
             that.player.setPosition([19232, 19946, 20311],[0,0,0],[0,0,0],[0,0,0]);
+            that.setBotsOnRestart();
             that.menu.close();
             that.gameOverBoolean = false;
+            that.gameFire = true;
         }, 6000);
+    },
+
+    setBotsOnRestart: function () {
+        for (var i = 0; i < this.enemies._list.length; i++) {
+            if (this.enemies._list[i].isBot) {
+                this.enemies._list[i].setPosition([-6879, 210, 406],[0,0,0],[0,0,0],[0,0,0]);
+            }
+        }
     },
 
     shieldBoost: function(){
@@ -659,6 +670,7 @@ s.SatelliteGame = new Class( {
         var shields = this.game[message.baseName].shields;
         console.log(this.game.baseNameMap[message.baseName] + ' was hit by ' + message.pilotName + '. Shields at ' + shields);
         if (this.game[message.baseName].shields < 0) {
+            this.game.gameFire = false;
             this.game.handleBaseDeath(message.baseName);
         }
     },

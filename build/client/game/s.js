@@ -50846,6 +50846,9 @@ s.Projectile = new Class({
     handleCollision: function(mesh, position){
         //check if your turret hit someone or an enemy base
         //else if check if you got hit by a bot or if a bot hit your base
+        console.log(this.game.gameFire);
+        if (!this.game.gameFire) { return; }
+        console.log(this.game.gameFire);
         if (this.pilot === this.game.pilot.name){
             if (mesh.instance.alliance && mesh.instance.alliance === "rebel"){
                 this.HUD.menu.animate({
@@ -51416,7 +51419,7 @@ s.Bot = new Class( {
     ///////  FIRING LOGIC ////////
     //////////////////////////////
 
-    if ( Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && this.closestDistance < maxDistance) {
+    if (Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && this.closestDistance < maxDistance) {
       this.fire('turret');
     }
 
@@ -52220,7 +52223,7 @@ s.Controls = new Class({
       roll = -1*this.options.rotationSpeed;
     }
 
-    if (this.keyboard.pressed('space') || this.firing){
+    if (this.game.gameFire && this.keyboard.pressed('space') || this.firing){
       this.player.fire('turret');
     }
 
@@ -54056,6 +54059,7 @@ s.SatelliteGame = new Class( {
 
         this.hostPlayer = false;
         this.teamMode = true;
+        this.gameFire = true;
 
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
 		// No gravity
@@ -54564,9 +54568,19 @@ s.SatelliteGame = new Class( {
             that.player.shields = s.config.ship.shields;
             that.player.hull = s.config.ship.hull;
             that.player.setPosition([19232, 19946, 20311],[0,0,0],[0,0,0],[0,0,0]);
+            that.setBotsOnRestart();
             that.menu.close();
             that.gameOverBoolean = false;
+            that.gameFire = true;
         }, 6000);
+    },
+
+    setBotsOnRestart: function () {
+        for (var i = 0; i < this.enemies._list.length; i++) {
+            if (this.enemies._list[i].isBot) {
+                this.enemies._list[i].setPosition([-6879, 210, 406],[0,0,0],[0,0,0],[0,0,0]);
+            }
+        }
     },
 
     shieldBoost: function(){
@@ -54682,6 +54696,7 @@ s.SatelliteGame = new Class( {
         var shields = this.game[message.baseName].shields;
         console.log(this.game.baseNameMap[message.baseName] + ' was hit by ' + message.pilotName + '. Shields at ' + shields);
         if (this.game[message.baseName].shields < 0) {
+            this.game.gameFire = false;
             this.game.handleBaseDeath(message.baseName);
         }
     },
