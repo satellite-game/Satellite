@@ -1,4 +1,4 @@
-module.exports = function(host, Sync) {
+module.exports = function(host, Sync) { // deprecated -- like all of it =( 
   return {
 
     keySync: function (socket, packet) {
