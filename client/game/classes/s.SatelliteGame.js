@@ -122,13 +122,12 @@ s.SatelliteGame = new Class( {
 
     initialize: function() {
         var that = this;
-
         this.IDs = [];
         this.hostPlayer = false;
 
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
-		// No gravity
-		this.scene.setGravity(new THREE.Vector3(0, 0, 0));
+        // No gravity
+        this.scene.setGravity(new THREE.Vector3(0, 0, 0));
 
         // Ambient light
         this.ambientLight = new THREE.AmbientLight( 0x382828 );
@@ -157,7 +156,6 @@ s.SatelliteGame = new Class( {
 
         this.pilot = {};
         this.callsigns = this.callsigns || ["Apollo","Strobe","Sage","Polkadot","Moonglow","Steel","Vanguard","Prong","Uptight","Blackpony","Hawk","Ramrod","Dice","Falcon","Rap","Buckshot","Cobra","Magpie","Warhawk","Boxer","Devil","Hammer","Phantom","Sharkbait","Dusty","Icon","Blade","Pedro","Stinger","Yellow Jacket","Limit","Sabre","Misty","Whiskey","Dice","Antic","Arrow","Auto","Avalon","Bandit","Banshee","Blackjack","Bulldog","Caesar","Cajun","Challenger","Chuggs","Cindy","Cracker","Dagger","Dino","Esso","Express","Fangs","Fighting Freddie","Freight Train","Freemason","Fury","Gamma","Gear","Ghost","Ginger","Greasy","Havoc","Hornet","Husky","Jackal","Jaguar","Jedi","Jazz","Jester","Knife","Kitty Hawk","Knight","Knightrider","Koala","Komono","Lancer","Lexus","Lion","Levi","Lucid","Malty","Mail Truck","Magma","Magnet","Malibu","Medusa","Maul","Monster","Misfit","Moss","Moose","Mustang","Nail","Nasa","Nacho","Nighthawk","Ninja","Neptune","Odin","Occult","Nukem","Ozark","Pagan","Pageboy","Panther","Peachtree","Phenom","Polestar","Punisher","Ram","Rambo","Raider","Raven","Razor","Rupee","Sabre","Rust","Ruin","Sultan","Savor","Scandal","Scorpion","Shooter","Smokey","Sniper","Spartan","Thunder","Titus","Titan","Timber Wolf","Totem","Trump","Venom","Veil","Viper","Weasel","Warthog","Winter","Wiki","Wild","Yonder","Yogi","Yucca","Zeppelin","Zeus","Zesty"];
-
         this.pilot.name = this.callsigns[Math.floor(this.callsigns.length*Math.random())] + ' ' + ( new Date( ).getTime( ) % 100 );
 
         // Add a hud
@@ -182,8 +180,8 @@ s.SatelliteGame = new Class( {
             HUD: this.HUD,
             game: this,
             shipClass: 'human_ship_heavy',
-            // position: new THREE.Vector3(this.getRandomCoordinate(),this.getRandomCoordinate(),this.getRandomCoordinate()),
-            position: new THREE.Vector3(23498, -25902, 24976),
+            position: new THREE.Vector3(this.getRandomCoordinate(),this.getRandomCoordinate(),this.getRandomCoordinate()),
+            // position: new THREE.Vector3(23498, -25902, 24976),
             name: this.pilot.name,
             rotation: new THREE.Vector3( 0, Math.PI/2, 0 ),
             alliance: 'alliance',
@@ -240,12 +238,13 @@ s.SatelliteGame = new Class( {
         } );
 
         this.comm = new s.Comm( {
+            room: this.room,
             game: that,
             pilot: that.pilot,
             player: this.player,
             server: window.location.hostname + ':' + window.location.port
         } );
-        
+
         this.comm.on('fire', that.handleEnemyFire);
         this.comm.on('hit', that.handleHit);
         this.comm.on('player list', that.handlePlayerList);
@@ -253,6 +252,7 @@ s.SatelliteGame = new Class( {
         this.comm.on( 'join', that.handleJoin );
         this.comm.on( 'leave', that.handleLeave );
         this.comm.on( 'move', that.handleMove );
+        this.comm.on( 'sync', that.handleSync);
         this.comm.on( 'bot retrieval', that.handleBotInfo );
         this.comm.on( 'bot positions', that.handleBotPositions );
 
@@ -262,6 +262,8 @@ s.SatelliteGame = new Class( {
         this.player.root.addEventListener('ready', function(){
             s.game.start();
         });
+
+        s.game.menu.joinRoom();
 	},
 
 	render: function(_super, time) {
@@ -343,6 +345,7 @@ s.SatelliteGame = new Class( {
     },
 
     handleJoin: function ( message ) {
+           console.log("Received a join");
            s.game.enemies.add( message );
     },
     handleLeave: function ( message ) {
@@ -350,6 +353,7 @@ s.SatelliteGame = new Class( {
             console.log( '%s has left', message.name );
         }
     },
+
     handleMove: function ( message ) {
         if ( message.name == this.pilot.name ) {
             // server told us to move
@@ -376,6 +380,7 @@ s.SatelliteGame = new Class( {
     },
 
     handleKill: function(message) {
+        console.log(message);
         // get enemy position
         var position = s.game.enemies.get(message.killed).root.position;
         new s.Explosion({
@@ -408,10 +413,10 @@ s.SatelliteGame = new Class( {
     },
 
     handleHit: function(message) {
-        var zappedName = message.otherPlayerName;
-        var killer = message.yourName;
-        var zappedEnemy = s.game.enemies.get(zappedName);
-        if (zappedName === s.game.pilot.name){
+        var zapped = message.zappedName;
+        var killer = message.killerName;
+        var zappedEnemy = s.game.enemies.get(zapped);
+        if (zapped === s.game.pilot.name){
             s.game.stopShields();
             s.game.rechargeShields();
             if (s.game.player.shields > 0){
@@ -434,22 +439,22 @@ s.SatelliteGame = new Class( {
             console.log('You were hit with a laser by %s! Your HP: %d', killer, s.game.player.hull);
 
             if (s.game.player.hull <= 0) {
-                s.game.handleDie(zappedName, killer);
+                s.game.handleDie(zapped, killer);
             }
         } else {
             if (zappedEnemy.shields > 0){
                 zappedEnemy.shields -= 20;
-                console.log(zappedName, ' shield is now: ', zappedEnemy.shields);
+                console.log(zapped, ' shield is now: ', zappedEnemy.shields);
                 setTimeout(function() {
                     s.game.replenishEnemyShield(zappedEnemy);
                 }, 7000);
             } else {
                 zappedEnemy.hull -= 20;
-                console.log(zappedName, ' hull is now: ', zappedEnemy.hull);
+                console.log(zapped, ' hull is now: ', zappedEnemy.hull);
             }
             if (zappedEnemy.hull <= 0 && zappedEnemy.isBot) {
-                console.log(zappedName, ' has died');
-                s.game.handleKill.call(s, { killed: zappedName, killer: killer });
+                console.log(zapped, ' has died');
+                s.game.handleKill.call(s, { killed: zapped, killer: killer });
                 s.game.enemies.add( {position: [ 23498, -25902, 24976 ]}, 'bot' );
             }
         }
@@ -477,6 +482,7 @@ s.SatelliteGame = new Class( {
             that.player.hull = s.config.ship.hull;
             that.player.setPosition([that.getRandomCoordinate(), that.getRandomCoordinate(), that.getRandomCoordinate()],[0,0,0],[0,0,0],[0,0,0]);
             that.hostPlayer = false;
+            that.menu.close();
             that.restart();
         }, 6000);
     },
@@ -536,9 +542,10 @@ s.SatelliteGame = new Class( {
                 that.game.updatePlayersWithBots('botUpdate');
             }, 2500);
         }
-
         this.game.hostPlayer = true;
+        console.log(this.game.hostPlayer);
         if (this.game.botCount === 0) {
+            console.log(true);
             // Create a new bot
             this.game.enemies.add( {}, 'bot');
         }
