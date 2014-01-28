@@ -2,20 +2,21 @@ s.SatelliteGame = new Class( {
     toString: 'SatelliteGame',
     extend: s.Game,
 
-	// Models that should be loaded
-	models: [
-		'phobos_hifi',
-		'phobos_lofi',
+    // Models that should be loaded
+    models: [
+        'phobos_hifi',
+        'phobos_lofi',
         'human_ship_heavy',
-		'human_ship_light',
+        'human_ship_light',
         'human_space_station',
         'human_building_short',
         'human_building_tall'
-	],
+    ],
 
     textures: [
         'particle.png',
-        'explosion.png'
+        'explosion.png',
+        'crosshairs.png'
     ],
 
     getRandomCoordinate: function(){
@@ -26,16 +27,117 @@ s.SatelliteGame = new Class( {
         return Math.floor(Math.random()* 15000 + 15000) * coefficient;
     },
 
-	initialize: function() {
-		var that = this;
-        this.IDs = [];
+    construct: function() {
         this.botCount = 0;
+
+        /******************
+         Enemy setup
+         ******************/
+        this.enemies = {
+            _list: [ ],
+            _map: {}, // new WeakMap()
+            get: function ( nameOrId ) {
+                if ( typeof nameOrId == 'string' ) {
+                    return this._map[ nameOrId ]; // return enemies._map.get(nameOrId);
+                } else if ( typeof nameOrId == 'number' ) {
+                    return this._list( nameOrId );
+                }
+            },
+            has: function ( nameOrId ) {
+                return !!this.get( nameOrId );
+            },
+            execute: function ( nameOrId, operation, args ) {
+                var enemy = this.get( nameOrId );
+                if ( enemy ) {
+                    enemy[ operation ].apply( enemy, args );
+                    return true;
+                }
+                return false;
+            },
+            forEach: function ( callback ) {
+                this._list.forEach( callback );
+            },
+            list: function ( ) {
+                return this._list;
+            },
+            delete: function ( nameOrId ) {
+                var enemy = this.get( nameOrId );
+                if ( enemy ) {
+                    // Remove from map
+                    delete this._map[ enemy.name ]; // this._map.delete(enemy.name);
+
+                    // Remove from array
+                    var enemyIndex = this._list.indexOf( enemy );
+                    if ( ~enemyIndex )
+                        this._list.splice( enemyIndex, 1 );
+
+                    // destroy
+                    enemy.destruct( );
+
+                    return true;
+                }
+                return false;
+            },
+            add: function ( enemyInfo, isBot ) {
+                if ( this.has( enemyInfo.name ) ) {
+                    this.delete( enemyInfo.name );
+                    console.error( 'Bug: Player %s added twice', enemyInfo.name );
+                } else {
+                    if ( enemyInfo.name === null ) {
+                        console.error( 'Bug: enemyInfo contained null player name' );
+                        console.log( enemyInfo );
+                        console.trace( );
+                    }
+                    if (!isBot) { console.log( '%s has joined the fray', enemyInfo.name ); }
+                }
+
+                // TODO: include velocities?
+                var enemyShip;
+                if (isBot) {
+                    enemyShip = new s.Bot( {
+                        game: s.game,
+                        shipClass: 'human_ship_heavy',
+                        name: enemyInfo.name,
+                        position: enemyInfo.position,
+                        rotation: enemyInfo.rotation,
+                        alliance: 'rebel'
+                    } );
+                } else {
+                    var alliance = 'rebel';
+                    if (s.game.teamMode) { alliance = 'alliance'; }
+                    enemyShip = new s.Player( {
+                        game: s.game,
+                        shipClass: 'human_ship_heavy',
+                        name: enemyInfo.name,
+                        position: new THREE.Vector3( enemyInfo.pos[ 0 ], enemyInfo.pos[ 1 ], enemyInfo.pos[ 2 ] ),
+                        rotation: new THREE.Vector3( enemyInfo.rot[ 0 ], enemyInfo.rot[ 1 ], enemyInfo.rot[ 2 ] ),
+                        alliance: alliance
+                    } );
+                }
+
+                if (isBot) { console.log( '%s has joined the fray', enemyShip.name ); }
+
+                this._list.push( enemyShip );
+                this._map[ enemyShip.name ] = enemyShip; // this._map.set(enemyInfo.name, otherShip);
+            }
+        };
+
+        // Create sound object
+        this.sound = new s.Sound({
+            enabled: s.config.sound.enabled,
+            sounds: s.config.sound.sounds
+        });
+    },
+
+    initialize: function() {
+        var that = this;
+        this.IDs = [];
         this.hostPlayer = false;
         this.teamMode = true;
 
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
-		// No gravity
-		this.scene.setGravity(new THREE.Vector3(0, 0, 0));
+        // No gravity
+        this.scene.setGravity(new THREE.Vector3(0, 0, 0));
 
         // Ambient light
         this.ambientLight = new THREE.AmbientLight( 0x382828 );
@@ -45,10 +147,6 @@ s.SatelliteGame = new Class( {
         this.light = new THREE.DirectionalLight( 0xEEEEEE, 2 );
         this.light.position.set( -100000, 0, 0 );
         this.scene.add( this.light );
-        this.sound = new s.Sound({
-            enabled: s.config.sound.enabled,
-            sounds: s.config.sound.sounds
-        });
 
         // Add moon
         this.moon = new s.Moon( {
@@ -103,6 +201,17 @@ s.SatelliteGame = new Class( {
             camera: this.camera
         } );
 
+        // Targeting square around targeted enemy.
+
+        // var targetingGeo = new THREE.PlaneGeometry(100, 100);
+        // var targetingMat = new THREE.MeshBasicMaterial({color: 0x00FF00, wireframe: true});
+
+        // this.targeting = new THREE.Mesh(targetingGeo, targetingMat);
+
+        // this.scene.add( this.targeting );
+
+        // this.currentTarget = null;
+
         this.HUD.hp = this.player.hull;
 
         $(document).on('keyup', function(evt) {
@@ -130,123 +239,32 @@ s.SatelliteGame = new Class( {
             menu: this.menu
         } );
 
-        /******************
-         Enemy setup
-         ******************/
-        this.enemies = {
-            _list: [ ],
-            _map: {}, // new WeakMap()
-            get: function ( nameOrId ) {
-                if ( typeof nameOrId == 'string' ) {
-                    return this._map[ nameOrId ]; // return enemies._map.get(nameOrId);
-                } else if ( typeof nameOrId == 'number' ) {
-                    return this._list( nameOrId );
-                }
-            },
-            has: function ( nameOrId ) {
-                return !!this.get( nameOrId );
-            },
-            execute: function ( nameOrId, operation, args ) {
-                var enemy = this.get( nameOrId );
-                if ( enemy ) {
-                    enemy[ operation ].apply( enemy, args );
-                    return true;
-                }
-                return false;
-            },
-            forEach: function ( callback ) {
-                this._list.forEach( callback );
-            },
-            list: function ( ) {
-                return this._list;
-            },
-            delete: function ( nameOrId ) {
-                var enemy = this.get( nameOrId );
-                if ( enemy ) {
-                    // Remove from map
-                    delete this._map[ enemy.name ]; // this._map.delete(enemy.name);
-
-                    // Remove from array
-                    var enemyIndex = this._list.indexOf( enemy );
-                    if ( ~enemyIndex )
-                        this._list.splice( enemyIndex, 1 );
-
-                    // destroy
-                    enemy.destruct( );
-
-                    return true;
-                }
-                return false;
-            },
-
-            add: function ( enemyInfo, isBot ) {
-                if ( this.has( enemyInfo.name ) ) {
-                    this.delete( enemyInfo.name );
-                    console.error( 'Bug: Player %s added twice', enemyInfo.name );
-                } else {
-                    if ( enemyInfo.name === null ) {
-                        console.error( 'Bug: enemyInfo contained null player name' );
-                        console.log( enemyInfo );
-                        console.trace( );
-                    }
-                    if (!isBot) { console.log( '%s has joined the fray', enemyInfo.name ); }
-                }
-
-                // TODO: include velocities?
-                var enemyShip;
-                if (isBot) {
-                    enemyShip = new s.Bot( {
-                        game: that,
-                        shipClass: 'human_ship_heavy',
-                        name: enemyInfo.name,
-                        position: enemyInfo.position,
-                        rotation: enemyInfo.rotation,
-                        alliance: 'rebel'
-                    } );
-                } else {
-                    var alliance = 'rebel';
-                    if (s.game.teamMode) { alliance = 'alliance'; }
-                    enemyShip = new s.Player( {
-                        game: that,
-                        shipClass: 'human_ship_heavy',
-                        name: enemyInfo.name,
-                        position: new THREE.Vector3( enemyInfo.pos[ 0 ], enemyInfo.pos[ 1 ], enemyInfo.pos[ 2 ] ),
-                        rotation: new THREE.Vector3( enemyInfo.rot[ 0 ], enemyInfo.rot[ 1 ], enemyInfo.rot[ 2 ] ),
-                        alliance: alliance
-                    } );
-                }
-
-                if (isBot) { console.log( '%s has joined the fray', enemyShip.name ); }
-
-                this._list.push( enemyShip );
-                this._map[ enemyShip.name ] = enemyShip; // this._map.set(enemyInfo.name, otherShip);
-            }
-        };
-
         // Dependent on controls; needs to be below s.Controls
         this.radar = new s.Radar( {
             game: this
             //controls: this.controls
         } );
 
+        // window.addEventListener( 'mousemove', function ( e ) {
+        //     that.HUD.targetX = e.pageX;
+        //     that.HUD.targetY = e.pageY;
+        // } );
 
-
-        window.addEventListener( 'mousemove', function ( e ) {
-            that.HUD.targetX = e.pageX;
-            that.HUD.targetY = e.pageY;
-        } );
         window.addEventListener( 'mousedown', function ( ) {
             that.controls.firing = true;
         } );
         window.addEventListener( 'mouseup', function ( ) {
             that.controls.firing = false;
         } );
+
+        // Add this back in later with new targeting system.
+
         window.addEventListener( 'keydown', function(e) {
             // Cycle through targets; extra logic guarding to prevent rapid cycling while the key is pressed
             e = e.which;
             that.HUD.changeTarget = (e === 69 ? 1 : e === 81 ? -1 : 0);
         } );
-
+        
         this.comm = new s.Comm( {
             room: this.room,
             game: that,
@@ -273,24 +291,59 @@ s.SatelliteGame = new Class( {
         this.player.root.addEventListener('ready', function(){
             s.game.start();
         });
+        
+        // Engine glow and flame trail on your player only.
 
-        s.game.menu.joinRoom();
-	},
+        this.flames = [];
 
-	render: function(_super, time) {
-		_super.call(this, time);
-		this.controls.update();
-	},
+        for (var i = 0; i < 5; i++) {
+          var sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: s.textures.particle,
+            useScreenCoordinates: false,
+            blending: THREE.AdditiveBlending,
+            color: 0x00FFFF
+          }));
 
-	addSkybox: function() {
-		var urlPrefix = "game/textures/skybox/Purple_Nebula_";
-		var urls = [
-			urlPrefix + "right1.png", urlPrefix + "left2.png",
-			urlPrefix + "top3.png", urlPrefix + "bottom4.png",
-			urlPrefix + "front5.png", urlPrefix + "back6.png"
-		];
+          this.flames.push(sprite);
+          this.player.root.add(sprite);
+          sprite.position.set(0, 0, (i*10)+40);
+        }
 
-		THREE.ImageUtils.loadTextureCube(urls, {}, function(textureCube) {
+        this.trailGlow = new THREE.PointLight(0x00FFFF, 5, 20);
+        this.player.root.add( this.trailGlow );
+        this.trailGlow.position.set(0, 0, 35);
+
+        this.ocuScale = this.oculus.detected ? 0.2 : 1;
+    },
+
+
+    render: function(_super, time) {
+        _super.call(this, time);
+        this.controls.update();
+        // this.targeting.lookAt(this.player.root.position);
+        // if (this.currentTarget) this.targeting.position.set(this.currentTarget.root.position);
+
+        // Adjusts engine glow based on linear velosity
+        this.trailGlow.intensity = this.player.root.getLinearVelocity().length()/100;
+
+        var flameScaler = (Math.random()*0.1 + 1)*this.ocuScale;
+
+        this.flames[0].scale.set(2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler);
+        this.flames[1].scale.set(3*this.trailGlow.intensity*flameScaler, 3*this.trailGlow.intensity*flameScaler, 3*this.trailGlow.intensity*flameScaler);
+        this.flames[2].scale.set(2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler);
+        this.flames[3].scale.set(1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler);
+        this.flames[4].scale.set(1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler);
+    },
+
+    addSkybox: function() {
+        var urlPrefix = "game/textures/skybox/Purple_Nebula_";
+        var urls = [
+            urlPrefix + "right1.png", urlPrefix + "left2.png",
+            urlPrefix + "top3.png", urlPrefix + "bottom4.png",
+            urlPrefix + "front5.png", urlPrefix + "back6.png"
+        ];
+
+        THREE.ImageUtils.loadTextureCube(urls, {}, function(textureCube) {
             textureCube.format = THREE.RGBFormat;
             var shader = THREE.ShaderLib.cube;
 
@@ -307,23 +360,23 @@ s.SatelliteGame = new Class( {
             this.skyboxMesh = new THREE.Mesh( new THREE.CubeGeometry( 200000, 200000, 200000, 1, 1, 1, null, true ), material );
             this.scene.add( this.skyboxMesh );
         }.bind(this));
-	},
+    },
 
-	addDust: function() {
-		var starSprite = THREE.ImageUtils.loadTexture('game/textures/particle.png');
-		var geometry = new THREE.Geometry();
+    addDust: function() {
+        var starSprite = THREE.ImageUtils.loadTexture('game/textures/particle.png');
+        var geometry = new THREE.Geometry();
 
-		// Set to false for "dust", true for stars
-		var outer = true;
+        // Set to false for "dust", true for stars
+        var outer = true;
 
-		// Spec size
-		var radius = 100000;
-		var size = 100;
-		var count = 1000;
+        // Spec size
+        var radius = 100000;
+        var size = 100;
+        var count = 1000;
 
-		for (var i = 0; i < count; i ++ ) {
+        for (var i = 0; i < count; i ++ ) {
 
-			var vertex = new THREE.Vector3( );
+            var vertex = new THREE.Vector3( );
 
             if ( outer ) {
                 // Distribute "stars" on the outer bounds of far space
@@ -340,9 +393,9 @@ s.SatelliteGame = new Class( {
 
             geometry.vertices.push( vertex );
 
-		}
+        }
 
-		var material = new THREE.ParticleBasicMaterial( {
+        var material = new THREE.ParticleBasicMaterial( {
             size: size,
             map: starSprite,
             blending: THREE.AdditiveBlending,
@@ -366,13 +419,6 @@ s.SatelliteGame = new Class( {
     },
 
     handleMove: function ( message ) {
-        // message.aAccel
-        // message.lAccel
-        // message.pos
-        // message.rot
-        // message.aVeloc
-        // message.lVeloc
-
         if ( message.name == this.pilot.name ) {
             // server told us to move
             console.log( 'Server reset position' );
@@ -386,47 +432,6 @@ s.SatelliteGame = new Class( {
             }
         }
     },
-    // handleSync: function ( pak ) {
-    //   var data = {};
-    //   for(var i in pak) {
-    //     data[i] = pak[i];
-    //   };
-    //   var whoAmI = s.game.pilot.name,
-    //       myData = pak[whoAmI];
-
-    //   var adjustPlayer = function( serverView ) {
-    //     var adjusted = [];
-
-    //     var myView = s.game.player.getPositionPacket();
-    //     for(var i = 0; i < serverView.lVeloc.length; i++) {
-    //       var pos = Math.abs(serverView.pos[i]) - Math.abs(myView.pos[i]);
-
-    //       if( pos >= 1700 ) {
-    //         console.log("Experiencing whiplash!", pos);
-    //         s.game.player.setPosition( serverView.pos, myView.rot, serverView.aVeloc, serverView.lVeloc, true );
-    //         return;
-    //       }
-
-    //       if(serverView.pos[i] >= 0) {
-    //         adjusted.push(serverView.lVeloc[i] + pos);
-    //       } else {
-    //         adjusted.push(serverView.lVeloc[i] - pos);
-    //       }
-
-    //     }
-    //     s.game.comm.position();
-    //     //s.game.player.setPosition( myView.pos, myView.rot, serverView.aVeloc, adjusted, false );
-    //   };
-
-    //   adjustPlayer(myData);
-    //   delete data[whoAmI];
-    //   for(var i in data ) {
-    //     if( !s.game.enemies.execute( data[i].name, 'setPosition', [ data[i].pos, data[i].rot, data[i].aVeloc, data[i].lVeloc, true ] ) ) {
-    //       s.game.enemies.add( data[i] );
-    //     }
-    //   }
-
-    // },
 
     handlePlayerList: function(message) {
         for (var otherPlayerName in message) {
