@@ -33,7 +33,8 @@ s.Controls = new Class({
     this.oculus = this.game.oculus;
 
     // Mouse interface - mice options are: 'keyboard', 'none', 'oculus'
-    this.mouse = new s.Mouse('keyboard', options);
+    // this.mouse = new s.Mouse('keyboard', options);
+    this.mouse = new s.Mouse('none', options);
 
     console.log('Initialized gamepad...');
 
@@ -117,10 +118,10 @@ s.Controls = new Class({
     ///////////////////////
 
     var yawSpeed = this.options.yawSpeed,
-      pitchSpeed = this.options.pitchSpeed;
-      // cursor = this.HUD.cursorVector,
-      // radius = this.HUD.subreticleBound.radius,
-      // crosshairs = {width: 30, height: 30};
+      pitchSpeed = this.options.pitchSpeed,
+      cursor = this.HUD.cursorVector,
+      radius = this.HUD.subreticleBound.radius,
+      crosshairs = {width: 30, height: 30};
 
     ///////////////////////
     // KEYBOARD COMMANDS //
@@ -163,25 +164,6 @@ s.Controls = new Class({
     if (this.keyboard.pressed('tilde')) {
       vr.resetHmdOrientation();
     }
-
-    ///////////////////////
-    //  MOUSE CONTROLS   //
-    ///////////////////////
-
-    // var mouseUpdate = this.mouse.update({
-    //     centerX: centerX,
-    //     crosshairs: crosshairs,
-    //     yaw: yaw,
-    //     radius: radius,
-    //     yawSpeed: yawSpeed,
-    //     thrustScalar: thrustScalar,
-    //     centerY: centerY,
-    //     pitch: pitch,
-    //     pitchSpeed: pitchSpeed
-    // });
-
-    // pitch = mouseUpdate.pitch || pitch;
-    // yaw = mouseUpdate.yaw || yaw;
 
     ///////////////////////
     // GAMEPAD CONTROLS  //
