@@ -53,7 +53,7 @@ describe('Ship class', function () {
       var specs = function () {
         var spy = sinon.spy(playerShip, 'makeTurret');
         playerShip.fire('turret');
-        expect(spy.calledTwice).to.equal(true);
+        expect(spy.called).to.equal(true);
       };
 
       runAsync(specs, done);
