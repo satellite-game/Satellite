@@ -292,7 +292,7 @@ s.SatelliteGame = new Class( {
         this.player.root.addEventListener('ready', function(){
             s.game.start();
         });
-        
+
         // Engine glow and flame trail on your player only.
 
         this.flames = [];
@@ -322,6 +322,9 @@ s.SatelliteGame = new Class( {
 		this.controls.update();
         // this.targeting.lookAt(this.player.root.position);
         // if (this.currentTarget) this.targeting.position.set(this.currentTarget.root.position);
+
+        
+        // console.log(_vec3.sub(x3, y3).lengthManhattan());
 
         // Adjusts engine glow based on linear velosity
         this.trailGlow.intensity = this.player.root.getLinearVelocity().length()/100;
@@ -573,7 +576,7 @@ s.SatelliteGame = new Class( {
     },
 
     handleFire: function(props) {
-        if (s.game.roomSelected) s.game.comm.fire(props.position, props.rotation, props.initialVelocity);
+        if (s.game.room) s.game.comm.fire(props.position, props.rotation, props.initialVelocity);
     },
 
     handleDie: function(you, killer) {
