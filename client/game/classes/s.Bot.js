@@ -196,7 +196,7 @@ s.Bot = new Class( {
     ///////  FIRING LOGIC ////////
     //////////////////////////////
 
-    if ( Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && this.closestDistance < maxDistance) {
+    if (this.game.gameFire && Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && this.closestDistance < maxDistance) {
       this.fire('turret');
     }
 
