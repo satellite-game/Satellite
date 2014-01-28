@@ -5,6 +5,7 @@ s.HUD = new Class({
 
 		this.game = options.game;
 		this.controls = options.controls;
+        this.oculus = options.game.oculus;
 
         this.PI = Math.PI;
 
@@ -97,6 +98,16 @@ s.HUD = new Class({
         this.changeTarget = 0;
         this.currentTarget = 0;
 
+        this.crosshairs = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: s.textures.crosshairs,
+            useScreenCoordinates: false,
+            blending: THREE.AdditiveBlending,
+            color: 0x00FF00
+        }));
+
+        this.game.camera.add( this.crosshairs );
+
+        this.crosshairs.position.setZ(-30);
 	},
 	update: function(){
             
@@ -400,6 +411,8 @@ s.HUD = new Class({
         //         }
 
 
+        //         // Fully just crashing on oculus view
+
         //         /////////////////////////////////
         //         // PREDICTIVE TARGETING SYSTEM //
         //         /////////////////////////////////
@@ -414,7 +427,7 @@ s.HUD = new Class({
         //         // angD = angular differential
         //         // velD = velocity differential
         //         // t    = quadratic solution for time at which player bullet and enemy ship will simultaneously reach a given location
-        //         if ( enemies[i] && targetInSight ){
+        //         if ( enemies[i] && targetInSight && !this.oculus.detected ){
 
         //             var aV = enemies[i].root.position.clone().add( self.position.clone().multiplyScalar(-1) );
         //             var a  = aV.length();
@@ -475,8 +488,6 @@ s.HUD = new Class({
 
         // }
 
-        // Damn that felt good.
-
         /////////////////////////////////
         // PLAYER SHIELD/HEALTH STATUS //
         /////////////////////////////////
@@ -509,9 +520,14 @@ s.HUD = new Class({
         // this.ctx.arc(centerX, centerY, 15, 0, 2 * this.PI, false);
         // this.ctx.stroke();
 
+        ///////////////////////
+        ///   CROSSHAIRS    ///
+        ///////////////////////
+
         this.oculusCtx.clearRect(0, 0, this.oculusCanvas.width, this.oculusCanvas.height);
         this.oculusCtx.drawImage(this.canvas, 50*1.07, -50, window.innerWidth/2, window.innerHeight/2);
         this.oculusCtx.drawImage(this.canvas, this.oculusCanvas.width/2-50*1.07, -50, window.innerWidth/2, window.innerHeight/2);
+
     }
 
 });
