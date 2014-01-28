@@ -30,7 +30,6 @@ s.SatelliteGame = new Class( {
 		var that = this;
         this.IDs = [];
         this.botCount = 0;
-        this.botHooks = [];
 
         this.hostPlayer = false;
         this.teamMode = true;
