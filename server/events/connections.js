@@ -82,6 +82,11 @@ module.exports = function (map, host, Sync, io) {
 
       this.disconnect(socket);
       this.join( socket, room );
+    },
+
+    query: function( socket ) {
+      var rooms = host.rooms;
+      socket.emit('roomQuery', Object.keys(rooms));
     }
 
   };
