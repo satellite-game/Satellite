@@ -52620,7 +52620,7 @@ s.HUD = new Class({
         // PLAYER SHIELD/HEALTH STATUS //
         /////////////////////////////////
 
-        if (this.hp !== s.config.ship.hull){
+        if (this.hp !== s.config.ship.hull && !this.game.gameOverBoolean){
             var grd = this.ctx.createRadialGradient(centerX,centerY,width/12,centerX,centerY,this.health);
             grd.addColorStop(0,"rgba(0,0,0,0)");
             grd.addColorStop(1,"rgba(256,0,0,0.75)");
@@ -54556,11 +54556,13 @@ s.SatelliteGame = new Class( {
 
     restartGame: function() {
         var that = this;
+        this.gameOverBoolean = true;
         setTimeout(function() {
             that.player.shields = s.config.ship.shields;
             that.player.hull = s.config.ship.hull;
             that.player.setPosition([19232, 19946, 20311],[0,0,0],[0,0,0],[0,0,0]);
             that.menu.close();
+            that.gameOverBoolean = false;
         }, 6000);
     },
 

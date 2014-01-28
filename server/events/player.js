@@ -26,7 +26,6 @@ module.exports = function (host, sync, io) {
       io.sockets.socket(globals.hostPlayer).emit("bot retrieval");
       // ************************************************************************ //
 
-      socket.emit('killed', deathNotification);
       socket.broadcast.to(room).emit('killed', deathNotification);
     },
 
