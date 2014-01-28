@@ -51300,8 +51300,63 @@ s.Bot = new Class( {
     }
   },
 
+  evasiveManeuvers: function() {
 
-  controlBot: function( ) {
+  },
+
+  determineDirection: function() {
+    var vTarget3D;
+    var vTarget2D;
+
+    var pitch = 0;
+    var yaw = 0;
+    var roll = 0;
+
+    var
+      yawSpeed     = this.botOptions.yawSpeed,
+      pitchSpeed   = this.botOptions.pitchSpeed;
+
+    var thrustScalar = this.botOptions.thrustImpulse/s.config.ship.maxSpeed + 1;
+
+    // TARGET HUD MARKING
+    if ( this.target ) {
+      this.target = this.target.root;
+
+      vTarget3D = this.target.position.clone();
+      vTarget2D = s.projector.projectVector(vTarget3D, this.camera);
+    }
+
+    if (vTarget2D.z < 1) {
+        //go left; else if go right
+        if (vTarget2D.x < -0.15) {
+          yaw = yawSpeed / thrustScalar;
+        } else if (vTarget2D.x > 0.15) {
+          yaw = -1 * yawSpeed / thrustScalar;
+        }
+        //do down; else if go up
+        if (vTarget2D.y < -0.15) {
+          pitch = -1*pitchSpeed / thrustScalar;
+        } else if (vTarget2D.y > 0.15) {
+          pitch  = pitchSpeed / thrustScalar;
+        }
+      } else {
+        //go right; else if go left
+        if (vTarget2D.x < 0) {
+          yaw = -1* yawSpeed / thrustScalar;
+        } else if (vTarget2D.x >= 0) {
+          yaw = yawSpeed / thrustScalar;
+        }
+        //do up; else if go down
+        if (vTarget2D.y < 0) {
+          pitch = pitchSpeed / thrustScalar;
+        } else if (vTarget2D.y > 0) {
+          pitch  = -1 * pitchSpeed / thrustScalar;
+        }
+      }
+      return [pitch, yaw, roll, vTarget2D];
+  },
+
+  controlBot: function() {
 
     //get closest enemy
     this.getEnemyList();
@@ -51343,54 +51398,9 @@ s.Bot = new Class( {
     //////////////////////////////
     // LEFT/RIGHT/UP/DOWN LOGIC //
     //////////////////////////////       
-
-    var vTarget3D;
-    var vTarget2D;
-
-    var pitch = 0;
-    var roll = 0;
-    var yaw = 0;
-
-    var yawSpeed    = this.botOptions.yawSpeed,
-    pitchSpeed  = this.botOptions.pitchSpeed;
-
-    var thrustScalar = this.botOptions.thrustImpulse/s.config.ship.maxSpeed + 1;
-
-    // TARGET HUD MARKING
-    if ( this.target ) {
-      this.target = this.target.root;
-
-      vTarget3D = this.target.position.clone();
-      vTarget2D = s.projector.projectVector(vTarget3D, this.camera);
-    }
-
-    if (vTarget2D.z < 1) {
-        //go left; else if go right
-        if (vTarget2D.x < -0.15) {
-          yaw = yawSpeed / thrustScalar;
-        } else if (vTarget2D.x > 0.15) {
-          yaw = -1 * yawSpeed / thrustScalar;
-        }
-        //do down; else if go up
-        if (vTarget2D.y < -0.15) {
-          pitch = -1*pitchSpeed / thrustScalar;
-        } else if (vTarget2D.y > 0.15) {
-          pitch  = pitchSpeed / thrustScalar;
-        }
-      } else {
-        //go right; else if go left
-        if (vTarget2D.x < 0) {
-          yaw = -1* yawSpeed / thrustScalar;
-        } else if (vTarget2D.x >= 0) {
-          yaw = yawSpeed / thrustScalar;
-        }
-        //do up; else if go down
-        if (vTarget2D.y < 0) {
-          pitch = pitchSpeed / thrustScalar;
-        } else if (vTarget2D.y > 0) {
-          pitch  = -1 * pitchSpeed / thrustScalar;
-        }
-      }
+    
+    var direction = this.determineDirection();
+    var pitch = direction[0], yaw = direction[1], roll = direction[2], vTarget2D = direction[3];
 
     //////////////////////////////
     // MOTION AND PHYSICS LOGIC //
@@ -54529,6 +54539,9 @@ s.SatelliteGame = new Class( {
                 s.game.handleDie(zapped, killer);
             }
         } else {
+            // if (zappedEnemy.isBot) {
+            //     zappedEnemy.evasiveManeuvers();
+            // }
             if (zappedEnemy.shields > 0){
                 zappedEnemy.shields -= 20;
                 console.log(zapped, ' shield is now: ', zappedEnemy.shields);

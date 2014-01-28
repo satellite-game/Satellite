@@ -502,6 +502,9 @@ s.SatelliteGame = new Class( {
                 s.game.handleDie(zapped, killer);
             }
         } else {
+            // if (zappedEnemy.isBot) {
+            //     zappedEnemy.evasiveManeuvers();
+            // }
             if (zappedEnemy.shields > 0){
                 zappedEnemy.shields -= 20;
                 console.log(zapped, ' shield is now: ', zappedEnemy.shields);
