@@ -14,6 +14,7 @@ s.Keyboard = new Class({
     'a'       : 65,
     's'       : 83,
     'd'       : 68,
+    'e'       : 69,
     'backtick': 192,
     'shift'   : 16,
     'tilde'   : 192

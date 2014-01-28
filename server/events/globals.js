@@ -1,8 +1,10 @@
 // ************************************************************************ //
 // bot stuff
-module.exports = {
-  lastClient: undefined,
-  clients: {},
-  hostPlayer: undefined
+module.exports = function() {
+  return { 
+    lastClient: undefined,
+    clients: {},
+    hostPlayer: undefined
+  };
 };
 // ************************************************************************ //
