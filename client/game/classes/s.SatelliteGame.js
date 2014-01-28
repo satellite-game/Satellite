@@ -94,7 +94,7 @@ s.SatelliteGame = new Class( {
                 var enemyShip;
                 if (isBot) {
                     enemyShip = new s.Bot( {
-                        game: that,
+                        game: s.game,
                         shipClass: 'human_ship_heavy',
                         name: enemyInfo.name,
                         position: enemyInfo.position,
@@ -105,7 +105,7 @@ s.SatelliteGame = new Class( {
                     var alliance = 'rebel';
                     if (s.game.teamMode) { alliance = 'alliance'; }
                     enemyShip = new s.Player( {
-                        game: that,
+                        game: s.game,
                         shipClass: 'human_ship_heavy',
                         name: enemyInfo.name,
                         position: new THREE.Vector3( enemyInfo.pos[ 0 ], enemyInfo.pos[ 1 ], enemyInfo.pos[ 2 ] ),
