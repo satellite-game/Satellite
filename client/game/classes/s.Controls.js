@@ -88,9 +88,7 @@ s.Controls = new Class({
   },
 
   destruct: function( ) {
-
-    game.unhook( this.update );
-
+    this.game.unhook( this.update );
   },
 
   update: function( time, delta ) {
@@ -126,73 +124,11 @@ s.Controls = new Class({
       crosshairs = {width: 30, height: 30};
 
     ///////////////////////
-    //  OCULUS CONTROLS  //
-    ///////////////////////
-
-    if (this.oculus.detected) {
-      this.mouse.mouseType = 'oculus';
-      pitch = this.oculus.quat.x;
-      yaw = this.oculus.quat.y;
-      roll = this.oculus.quat.z;
-      if (this.menu.displayed) {
-        this.menu.updateHovered();
-      }
-    }
-
-    ///////////////////////
-    //  MOUSE CONTROLS   //
-    ///////////////////////
-
-    var mouseUpdate = this.mouse.update({
-        centerX: centerX,
-        crosshairs: crosshairs,
-        yaw: yaw,
-        radius: radius,
-        yawSpeed: yawSpeed,
-        thrustScalar: thrustScalar,
-        centerY: centerY,
-        pitch: pitch,
-        pitchSpeed: pitchSpeed
-    });
-
-    pitch = mouseUpdate.pitch || pitch;
-    yaw = mouseUpdate.yaw || yaw;
-
-    ///////////////////////
-    // GAMEPAD CONTROLS  //
-    ///////////////////////
-
-    if (hasGamepad) {
-      var gamepadState = this.gamepad.gamepads[0].state;
-
-      // TODO: Handle inverted option
-      pitch = gamepadState.LEFT_STICK_Y;
-
-      if (gamepadYaw) {
-        yaw = gamepadState.LEFT_STICK_X*-1;
-      }
-      else {
-        roll = gamepadState.LEFT_STICK_X*-1 * this.options.rotationSpeed;
-      }
-
-      if (gamepadState.RB || gamepadState.X || gamepadState.FACE_1)
-        this.firing = true;
-      else
-        this.firing = false;
-
-      var gamepadThrust = (gamepadState.RIGHT_STICK_X*-1 + 1)/2;
-
-      // Set thrust
-      this.options.thrustImpulse = gamepadThrust * s.config.ship.maxSpeed;
-    }
-
-    ///////////////////////
     // KEYBOARD COMMANDS //
     ///////////////////////
 
     if (this.keyboard.pressed('left')) {
       yaw = yawSpeed / thrustScalar;
-
     }
     else if (this.keyboard.pressed('right')) {
       yaw = -1*yawSpeed / thrustScalar;
@@ -229,6 +165,56 @@ s.Controls = new Class({
       vr.resetHmdOrientation();
     }
 
+    ///////////////////////
+    // GAMEPAD CONTROLS  //
+    ///////////////////////
+
+    if (hasGamepad) {
+      var gamepadState = this.gamepad.gamepads[0].state;
+
+      // TODO: Handle inverted option
+      pitch = gamepadState.LEFT_STICK_Y;
+
+      if (gamepadYaw) {
+        yaw = gamepadState.LEFT_STICK_X*-1;
+      }
+      else {
+        roll = gamepadState.LEFT_STICK_X*-1 * this.options.rotationSpeed;
+      }
+
+      if (gamepadState.RB || gamepadState.X || gamepadState.FACE_1)
+        this.firing = true;
+      else
+        this.firing = false;
+
+      var gamepadThrust = (gamepadState.RIGHT_STICK_X*-1 + 1)/2;
+
+      // Set thrust
+      this.options.thrustImpulse = gamepadThrust * s.config.ship.maxSpeed;
+    }
+
+    ///////////////////////
+    //  OCULUS CONTROLS  //
+    ///////////////////////
+
+    if (this.oculus.detected) {
+      this.mouse.mouseType = 'oculus';
+      this.camera.rotation.setEulerFromQuaternion(this.oculus.quat);
+      if (hasGamepad) {
+        pitch += this.oculus.quat.x/2;
+        yaw += this.oculus.quat.y/2;
+        roll += this.oculus.quat.z/2;
+      } else {
+        pitch += this.oculus.quat.x;
+        yaw += this.oculus.quat.y;
+        roll += this.oculus.quat.z;
+      }
+      if (this.menu.displayed) {
+        this.menu.updateHovered();
+      }
+    } else {
+      this.mouse.mouseType = 'keyboard';
+    }
 
     //////////////////////////////
     // MOTION AND PHYSICS LOGIC //

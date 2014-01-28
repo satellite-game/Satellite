@@ -2,10 +2,17 @@ module.exports = function (host, sync) {
 
   return {
     move: function( socket, packet ) {
+      if( host.sockets[socket.id] === undefined  || host.rooms[host.sockets[socket.id].room] === undefined) {
+        socket.disconnect(true);
+        return console.log("Combat / Move has an undefined error, client probably needs to relog!");
+      }
+
       var room = host.sockets[socket.id].room;
       var shipName = host.sockets[socket.id].name;
       var playerState = host.rooms[room].gamestate[shipName];
       // copy over the packet data into the canonical state
+
+
       for(var i in packet) {
         playerState[i] = packet[i];
       }
@@ -14,6 +21,11 @@ module.exports = function (host, sync) {
     },
 
     fire: function( socket, packet ) {
+      if(host.sockets[socket.id].room === undefined) {
+        socket.disconnect(true);
+        return console.log("Firing has an error to it etc. Client needs to relog.");
+      }
+      
       var room = host.sockets[socket.id].room;
       socket.get('name', function (err, name) {
           socket.broadcast.to(room).emit('fire', {

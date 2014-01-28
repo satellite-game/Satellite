@@ -9,6 +9,11 @@ Sync.prototype = Object.create({});
 
 Sync.prototype.setInit = function( socket, list, packet, shortcut ) {
   //this.instanceTime = new Date().getTime();
+  if(list.gamestate === undefined) {
+    socket.disconnect(true);
+    return console.log("setInit has an undefined gamestate/list, routing this request");
+  }
+
   list.gamestate[packet.name] = {
     name: packet.name,
     time: packet.time,

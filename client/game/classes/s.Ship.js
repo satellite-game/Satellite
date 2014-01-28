@@ -1,5 +1,5 @@
 s.Ship = new Class({
-	extend: s.GameObject,
+    extend: s.GameObject,
 
     options: {
         leftTurretOffset: new THREE.Vector3(35, 0, -200),
@@ -9,10 +9,6 @@ s.Ship = new Class({
         botTurretFireTime: 3000,
         missileFireTime: 1000
     },
-
-	construct: function(options) {
-        this.game = options.game;
-	},
 
     initialize: function(options) {
         var geometry = s.models[options.shipClass].geometry;
@@ -40,11 +36,11 @@ s.Ship = new Class({
         return offset.clone().applyMatrix4(this.root.matrixWorld);
     },
 
-	fire: function(weapon){
-		var now = new Date().getTime();
+    fire: function(weapon){
+        var now = new Date().getTime();
         var rotation = this.root.rotation.clone();
         var initialVelocity = this.root.getLinearVelocity().clone();
-        
+
         var bullet = {
             game: this.game,
             pilot: this.name,
@@ -53,7 +49,7 @@ s.Ship = new Class({
             isBot: this.isBot,
             team: this.alliance
         };
-        
+
         var turretFireTime;
         if (this.isBot) {
             turretFireTime = this.options.botTurretFireTime;
