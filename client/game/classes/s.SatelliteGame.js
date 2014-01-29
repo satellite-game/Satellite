@@ -134,9 +134,12 @@ s.SatelliteGame = new Class( {
         this.IDs = [];
 
         this.hostPlayer = false;
-        this.teamMode = true;
         this.gameFire = true;
-        this.gameType = 'invasion';
+
+        //teamMode - invasion;, Not teamMode - free-for-all; 
+        this.teamMode = true;
+        this.startingPosition = [19232, 19946, 20311];
+        this.humansOnly = false;
 
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
         // No gravity
@@ -197,12 +200,14 @@ s.SatelliteGame = new Class( {
             HUD: this.HUD,
             game: this,
             shipClass: 'human_ship_heavy',
-            position: new THREE.Vector3(19232, 19946, 20311),
+            position: new THREE.Vector3(this.startingPosition[0], this.startingPosition[1], this.startingPosition[2]),
             name: this.pilot.name,
             rotation: new THREE.Vector3( 0, Math.PI/2, 0 ),
             alliance: 'alliance',
             camera: this.camera
         } );
+
+        if (this.teamMode) { this.player.enemyBase = 'moonBaseTall'; }
 
         // Targeting square around targeted enemy.
 
@@ -287,6 +292,7 @@ s.SatelliteGame = new Class( {
         this.comm.on( 'bot retrieval', that.handleBotInfo );
         this.comm.on( 'bot positions', that.handleBotPositions );
         this.comm.on( 'baseHit', that.baseHit );
+        this.comm.on( 'setTeam', that.setTeam );
 
         this.HUD.controls = this.controls;
 
@@ -557,7 +563,7 @@ s.SatelliteGame = new Class( {
         setTimeout(function() {
             that.player.shields = s.config.ship.shields;
             that.player.hull = s.config.ship.hull;
-            that.player.setPosition([19232, 19946, 20311],[0,0,0],[0,0,0],[0,0,0]);
+            that.player.setPosition(that.startingPosition,[0,0,0],[0,0,0],[0,0,0]);
             if (type === 'base death') {
                 that.setBotsOnRestart();
             }
@@ -623,6 +629,8 @@ s.SatelliteGame = new Class( {
 
     //this function only gets called if client is the host player
     handleBotInfo: function() {
+        if (this.game.humansOnly) { return; }
+
         var that = this;
         if (!this.game.hostPlayer) {
             //this the first time this function has been called with this client
@@ -631,7 +639,6 @@ s.SatelliteGame = new Class( {
             }, 2500);
         }
         this.game.hostPlayer = true;
-        console.log(this.game.hostPlayer);
         if (this.game.botCount === 0) {
             // Create a new bot
             this.game.enemies.add( {}, 'bot');
@@ -710,6 +717,19 @@ s.SatelliteGame = new Class( {
             s.game.restartGame('base death');
         }, 3000);
 
+    },
+
+    setTeam: function(message) {
+        this.game.player.alliance = message.alliance;
+        var position;
+        if (message.alliance === 'rebel') {
+            this.game.startingPosition = [-6879, 210, 406]; //start at moon
+            this.game.player.enemyBase = 'moonBaseTall';
+        } else {
+            this.game.startingPosition = [19232, 19946, 20311]; //start at spacestation
+            this.game.player.enemyBase = 'spaceStation';
+        }
+        this.game.player.setPosition(this.game.startingPosition,[0,0,0],[0,0,0],[0,0,0]);
     }
 
 } );

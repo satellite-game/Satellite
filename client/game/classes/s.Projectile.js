@@ -31,7 +31,7 @@ s.Projectile = new Class({
         //else if check if you got hit by a bot or if a bot hit your base
 
         if (this.pilot === this.game.pilot.name){
-            if (mesh.instance.alliance && mesh.instance.alliance === "rebel"){
+            if (mesh.instance.alliance && mesh.instance.alliance !== this.game.player.alliance){
                 this.HUD.menu.animate({
                 color: this.HUD.hit,
                 frames: 30
@@ -44,7 +44,7 @@ s.Projectile = new Class({
                 }
                 this.comm.hit(mesh.name,this.game.pilot.name);
             }
-            if (mesh.name === 'moonBaseTall') {
+            if (mesh.name === this.game.player.enemyBase) {
                 this.comm.baseFire(mesh.name, this.pilot);
             }
         } else if (this.isBot) {
