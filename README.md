@@ -18,4 +18,4 @@ Running `grunt test` will initiate mocha/chai/sinon testing on both client side 
 
 ## Dev Staging
 
-Pushes to Azure with every merge to dev branch. [Link can be found here](http://satellite-stage.azurewebsites.net/)
+Pushes to Azure with every merge to dev branch. [Link can be found here](http://satellite.azurewebsites.net/)

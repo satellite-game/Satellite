@@ -46,7 +46,6 @@ s.Comm = new Class({
     this.timer = setInterval(this.clockTick,1000);
     this.time = 0;
 
-    // this.connectSockets();
   },
 
   connectSockets: function ( ) {
@@ -68,6 +67,7 @@ s.Comm = new Class({
     this.socket.on('bot retrieval', this.makeTrigger('bot retrieval'));
     this.socket.on('bot positions', this.makeTrigger('bot positions'));
     this.socket.on('baseHit', this.makeTrigger( 'baseHit' ));
+    this.socket.on('setTeam', this.makeTrigger( 'setTeam' ));
 
     this.game.hook( this.position );
 
