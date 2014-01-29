@@ -54,3 +54,4 @@ coverage
 test-mocha
 build
 dump.rdb
+build/
