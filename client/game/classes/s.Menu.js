@@ -43,6 +43,9 @@ s.Menu = new Class({
     if (this.oculus.detected) {
       this.menuBox.position.setZ(-50);
     }
+
+    this.roomNamePrefix = ['Space', 'Wolf', 'Jupiter', 'Planet', 'Purple', 'Nova', 'M', 'Rad', 'Moon', 'Vector', 'Orion', 'Terra', 'Danger'];
+    this.roomNameSuffix = ['Base', '359', 'Station', 'X', 'Dimension', 'Zone', 'Alpha', '83', 'Sector', 'Prime', 'Dome', 'Prospect'];
   },
 
   addMenuItems: function ( items ) {
@@ -153,15 +156,15 @@ s.Menu = new Class({
   hoverItem: function ( item ) {
     // changes appearance of hovered item to make it obvious
     // which one you have hovered. red can be a placeholder.
-    if (item) {
-      if (this.hoveredItem !== item) {
-        this.unhoverItem(this.hoveredItem);
-        this.hoveredItem = item;
-      }
-      item.material.color.setHex(0xCC0000);
-      if (item.material.ambient) {
-        item.material.ambient.setHex(0xFF0000);
-        item.material.specular.setHex(0xFF3333);
+    if (item && this.hoveredItem !== item) {
+      this.unhoverItem(this.hoveredItem);
+      this.hoveredItem = item;
+      if (this.hoveredItem.menuItemSelectCallback) {
+        item.material.color.setHex(0xCC0000);
+        if (item.material.ambient) {
+          item.material.ambient.setHex(0xFF0000);
+          item.material.specular.setHex(0xFF3333);
+        }
       }
     }
   },
@@ -228,7 +231,8 @@ s.Menu = new Class({
 
     this.addMenuItems([
       {text: 'JOIN GAME', size: 5, action: 'showRoomList'},
-      {text: 'CREATE GAME', size: 5, action: 'createRoom'},
+      {text: 'CREATE GAME', size: 5, action: 'showCreateRoom'},
+      {text: 'CREDITS', size: 5, action: 'showCredits'},
       {text: 'QUIT', size: 5, action: 'disconnect'}
     ]);
   },
@@ -263,15 +267,26 @@ s.Menu = new Class({
 
   joinRoom: function () {
     this.game.roomEntered = true;
-    // var room = this.hoveredItem.theRoomYouWillJoin;
-    var room = 'asdf';
+    room = this.hoveredItem.theRoomYouWillJoin;
+    // room = 'asdf';
     this.game.room = room;
     this.game.comm.connectSockets();
     this.close();
   },
 
-  createRoom: function () {
-    console.log('No.');
+  showCreateRoom: function () {
+    this.menuScreen = 'create';
+    var prefix = this.roomNamePrefix[Math.floor(Math.random()*this.roomNamePrefix.length)];
+    var suffix = this.roomNameSuffix[Math.floor(Math.random()*this.roomNameSuffix.length)];
+
+    var roomName = prefix.toUpperCase() + '-' + suffix.toUpperCase();
+
+    this.addMenuItems([
+      {text: 'NAME: '+roomName, size: 5},
+      {text: 'CHANGE NAME', size: 4, action: 'showCreateRoom'}, // todo: make an updateMenuItem function
+      {text: 'INVASION MODE', size: 5, action: 'joinRoom', room: roomName},
+      {text: 'FREE-FOR-ALL', size: 5, action: 'joinRoom', room: roomName}
+    ]);
   },
 
   showScoreboard: function () {
@@ -279,10 +294,11 @@ s.Menu = new Class({
     var that = this;
 
     $.get('/rooms/'+this.game.room, function (data) {
-      var players = [{text: 'LEADERBOARD', size: 5}];
+      var players = [{text: 'LEADERBOARD', size: 5, score: Infinity}];
       for (var name in data) {
-        players.push({text: name+' . . . '+data[name], small: true});
+        players.push({text: name+' . . . '+data[name], small: true, score: data[name]});
       }
+      players.sort(function (a, b) { return a.score > b.score; });
       that.addMenuItems(players);
     });
   },
