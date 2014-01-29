@@ -3,15 +3,15 @@
   "main": "server/app.js",
   "version": "0.0.0-1",
   "private": true,
-  "homepage": "https://lazd.github.com/Satellite",
-  "author": "Larry Davis <lazdnet@gmail.com>",
+  "homepage": "satellite-game.com",
+  "author": "Satellite Team",
   "license": "BSD",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lazd/Satellite.git"
+    "url": "https://github.com/satellite-game/Satellite.git"
   },
   "bugs": {
-    "url": "https://github.com/lazd/Satellite/issues"
+    "url": "https://github.com/satellite-game/Satellite/issues"
   },
   "devDependencies": {
     "grunt": "0.4.x",
@@ -47,7 +47,11 @@
   "keywords": [
     "game",
     "webgl",
-    "satellite"
+    "satellite",
+    "oculus",
+    "oculus rift",
+    "multiplayer",
+    "three.js"
   ],
   "dependencies": {
     "socket.io": "~0.9.16",
@@ -59,6 +63,5 @@
   "scripts": {
     "start": "node server/app.js",
     "test": "grunt travisCI --force"
-  },
-  "subdomain": "lockon"
+  }
 }
