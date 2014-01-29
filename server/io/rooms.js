@@ -3,32 +3,55 @@ var Room = function( sync_settings ) {
 	this.rooms = {};
 	this.sockets = {};
 	sync = sync_settings;
-  // this.allianceCount = 0;
-  // this.rebelCount = 0;
 };
 
 Room.prototype = Object.create({});
 
 Room.prototype.init = function( socket, room, playerData ) {
-  console.log(playerData);
-  this.rooms[room] = {};
-  this.rooms[room].gamestate = {};
-  this.rooms[room].playerList = {};
-  // if ( <= ) {
-  //   playerData.team = 'alliance';
-    this.rooms[room].playerList[playerData.name] = playerData;
-  //   this.teamToggle = false;
-  // } else {
-  //   playerData.team = 'rebel';
-  //   this.rooms[room].playerList[playerData.name] = playerData;
-  //   this.teamToggle = true;
-  // }
-  this.sockets[socket.id] = {name: playerData.name, socket: socket.id, ship: playerData.ship, room: room};
+  // make a room with a playerlist and the
+  // 'gamestate' of all player positions:
+  var roomProperties = {
+    gamestate: {},
+    playerList: {},
+    teamMode: true,
+  };
+
+  if (roomProperties.teamMode === true){ // team mode currently DNE
+    // make the first player alliance
+    playerData.team = 'alliance';
+    // extend the rooms so that they
+    // account for teams balance
+    roomProperties.allianceCount = 1;
+    roomProperties.rebelCount = 0;
+  }
+
+  roomProperties.playerList[playerData.name] = playerData;
+
+  this.rooms[room] = roomProperties;
+  this.sockets[socket.id] = {
+    name: playerData.name,
+    team: playerData.team,
+    socket: socket.id,
+    ship: playerData.ship,
+    room: room
+  };
 };
 
 Room.prototype.add = function( socket, room, playerData) {
-  this.sockets[socket.id] = {name: playerData.name, room: room, ship: playerData.ship};
-  this.rooms[room].playerList[playerData.name] = playerData;
+  var roomData = this.rooms[room];
+  if (roomData.teamMode === true){ // team mode currently DNE
+    playerData.team = ( roomData.allianceCount < roomData.rebelCount ) ? 'alliance' : 'rebel';
+    roomData[playerData.team]++;
+  }
+
+  roomData.playerList[playerData.name] = playerData;
+  this.sockets[socket.id] = {
+    name: playerData.name,
+    team: playerData.team,
+    socket: socket.id,
+    ship: playerData.ship,
+    room: roomData
+  };
 };
 
 
