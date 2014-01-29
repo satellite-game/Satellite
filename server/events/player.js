@@ -48,7 +48,7 @@ module.exports = function (host, sync, io) {
     botHit: function ( socket, packet) {
       var room = host.sockets[socket.id];
 
-      if( host.sockets[socket] === undefined) {
+      if( room === undefined) {
         socket.disconnect(true);
         return console.log("Room doesn't exist at botHit");
       }
@@ -57,7 +57,7 @@ module.exports = function (host, sync, io) {
         zappedName: packet.yourName,
         killerName: packet.botName
       };
-
+      console.log('helahfdlkajfd', room);
       socket.broadcast.to(room.room).emit('hit', response);
       socket.emit('hit', response);
     },
