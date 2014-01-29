@@ -78,7 +78,7 @@ module.exports = function (map, host, Sync, io) {
       var myData = {};
       for(var i in host.sockets[socket.id]) {
         myData[i] = host.sockets[socket.id][i];
-      };
+      }
 
       this.disconnect(socket);
       this.join( socket, room );
