@@ -14,6 +14,7 @@ module.exports = function (map, host, Sync, io) {
         host.rooms[data.room].bot = globals();
         target.bot.lastClient = socket.id;
         target.bot.clients[socket.id] = true; 
+
         
       } else {
         host.add(socket, data.room, data);
@@ -21,7 +22,7 @@ module.exports = function (map, host, Sync, io) {
         Sync.setInit( socket, target, data );
 
         target.bot.lastClient = socket.id;
-        target.bot.clients[socket.id] = true; 
+        target.bot.clients[socket.id] = true;
       }
 
       db.joinRoom(data.room, data.name);  // add to game in the db
@@ -62,6 +63,8 @@ module.exports = function (map, host, Sync, io) {
         }
       }
       
+      //if the hostplayer hasn't change, no more clients remaining - reset to null
+      if (target.hostPlayer === socket.id) { target.hostPlayer = null; }
 
       socket.broadcast.to(room).emit('leave', {name: name});
       socket.leave(room);
