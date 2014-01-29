@@ -324,7 +324,7 @@ s.Menu = new Class({
   showCredits: function () {
     this.menuScreen = 'creds';
     this.addMenuItems([
-      {text: 'SATELLITE', size: 6},
+      {text: 'SATELLITE', size: 6, bold: true},
       {text: '%b', size: 5},
       {text: 'Team Lead, Client-Server Architecture, Build Automation, Website Design', small: true},
       {text: 'PHILIP ALEXANDER', size: 4},
@@ -358,15 +358,16 @@ s.Menu = new Class({
       {text: '%b', size: 18},
       {text: 'Thanks for playing!', size: 6}
     ]);
-    this.autoScrollMenu();
+    this.autoScrollMenu(2);
   },
 
-  autoScrollMenu: function () {
+  autoScrollMenu: function (speed) {
+    speed = speed || 1;
     this.menuBox.position.setY(this.menuHeight/-2);
     var that = this;
     this.game.hook(function () {
       if (that.menuBox.position.y < that.menuHeight/2) {
-        that.menuBox.position.y++;
+        that.menuBox.position.y += speed/16;
       }
     });
   },
