@@ -3,7 +3,7 @@ s.Bot = new Class( {
   extend: s.Ship,
 
   construct: function( options ) {
-    var position = options.position || [-6879, 210, 406];
+    var position = options.position || [19231, 19942, 20317];
     var rotation = options.rotation || [0, Math.PI / 2, 0];
 
     // Generating a new bot with properties
@@ -208,6 +208,8 @@ s.Bot = new Class( {
   },
 
   controlBot: function() {
+    //return if player hasn't entered a room yet
+    if (!this.game.roomEntered) { return; }
 
     this.moveStates = {
       thrust: 0,

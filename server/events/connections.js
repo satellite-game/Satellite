@@ -8,8 +8,8 @@ module.exports = function (map, host, Sync, io) {
       if(host.rooms[data.room] === undefined) {
         host.init(socket, data.room, data);
         target = host.rooms[data.room];
-        Sync.setInit( socket, target, data );
-        host.rooms[data.room].sync(io, data.room);
+        Sync.setInit( socket, target, data ); //depreicated?
+        host.rooms[data.room].sync(io, data.room); //depreicated?
         
         host.rooms[data.room].bot = globals();
         target.bot.lastClient = socket.id;
