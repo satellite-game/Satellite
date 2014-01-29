@@ -38,7 +38,6 @@ s.Comm = new Class({
     this.ship = options.ship;
     this.server = 'http://' + options.server;
     this.pilot = options.pilot;
-    this.room = 'sa'; // PLEASE PAY ATTENTION TO THIS. ROOMS ARE HARD CODED LOL. 
 
     var that = this;
 
@@ -82,7 +81,7 @@ s.Comm = new Class({
 
     var packet = {
       evt: 'joined',
-      room: this.room,
+      room: this.game.room,
       name: this.pilot.name,
       time: time,
       pos: shipPosition.pos,
