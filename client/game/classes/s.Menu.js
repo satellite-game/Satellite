@@ -43,6 +43,9 @@ s.Menu = new Class({
     if (this.oculus.detected) {
       this.menuBox.position.setZ(-50);
     }
+
+    this.roomNamePrefix = ['Space', 'Wolf', 'Jupiter', 'Planet', 'Purple', 'Nova', 'M', 'Rad'];
+    this.roomNameSuffix = ['Base', '359', 'Station', 'X', 'Dimension', 'Zone', 'Alpha', '83', 'Sector', 'Prime'];
   },
 
   addMenuItems: function ( items ) {
@@ -153,15 +156,15 @@ s.Menu = new Class({
   hoverItem: function ( item ) {
     // changes appearance of hovered item to make it obvious
     // which one you have hovered. red can be a placeholder.
-    if (item) {
-      if (this.hoveredItem !== item) {
-        this.unhoverItem(this.hoveredItem);
-        this.hoveredItem = item;
-      }
-      item.material.color.setHex(0xCC0000);
-      if (item.material.ambient) {
-        item.material.ambient.setHex(0xFF0000);
-        item.material.specular.setHex(0xFF3333);
+    if (item && this.hoveredItem !== item) {
+      this.unhoverItem(this.hoveredItem);
+      this.hoveredItem = item;
+      if (this.hoveredItem.menuItemSelectCallback) {
+        item.material.color.setHex(0xCC0000);
+        if (item.material.ambient) {
+          item.material.ambient.setHex(0xFF0000);
+          item.material.specular.setHex(0xFF3333);
+        }
       }
     }
   },
@@ -279,10 +282,11 @@ s.Menu = new Class({
     var that = this;
 
     $.get('/rooms/'+this.game.room, function (data) {
-      var players = [{text: 'LEADERBOARD', size: 5}];
+      var players = [{text: 'LEADERBOARD', size: 5, score: Infinity}];
       for (var name in data) {
-        players.push({text: name+' . . . '+data[name], small: true});
+        players.push({text: name+' . . . '+data[name], small: true, score: data[name]});
       }
+      players.sort(function (a, b) { return a.score > b.score; });
       that.addMenuItems(players);
     });
   },
