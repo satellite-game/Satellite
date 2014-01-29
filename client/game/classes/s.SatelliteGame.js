@@ -143,7 +143,7 @@ s.SatelliteGame = new Class( {
         //teamMode - invasion;, Not teamMode - free-for-all; 
         this.teamMode = true;
         this.startingPosition = [19232, 19946, 20311];
-        this.humansOnly = false;
+        this.humansOnly = true;
 
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
         // No gravity
