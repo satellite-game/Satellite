@@ -318,8 +318,13 @@ s.HUD = new Class({
                     distanceToCallTarget = self.position.distanceTo(this.callTarget.position);
                     callSize = Math.round((width - distanceToCallTarget/100)/26);
                     c2D = call2D.clone();
-                    c2D.x =  ( width  + c2D.x*width  )/2+115;
-                    c2D.y = -(-height + c2D.y*height )/2*2.26-400;
+                    if (this.oculus.detected) {
+                        c2D.x =  ( width  + c2D.x*width  )/2+105;
+                        c2D.y = -(-height + c2D.y*height )/2*2.26-460;
+                    } else {
+                        c2D.x =  ( width  + c2D.x*width  )/2;
+                        c2D.y = -(-height + c2D.y*height )/2;
+                    }
 
                     this.writeName(enemies[j].name, c2D);
                 }
@@ -380,7 +385,7 @@ s.HUD = new Class({
 
     writeName: function (name, clone) {
         this.ctx.fillStyle = this.menu.color;
-        this.ctx.fillText( name, clone.x-30, clone.y+10);
+        this.ctx.fillText( name, clone.x-20, clone.y+30);
         this.ctx.fill();
     },
 
@@ -421,10 +426,10 @@ s.HUD = new Class({
             v2DcircleTarget.y = -(-this.height + v2DcircleTarget.y*this.height )/2;
 
             if (this.oculus.detected) {
-                this.ctx.strokeRect( v2DcircleTarget.x+105-size, v2DcircleTarget.y*2.26-460-size, size*2, size*2 );
-            } else {
-                this.ctx.strokeRect( v2DcircleTarget.x-size, v2DcircleTarget.y-size, size*2, size*2 );
+                v2DcircleTarget.x += 105;
+                v2DcircleTarget.y = v2DcircleTarget.y*2.26-460;
             }
+            this.ctx.strokeRect( v2DcircleTarget.x-size, v2DcircleTarget.y-size, size*2, size*2 );
             this.ctx.lineWidth = 1;
             this.ctx.strokeStyle = this.menu.color;
 
