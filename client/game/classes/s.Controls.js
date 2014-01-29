@@ -127,38 +127,40 @@ s.Controls = new Class({
     // KEYBOARD COMMANDS //
     ///////////////////////
 
-    if (this.keyboard.pressed('left')) {
-      yaw = yawSpeed / thrustScalar;
-    }
-    else if (this.keyboard.pressed('right')) {
-      yaw = -1*yawSpeed / thrustScalar;
-    }
+    if (!this.menu.displayed) {
+      if (this.keyboard.pressed('left')) {
+        yaw = yawSpeed / thrustScalar;
+      }
+      else if (this.keyboard.pressed('right')) {
+        yaw = -1*yawSpeed / thrustScalar;
+      }
 
-    if (this.keyboard.pressed('up')) {
-      // Pitch down
-      pitch = -1*pitchSpeed / thrustScalar;
-    }
-    else if (this.keyboard.pressed('down')) {
-      // Pitch up
-      pitch = pitchSpeed / thrustScalar;
-    }
+      if (this.keyboard.pressed('up')) {
+        // Pitch down
+        pitch = -1*pitchSpeed / thrustScalar;
+      }
+      else if (this.keyboard.pressed('down')) {
+        // Pitch up
+        pitch = pitchSpeed / thrustScalar;
+      }
 
-    if (this.keyboard.pressed('w')) {
-      thrust = 1;
-    }
-    else if (this.keyboard.pressed('s')) {
-      brakes = 1;
-    }
+      if (this.keyboard.pressed('w')) {
+        thrust = 1;
+      }
+      else if (this.keyboard.pressed('s')) {
+        brakes = 1;
+      }
 
-    if (this.keyboard.pressed('a')) {
-      roll = this.options.rotationSpeed;
-    }
-    else if (this.keyboard.pressed('d')) {
-      roll = -1*this.options.rotationSpeed;
-    }
+      if (this.keyboard.pressed('a')) {
+        roll = this.options.rotationSpeed;
+      }
+      else if (this.keyboard.pressed('d')) {
+        roll = -1*this.options.rotationSpeed;
+      }
 
-    if (this.game.gameFire && this.keyboard.pressed('space') || this.firing){
-      this.player.fire('turret');
+      if (this.game.gameFire && this.keyboard.pressed('space') || this.firing){
+        this.player.fire('turret');
+      }
     }
 
     if (this.keyboard.pressed('tilde')) {
@@ -169,7 +171,7 @@ s.Controls = new Class({
     // GAMEPAD CONTROLS  //
     ///////////////////////
 
-    if (hasGamepad) {
+    if (hasGamepad && !this.menu.displayed) {
       var gamepadState = this.gamepad.gamepads[0].state;
 
       // TODO: Handle inverted option
@@ -200,16 +202,17 @@ s.Controls = new Class({
     if (this.oculus.detected) {
       this.mouse.mouseType = 'oculus';
       this.camera.rotation.setEulerFromQuaternion(this.oculus.quat);
-      if (hasGamepad) {
-        pitch += this.oculus.quat.x/2;
-        yaw += this.oculus.quat.y/2;
-        roll += this.oculus.quat.z/2;
+      if (!this.menu.displayed) {
+        if (hasGamepad) {
+          pitch += this.oculus.quat.x/2;
+          yaw += this.oculus.quat.y/2;
+          roll += this.oculus.quat.z/2;
+        } else {
+          pitch += this.oculus.quat.x;
+          yaw += this.oculus.quat.y;
+          roll += this.oculus.quat.z;
+        }
       } else {
-        pitch += this.oculus.quat.x;
-        yaw += this.oculus.quat.y;
-        roll += this.oculus.quat.z;
-      }
-      if (this.menu.displayed) {
         this.menu.updateHovered();
       }
     } else {

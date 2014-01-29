@@ -14,7 +14,8 @@ s.Menu = new Class({
     this.cursorPosition = 0;
     this.hoveredItem = null;
 
-    this.selectorRay = new THREE.Raycaster(new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,1), 0, 300);
+    // todo: use raycasting for better menu selection
+    // this.selectorRay = new THREE.Raycaster(new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,1), 0, 300);
     // this.selectorHelper = new THREE.ArrowHelper(new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,-0.3), 50, 0xFF00FF);
 
     // PlaneGeometry would be better than a cube for this but harder to write because 
@@ -44,8 +45,8 @@ s.Menu = new Class({
       this.menuBox.position.setZ(-50);
     }
 
-    this.roomNamePrefix = ['Space', 'Wolf', 'Jupiter', 'Planet', 'Purple', 'Nova', 'M', 'Rad', 'Moon', 'Vector', 'Orion', 'Terra', 'Danger'];
-    this.roomNameSuffix = ['Base', '359', 'Station', 'X', 'Dimension', 'Zone', 'Alpha', '83', 'Sector', 'Prime', 'Dome', 'Prospect'];
+    this.roomNamePrefix = ['Space', 'Wolf', 'Jupiter', 'Planet', 'Purple', 'Nova', 'M', 'Rad', 'Moon', 'Vector', 'Orion', 'Terra', 'Danger', 'Solar', 'Starlight', 'Spice', 'Lumpy'];
+    this.roomNameSuffix = ['Base', '359', 'Station', 'X', 'Dimension', 'Zone', 'Alpha', '83', 'Sector', 'Prime', 'Dome', 'Prospect', 'Expanse', 'Imperium', 'Outpost'];
   },
 
   addMenuItems: function ( items ) {
@@ -252,7 +253,7 @@ s.Menu = new Class({
     var that = this;
 
     $.get('/rooms', function (data) {
-      var roomList = [{text: 'JOIN GAME', size: 5},{text:'name      players', size: 3, flat: true}];
+      var roomList = [{text: 'JOIN GAME', size: 5},{text:'name    players', size: 3, flat: true}];
       for (var room in data) {
         roomList.push({text: room + ' . . . ' + data[room], small: true, action: 'joinRoom', room: room});
       }
@@ -295,7 +296,7 @@ s.Menu = new Class({
 
     $.get('/rooms/'+this.game.room, function (data) {
       var players = [{text: 'LEADERBOARD', size: 5, score: Infinity}];
-      for (var name in data) {
+      for (var name in data.kills) {
         players.push({text: name+' . . . '+data[name], small: true, score: data[name]});
       }
       players.sort(function (a, b) { return a.score > b.score; });

@@ -109,6 +109,7 @@ s.HUD = new Class({
 
         this.crosshairs.position.setZ(-30);
 	},
+
 	update: function(){
             
         ////////////////////////
@@ -146,13 +147,6 @@ s.HUD = new Class({
         this.ctx.lineWidth = 2;
         this.ctx.strokeStyle = this.menu.color;
         this.ctx.stroke();
-
-
-        // if (this.cursorVector.length() > this.subreticleBound.radius) {
-        //     this.cursorVector.normalize().multiplyScalar(this.subreticleBound.radius);
-        //     this.targetX = this.cursorVector.x+centerX;
-        //     this.targetY = this.cursorVector.y+centerY;
-        // }
 
         this.ctx.fillStyle = this.menu.color;
         this.ctx.strokeStyle = this.menu.color;
@@ -324,8 +318,13 @@ s.HUD = new Class({
                     distanceToCallTarget = self.position.distanceTo(this.callTarget.position);
                     callSize = Math.round((width - distanceToCallTarget/100)/26);
                     c2D = call2D.clone();
-                    c2D.x =  ( width  + c2D.x*width  )/2;
-                    c2D.y = -(-height + c2D.y*height )/2;
+                    if (this.oculus.detected) {
+                        c2D.x =  ( width  + c2D.x*width  )/2+105;
+                        c2D.y = -(-height + c2D.y*height )/2*2.26-460;
+                    } else {
+                        c2D.x =  ( width  + c2D.x*width  )/2;
+                        c2D.y = -(-height + c2D.y*height )/2;
+                    }
 
                     this.writeName(enemies[j].name, c2D);
                 }
@@ -333,7 +332,7 @@ s.HUD = new Class({
 
             // TARGET HUD MARKING
             if ( this.target ) {
-                 this.findTargets(this.target.root, "rgba(256,0,0,0.5)", 12, 0, true, enemies[i]);
+                 this.findTargets(this.target.root, "rgba(255,0,0,0.5)", 12, 0, true, enemies[i]);
             }
 
         }
@@ -349,7 +348,7 @@ s.HUD = new Class({
         if (this.hp !== s.config.ship.hull && this.health > -10){
             var grd = this.ctx.createRadialGradient(centerX,centerY,width/12,centerX,centerY,this.health);
             grd.addColorStop(0,"rgba(0,0,0,0)");
-            grd.addColorStop(1,"rgba(256,0,0,0.75)");
+            grd.addColorStop(1,"rgba(255,0,0,0.75)");
 
             // Fill with gradient
             // this.ctx.fillStyle = grd;
@@ -364,24 +363,19 @@ s.HUD = new Class({
             // this.ctx.fillRect(0,0,width,height);
         }
 
-
-        // this.ctx.lineWidth = 1;
-        // this.ctx.fillStyle = this.menu.color;
-        // this.ctx.beginPath();
-        // this.ctx.arc(centerX, centerY, 3, 0, 2 * this.PI, false);
-        // this.ctx.fill();
-        // this.ctx.beginPath();
-        // this.ctx.arc(centerX, centerY, 15, 0, 2 * this.PI, false);
-        // this.ctx.stroke();
-
         ///////////////////////
         ///   CROSSHAIRS    ///
         ///////////////////////
+
+        // This is still pretty much a disaster.
+        // Help.
 
         var viewingAngleX = Math.PI/4 * (this.oculus.quat.x);
         var viewingAngleY = Math.PI/4 * (this.oculus.quat.y);
         this.crosshairs.position.setY(-60*Math.tan(viewingAngleX)*1.5);
         this.crosshairs.position.setX(60*Math.tan(viewingAngleY)*1.5);
+
+        // Rendering to oculus scenes
 
         this.oculusCtx.clearRect(0, 0, this.oculusCanvas.width, this.oculusCanvas.height);
 
@@ -391,7 +385,7 @@ s.HUD = new Class({
 
     writeName: function (name, clone) {
         this.ctx.fillStyle = this.menu.color;
-        this.ctx.fillText( name, clone.x-30, clone.y+10);
+        this.ctx.fillText( name, clone.x-20, clone.y+30);
         this.ctx.fill();
     },
 
@@ -399,12 +393,12 @@ s.HUD = new Class({
 
         var vcircleTarget3D = circleTarget.position.clone();
         var vcircleTarget2D = s.projector.projectVector( vcircleTarget3D, s.game.camera );
-        var circleTargetInSight, distanceTocircleTarget, v2DcircleTarget, size; 
+        var circleTargetInSight, distanceToCircleTarget, v2DcircleTarget, size; 
 
         if ( Math.abs(vcircleTarget2D.x) <= 0.95 && Math.abs(vcircleTarget2D.y) <= 0.95 && vcircleTarget2D.z < 1 ) {
             circleTargetInSight = true;
-            distanceTocircleTarget = this.game.player.root.position.distanceTo(circleTarget.position);
-            size = Math.round((this.width - distanceTocircleTarget/100)/26);
+            distanceToCircleTarget = this.game.player.root.position.distanceTo(circleTarget.position);
+            size = Math.round((this.width - distanceToCircleTarget/100)/26);
         }
 
         // circleTarget targeting reticule and targeting box
@@ -426,11 +420,15 @@ s.HUD = new Class({
             this.ctx.stroke();
         }
         if (circleTarget === s.game.moon.root) { return; } //moon has no green square rectangle surroundig it
-        if ( circleTargetInSight && distanceTocircleTarget > maxBoxDistance ) {
+        if ( circleTargetInSight && distanceToCircleTarget > maxBoxDistance ) {
             v2DcircleTarget = vcircleTarget2D.clone();
             v2DcircleTarget.x =  ( this.width  + v2DcircleTarget.x*this.width  )/2;
             v2DcircleTarget.y = -(-this.height + v2DcircleTarget.y*this.height )/2;
 
+            if (this.oculus.detected) {
+                v2DcircleTarget.x += 105;
+                v2DcircleTarget.y = v2DcircleTarget.y*2.26-460;
+            }
             this.ctx.strokeRect( v2DcircleTarget.x-size, v2DcircleTarget.y-size, size*2, size*2 );
             this.ctx.lineWidth = 1;
             this.ctx.strokeStyle = this.menu.color;
@@ -506,7 +504,7 @@ s.HUD = new Class({
                         // Draw the prediction marker
                         this.ctx.beginPath();
                         this.ctx.arc(enemyV2D.x, enemyV2D.y, size/5, 0, 2*this.PI, false);
-                        this.ctx.fillStyle = "rgba(256,0,0,0.5)";
+                        this.ctx.fillStyle = "rgba(255,0,0,0.5)";
                         this.ctx.fill();
                         this.ctx.lineWidth = 2;
                         this.ctx.strokeStyle = this.menu.color;
