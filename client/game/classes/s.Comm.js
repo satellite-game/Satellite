@@ -46,7 +46,7 @@ s.Comm = new Class({
     this.timer = setInterval(this.clockTick,1000);
     this.time = 0;
 
-    this.connectSockets();
+    // this.connectSockets();
   },
 
   connectSockets: function ( ) {

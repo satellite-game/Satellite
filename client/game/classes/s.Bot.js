@@ -129,31 +129,31 @@ s.Bot = new Class( {
     
     var vTarget2D = this.target2d();
 
-    if (this.moveStates.vTarget2D.z < 1) {
+    if (vTarget2D.z < 1) {
         //go left; else if go right
-        if (this.moveStates.vTarget2D.x < -0.15) {
-          this.moveStates.yaw = yawSpeed / thrustScalar;
-        } else if (this.moveStates.vTarget2D.x > 0.15) {
-          this.moveStates.yaw = -1 * yawSpeed / thrustScalar;
+        if (vTarget2D.x < -0.15) {
+          yaw = yawSpeed / thrustScalar;
+        } else if (vTarget2D.x > 0.15) {
+          yaw = -1 * yawSpeed / thrustScalar;
         }
         //do down; else if go up
-        if (this.moveStates.vTarget2D.y < -0.15) {
-          this.moveStates.pitch = -1 * pitchSpeed / thrustScalar;
-        } else if (this.moveStates.vTarget2D.y > 0.15) {
-          this.moveStates.pitch  = pitchSpeed / thrustScalar;
+        if (vTarget2D.y < -0.15) {
+          pitch = -1 * pitchSpeed / thrustScalar;
+        } else if (vTarget2D.y > 0.15) {
+          pitch  = pitchSpeed / thrustScalar;
         }
       } else {
         //go right; else if go left
-        if (this.moveStates.vTarget2D.x < 0) {
-          this.moveStates.yaw = -1 * yawSpeed / thrustScalar;
-        } else if (this.moveStates.vTarget2D.x >= 0) {
-          this.moveStates.yaw = yawSpeed / thrustScalar;
+        if (vTarget2D.x < 0) {
+          yaw = -1 * yawSpeed / thrustScalar;
+        } else if (vTarget2D.x >= 0) {
+          yaw = yawSpeed / thrustScalar;
         }
         //do up; else if go down
-        if (this.moveStates.vTarget2D.y < 0) {
-          this.moveStates.pitch = pitchSpeed / thrustScalar;
-        } else if (this.moveStates.vTarget2D.y > 0) {
-          this.moveStates.pitch = -1 * pitchSpeed / thrustScalar;
+        if (vTarget2D.y < 0) {
+          pitch = pitchSpeed / thrustScalar;
+        } else if (vTarget2D.y > 0) {
+          pitch = -1 * pitchSpeed / thrustScalar;
         }
       }
       return [pitch, yaw, roll, vTarget2D];
@@ -197,7 +197,7 @@ s.Bot = new Class( {
     angularVelocity = angularVelocity.clone().divideScalar(this.botOptions.rotationFadeFactor);
     this.root.setAngularVelocity(angularVelocity);
 
-    var newAngularVelocity = new THREE.Vector3(this.moveStates.pitch, this.moveStates.yaw, this.moveStates.roll).applyMatrix4(rotationMatrix).add(angularVelocity);
+    var newAngularVelocity = new THREE.Vector3(pitch, yaw, roll).applyMatrix4(rotationMatrix).add(angularVelocity);
     this.root.setAngularVelocity(newAngularVelocity);
 
     var impulse = linearVelocity.clone().negate();
@@ -208,6 +208,8 @@ s.Bot = new Class( {
   },
 
   controlBot: function() {
+    //return if player hasn't entered a room yet
+    if (!this.game.roomEntered) { return; }
 
     this.moveStates = {
       thrust: 0,

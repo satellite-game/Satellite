@@ -4,7 +4,7 @@ var async = require('async');
 var defaultCallback = function (functionName) {
   return function (err, data){
     if (err) throw functionName + ' : ' + err;
-    console.log(functionName, 'successfull! ', data);
+    console.log('[db] '+ functionName, 'successfull! ', data);
   };
 };
 
@@ -15,12 +15,12 @@ module.exports = {
     db.hgetall('rooms', function(err, data){
       if (err) throw 'addRoom error: ' + err;
       if (!data || !data[roomName]){
-        console.log(roomName, 'DNE: creating...');
+        console.log('[db] '+ roomName, 'DNE: creating...');
         db.HSET('rooms', roomName, 1, function(err, data){
           callback(err, data);
         });
       } else {
-        console.log(roomName, 'exists: joining...');
+        console.log('[db] '+ roomName, 'exists: joining...');
         db.HINCRBY('rooms', roomName, 1, function(err, data){
           callback(err, data);
         });
@@ -32,17 +32,17 @@ module.exports = {
     callback = callback || defaultCallback('deleteRooms');
     async.waterfall([function (callback) {
       db.HDEL('rooms', roomName, function(err, data){
-        console.log(roomName+' deleted from rooms');
+        console.log('[db] '+ roomName+' deleted from rooms');
         callback(null, data);
       });
     }, function (data, callback) {
       db.DEL(roomName+'_KILLS', function(err, data){
-        console.log(roomName+'_KILLS deleted');
+        console.log('[db] '+ roomName+'_KILLS deleted');
         callback(null, data);
       });
     }, function (data, callback) {
       db.DEL(roomName+'_DEATHS', function(err, data){
-        console.log(roomName+'_DEATHS deleted');
+        console.log('[db] '+ roomName+'_DEATHS deleted');
         callback(null, data);
       });
     }], callback);
@@ -57,13 +57,13 @@ module.exports = {
     },
     function(resultData, callback) {
       db.HSET(roomName+'_KILLS', playerID, 0, function(err, data){
-        console.log(playerID + '\tjoined\t' + roomName+'_KILLS');
+        console.log('[db] '+ playerID + '\tjoined\t' + roomName+'_KILLS');
         callback(null, data);
       });
     },
     function(resultData, callback) {
       db.HSET(roomName+'_DEATHS', playerID, 0, function(err, data){
-        console.log(playerID + '\tjoined\t' + roomName+'_DEATHS');
+        console.log('[db] '+ playerID + '\tjoined\t' + roomName+'_DEATHS');
         callback(null, data);
       });
     }], joinCallback);
@@ -75,19 +75,19 @@ module.exports = {
 
     async.waterfall([function (callback){
       db.HDEL(roomName+'_KILLS', playerID, function(err, data){
-        console.log(playerID + '\tleft\t' + roomName+'_KILLS');
+        console.log('[db] '+ playerID + '\tleft\t' + roomName+'_KILLS');
         callback(null, data);
       });
     },
     function(resultData, callback) {
       db.HDEL(roomName+'_DEATHS', playerID, function(err, data){
-        console.log(playerID + '\tleft\t' + roomName+'_DEATHS');
+        console.log('[db] '+ playerID + '\tleft\t' + roomName+'_DEATHS');
         callback(null, data);
       });
     },
     function(resultData, callback) {
       db.HINCRBY('rooms', roomName, -1, function(err, playersInRoom){
-        console.log('rooms removed one player from '+ roomName);
+        console.log('[db] '+ 'rooms removed one player from '+ roomName);
         callback(null, playersInRoom);
       });
     },
