@@ -20,7 +20,7 @@ s.Bot = new Class( {
       rotationFadeFactor: 4
     };
 
-    this.maxDistance = 8000;
+    this.maxDistance = 7000;
     this.minDistance = 1000;
 
     this.evasiveManeuvers = false;
