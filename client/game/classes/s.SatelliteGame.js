@@ -136,6 +136,7 @@ s.SatelliteGame = new Class( {
         this.hostPlayer = false;
         this.teamMode = true;
         this.gameFire = true;
+        this.gameType = 'invasion';
 
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
         // No gravity
@@ -546,17 +547,20 @@ s.SatelliteGame = new Class( {
         this.menu.gameOver(killer);
         s.game.comm.died(you, killer);
 
+        this.gameFire = false;
         this.hostPlayer = false;
         this.restartGame();
     },
 
-    restartGame: function() {
+    restartGame: function(type) {
         var that = this;
         setTimeout(function() {
             that.player.shields = s.config.ship.shields;
             that.player.hull = s.config.ship.hull;
             that.player.setPosition([19232, 19946, 20311],[0,0,0],[0,0,0],[0,0,0]);
-            that.setBotsOnRestart();
+            if (type === 'base death') {
+                that.setBotsOnRestart();
+            }
             that.menu.close();
             that.gameOverBoolean = false;
             that.gameFire = true;
@@ -703,7 +707,7 @@ s.SatelliteGame = new Class( {
             }
             s.game.gameOverBoolean = true;
             s.game.menu.gameOver('temp', s.game.baseNameMap[base], message);
-            s.game.restartGame();
+            s.game.restartGame('base death');
         }, 3000);
 
     }
