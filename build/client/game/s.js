@@ -50844,8 +50844,12 @@ s.Projectile = new Class({
     },
 
     handleCollision: function(mesh, position){
+        
+        if (!this.game.gameFire) { return; }
+
         //check if your turret hit someone or an enemy base
         //else if check if you got hit by a bot or if a bot hit your base
+
         if (this.pilot === this.game.pilot.name){
             if (mesh.instance.alliance && mesh.instance.alliance === "rebel"){
                 this.HUD.menu.animate({
@@ -50986,7 +50990,7 @@ s.Ship = new Class({
         rightTurretOffset: new THREE.Vector3(-35, 0, -200),
         missileOffset: new THREE.Vector3(0, 0, -120),
         turretFireTime: 150,
-        botTurretFireTime: 1000,
+        botTurretFireTime: 3000,
         missileFireTime: 1000
     },
 
@@ -51167,10 +51171,15 @@ s.Player = new Class({
     this.root.castShadow = true;
 
     // Moon facing initilization
-    this.root.lookAt(this.game.moon.root.position);
+    //this.player.root.lookAt(this.moon.root.position);
 
     // Root camera to the player's position
     this.root.add( this.camera );
+
+    this.trailGlow = new THREE.PointLight(0x00FFFF, 5, 20);
+    this.trailGlow.intensity = 0;
+    this.root.add( this.trailGlow );
+    this.trailGlow.position.set(0, 0, 35);
     
     this.game.hook(this.update);
 
@@ -51179,14 +51188,25 @@ s.Player = new Class({
 
     // Setup camera: Chase view
     this.game.camera.position.set(0,35,250);
+
+    // Create particle objects for engine trail.
+    this.flames = [];
+
+    for (var i = 0; i < 5; i++) {
+      var sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: s.textures.particle,
+        useScreenCoordinates: false,
+        blending: THREE.AdditiveBlending,
+        color: 0x00FFFF
+      }));
+
+      this.flames.push(sprite);
+      sprite.position.set(0, 0, (i*10)+40);
+      this.root.add(sprite);
+    }
   },
 
   update: function() {
-<<<<<<< HEAD
-    if (this.hull <= 0){
-      this.game.handleDie();
-    }
-=======
 
     // Adjusts engine glow based on linear velosity
     this.trailGlow.intensity = this.root.getLinearVelocity().length()/100;
@@ -51199,7 +51219,6 @@ s.Player = new Class({
     this.flames[2].scale.set(2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler);
     this.flames[3].scale.set(1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler);
     this.flames[4].scale.set(1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler);
->>>>>>> dev
   }
 });
 
@@ -51208,7 +51227,7 @@ s.Bot = new Class( {
   extend: s.Ship,
 
   construct: function( options ) {
-    var position = options.position || [22498, -25902, 24976];
+    var position = options.position || [-6879, 210, 406];
     var rotation = options.rotation || [0, Math.PI / 2, 0];
 
     // Generating a new bot with properties
@@ -51225,16 +51244,22 @@ s.Bot = new Class( {
       rotationFadeFactor: 4
     };
 
+    this.maxDistance = 8000;
+    this.minDistance = 1000;
+
+    this.evasiveManeuvers = false;
+    this.evade = {};
+    this.evade.pitchSign = 1;
+    this.evade.yawSign = 1;
+
     //set a hook on the bot controls.
     //unhook is necessary when bot dies and new bot is created
     //need to refactor when multiple bots on screen
-    this.controlBot = this.controlBot.bind(this);
-    if (this.game.lastBotCallBack) {
-      this.game.unhook (this.game.lastBotCallBack);
-    }
+    var hookName = ('control' + this.name).split(' ').join('');
+    this[hookName] = this.controlBot.bind(this);
 
-    this.game.hook( this.controlBot );
-    this.game.lastBotCallBack = this.controlBot;
+    this.game.hook( this[hookName] );
+    // this.game.botHooks = this.controlBot;
 
     this.lastTime = new Date( ).getTime( );
 
@@ -51248,7 +51273,7 @@ s.Bot = new Class( {
 
 
     //CAMERA SETUP COMES AFER INITALIZE SO ROOT IS ALREADY SET UP
-    //Create a camera for the bot
+    //Create a camera for the bot - used for radial direction mark
     this.camera = new THREE.PerspectiveCamera(35, 1, 1, 300000);
 
     // Root camera to the bot's position
@@ -51280,69 +51305,56 @@ s.Bot = new Class( {
     }
   },
 
-
-  controlBot: function( ) {
-
-    //get closest enemy
-    this.getEnemyList();
-    this.getClosestDistance();
-
-    //////////////////////////////
-    //// THRUST/BREAK LOGIC ////
-    //////////////////////////////    
-
-    var now = new Date( ).getTime( );
-    var difference = now - this.lastTime;
-
-    var thrust = 0;
-    var brakes = 0;
-
-    var  maxDistance = 4100, minDistance = 1500;
-
-    if (this.closestDistance > maxDistance) {
-      thrust = 1;
-    }
-    else if (this.closestDistance < minDistance) {
-      brakes = 1;
-    } else {
-      var ratio = (this.closestDistance - minDistance) / (maxDistance - minDistance);
-      var optimumSpeed = s.config.ship.maxSpeed * ratio;
-      if (optimumSpeed < this.botOptions.thrustImpulse) { brakes = 1; }
-      if (optimumSpeed > this.botOptions.thrustImpulse) { thrust = 1; }
-    }
-
-    if (thrust && this.botOptions.thrustImpulse < s.config.ship.maxSpeed){
-      this.botOptions.thrustImpulse += difference;
-    }
-
-    if (brakes && this.botOptions.thrustImpulse > 0){
-      this.botOptions.thrustImpulse -= difference;
-    }
-
-
-    //////////////////////////////
-    // LEFT/RIGHT/UP/DOWN LOGIC //
-    //////////////////////////////       
-
-    var vTarget3D;
-    var vTarget2D;
-
-    var pitch = 0;
-    var roll = 0;
-    var yaw = 0;
-
-    var yawSpeed    = this.botOptions.yawSpeed,
-    pitchSpeed  = this.botOptions.pitchSpeed;
-
-    var thrustScalar = this.botOptions.thrustImpulse/s.config.ship.maxSpeed + 1;
-
+  target2d: function () {
     // TARGET HUD MARKING
+    var vTarget3D, vTarget2D;
     if ( this.target ) {
       this.target = this.target.root;
 
       vTarget3D = this.target.position.clone();
       vTarget2D = s.projector.projectVector(vTarget3D, this.camera);
     }
+    return vTarget2D;
+  },
+
+  dodgeBullet: function(now) {
+    var
+      yawSpeed     = this.botOptions.yawSpeed,
+      pitchSpeed   = this.botOptions.pitchSpeed;
+
+    var thrustScalar = this.botOptions.thrustImpulse/s.config.ship.maxSpeed + 1;
+
+    var yaw  = this.evade.yawSign * yawSpeed / thrustScalar;
+    var pitch  = this.evade.pitchSign * pitchSpeed / thrustScalar;
+    var roll = 0;
+
+    var vTarget2D = this.target2d();
+
+    var difference = now - this.lastTime;
+
+    //thrust unless at max speed
+    if (this.botOptions.thrustImpulse < s.config.ship.maxSpeed){
+      console.log(difference);
+      console.log(this.botOptions.thrustImpulse);
+      this.botOptions.thrustImpulse += difference;
+    }
+
+    return  [pitch, yaw, roll, vTarget2D];
+  },
+
+  determineDirection: function() {
+    var pitch = 0;
+    var yaw = 0;
+    var roll = 0;
+
+    var
+      yawSpeed     = this.botOptions.yawSpeed,
+      pitchSpeed   = this.botOptions.pitchSpeed;
+
+    var thrustScalar = this.botOptions.thrustImpulse/s.config.ship.maxSpeed + 1;
+
+    
+    var vTarget2D = this.target2d();
 
     if (vTarget2D.z < 1) {
         //go left; else if go right
@@ -51371,12 +51383,39 @@ s.Bot = new Class( {
           pitch  = -1 * pitchSpeed / thrustScalar;
         }
       }
+      return [pitch, yaw, roll, vTarget2D];
+  },
 
-    //////////////////////////////
-    // MOTION AND PHYSICS LOGIC //
-    //////////////////////////////
+  thrustAndBreaks: function(now) {
+    var difference = now - this.lastTime;
 
+    var thrust = 0;
+    var brakes = 0;
 
+    var  maxDistance = this.maxDistance, minDistance = this.minDistance;
+
+    if (this.closestDistance > maxDistance) {
+      thrust = 1;
+    }
+    else if (this.closestDistance < minDistance) {
+      brakes = 1;
+    } else {
+      var ratio = (this.closestDistance - minDistance) / (maxDistance - minDistance);
+      var optimumSpeed = s.config.ship.maxSpeed * ratio;
+      if (optimumSpeed < this.botOptions.thrustImpulse) { brakes = 1; }
+      if (optimumSpeed > this.botOptions.thrustImpulse) { thrust = 1; }
+    }
+
+    if (thrust && this.botOptions.thrustImpulse < s.config.ship.maxSpeed){
+      this.botOptions.thrustImpulse += difference;
+    }
+
+    if (brakes && this.botOptions.thrustImpulse > 0){
+      this.botOptions.thrustImpulse -= difference;
+    }
+  },
+
+  motionAndPhysics: function(pitch, yaw, roll, vTarget2D) {
     var linearVelocity = this.root.getLinearVelocity().clone();
     var angularVelocity = this.root.getAngularVelocity().clone();
     var rotationMatrix = new THREE.Matrix4();
@@ -51393,14 +51432,37 @@ s.Bot = new Class( {
 
     var getForceVector = new THREE.Vector3(0,0, -1*this.botOptions.thrustImpulse).applyMatrix4(rotationMatrix);
     this.root.applyCentralImpulse(getForceVector);
+  },
+
+  controlBot: function() {
+
+    //get closest enemy
+    this.getEnemyList();
+    this.getClosestDistance();
+
+    var now = new Date( ).getTime( );
+
+    var direction;
+    if (this.evasiveManeuvers) {
+      direction = this.dodgeBullet(now);
+    } else {
+      this.thrustAndBreaks(now); //// THRUST/BREAK LOGIC ////
+      direction = this.determineDirection(); // LEFT/RIGHT/UP/DOWN LOGIC //
+
+      //flip yaw and pitch direction for evading bullets
+      this.evade.yawSign = this.evade.yawSign * -1;
+      this.evade.pitchSign = this.evade.pitchSign * -1;
+    }
+
+    var pitch = direction[0], yaw = direction[1], roll = direction[2], vTarget2D = direction[3];
+
+    // MOTION AND PHYSICS LOGIC //
+    this.motionAndPhysics(pitch, yaw, roll, vTarget2D);
 
     this.lastTime = now;
 
-    //////////////////////////////
     ///////  FIRING LOGIC ////////
-    //////////////////////////////
-
-    if ( Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && this.closestDistance < maxDistance) {
+    if (this.game.gameFire && Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && this.closestDistance < this.maxDistance) {
       this.fire('turret');
     }
 
@@ -51805,7 +51867,6 @@ s.Keyboard = new Class({
     'a'       : 65,
     's'       : 83,
     'd'       : 68,
-    'e'       : 69,
     'backtick': 192,
     'shift'   : 16,
     'tilde'   : 192
@@ -51962,16 +52023,17 @@ s.Oculus = new Class({
     this.quat = new THREE.Quaternion();
     this.detected = false;
     this.game = options.game;
-    this.update = this.update.bind(this);
 
     vr.load(function () {
       this.state = new vr.State();
+      console.log(this.state);
       vr.pollState(this.state);
       if (this.state.hmd.present) {
         this.detected = true;
-        this.game.hook(this.update);
       }
     }, this);
+    this.update = this.update.bind(this);
+    this.game.hook(this.update);
   },
   update: function () {
     vr.pollState(this.state);
@@ -52071,7 +52133,9 @@ s.Controls = new Class({
   },
 
   destruct: function( ) {
-    this.game.unhook( this.update );
+
+    game.unhook( this.update );
+
   },
 
   update: function( time, delta ) {
@@ -52101,12 +52165,6 @@ s.Controls = new Class({
     ///////////////////////
 
     var yawSpeed = this.options.yawSpeed,
-<<<<<<< HEAD
-      pitchSpeed = this.options.pitchSpeed;
-      // cursor = this.HUD.cursorVector,
-      // radius = this.HUD.subreticleBound.radius,
-      // crosshairs = {width: 30, height: 30};
-=======
       pitchSpeed = this.options.pitchSpeed,
       cursor = this.HUD.cursorVector,
       radius = this.HUD.subreticleBound.radius,
@@ -52172,7 +52230,6 @@ s.Controls = new Class({
       // Set thrust
       this.options.thrustImpulse = gamepadThrust * s.config.ship.maxSpeed;
     }
->>>>>>> dev
 
     ///////////////////////
     // KEYBOARD COMMANDS //
@@ -52180,6 +52237,7 @@ s.Controls = new Class({
 
     if (this.keyboard.pressed('left')) {
       yaw = yawSpeed / thrustScalar;
+
     }
     else if (this.keyboard.pressed('right')) {
       yaw = -1*yawSpeed / thrustScalar;
@@ -52208,7 +52266,7 @@ s.Controls = new Class({
       roll = -1*this.options.rotationSpeed;
     }
 
-    if (this.keyboard.pressed('space') || this.firing){
+    if (this.game.gameFire && this.keyboard.pressed('space') || this.firing){
       this.player.fire('turret');
     }
 
@@ -52216,75 +52274,6 @@ s.Controls = new Class({
       vr.resetHmdOrientation();
     }
 
-    ///////////////////////
-    //  MOUSE CONTROLS   //
-    ///////////////////////
-
-    // var mouseUpdate = this.mouse.update({
-    //     centerX: centerX,
-    //     crosshairs: crosshairs,
-    //     yaw: yaw,
-    //     radius: radius,
-    //     yawSpeed: yawSpeed,
-    //     thrustScalar: thrustScalar,
-    //     centerY: centerY,
-    //     pitch: pitch,
-    //     pitchSpeed: pitchSpeed
-    // });
-
-    // pitch = mouseUpdate.pitch || pitch;
-    // yaw = mouseUpdate.yaw || yaw;
-
-    ///////////////////////
-    // GAMEPAD CONTROLS  //
-    ///////////////////////
-
-    if (hasGamepad) {
-      var gamepadState = this.gamepad.gamepads[0].state;
-
-      // TODO: Handle inverted option
-      pitch = gamepadState.LEFT_STICK_Y;
-
-      if (gamepadYaw) {
-        yaw = gamepadState.LEFT_STICK_X*-1;
-      }
-      else {
-        roll = gamepadState.LEFT_STICK_X*-1 * this.options.rotationSpeed;
-      }
-
-      if (gamepadState.RB || gamepadState.X || gamepadState.FACE_1)
-        this.firing = true;
-      else
-        this.firing = false;
-
-      var gamepadThrust = (gamepadState.RIGHT_STICK_X*-1 + 1)/2;
-
-      // Set thrust
-      this.options.thrustImpulse = gamepadThrust * s.config.ship.maxSpeed;
-    }
-
-    ///////////////////////
-    //  OCULUS CONTROLS  //
-    ///////////////////////
-
-    if (this.oculus.detected) {
-      this.mouse.mouseType = 'oculus';
-      this.camera.rotation.setEulerFromQuaternion(this.oculus.quat);
-      if (hasGamepad) {
-        pitch += this.oculus.quat.x/2;
-        yaw += this.oculus.quat.y/2;
-        roll += this.oculus.quat.z/2;
-      } else {
-        pitch += this.oculus.quat.x;
-        yaw += this.oculus.quat.y;
-        roll += this.oculus.quat.z;
-      }
-      if (this.menu.displayed) {
-        this.menu.updateHovered();
-      }
-    } else {
-      this.mouse.mouseType = 'keyboard';
-    }
 
     //////////////////////////////
     // MOTION AND PHYSICS LOGIC //
@@ -52348,7 +52337,6 @@ s.HUD = new Class({
 
 		this.game = options.game;
 		this.controls = options.controls;
-        this.oculus = options.game.oculus;
 
         this.PI = Math.PI;
 
@@ -52379,8 +52367,8 @@ s.HUD = new Class({
         // end Oculus canvases
 
 
-		// this.gameOver = new Image();
-        // this.gameOver.src = 'game/textures/Game-Over-1.png';
+		this.gameOver = new Image();
+        this.gameOver.src = 'game/textures/Game-Over-1.png';
 
 		this.targetX = 0;
 		this.targetY = 0;
@@ -52440,8 +52428,8 @@ s.HUD = new Class({
         // changeTarget modified by key commands to cycle through targets; currentTarget represents index of targeted enemy
         this.changeTarget = 0;
         this.currentTarget = 0;
-	},
 
+	},
 	update: function(){
             
         ////////////////////////
@@ -52481,11 +52469,11 @@ s.HUD = new Class({
         this.ctx.stroke();
 
 
-        // if (this.cursorVector.length() > this.subreticleBound.radius) {
-        //     this.cursorVector.normalize().multiplyScalar(this.subreticleBound.radius);
-        //     this.targetX = this.cursorVector.x+centerX;
-        //     this.targetY = this.cursorVector.y+centerY;
-        // }
+        if (this.cursorVector.length() > this.subreticleBound.radius) {
+            this.cursorVector.normalize().multiplyScalar(this.subreticleBound.radius);
+            this.targetX = this.cursorVector.x+centerX;
+            this.targetY = this.cursorVector.y+centerY;
+        }
 
         this.ctx.fillStyle = this.menu.color;
         this.ctx.strokeStyle = this.menu.color;
@@ -52610,7 +52598,7 @@ s.HUD = new Class({
         this.ctx.fillText("Shields",throttleEndX - 45,throttleEndY + 30);
         this.ctx.beginPath();
         this.ctx.fillStyle = this.menu.color;
-        //this.ctx.arc(this.targetX, this.targetY, 5, 0, 2 * this.PI, false);
+        this.ctx.arc(this.targetX, this.targetY, 5, 0, 2 * this.PI, false);
         this.ctx.fill();
 
 
@@ -52630,168 +52618,36 @@ s.HUD = new Class({
 
         var self = s.game.player.root;
 
-        // if (enemies) {
+        if (enemies) {
 
-        //     // changeTarget changes current tracked enemy in the enemy array by +/- 1
-        //     var i = this.currentTarget + this.changeTarget;
+            // changeTarget changes current tracked enemy in the enemy array by +/- 1
+            var i = this.currentTarget + this.changeTarget;
 
-        //     // cycle i through the list of enemies
-        //     i = ( i === -1 ? enemiesLen-1 : i > enemiesLen-1 ? 0 : i );
-        //     this.currentTarget = i;
-        //     this.changeTarget = 0;
+            // cycle i through the list of enemies
+            i = ( i === -1 ? enemiesLen-1 : i > enemiesLen-1 ? 0 : i );
+            this.currentTarget = i;
+            this.changeTarget = 0;
 
-        //     this.target = enemies[i];
-        //     var targetInSight = false;
+            this.target = enemies[i];
+            var targetInSight = false;
 
-        //     for (var j = 0; j < enemiesLen; j++) {
+            for (var j = 0; j < enemiesLen; j++) {
 
-        //         this.callTarget = enemies[j].root;
+                this.callTarget = enemies[j].root;
 
-        //         var call3D = this.callTarget.position.clone();
-        //         var call2D = s.projector.projectVector(call3D, s.game.camera);
+                var call3D = this.callTarget.position.clone();
+                var call2D = s.projector.projectVector(call3D, s.game.camera);
 
-        //         var distanceToCallTarget, c2D, callSize, callTargetInSight;
+                var distanceToCallTarget, c2D, callSize, callTargetInSight;
 
-        //         if ( Math.abs(call2D.x) <= 0.95 && Math.abs(call2D.y) <= 0.95 && call2D.z < 1 ){
+                if ( Math.abs(call2D.x) <= 0.95 && Math.abs(call2D.y) <= 0.95 && call2D.z < 1 ){
 
-        //             distanceToCallTarget = self.position.distanceTo(this.callTarget.position);
-        //             callSize = Math.round((width - distanceToCallTarget/100)/26);
-        //             c2D = call2D.clone();
-        //             c2D.x =  ( width  + c2D.x*width  )/2;
-        //             c2D.y = -(-height + c2D.y*height )/2;
+                    distanceToCallTarget = self.position.distanceTo(this.callTarget.position);
+                    callSize = Math.round((width - distanceToCallTarget/100)/26);
+                    c2D = call2D.clone();
+                    c2D.x =  ( width  + c2D.x*width  )/2;
+                    c2D.y = -(-height + c2D.y*height )/2;
 
-<<<<<<< HEAD
-        //             this.ctx.fillStyle = this.menu.color;
-        //             this.ctx.fillText( enemies[j].name, c2D.x-30, c2D.y+10);
-        //             this.ctx.fill();
-        //         }
-        //     }
-
-        //     // TARGET HUD MARKING
-        //     if ( this.target ) {
-        //         this.target = this.target.root;
-
-        //         var vTarget3D = this.target.position.clone();
-        //         var vTarget2D = s.projector.projectVector(vTarget3D, s.game.camera);
-
-        //         var distanceToTarget, v2D, size;
-
-        //         if ( Math.abs(vTarget2D.x) <= 0.95 && Math.abs(vTarget2D.y) <= 0.95 && vTarget2D.z < 1 ){
-        //             targetInSight = true;
-        //             distanceToTarget = self.position.distanceTo(this.target.position);
-        //             size = Math.round((width - distanceToTarget/100)/26);
-        //         }
-
-        //         // Targeting box
-        //         if ( targetInSight ){
-
-        //             v2D = vTarget2D.clone();
-        //             v2D.x =  ( width  + v2D.x*width  )/2;
-        //             v2D.y = -(-height + v2D.y*height )/2;
-
-        //             this.ctx.strokeRect( v2D.x-size, v2D.y-size, size*2, size*2 );
-        //             this.ctx.lineWidth = 1;
-        //             this.ctx.strokeStyle = this.menu.color;
-
-        //         // Radial direction marker
-        //         } else {
-
-        //             v2D = new THREE.Vector2(vTarget2D.x, vTarget2D.y);
-        //             v2D.multiplyScalar(1/v2D.length()).multiplyScalar(this.subreticleBound.radius+12);
-
-        //             this.ctx.beginPath();
-        //             if (vTarget2D.z > 1)
-        //                 this.ctx.arc( -v2D.x+centerX, (-v2D.y+centerY), 10, 0, 2*this.PI, false);
-        //             else
-        //                 this.ctx.arc( v2D.x+centerX, -(v2D.y-centerY), 10, 0, 2*this.PI, false);
-
-        //             this.ctx.fillStyle = "rgba(256,0,0,0.5)";
-        //             this.ctx.fill();
-        //             this.ctx.lineWidth = 2;
-        //             this.ctx.strokeStyle = this.menu.color;
-        //             this.ctx.stroke();
-
-        //         }
-
-
-        //         // Fully just crashing on oculus view
-
-        //         /////////////////////////////////
-        //         // PREDICTIVE TARGETING SYSTEM //
-        //         /////////////////////////////////
-
-        //         // PARAMETERS
-        //         // aV   = vector from target to self
-        //         // a    = distance between self and target
-        //         // eV   = enemy's current velocity vector
-        //         // e    = magnitude of eV
-        //         // pV   = players's velocity vector
-        //         // b    = magnitude of bV plus initial bullet speed
-        //         // angD = angular differential
-        //         // velD = velocity differential
-        //         // t    = quadratic solution for time at which player bullet and enemy ship will simultaneously reach a given location
-        //         if ( enemies[i] && targetInSight && !this.oculus.detected ){
-
-        //             var aV = enemies[i].root.position.clone().add( self.position.clone().multiplyScalar(-1) );
-        //             var a  = aV.length();
-        //             var eV = this.target.getLinearVelocity();
-        //             var e  = eV.length();
-        //             var pV = self.getLinearVelocity();
-        //             var b = 5000+pV.length();
-
-        //             if (eV && b && aV){
-        //                 var angD = aV.dot(eV);
-        //                 var velD = (b*b - e*e);
-
-        //                 var t = angD/velD + Math.sqrt( angD*angD + velD*a*a )/velD;
-
-        //                 // Don't show the marker if the enemy is more than 4 seconds away
-        //                 if (t < 4){
-
-        //                     this.trailingPredictions.push(eV.multiplyScalar(t));
-        //                     var pLen = this.trailingPredictions.length;
-
-        //                     // If the previous frames had a prediction, tween the midpoint of all predictions and plot that
-        //                     if (pLen > 3){
-        //                         var pX = 0, pY = 0;
-        //                         for (var p = 0; p < pLen; p++){
-
-        //                             // Project 3D coords onto 2D plane in perspective of the camera;
-        //                             // Scale predictions with current camera perspective
-        //                             var current = s.projector.projectVector(
-        //                                 this.target.position.clone().add( this.trailingPredictions[p] ), s.game.camera );
-        //                             pX += (width + current.x*width)/2;
-        //                             pY += -(-height + current.y*height)/2;
-
-        //                         }
-        //                         var enemyV2D = new THREE.Vector2(pX/pLen, pY/pLen);
-
-        //                         if (enemyV2D.distanceTo(v2D) > size/3) {
-        //                             // Draw the prediction marker
-        //                             this.ctx.beginPath();
-        //                             this.ctx.arc(enemyV2D.x, enemyV2D.y, size/5, 0, 2*this.PI, false);
-        //                             this.ctx.fillStyle = "rgba(256,0,0,0.5)";
-        //                             this.ctx.fill();
-        //                             this.ctx.lineWidth = 2;
-        //                             this.ctx.strokeStyle = this.menu.color;
-        //                             this.ctx.stroke();
-        //                         }
-
-        //                         // remove the earliest trailing prediction
-        //                         this.trailingPredictions.shift();
-
-        //                     }
-        //                 }
-        //             }
-        //         // If the target is no longer on screen, but lastV2D is still assigned, set to null
-        //         } else if ( this.trailingPredictions.length ) {
-        //             this.trailingPredictions = [];
-        //         }
-        //     }
-
-        // }
-
-=======
                     this.writeName(enemies[j].name, c2D);
                 }
             }
@@ -52807,12 +52663,11 @@ s.HUD = new Class({
         this.findTargets(s.game.spaceStation.root, 'blue', 34, 5500);
         this.findTargets(s.game.moonBaseTall.root, 'yellow', 34, 5500);
         
->>>>>>> dev
         /////////////////////////////////
         // PLAYER SHIELD/HEALTH STATUS //
         /////////////////////////////////
 
-        if (this.hp !== s.config.ship.hull && !this.game.gameOverBoolean){
+        if (this.hp !== s.config.ship.hull && this.health > -10){
             var grd = this.ctx.createRadialGradient(centerX,centerY,width/12,centerX,centerY,this.health);
             grd.addColorStop(0,"rgba(0,0,0,0)");
             grd.addColorStop(1,"rgba(256,0,0,0.75)");
@@ -52831,27 +52686,19 @@ s.HUD = new Class({
         }
 
 
-        // this.ctx.lineWidth = 1;
-        // this.ctx.fillStyle = this.menu.color;
-        // this.ctx.beginPath();
-        // this.ctx.arc(centerX, centerY, 3, 0, 2 * this.PI, false);
-        // this.ctx.fill();
-        // this.ctx.beginPath();
-        // this.ctx.arc(centerX, centerY, 15, 0, 2 * this.PI, false);
-        // this.ctx.stroke();
-
-        ///////////////////////
-        ///   CROSSHAIRS    ///
-        ///////////////////////
+        this.ctx.lineWidth = 1;
+        this.ctx.fillStyle = this.menu.color;
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, 3, 0, 2 * this.PI, false);
+        this.ctx.fill();
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, 15, 0, 2 * this.PI, false);
+        this.ctx.stroke();
 
         this.oculusCtx.clearRect(0, 0, this.oculusCanvas.width, this.oculusCanvas.height);
 
         this.oculusCtx.drawImage(this.canvas, 50*1.07, -50, window.innerWidth/2, window.innerHeight/2);
         this.oculusCtx.drawImage(this.canvas, this.oculusCanvas.width/2-50*1.07, -50, window.innerWidth/2, window.innerHeight/2);
-<<<<<<< HEAD
-
-    }
-=======
     },
 
     writeName: function (name, clone) {
@@ -52859,7 +52706,6 @@ s.HUD = new Class({
         this.ctx.fillText( name, clone.x-30, clone.y+10);
         this.ctx.fill();
     },
->>>>>>> dev
 
     findTargets: function (circleTarget, fillColor, distanceFromRadius, maxBoxDistance, predictiveAnalytics, enemy) {
 
@@ -53757,7 +53603,7 @@ s.Menu = new Class({
   selectItem: function () {
     // todo: cache menu screens during game load
     // currently recreating text mesh on every screen switch.
-    if (this.hoveredItem.menuItemSelectCallback) {
+    if (!this.game.gameOverBoolean && this.hoveredItem.menuItemSelectCallback) {
       this.clearMenu();
       this[this.hoveredItem.menuItemSelectCallback]();
       this.cursorPosition = 0;
@@ -53772,14 +53618,12 @@ s.Menu = new Class({
         // items and moves hover up and down with head motion
         // todo: use ray casting to select items more accurately
 
-        var viewingAngleX = Math.PI/4 * (this.oculus.quat.x);
-        var viewingAngleY = Math.PI/4 * (this.oculus.quat.y);
+        var viewingAngle = Math.PI/4 * (this.oculus.quat.x);
         var tilt = ~~((this.menuItems.length/2 * this.oculus.quat.x) * 6 + ~~(this.menuItems.length/2));
         var hover = this.menuItems[tilt];
         this.hoverItem(hover);
 
-        this.menuBox.position.setY((-150*Math.sin(viewingAngleX))/Math.sin(Math.PI/4));
-        this.menuBox.position.setX((150*Math.sin(viewingAngleY))/Math.sin(Math.PI/4));
+        this.menuBox.position.setY((-150*Math.sin(viewingAngle))/Math.sin(Math.PI/4)/2+4); // ...ish
         // console.log(this.selectorRay.intersectObjects(this.menuBox.children));
       } else {
         // todo: skip over items with no action property
@@ -54240,8 +54084,7 @@ s.SatelliteGame = new Class( {
 
     textures: [
         'particle.png',
-        'explosion.png',
-        'crosshairs.png'
+        'explosion.png'
     ],
 
     getRandomCoordinate: function(){
@@ -54256,8 +54099,10 @@ s.SatelliteGame = new Class( {
 		var that = this;
         this.IDs = [];
         this.botCount = 0;
+
         this.hostPlayer = false;
         this.teamMode = true;
+        this.gameFire = true;
 
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
 		// No gravity
@@ -54329,20 +54174,6 @@ s.SatelliteGame = new Class( {
             camera: this.camera
         } );
 
-<<<<<<< HEAD
-        // Targeting square around targeted enemy.
-
-        var targetingGeo = new THREE.PlaneGeometry(100, 100);
-        var targetingMat = new THREE.MeshBasicMaterial({color: 0x00FF00, wireframe: true});
-
-        this.targeting = new THREE.Mesh(targetingGeo, targetingMat);
-
-        this.scene.add( this.targeting );
-
-        this.currentTarget = null;
-
-=======
->>>>>>> dev
         this.HUD.hp = this.player.hull;
 
         $(document).on('keyup', function(evt) {
@@ -54456,19 +54287,12 @@ s.SatelliteGame = new Class( {
                     } );
                 }
 
-<<<<<<< HEAD
-                that.currentTarget = enemyShip;
-                
-=======
->>>>>>> dev
                 if (isBot) { console.log( '%s has joined the fray', enemyShip.name ); }
 
                 this._list.push( enemyShip );
                 this._map[ enemyShip.name ] = enemyShip; // this._map.set(enemyInfo.name, otherShip);
             }
         };
-
-
 
         // Dependent on controls; needs to be below s.Controls
         this.radar = new s.Radar( {
@@ -54478,19 +54302,16 @@ s.SatelliteGame = new Class( {
 
 
 
-        // window.addEventListener( 'mousemove', function ( e ) {
-        //     that.HUD.targetX = e.pageX;
-        //     that.HUD.targetY = e.pageY;
-        // } );
+        window.addEventListener( 'mousemove', function ( e ) {
+            that.HUD.targetX = e.pageX;
+            that.HUD.targetY = e.pageY;
+        } );
         window.addEventListener( 'mousedown', function ( ) {
             that.controls.firing = true;
         } );
         window.addEventListener( 'mouseup', function ( ) {
             that.controls.firing = false;
         } );
-
-        // Add this back in later with new targeting system.
-
         window.addEventListener( 'keydown', function(e) {
             // Cycle through targets; extra logic guarding to prevent rapid cycling while the key is pressed
             e = e.which;
@@ -54524,64 +54345,12 @@ s.SatelliteGame = new Class( {
             s.game.start();
         });
 
-<<<<<<< HEAD
-        // Engine glow and flame trail on your player only.
-
-        this.flames = [];
-
-        for (var i = 0; i < 5; i++) {
-          var sprite = new THREE.Sprite(new THREE.SpriteMaterial({
-            map: s.textures.particle,
-            useScreenCoordinates: false,
-            blending: THREE.AdditiveBlending,
-            color: 0x00FFFF
-          }));
-
-          this.flames.push(sprite);
-          this.player.root.add(sprite);
-          sprite.position.set(0, 0, (i*10)+40);
-        }
-
-        this.trailGlow = new THREE.PointLight(0x00FFFF, 5, 20);
-        this.trailGlow.intensity = 0;
-        this.player.root.add( this.trailGlow );
-        this.trailGlow.position.set(0, 0, 35);
-
-        this.ocuScale = this.oculus.detected ? 0.2 : 1;
-
-        // crosshairs
-
-        this.crosshairs = new THREE.Sprite(new THREE.SpriteMaterial({
-            map: s.textures.crosshairs,
-            useScreenCoordinates: false,
-            blending: THREE.AdditiveBlending,
-            color: 0x00FF00
-        }));
-
-        this.game.player.root.add( this.crosshairs );
-
-        this.crosshairs.position.setZ(150);
-=======
         s.game.menu.joinRoom();
->>>>>>> dev
 	},
 
 	render: function(_super, time) {
 		_super.call(this, time);
 		this.controls.update();
-        this.targeting.lookAt(this.player.root.position);
-        if (this.currentTarget) this.targeting.position.set(this.currentTarget.root.position);
-
-        // Adjusts engine glow based on linear velosity
-        this.trailGlow.intensity = this.player.root.getLinearVelocity().length()/100;
-
-        var flameScaler = (Math.random()*0.1 + 1)*this.ocuScale;
-
-        this.flames[0].scale.set(2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler);
-        this.flames[1].scale.set(3*this.trailGlow.intensity*flameScaler, 3*this.trailGlow.intensity*flameScaler, 3*this.trailGlow.intensity*flameScaler);
-        this.flames[2].scale.set(2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler, 2*this.trailGlow.intensity*flameScaler);
-        this.flames[3].scale.set(1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler);
-        this.flames[4].scale.set(1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler, 1*this.trailGlow.intensity*flameScaler);
 	},
 
 	addSkybox: function() {
@@ -54741,7 +54510,6 @@ s.SatelliteGame = new Class( {
     },
 
     handleKill: function(message) {
-        console.log(message);
         // get enemy position
         var position = s.game.enemies.get(message.killed).root.position;
         new s.Explosion({
@@ -54803,6 +54571,13 @@ s.SatelliteGame = new Class( {
                 s.game.handleDie(zapped, killer);
             }
         } else {
+            if (zappedEnemy.isBot) {
+                zappedEnemy.evasiveManeuvers = true;
+                setTimeout(function() {
+                    zappedEnemy.evasiveManeuvers = false;
+                    console.log('when does this go');
+                }, 3000);
+            }
             if (zappedEnemy.shields > 0){
                 zappedEnemy.shields -= 20;
                 console.log(zapped, ' shield is now: ', zappedEnemy.shields);
@@ -54816,7 +54591,10 @@ s.SatelliteGame = new Class( {
             if (zappedEnemy.hull <= 0 && zappedEnemy.isBot) {
                 console.log(zapped, ' has died');
                 s.game.handleKill.call(s, { killed: zapped, killer: killer });
-                s.game.enemies.add( {position: [ 23498, -25902, 24976 ]}, 'bot' );
+                var hookName = ('control' + zapped).split(' ').join('');
+                s.game.unhook( zappedEnemy[hookName] );
+
+                s.game.enemies.add( {}, 'bot' );
             }
         }
     },
@@ -54836,14 +54614,23 @@ s.SatelliteGame = new Class( {
 
     restartGame: function() {
         var that = this;
-        this.gameOverBoolean = true;
         setTimeout(function() {
             that.player.shields = s.config.ship.shields;
             that.player.hull = s.config.ship.hull;
             that.player.setPosition([19232, 19946, 20311],[0,0,0],[0,0,0],[0,0,0]);
+            that.setBotsOnRestart();
             that.menu.close();
             that.gameOverBoolean = false;
+            that.gameFire = true;
         }, 6000);
+    },
+
+    setBotsOnRestart: function () {
+        for (var i = 0; i < this.enemies._list.length; i++) {
+            if (this.enemies._list[i].isBot) {
+                this.enemies._list[i].setPosition([-6879, 210, 406],[0,0,0],[0,0,0],[0,0,0]);
+            }
+        }
     },
 
     shieldBoost: function(){
@@ -54904,8 +54691,8 @@ s.SatelliteGame = new Class( {
         this.game.hostPlayer = true;
         console.log(this.game.hostPlayer);
         if (this.game.botCount === 0) {
-            console.log(true);
             // Create a new bot
+            this.game.enemies.add( {}, 'bot');
             this.game.enemies.add( {}, 'bot');
         }
         that.game.updatePlayersWithBots('botInfo');
@@ -54959,6 +54746,7 @@ s.SatelliteGame = new Class( {
         var shields = this.game[message.baseName].shields;
         console.log(this.game.baseNameMap[message.baseName] + ' was hit by ' + message.pilotName + '. Shields at ' + shields);
         if (this.game[message.baseName].shields < 0) {
+            this.game.gameFire = false;
             this.game.handleBaseDeath(message.baseName);
         }
     },
@@ -54975,6 +54763,7 @@ s.SatelliteGame = new Class( {
             } else {
                 message = "alliance win";
             }
+            s.game.gameOverBoolean = true;
             s.game.menu.gameOver('temp', s.game.baseNameMap[base], message);
             s.game.restartGame();
         }, 3000);

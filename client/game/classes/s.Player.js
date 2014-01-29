@@ -3,7 +3,6 @@ s.Player = new Class({
   construct: function(options) {
 
     this.camera = options.camera;
-    this.game = options.game;
     this.HUD = options.HUD;
     this.firstPerson = false;
     this.name = options.name || '';

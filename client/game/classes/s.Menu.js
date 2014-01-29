@@ -179,7 +179,7 @@ s.Menu = new Class({
   selectItem: function () {
     // todo: cache menu screens during game load
     // currently recreating text mesh on every screen switch.
-    if (this.hoveredItem.menuItemSelectCallback) {
+    if (!this.game.gameOverBoolean && this.hoveredItem.menuItemSelectCallback) {
       this.clearMenu();
       this[this.hoveredItem.menuItemSelectCallback]();
       this.cursorPosition = 0;
