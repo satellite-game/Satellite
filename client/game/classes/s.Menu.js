@@ -25,7 +25,7 @@ s.Menu = new Class({
 
     // Format for adding menu item object:
     // {
-    //   text:   'displayed text string'(required),
+    //   text:   'displayed text string'(required, '%b' for linebreak object),
     //   action: 'callbackNameString' (called in context of 'this')(default null),
     //   font:   'font name string'(default "helvetiker"),
     //   bold:   true/false (default false),
@@ -98,6 +98,10 @@ s.Menu = new Class({
       var menuItemGeo = new THREE.TextGeometry(items[items.length-i-1].text, {font: font, size: size, height: size/2, weight: bold, bevelEnabled: bevelEnabled, bevelThickness: bevel, bevelSize: bevel});
       var menuItemMaterial = new THREE[mat]({color: 0x00CC00, ambient: 0x00FF00, specular: 0x33FF33, shininess: 5});
       var menuItem = new THREE.Mesh(menuItemGeo, menuItemMaterial);
+
+      if (items[items.length-i-1].text === '%b') {
+        menuItem.visible = false;
+      }
 
       menuItem.position.setY((currentHeight)-(menuHeight/2)+(size/2)); // MATH?
       menuItem.position.setX(menuItem.geometry.boundingSphere.radius*-0.5);
@@ -311,6 +315,44 @@ s.Menu = new Class({
       {text: 'SAMPLE TEXT 2', size: 2},
       {text: 'SAMPLE TEXT 3', size: 4},
       {text: 'SAMPLE TEXT 4', size: 3}
+    ]);
+  },
+
+  showCredits: function () {
+    this.menuScreen = 'creds';
+    this.addMenuItems([
+      {text: 'SATELLITE', size: 6},
+      {text: '%b', size: 3},
+      {text: 'Team Lead, Client-Server Architecture, Build Automation, Website Design', small: true},
+      {text: 'PHILIP ALEXANDER', size: 4},
+      {text: '%b', size: 3},
+      {text: 'NPC Artificial Intelligence, Gameplay Mode Design, Multiplayer', small: true},
+      {text: 'BRANDON COOPER', size: 4},
+      {text: '%b', size: 3},
+      {text: 'Oulus Rift Integration, Flight Controls, In-Game UI, Aditional Graphics, Lighting', small: true},
+      {text: 'ERIC HANNUM', size: 4},
+      {text: '%b', size: 3},
+      {text: 'Server-Side Predictive Player Movement, Socket.io Integration', small: true},
+      {text: 'ANDREW LU', size: 4},
+      {text: '%b', size: 3},
+      {text: 'Combat Mechanics, Weapon Design, Lighting, Particle Systems, Pyrotechnics', small: true},
+      {text: 'GARY RYAN', size: 4},
+      {text: '%b', size: 3},
+      {text: 'Camera System, Environment Design, 3D Radar, Tactical Navigation Systems', small: true},
+      {text: 'ANDREW SPADE', size: 4},
+      {text: '%b', size: 3},
+      {text: 'NPC Controller, Artificial Intelligence, Unit Testing, Website Design', small: true},
+      {text: 'JOAO STEIN', size: 4},
+      {text: '%b', size: 3},
+      {text: 'Project Manager, Unit Testing, Network Optimization, Server-Side Predictive Physics', small: true},
+      {text: 'SAM STITES', size: 4},
+      {text: '%b', size: 3},
+      {text: 'HUD, Flight Controls, Game Logic, Multiplayer Support, Audio Design', small: true},
+      {text: 'FELIX TRIPIER', size: 4},
+      {text: '%b', size: 7},
+      {text: 'and Special Thanks to', small: true},
+      {text: 'LARRY DAVIS', size: 3}
+
     ]);
   },
 
