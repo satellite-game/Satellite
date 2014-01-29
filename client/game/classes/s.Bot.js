@@ -3,13 +3,13 @@ s.Bot = new Class( {
   extend: s.Ship,
 
   construct: function( options ) {
-    var position = options.position || [22498, -25902, 24976];
+    var position = options.position || [-6879, 210, 406];
     var rotation = options.rotation || [0, Math.PI / 2, 0];
 
     // Generating a new bot with properties
     this.name = options.name || 'bot ' + (++this.game.botCount);
     this.isBot = true;
-    
+
     this.botOptions = {
       rotationSpeed: Math.PI/2,
       pitchSpeed: Math.PI/4,
@@ -20,16 +20,22 @@ s.Bot = new Class( {
       rotationFadeFactor: 4
     };
 
+    this.maxDistance = 8000;
+    this.minDistance = 1000;
+
+    this.evasiveManeuvers = false;
+    this.evade = {};
+    this.evade.pitchSign = 1;
+    this.evade.yawSign = 1;
+
     //set a hook on the bot controls.
     //unhook is necessary when bot dies and new bot is created
     //need to refactor when multiple bots on screen
-    this.controlBot = this.controlBot.bind(this);
-    if (this.game.lastBotCallBack) {
-      this.game.unhook (this.game.lastBotCallBack);
-    }
+    var hookName = ('control' + this.name).split(' ').join('');
+    this[hookName] = this.controlBot.bind(this);
 
-    this.game.hook( this.controlBot );
-    this.game.lastBotCallBack = this.controlBot;
+    this.game.hook( this[hookName] );
+    // this.game.botHooks = this.controlBot;
 
     this.lastTime = new Date( ).getTime( );
 
@@ -43,7 +49,7 @@ s.Bot = new Class( {
 
 
     //CAMERA SETUP COMES AFER INITALIZE SO ROOT IS ALREADY SET UP
-    //Create a camera for the bot
+    //Create a camera for the bot - used for radial direction mark
     this.camera = new THREE.PerspectiveCamera(35, 1, 1, 300000);
 
     // Root camera to the bot's position
@@ -75,24 +81,91 @@ s.Bot = new Class( {
     }
   },
 
+  target2d: function () {
+    // TARGET HUD MARKING
+    var vTarget3D, vTarget2D;
+    if ( this.target ) {
+      this.target = this.target.root;
 
-  controlBot: function( ) {
+      vTarget3D = this.target.position.clone();
+      vTarget2D = s.projector.projectVector(vTarget3D, this.camera);
+    }
+    return vTarget2D;
+  },
 
-    //get closest enemy
-    this.getEnemyList();
-    this.getClosestDistance();
+  dodgeBullet: function(now) {
+    var
+      yawSpeed     = this.botOptions.yawSpeed,
+      pitchSpeed   = this.botOptions.pitchSpeed;
 
-    //////////////////////////////
-    //// THRUST/BREAK LOGIC ////
-    //////////////////////////////    
+    var thrustScalar = this.botOptions.thrustImpulse/s.config.ship.maxSpeed + 1;
 
-    var now = new Date( ).getTime( );
+    var yaw  = this.evade.yawSign * yawSpeed / thrustScalar;
+    var pitch  = this.evade.pitchSign * pitchSpeed / thrustScalar;
+    var roll = 0;
+
+    var vTarget2D = this.target2d();
+
+    var difference = now - this.lastTime;
+
+    //thrust unless at max speed
+    if (this.botOptions.thrustImpulse < s.config.ship.maxSpeed){
+      this.botOptions.thrustImpulse += difference;
+    }
+
+    return  [pitch, yaw, roll, vTarget2D];
+  },
+
+  determineDirection: function() {
+    var pitch = 0;
+    var yaw = 0;
+    var roll = 0;
+
+    var
+      yawSpeed     = this.botOptions.yawSpeed,
+      pitchSpeed   = this.botOptions.pitchSpeed;
+
+    var thrustScalar = this.botOptions.thrustImpulse / s.config.ship.maxSpeed + 1;
+    
+    var vTarget2D = this.target2d();
+
+    if (this.moveStates.vTarget2D.z < 1) {
+        //go left; else if go right
+        if (this.moveStates.vTarget2D.x < -0.15) {
+          this.moveStates.yaw = yawSpeed / thrustScalar;
+        } else if (this.moveStates.vTarget2D.x > 0.15) {
+          this.moveStates.yaw = -1 * yawSpeed / thrustScalar;
+        }
+        //do down; else if go up
+        if (this.moveStates.vTarget2D.y < -0.15) {
+          this.moveStates.pitch = -1 * pitchSpeed / thrustScalar;
+        } else if (this.moveStates.vTarget2D.y > 0.15) {
+          this.moveStates.pitch  = pitchSpeed / thrustScalar;
+        }
+      } else {
+        //go right; else if go left
+        if (this.moveStates.vTarget2D.x < 0) {
+          this.moveStates.yaw = -1 * yawSpeed / thrustScalar;
+        } else if (this.moveStates.vTarget2D.x >= 0) {
+          this.moveStates.yaw = yawSpeed / thrustScalar;
+        }
+        //do up; else if go down
+        if (this.moveStates.vTarget2D.y < 0) {
+          this.moveStates.pitch = pitchSpeed / thrustScalar;
+        } else if (this.moveStates.vTarget2D.y > 0) {
+          this.moveStates.pitch = -1 * pitchSpeed / thrustScalar;
+        }
+      }
+      return [pitch, yaw, roll, vTarget2D];
+  },
+
+  thrustAndBreaks: function(now) {
     var difference = now - this.lastTime;
 
     var thrust = 0;
     var brakes = 0;
 
-    var  maxDistance = 4100, minDistance = 1500;
+    var  maxDistance = this.maxDistance, minDistance = this.minDistance;
 
     if (this.closestDistance > maxDistance) {
       thrust = 1;
@@ -113,65 +186,9 @@ s.Bot = new Class( {
     if (brakes && this.botOptions.thrustImpulse > 0){
       this.botOptions.thrustImpulse -= difference;
     }
+  },
 
-
-    //////////////////////////////
-    // LEFT/RIGHT/UP/DOWN LOGIC //
-    //////////////////////////////       
-
-    var vTarget3D;
-    var vTarget2D;
-
-    var pitch = 0;
-    var roll = 0;
-    var yaw = 0;
-
-    var yawSpeed    = this.botOptions.yawSpeed,
-    pitchSpeed  = this.botOptions.pitchSpeed;
-
-    var thrustScalar = this.botOptions.thrustImpulse/s.config.ship.maxSpeed + 1;
-
-    // TARGET HUD MARKING
-    if ( this.target ) {
-      this.target = this.target.root;
-
-      vTarget3D = this.target.position.clone();
-      vTarget2D = s.projector.projectVector(vTarget3D, this.camera);
-    }
-
-    if (vTarget2D.z < 1) {
-        //go left; else if go right
-        if (vTarget2D.x < -0.15) {
-          yaw = yawSpeed / thrustScalar;
-        } else if (vTarget2D.x > 0.15) {
-          yaw = -1 * yawSpeed / thrustScalar;
-        }
-        //do down; else if go up
-        if (vTarget2D.y < -0.15) {
-          pitch = -1*pitchSpeed / thrustScalar;
-        } else if (vTarget2D.y > 0.15) {
-          pitch  = pitchSpeed / thrustScalar;
-        }
-      } else {
-        //go right; else if go left
-        if (vTarget2D.x < 0) {
-          yaw = -1* yawSpeed / thrustScalar;
-        } else if (vTarget2D.x >= 0) {
-          yaw = yawSpeed / thrustScalar;
-        }
-        //do up; else if go down
-        if (vTarget2D.y < 0) {
-          pitch = pitchSpeed / thrustScalar;
-        } else if (vTarget2D.y > 0) {
-          pitch  = -1 * pitchSpeed / thrustScalar;
-        }
-      }
-
-    //////////////////////////////
-    // MOTION AND PHYSICS LOGIC //
-    //////////////////////////////
-
-
+  motionAndPhysics: function(pitch, yaw, roll, vTarget2D) {
     var linearVelocity = this.root.getLinearVelocity().clone();
     var angularVelocity = this.root.getAngularVelocity().clone();
     var rotationMatrix = new THREE.Matrix4();
@@ -180,7 +197,7 @@ s.Bot = new Class( {
     angularVelocity = angularVelocity.clone().divideScalar(this.botOptions.rotationFadeFactor);
     this.root.setAngularVelocity(angularVelocity);
 
-    var newAngularVelocity = new THREE.Vector3(pitch, yaw, roll).applyMatrix4(rotationMatrix).add(angularVelocity);
+    var newAngularVelocity = new THREE.Vector3(this.moveStates.pitch, this.moveStates.yaw, this.moveStates.roll).applyMatrix4(rotationMatrix).add(angularVelocity);
     this.root.setAngularVelocity(newAngularVelocity);
 
     var impulse = linearVelocity.clone().negate();
@@ -188,14 +205,45 @@ s.Bot = new Class( {
 
     var getForceVector = new THREE.Vector3(0,0, -1*this.botOptions.thrustImpulse).applyMatrix4(rotationMatrix);
     this.root.applyCentralImpulse(getForceVector);
+  },
+
+  controlBot: function() {
+
+    this.moveStates = {
+      thrust: 0,
+      brakes: 0,
+      pitch: 0,
+      roll: 0,
+      yaw: 0
+    };
+
+    //get closest enemy
+    this.getEnemyList();
+    this.getClosestDistance();
+
+    var now = new Date( ).getTime( );
+
+    var direction;
+    if (this.evasiveManeuvers) {
+      direction = this.dodgeBullet(now); ///DODGE BULLET LOGIC ///
+    } else {
+      this.thrustAndBreaks(now); //// THRUST/BREAK LOGIC ////
+      direction = this.determineDirection(); // LEFT/RIGHT/UP/DOWN LOGIC //
+
+      //flip yaw and pitch direction for evading bullets
+      this.evade.yawSign = this.evade.yawSign * -1;
+      this.evade.pitchSign = this.evade.pitchSign * -1;
+    }
+
+    var pitch = direction[0], yaw = direction[1], roll = direction[2], vTarget2D = direction[3];
+
+    // MOTION AND PHYSICS LOGIC //
+    this.motionAndPhysics(pitch, yaw, roll, vTarget2D);
 
     this.lastTime = now;
 
-    //////////////////////////////
     ///////  FIRING LOGIC ////////
-    //////////////////////////////
-
-    if ( Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && this.closestDistance < maxDistance) {
+    if (this.game.gameFire && Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && this.closestDistance < this.maxDistance) {
       this.fire('turret');
     }
 
