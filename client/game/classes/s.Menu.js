@@ -192,7 +192,7 @@ s.Menu = new Class({
   selectItem: function () {
     // todo: cache menu screens during game load
     // currently recreating text mesh on every screen switch.
-    if (!this.game.gameOverBoolean && this.hoveredItem.menuItemSelectCallback) {
+    if (!this.game.gameOverBoolean && this.hoveredItem && this.hoveredItem.menuItemSelectCallback) {
       this.clearMenu();
       this[this.hoveredItem.menuItemSelectCallback]();
       this.cursorPosition = 0;
@@ -213,9 +213,11 @@ s.Menu = new Class({
         var hover = this.menuItems[tilt];
         this.hoverItem(hover);
 
-        this.menuBox.position.setY((-150*Math.sin(viewingAngleX))/Math.sin(Math.PI/4));
+        if (this.menuScreen !== 'creds') this.menuBox.position.setY((-150*Math.sin(viewingAngleX))/Math.sin(Math.PI/4));
         this.menuBox.position.setX((150*Math.sin(viewingAngleY))/Math.sin(Math.PI/4));
         // console.log(this.selectorRay.intersectObjects(this.menuBox.children));
+
+        this.menuBox.rotation.z = this.camera.rotation.z*-1;
       } else {
         // todo: skip over items with no action property
         if (direction === 'up' && this.cursorPosition < this.menuItems.length-1) {
@@ -266,13 +268,17 @@ s.Menu = new Class({
       for (var room in data) {
         roomList.push({text: room + ' . . . ' + data[room], small: true, action: 'joinRoom', room: room});
       }
-      if (that.game.room) {
-        roomList.push({text: 'BACK', size: 3, action: 'showDefaultMenu'});
-      } else {
-        roomList.push({text: 'BACK', size: 3, action: 'showInitialMenu'});
-      }
+      roomList.push({text: 'BACK', size: 3, action: 'back'});
       that.addMenuItems(roomList);
     });
+  },
+
+  back: function () {
+    if (this.game.room) {
+      this.showDefaultMenu();
+    } else {
+      this.showInitialMenu();
+    }
   },
 
   joinRoom: function () {
@@ -385,7 +391,7 @@ s.Menu = new Class({
       {text: 'and Special Thanks to', small: true},
       {text: 'LARRY DAVIS', size: 3},
       {text: '%b', size: 18},
-      {text: 'Thanks for playing!', size: 6}
+      {text: 'Thanks for playing!', size: 6, action: 'back'}
     ]);
     this.autoScrollMenu(2);
   },
