@@ -30,14 +30,13 @@ s.Bot = new Class( {
 
     //type 1: defender; type 2: baseShooter; type 3: roamer
     if (this.game.teamMode) {
-      this.botType = this.game.botCount % 3;
+      this.botType = parseInt( this.name.slice(-1) ) % 3;
     } else {
       this.botType = 3;
     }
 
     //set a hook on the bot controls.
-    //unhook is necessary when bot dies and new bot is created
-    //need to refactor when multiple bots on screen
+    //save name of hook. when bot dies this name/function gets unhooked
     var hookName = ('control' + this.name).split(' ').join('');
     this[hookName] = this.controlBot.bind(this);
 
@@ -79,7 +78,7 @@ s.Bot = new Class( {
 
   getClosestDistance: function () {
     this.closestDistance = null;
-    this.target = null; //reset to null every time in case no enemies on screen
+    this.target = null; //reset to null every time in case no enemies on screen or in range
 
     if (this.botType === 2) {
       this.target = this.game.spaceStation;
