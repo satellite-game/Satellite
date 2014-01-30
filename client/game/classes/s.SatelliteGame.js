@@ -526,7 +526,7 @@ s.SatelliteGame = new Class( {
                 zappedEnemy.evasiveManeuvers = true;
                 setTimeout(function() {
                     zappedEnemy.evasiveManeuvers = false;
-                }, 4000);
+                }, 2000);
             }
             if (zappedEnemy.shields > 0){
                 zappedEnemy.shields -= 20;
