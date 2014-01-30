@@ -31,7 +31,6 @@ module.exports = function (map, host, Sync, io) {
       socket.emit('map', map.mapItems);
       socket.join(data.room);
       socket.broadcast.to(data.room).emit('join', data);
-
       
       for (var key in target.bot.clients) {
         if (!target.bot.hostPlayer) {
@@ -43,14 +42,17 @@ module.exports = function (map, host, Sync, io) {
     },
 
     disconnect: function( socket ) {
+      // if(host.sockets[socket.id] === undefined || host.sockets[socket.id].room === undefined ||
+      //    host.sockets[socket.id].name === undefined || host.rooms[host.sockets[socket.id].room].bot === undefined) {
+      //   socket.disconnect(true);
+      //   return console.log("Something is undefined on line 50, aborting.");
+      // }
+      console.log('socket:=================', socket, '\n=================');
+      console.log('host.sockets:=================', host.sockets, '\n=================');
+      console.log('host:=================', host, '\n=================');
       var room = host.sockets[socket.id].room;
       var name = host.sockets[socket.id].name;
       var target = host.rooms[room].bot; 
-     
-      if(room === undefined || name === undefined || target === undefined) {
-        socket.disconnect(true);
-        return console.log("Something is undefined on line 50, aborting.");
-      }
       
       db.leaveRoom(room, name); 
 

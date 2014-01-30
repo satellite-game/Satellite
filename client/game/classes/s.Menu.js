@@ -278,7 +278,7 @@ s.Menu = new Class({
   joinRoom: function () {
     this.game.roomEntered = true;
     room = this.hoveredItem.theRoomYouWillJoin;
-    // room = 'asdf';
+    this.game.room = room;
     this.game.comm.connectSockets();
     this.close();
   },
@@ -308,7 +308,6 @@ s.Menu = new Class({
     } else {
       this.game.teamMode = false;
     }
-    // room = 'asdf';
     this.game.comm.connectSockets();
     this.close();
   },
