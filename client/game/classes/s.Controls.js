@@ -209,8 +209,8 @@ s.Controls = new Class({
           thrust = gamepadState.LEFT_STICK_Y*-1 > 0.1 ? gamepadState.LEFT_STICK_Y*-1: 0;
           brakes = gamepadState.LEFT_STICK_Y > 0.1 ? gamepadState.LEFT_STICK_Y: 0;
         }
-      // Menu navigation with controllers
       } else {
+        // Menu navigation with controllers
         if (this.slowControllerScroll) {
           if (gamepadState.LEFT_STICK_Y > 0.4 || gamepadState.RIGHT_STICK_Y > 0.4 && !this.oculus.detected) {
             this.menu.updateHovered('down');
@@ -241,7 +241,7 @@ s.Controls = new Class({
         if (hasGamepad) {
           pitch += this.oculus.quat.x/2;
           yaw += this.oculus.quat.y/2;
-          roll += this.oculus.quat.z/2;
+          roll += this.oculus.quat.z/1.5;
         } else {
           pitch += this.oculus.quat.x;
           yaw += this.oculus.quat.y;

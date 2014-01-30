@@ -216,6 +216,8 @@ s.Menu = new Class({
         if (this.menuScreen !== 'creds') this.menuBox.position.setY((-150*Math.sin(viewingAngleX))/Math.sin(Math.PI/4));
         this.menuBox.position.setX((150*Math.sin(viewingAngleY))/Math.sin(Math.PI/4));
         // console.log(this.selectorRay.intersectObjects(this.menuBox.children));
+
+        this.menuBox.rotation.z = this.camera.rotation.z*-1;
       } else {
         // todo: skip over items with no action property
         if (direction === 'up' && this.cursorPosition < this.menuItems.length-1) {
