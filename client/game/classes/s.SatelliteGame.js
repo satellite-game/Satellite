@@ -108,7 +108,6 @@ s.SatelliteGame = new Class( {
                 } else {
                     this._numberOfHumans++;
                     var alliance = 'rebel';
-                    console.log('s.game.teamMode', s.game.teamMode);
                     if (s.game.teamMode) {
                         alliance = enemyInfo.alliance || 'alliance';
                     }
@@ -428,8 +427,8 @@ s.SatelliteGame = new Class( {
     },
 
     handleJoin: function ( message ) {
-           console.log("Received a join");
            s.game.enemies.add( message );
+           s.game.addBotOnBotDeathOrJoin();
     },
     handleLeave: function ( message ) {
         if ( s.game.enemies.delete( message.name ) ) {
@@ -461,7 +460,7 @@ s.SatelliteGame = new Class( {
             var otherPlayer = message[otherPlayerName];
             s.game.enemies.add(otherPlayer);
         }
-        s.game.addBotOnBotDeath();
+        s.game.addBotOnBotDeathOrJoin();
     },
 
     handleKill: function(message) {
@@ -549,7 +548,7 @@ s.SatelliteGame = new Class( {
                 s.game.unhook( zappedEnemy[hookName] );
 
                 s.game.enemies._numberOfBots--;
-                setTimeout(function() { s.game.addBotOnBotDeath(); }, 6000);
+                setTimeout(function() { s.game.addBotOnBotDeathOrJoin(); }, 6000);
             }
         }
     },
@@ -568,7 +567,7 @@ s.SatelliteGame = new Class( {
         this.restartGame();
     },
 
-    addBotOnBotDeath: function() {
+    addBotOnBotDeathOrJoin: function() {
         var humans = this.enemies._numberOfHumans;
         var bots = this.enemies._numberOfBots;
 
