@@ -299,7 +299,7 @@
 		this.gamepads = [];
 		this.listeners = {};
 		this.platform = nullPlatform;
-		this.deadzone = 0.03;
+		this.deadzone = 0; // so it can tell the difference between flight stick and controller by the number of axes.
 		this.maximizeThreshold = 0.97;
 	};
 
