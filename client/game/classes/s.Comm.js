@@ -82,6 +82,7 @@ s.Comm = new Class({
     var packet = {
       evt: 'joined',
       room: this.game.room,
+      teamMode: this.game.teamMode,
       name: this.pilot.name,
       time: time,
       pos: shipPosition.pos,
