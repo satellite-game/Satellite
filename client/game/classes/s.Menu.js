@@ -192,7 +192,7 @@ s.Menu = new Class({
   selectItem: function () {
     // todo: cache menu screens during game load
     // currently recreating text mesh on every screen switch.
-    if (!this.game.gameOverBoolean && this.hoveredItem.menuItemSelectCallback) {
+    if (!this.game.gameOverBoolean && this.hoveredItem && this.hoveredItem.menuItemSelectCallback) {
       this.clearMenu();
       this[this.hoveredItem.menuItemSelectCallback]();
       this.cursorPosition = 0;
@@ -278,7 +278,7 @@ s.Menu = new Class({
   joinRoom: function () {
     this.game.roomEntered = true;
     room = this.hoveredItem.theRoomYouWillJoin;
-    // room = 'asdf';
+    this.game.room = room;
     this.game.comm.connectSockets();
     this.close();
   },
@@ -308,7 +308,6 @@ s.Menu = new Class({
     } else {
       this.game.teamMode = false;
     }
-    // room = 'asdf';
     this.game.comm.connectSockets();
     this.close();
   },

@@ -22,6 +22,7 @@ s.Controls = new Class({
     this.player = options.player;
     this.camera = options.camera;
     this.menu = options.menu;
+    this.slowControllerScroll = true;
 
     // Create interpreters for controllers
     this.keyboard = new s.Keyboard();
@@ -172,8 +173,8 @@ s.Controls = new Class({
     ///////////////////////
 
     if (hasGamepad) {
+      var gamepadThrust, gamepadState = this.gamepad.gamepads[0].state;
       if (!this.menu.displayed) {
-        var gamepadThrust, gamepadState = this.gamepad.gamepads[0].state;
 
         // Flight stick controls.
         if (!gamepadState.RIGHT_STICK_Y) {
@@ -207,6 +208,24 @@ s.Controls = new Class({
 
           thrust = gamepadState.RIGHT_STICK_Y*-1 > 0.04 ? gamepadState.RIGHT_STICK_Y*-1: 0;
           brakes = gamepadState.RIGHT_STICK_Y > 0.04 ? gamepadState.RIGHT_STICK_Y: 0;
+        }
+      // Menu navigation with controllers
+      } else {
+        if (this.slowControllerScroll) {
+          if (gamepadState.LEFT_STICK_Y > 0.4 || gamepadState.RIGHT_STICK_Y > 0.4 && !this.oculus.detected) {
+            this.menu.updateHovered('down');
+            this.slowControllerScroll = false;
+          } else if (gamepadState.LEFT_STICK_Y < -0.4 || gamepadState.RIGHT_STICK_Y < -0.4 && !this.oculus.detected) {
+            this.menu.updateHovered('up');
+            this.slowControllerScroll = false;
+          }
+          if (gamepadState.FACE_1 || gamepadState.RIGHT_BOTTOM_SHOULDER) {
+            this.menu.selectItem();
+            this.slowControllerScroll = false;
+          }
+        }
+        if (gamepadState.LEFT_STICK_Y < 0.4 && gamepadState.RIGHT_STICK_Y < 0.4 && gamepadState.LEFT_STICK_Y > -0.4 && gamepadState.RIGHT_STICK_Y > -0.4 && !gamepadState.FACE_1 && !gamepadState.RIGHT_BOTTOM_SHOULDER && !this.oculus.detected) {
+          this.slowControllerScroll = true;
         }
       }
     }
