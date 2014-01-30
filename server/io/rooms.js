@@ -13,12 +13,13 @@ Room.prototype.init = function( socket, room, playerData ) {
   var roomProperties = {
     gamestate: {},
     playerList: {},
-    teamMode: true,
+    teamMode: playerData.teamMode,
+    humansOnly: playerData.humansOnly,
   };
 
-  if (roomProperties.teamMode === true){ // team mode currently DNE
+  if (roomProperties.teamMode){
     // make the first player alliance
-    playerData.team = 'alliance';
+    playerData.alliance = 'alliance';
     // extend the rooms so that they
     // account for teams balance
     roomProperties.allianceCount = 1;
@@ -30,7 +31,7 @@ Room.prototype.init = function( socket, room, playerData ) {
   this.rooms[room] = roomProperties;
   this.sockets[socket.id] = {
     name: playerData.name,
-    team: playerData.team,
+    alliance: playerData.alliance,
     socket: socket.id,
     ship: playerData.ship,
     room: room
@@ -39,18 +40,21 @@ Room.prototype.init = function( socket, room, playerData ) {
 
 Room.prototype.add = function( socket, room, playerData) {
   var roomData = this.rooms[room];
-  if (roomData.teamMode === true){ // team mode currently DNE
-    playerData.team = ( roomData.allianceCount < roomData.rebelCount ) ? 'alliance' : 'rebel';
-    roomData[playerData.team]++;
+  if (roomData.teamMode && roomData.humansOnly){ // team mode currently DNE
+    playerData.alliance = ( roomData.allianceCount < roomData.rebelCount ) ? 'alliance' : 'rebel';
+    roomData[playerData.alliance + 'Count']++;
+  } else if (roomData.teamMode) {
+    playerData.alliance = 'alliance';
+    roomData.allianceCount++;
   }
 
   roomData.playerList[playerData.name] = playerData;
   this.sockets[socket.id] = {
     name: playerData.name,
-    team: playerData.team,
+    alliance: playerData.alliance,
     socket: socket.id,
     ship: playerData.ship,
-    room: roomData
+    room: room
   };
 };
 

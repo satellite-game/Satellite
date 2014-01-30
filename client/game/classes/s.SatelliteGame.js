@@ -108,7 +108,10 @@ s.SatelliteGame = new Class( {
                 } else {
                     this._numberOfHumans++;
                     var alliance = 'rebel';
-                    if (s.game.teamMode) { alliance = 'alliance'; }
+                    console.log('s.game.teamMode', s.game.teamMode);
+                    if (s.game.teamMode) {
+                        alliance = enemyInfo.alliance || 'alliance';
+                    }
                     enemyShip = new s.Player( {
                         game: s.game,
                         shipClass: 'human_ship_heavy',
@@ -458,6 +461,7 @@ s.SatelliteGame = new Class( {
             var otherPlayer = message[otherPlayerName];
             s.game.enemies.add(otherPlayer);
         }
+        s.game.addBotOnBotDeath();
     },
 
     handleKill: function(message) {
@@ -567,17 +571,18 @@ s.SatelliteGame = new Class( {
     addBotOnBotDeath: function() {
         var humans = this.enemies._numberOfHumans;
         var bots = this.enemies._numberOfBots;
+
+        if ( this.teamMode) {
         //there should be roughly 50% more bots than humans in team mode
-        if ( this.teamMode && bots < humans + Math.ceil(humans / 2) ) {
-            this.enemies.add( {}, 'bot' );
-        }
+            while (bots < humans + Math.ceil(humans / 2) ) {
+                this.enemies.add( {}, 'bot' );
+                bots++;
+            }
+        } else {
         //there should be equal amount of bots to humans in free for all
-        //unless there are less than 5 bots - then should be one more bot than human
-        if ( !this.teamMode) {
-            if ( humans < 5 && bots <= humans) {
+            while ( bots < humans ) {
                 this.enemies.add( {}, 'bot' );
-            } else if ( humans >= 5 && bots < humans) {
-                this.enemies.add( {}, 'bot' );
+                bots++;
             }
         }
     },
