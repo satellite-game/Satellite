@@ -278,6 +278,7 @@ s.Menu = new Class({
   joinRoom: function () {
     this.game.roomEntered = true;
     room = this.hoveredItem.theRoomYouWillJoin;
+    this.game.room = room;
     this.game.comm.connectSockets();
     this.close();
   },
