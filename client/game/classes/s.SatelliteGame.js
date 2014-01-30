@@ -664,7 +664,7 @@ s.SatelliteGame = new Class( {
             //this the first time this function has been called with this client
             this.game.botPositionInterval = setInterval(function() {
                 that.game.updatePlayersWithBots('botUpdate');
-            }, 2500);
+            }, 1000);
         }
         this.game.hostPlayer = true;
         if (this.game.botCount === 0) {
