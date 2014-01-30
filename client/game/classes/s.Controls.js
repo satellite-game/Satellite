@@ -219,7 +219,7 @@ s.Controls = new Class({
             this.menu.updateHovered('up');
             this.slowControllerScroll = false;
           }
-          if (gamepadState.FACE_1 || gamepadState.RIGHT_BOTTOM_SHOULDER) {
+          if (gamepadState.FACE_1 || gamepadState.FACE_2 || gamepadState.FACE_3 || gamepadState.FACE_4 || gamepadState.LEFT_BOTTOM_SHOULDER || gamepadState.RIGHT_BOTTOM_SHOULDER) {
             this.menu.selectItem();
             this.slowControllerScroll = false;
           }
