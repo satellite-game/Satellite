@@ -326,7 +326,7 @@ s.HUD = new Class({
                         c2D.y = -(-height + c2D.y*height )/2;
                     }
 
-                    this.writeName(enemies[j].name, c2D);
+                    this.writeName(enemies[j].name, c2D, enemies[j].alliance);
                 }
             }
 
@@ -383,8 +383,14 @@ s.HUD = new Class({
         this.oculusCtx.drawImage(this.canvas, this.oculusCanvas.width/2-50*1.07, -50, window.innerWidth/2, window.innerHeight/2);
     },
 
-    writeName: function (name, clone) {
-        this.ctx.fillStyle = this.menu.color;
+    writeName: function (name, clone, alliance) {
+        if (alliance === 'rebel') {
+            this.ctx.fillStyle = 'yellow';
+        } else if (alliance === 'alliance') {
+            this.ctx.fillStyle = 'blue';
+        } else {
+            this.ctx.fillStyle = this.menu.color;
+        }
         this.ctx.fillText( name, clone.x-20, clone.y+30);
         this.ctx.fill();
     },
