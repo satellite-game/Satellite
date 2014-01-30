@@ -278,11 +278,6 @@ s.Menu = new Class({
   joinRoom: function () {
     this.game.roomEntered = true;
     room = this.hoveredItem.theRoomYouWillJoin;
-    if (this.hoveredItem.text === 'INVASION MODE') {
-      this.game.teamMode = true;
-    } else {
-      this.game.teamMode = false;
-    }
     // room = 'asdf';
     this.game.comm.connectSockets();
     this.close();
@@ -300,9 +295,22 @@ s.Menu = new Class({
       {text: 'NAME: '+this.game.room.toUpperCase(), size: 5},
       {text: 'CHANGE NAME', size: 4, action: 'shuffleRoom'},
       {text: 'BOTS: '+bots, size: 4, action: 'toggleBots'},
-      {text: 'INVASION MODE', size: 5, action: 'joinRoom'},
-      {text: 'FREE-FOR-ALL', size: 5, action: 'joinRoom'}
+      {text: 'INVASION MODE', size: 5, action: 'createRoom'},
+      {text: 'FREE-FOR-ALL', size: 5, action: 'createRoom'}
     ]);
+  },
+
+  createRoom: function () {
+    this.game.roomEntered = true;
+    room = this.game.room;
+    if (this.hoveredItem.text === 'INVASION MODE') {
+      this.game.teamMode = true;
+    } else {
+      this.game.teamMode = false;
+    }
+    // room = 'asdf';
+    this.game.comm.connectSockets();
+    this.close();
   },
 
   // todo: make an updateMenuItem function!
