@@ -35,6 +35,8 @@ s.SatelliteGame = new Class( {
          ******************/
         this.enemies = {
             _list: [ ],
+            _numberOfHumans: 1, //initialize to 1 for yourself
+            _numberOfBots: 0,
             _map: {}, // new WeakMap()
             get: function ( nameOrId ) {
                 if ( typeof nameOrId == 'string' ) {
@@ -94,6 +96,7 @@ s.SatelliteGame = new Class( {
                 // TODO: include velocities?
                 var enemyShip;
                 if (isBot) {
+                    this._numberOfBots++;
                     enemyShip = new s.Bot( {
                         game: s.game,
                         shipClass: 'human_ship_heavy',
@@ -103,6 +106,7 @@ s.SatelliteGame = new Class( {
                         alliance: 'rebel'
                     } );
                 } else {
+                    this._numberOfHumans++;
                     var alliance = 'rebel';
                     if (s.game.teamMode) { alliance = 'alliance'; }
                     enemyShip = new s.Player( {
@@ -427,6 +431,7 @@ s.SatelliteGame = new Class( {
     handleLeave: function ( message ) {
         if ( s.game.enemies.delete( message.name ) ) {
             console.log( '%s has left', message.name );
+            s.game.enemies._numberOfHumans--;
         }
     },
 
@@ -521,7 +526,7 @@ s.SatelliteGame = new Class( {
                 zappedEnemy.evasiveManeuvers = true;
                 setTimeout(function() {
                     zappedEnemy.evasiveManeuvers = false;
-                }, 4000);
+                }, 2000);
             }
             if (zappedEnemy.shields > 0){
                 zappedEnemy.shields -= 20;
@@ -539,7 +544,8 @@ s.SatelliteGame = new Class( {
                 var hookName = ('control' + zapped).split(' ').join('');
                 s.game.unhook( zappedEnemy[hookName] );
 
-                s.game.enemies.add( {}, 'bot' );
+                s.game.enemies._numberOfBots--;
+                setTimeout(function() { s.game.addBotOnBotDeath(); }, 6000);
             }
         }
     },
@@ -556,6 +562,24 @@ s.SatelliteGame = new Class( {
         this.gameFire = false;
         this.hostPlayer = false;
         this.restartGame();
+    },
+
+    addBotOnBotDeath: function() {
+        var humans = this.enemies._numberOfHumans;
+        var bots = this.enemies._numberOfBots;
+        //there should be roughly 50% more bots than humans in team mode
+        if ( this.teamMode && bots < humans + Math.ceil(humans / 2) ) {
+            this.enemies.add( {}, 'bot' );
+        }
+        //there should be equal amount of bots to humans in free for all
+        //unless there are less than 5 bots - then should be one more bot than human
+        if ( !this.teamMode) {
+            if ( humans < 5 && bots <= humans) {
+                this.enemies.add( {}, 'bot' );
+            } else if ( humans >= 5 && bots < humans) {
+                this.enemies.add( {}, 'bot' );
+            }
+        }
     },
 
     restartGame: function(type) {

@@ -109,6 +109,7 @@ s.Menu = new Class({
         menuItem.position.setZ(1);
         menuItem.menuItemSelectCallback = items[items.length-i-1].action || null;
         menuItem.theRoomYouWillJoin = items[items.length-i-1].room;
+        menuItem.text = items[items.length-i-1].text;
 
         this.menuBox.add( menuItem );
         this.menuItems.push( menuItem );
@@ -276,6 +277,11 @@ s.Menu = new Class({
   joinRoom: function () {
     this.game.roomEntered = true;
     room = this.hoveredItem.theRoomYouWillJoin;
+    if (this.hoveredItem.text === 'INVASION MODE') {
+      this.game.teamMode = true;
+    } else {
+      this.game.teamMode = false;
+    }
     // room = 'asdf';
     this.game.room = room;
     this.game.comm.connectSockets();
