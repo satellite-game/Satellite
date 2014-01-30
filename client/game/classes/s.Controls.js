@@ -202,12 +202,12 @@ s.Controls = new Class({
             this.firing = false;
           }
 
-          pitch = gamepadState.LEFT_STICK_Y/2;
+          pitch = gamepadState.RIGHT_STICK_Y/2;
           roll = (gamepadState.LEFT_STICK_X*-1 * this.options.rotationSpeed)/2;
           yaw = gamepadState.RIGHT_STICK_X * -1;
 
-          thrust = gamepadState.RIGHT_STICK_Y*-1 > 0.04 ? gamepadState.RIGHT_STICK_Y*-1: 0;
-          brakes = gamepadState.RIGHT_STICK_Y > 0.04 ? gamepadState.RIGHT_STICK_Y: 0;
+          thrust = gamepadState.LEFT_STICK_Y*-1 > 0.1 ? gamepadState.LEFT_STICK_Y*-1: 0;
+          brakes = gamepadState.LEFT_STICK_Y > 0.1 ? gamepadState.LEFT_STICK_Y: 0;
         }
       // Menu navigation with controllers
       } else {
@@ -224,7 +224,7 @@ s.Controls = new Class({
             this.slowControllerScroll = false;
           }
         }
-        if (gamepadState.LEFT_STICK_Y < 0.4 && gamepadState.RIGHT_STICK_Y < 0.4 && gamepadState.LEFT_STICK_Y > -0.4 && gamepadState.RIGHT_STICK_Y > -0.4 && !gamepadState.FACE_1 && !gamepadState.RIGHT_BOTTOM_SHOULDER && !this.oculus.detected) {
+        if (gamepadState.LEFT_STICK_Y < 0.4 && gamepadState.RIGHT_STICK_Y < 0.4 && gamepadState.LEFT_STICK_Y > -0.4 && gamepadState.RIGHT_STICK_Y > -0.4 && !gamepadState.FACE_1 && !gamepadState.RIGHT_BOTTOM_SHOULDER) {
           this.slowControllerScroll = true;
         }
       }
