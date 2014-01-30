@@ -128,6 +128,7 @@ s.Menu = new Class({
     }
     this.menuItems = [];
     this.menuBox.children = [];
+    this.menuHeight = 0;
   },
 
   open: function () {
@@ -277,12 +278,6 @@ s.Menu = new Class({
   joinRoom: function () {
     this.game.roomEntered = true;
     room = this.hoveredItem.theRoomYouWillJoin;
-    if (this.hoveredItem.text === 'INVASION MODE') {
-      this.game.teamMode = true;
-    } else {
-      this.game.teamMode = false;
-    }
-    // room = 'asdf';
     this.game.room = room;
     this.game.comm.connectSockets();
     this.close();
@@ -293,14 +288,42 @@ s.Menu = new Class({
     var prefix = this.roomNamePrefix[Math.floor(Math.random()*this.roomNamePrefix.length)];
     var suffix = this.roomNameSuffix[Math.floor(Math.random()*this.roomNameSuffix.length)];
 
-    var roomName = prefix.toUpperCase() + '-' + suffix.toUpperCase();
+    this.game.room = this.game.room || prefix.toUpperCase() + '-' + suffix.toUpperCase();
+    var bots = this.game.humansOnly ? 'OFF' : 'ON';
 
     this.addMenuItems([
-      {text: 'NAME: '+roomName, size: 5},
-      {text: 'CHANGE NAME', size: 4, action: 'showCreateRoom'}, // todo: make an updateMenuItem function
-      {text: 'INVASION MODE', size: 5, action: 'joinRoom', room: roomName},
-      {text: 'FREE-FOR-ALL', size: 5, action: 'joinRoom', room: roomName}
+      {text: 'NAME: '+this.game.room.toUpperCase(), size: 5},
+      {text: 'CHANGE NAME', size: 4, action: 'shuffleRoom'},
+      {text: 'BOTS: '+bots, size: 4, action: 'toggleBots'},
+      {text: 'INVASION MODE', size: 5, action: 'createRoom'},
+      {text: 'FREE-FOR-ALL', size: 5, action: 'createRoom'}
     ]);
+  },
+
+  createRoom: function () {
+    this.game.roomEntered = true;
+    room = this.game.room;
+    if (this.hoveredItem.text === 'INVASION MODE') {
+      this.game.teamMode = true;
+    } else {
+      this.game.teamMode = false;
+    }
+    this.game.comm.connectSockets();
+    this.close();
+  },
+
+  // todo: make an updateMenuItem function!
+  shuffleRoom: function () {
+    var prefix = this.roomNamePrefix[Math.floor(Math.random()*this.roomNamePrefix.length)];
+    var suffix = this.roomNameSuffix[Math.floor(Math.random()*this.roomNameSuffix.length)];
+
+    this.game.room = prefix.toUpperCase() + '-' + suffix.toUpperCase();
+    this.showCreateRoom();
+  },
+
+  toggleBots: function () {
+    this.game.humansOnly = !this.game.humansOnly;
+    this.showCreateRoom();
   },
 
   showScoreboard: function () {

@@ -108,7 +108,9 @@ s.SatelliteGame = new Class( {
                 } else {
                     this._numberOfHumans++;
                     var alliance = 'rebel';
-                    if (s.game.teamMode) { alliance = enemyInfo.alliance || 'alliance'; }
+                    if (s.game.teamMode) {
+                        alliance = enemyInfo.alliance || 'alliance';
+                    }
                     enemyShip = new s.Player( {
                         game: s.game,
                         shipClass: 'human_ship_heavy',
@@ -425,8 +427,8 @@ s.SatelliteGame = new Class( {
     },
 
     handleJoin: function ( message ) {
-           console.log("Received a join");
            s.game.enemies.add( message );
+           s.game.addBotOnBotDeathOrJoin();
     },
     handleLeave: function ( message ) {
         if ( s.game.enemies.delete( message.name ) ) {

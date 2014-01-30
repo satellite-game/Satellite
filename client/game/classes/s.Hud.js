@@ -332,7 +332,7 @@ s.HUD = new Class({
 
             // TARGET HUD MARKING
             if ( this.target ) {
-                 this.findTargets(this.target.root, "rgba(255,0,0,0.5)", 12, 0, true, enemies[i]);
+                 this.findTargets(this.target.root, "rgba(255,0,0,0.5)", 12, -1, true, enemies[i]);
             }
 
         }

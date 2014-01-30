@@ -83,6 +83,7 @@ s.Comm = new Class({
       evt: 'joined',
       room: this.game.room,
       teamMode: this.game.teamMode,
+      humansOnly: this.game.humansOnly,
       name: this.pilot.name,
       time: time,
       pos: shipPosition.pos,

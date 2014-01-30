@@ -30,7 +30,7 @@ s.Bot = new Class( {
 
     //type 1: defender; type 2: baseShooter; type 3: roamer
     if (this.game.teamMode) {
-      this.botType = parseInt( this.name.slice(-1) ) % 3;
+      this.botType = parseInt(this.name.slice(-1), 10) % 3;
     } else {
       this.botType = 3;
     }
