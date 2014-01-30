@@ -127,6 +127,7 @@ s.Menu = new Class({
     }
     this.menuItems = [];
     this.menuBox.children = [];
+    this.menuHeight = 0;
   },
 
   open: function () {
@@ -293,8 +294,8 @@ s.Menu = new Class({
       {text: 'NAME: '+this.game.room.toUpperCase(), size: 5},
       {text: 'CHANGE NAME', size: 4, action: 'shuffleRoom'},
       {text: 'BOTS: '+bots, size: 4, action: 'toggleBots'},
-      {text: 'INVASION MODE', size: 5, action: 'joinRoom', room: roomName},
-      {text: 'FREE-FOR-ALL', size: 5, action: 'joinRoom', room: roomName}
+      {text: 'INVASION MODE', size: 5, action: 'joinRoom'},
+      {text: 'FREE-FOR-ALL', size: 5, action: 'joinRoom'}
     ]);
   },
 
