@@ -13,8 +13,10 @@ s.Menu = new Class({
     this.menuScreen = 'none';
     this.cursorPosition = 0;
     this.hoveredItem = null;
+    this.menuHeight = 0;
 
-    this.selectorRay = new THREE.Raycaster(new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,1), 0, 300);
+    // todo: use raycasting for better menu selection
+    // this.selectorRay = new THREE.Raycaster(new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,1), 0, 300);
     // this.selectorHelper = new THREE.ArrowHelper(new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,-0.3), 50, 0xFF00FF);
 
     // PlaneGeometry would be better than a cube for this but harder to write because 
@@ -24,7 +26,7 @@ s.Menu = new Class({
 
     // Format for adding menu item object:
     // {
-    //   text:   'displayed text string'(required),
+    //   text:   'displayed text string'(required, '%b' for linebreak object),
     //   action: 'callbackNameString' (called in context of 'this')(default null),
     //   font:   'font name string'(default "helvetiker"),
     //   bold:   true/false (default false),
@@ -44,21 +46,20 @@ s.Menu = new Class({
       this.menuBox.position.setZ(-50);
     }
 
-    this.roomNamePrefix = ['Space', 'Wolf', 'Jupiter', 'Planet', 'Purple', 'Nova', 'M', 'Rad', 'Moon', 'Vector', 'Orion', 'Terra', 'Danger'];
-    this.roomNameSuffix = ['Base', '359', 'Station', 'X', 'Dimension', 'Zone', 'Alpha', '83', 'Sector', 'Prime', 'Dome', 'Prospect'];
+    this.roomNamePrefix = ['Space', 'Wolf', 'Jupiter', 'Planet', 'Purple', 'Nova', 'M', 'Rad', 'Moon', 'Vector', 'Orion', 'Terra', 'Danger', 'Solar', 'Starlight', 'Spice', 'Lumpy'];
+    this.roomNameSuffix = ['Base', '359', 'Station', 'X', 'Dimension', 'Zone', 'Alpha', '83', 'Sector', 'Prime', 'Dome', 'Prospect', 'Expanse', 'Imperium', 'Outpost'];
   },
 
   addMenuItems: function ( items ) {
     // procedurally center aligns text, vertically center aligns menu
-    var menuHeight = 0;
     var currentHeight = 0;
     this.menuItems = [];
     for (var j = 0; j < items.length; j++) {
       if (items[j].small) {
-        menuHeight += 4;
+        this.menuHeight += 4;
       } else {
         var itemSize = items[j].size || 3;
-        menuHeight += itemSize*2;
+        this.menuHeight += itemSize*2;
       }
     }
     for (var i = 0; i < items.length; i++) {
@@ -71,6 +72,7 @@ s.Menu = new Class({
           mat,
           bold,
           size,
+          height,
           font = items[items.length-i-1].font || 'helvetiker';
 
       if (items[items.length-i-1].small) {
@@ -79,6 +81,7 @@ s.Menu = new Class({
         bevelEnabled = false;
         bevel = 0;
         mat = 'MeshBasicMaterial';
+        height = 0.5;
       } else {
         size = items[items.length-i-1].size || 3;
         bold = items[items.length-i-1].bold ? 'bold' : 'normal';
@@ -87,24 +90,30 @@ s.Menu = new Class({
           bevelEnabled = false;
           bevel = 0;
           mat = 'MeshBasicMaterial';
+          height = size/4;
         } else {
           bevelEnabled = true;
           bevel = 0.2;
           mat = 'MeshPhongMaterial';
+          height = size/2;
         }
       }
 
-      var menuItemGeo = new THREE.TextGeometry(items[items.length-i-1].text, {font: font, size: size, height: size/2, weight: bold, bevelEnabled: bevelEnabled, bevelThickness: bevel, bevelSize: bevel});
-      var menuItemMaterial = new THREE[mat]({color: 0x00CC00, ambient: 0x00FF00, specular: 0x33FF33, shininess: 5});
-      var menuItem = new THREE.Mesh(menuItemGeo, menuItemMaterial);
+      if (items[items.length-i-1].text !== '%b') {
+        var menuItemGeo = new THREE.TextGeometry(items[items.length-i-1].text, {font: font, size: size, height: height, weight: bold, bevelEnabled: bevelEnabled, bevelThickness: bevel, bevelSize: bevel});
+        var menuItemMaterial = new THREE[mat]({color: 0x00CC00, ambient: 0x00FF00, specular: 0x33FF33, shininess: 5});
+        var menuItem = new THREE.Mesh(menuItemGeo, menuItemMaterial);
 
-      menuItem.position.setY((currentHeight)-(menuHeight/2)+(size/2)); // MATH?
-      menuItem.position.setX(menuItem.geometry.boundingSphere.radius*-0.5);
-      menuItem.menuItemSelectCallback = items[items.length-i-1].action || null;
-      menuItem.theRoomYouWillJoin = items[items.length-i-1].room;
+        menuItem.position.setX(menuItem.geometry.boundingSphere.radius*-0.5);
+        menuItem.position.setY((currentHeight)-(this.menuHeight/2)+(size/2));
+        menuItem.position.setZ(1);
+        menuItem.menuItemSelectCallback = items[items.length-i-1].action || null;
+        menuItem.theRoomYouWillJoin = items[items.length-i-1].room;
+        menuItem.text = items[items.length-i-1].text;
 
-      this.menuBox.add( menuItem );
-      this.menuItems.push( menuItem );
+        this.menuBox.add( menuItem );
+        this.menuItems.push( menuItem );
+      }
       currentHeight += size*2;
     }
   },
@@ -252,7 +261,7 @@ s.Menu = new Class({
     var that = this;
 
     $.get('/rooms', function (data) {
-      var roomList = [{text: 'JOIN GAME', size: 5},{text:'name      players', size: 3, flat: true}];
+      var roomList = [{text: 'JOIN GAME', size: 5},{text:'name    players', size: 3, flat: true}];
       for (var room in data) {
         roomList.push({text: room + ' . . . ' + data[room], small: true, action: 'joinRoom', room: room});
       }
@@ -268,6 +277,11 @@ s.Menu = new Class({
   joinRoom: function () {
     this.game.roomEntered = true;
     room = this.hoveredItem.theRoomYouWillJoin;
+    if (this.hoveredItem.text === 'INVASION MODE') {
+      this.game.teamMode = true;
+    } else {
+      this.game.teamMode = false;
+    }
     // room = 'asdf';
     this.game.room = room;
     this.game.comm.connectSockets();
@@ -295,7 +309,7 @@ s.Menu = new Class({
 
     $.get('/rooms/'+this.game.room, function (data) {
       var players = [{text: 'LEADERBOARD', size: 5, score: Infinity}];
-      for (var name in data) {
+      for (var name in data.kills) {
         players.push({text: name+' . . . '+data[name], small: true, score: data[name]});
       }
       players.sort(function (a, b) { return a.score > b.score; });
@@ -311,6 +325,57 @@ s.Menu = new Class({
       {text: 'SAMPLE TEXT 3', size: 4},
       {text: 'SAMPLE TEXT 4', size: 3}
     ]);
+  },
+
+  showCredits: function () {
+    this.menuScreen = 'creds';
+    this.addMenuItems([
+      {text: 'SATELLITE', size: 6, bold: true},
+      {text: '%b', size: 5},
+      {text: 'Team Lead, Client-Server Architecture, Build Automation, Website Design', small: true},
+      {text: 'PHILIP ALEXANDER', size: 4},
+      {text: '%b', size: 2},
+      {text: 'NPC Artificial Intelligence, Gameplay Mode Design, Multiplayer', small: true},
+      {text: 'BRANDON COOPER', size: 4},
+      {text: '%b', size: 2},
+      {text: 'Oulus Rift Integration, Flight Controls, In-Game UI, Aditional Graphics, Lighting', small: true},
+      {text: 'ERIC HANNUM', size: 4},
+      {text: '%b', size: 2},
+      {text: 'Server-Side Predictive Player Movement, Socket.io Integration', small: true},
+      {text: 'ANDREW LU', size: 4},
+      {text: '%b', size: 2},
+      {text: 'Combat Mechanics, Weapon Design, Lighting, Particle Systems, Pyrotechnics', small: true},
+      {text: 'GARY RYAN', size: 4},
+      {text: '%b', size: 2},
+      {text: 'Camera System, Environment Design, 3D Radar, Tactical Navigation Systems', small: true},
+      {text: 'ANDREW SPADE', size: 4},
+      {text: '%b', size: 2},
+      {text: 'NPC Controller, Artificial Intelligence, Unit Testing, Website Design', small: true},
+      {text: 'JOAO STEIN', size: 4},
+      {text: '%b', size: 2},
+      {text: 'Project Manager, Unit Testing, Network Optimization, Server-Side Predictive Physics', small: true},
+      {text: 'SAM STITES', size: 4},
+      {text: '%b', size: 2},
+      {text: 'HUD, Flight Controls, Game Logic, Multiplayer Support, Audio Design', small: true},
+      {text: 'FELIX TRIPIER', size: 4},
+      {text: '%b', size: 5},
+      {text: 'and Special Thanks to', small: true},
+      {text: 'LARRY DAVIS', size: 3},
+      {text: '%b', size: 18},
+      {text: 'Thanks for playing!', size: 6}
+    ]);
+    this.autoScrollMenu(2);
+  },
+
+  autoScrollMenu: function (speed) {
+    speed = speed || 1;
+    this.menuBox.position.setY(this.menuHeight/-2);
+    var that = this;
+    this.game.hook(function () {
+      if (that.menuBox.position.y < that.menuHeight/2) {
+        that.menuBox.position.y += speed/16;
+      }
+    });
   },
 
   disconnect: function () {

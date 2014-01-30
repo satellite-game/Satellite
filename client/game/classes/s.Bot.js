@@ -20,13 +20,20 @@ s.Bot = new Class( {
       rotationFadeFactor: 4
     };
 
-    this.maxDistance = 7000;
+    this.maxDistance = 6000;
     this.minDistance = 1000;
 
     this.evasiveManeuvers = false;
     this.evade = {};
     this.evade.pitchSign = 1;
     this.evade.yawSign = 1;
+
+    //type 1: defender; type 2: baseShooter; type 3: roamer
+    if (this.game.teamMode) {
+      this.botType = this.game.botCount % 3;
+    } else {
+      this.botType = 3;
+    }
 
     //set a hook on the bot controls.
     //unhook is necessary when bot dies and new bot is created
@@ -72,13 +79,32 @@ s.Bot = new Class( {
 
   getClosestDistance: function () {
     this.closestDistance = null;
+    this.target = null; //reset to null every time in case no enemies on screen
+
+    if (this.botType === 2) {
+      this.target = this.game.spaceStation;
+      this.closestDistance = this.root.position.distanceTo(this.target.root.position);
+      return;
+    }
+
     for (i = 0; i < this.botEnemyList.length; i++) {
-      var distance = this.root.position.distanceTo(this.botEnemyList[i].root.position);
+      var enemyPosition = this.botEnemyList[i].root.position;
+      var distance = this.root.position.distanceTo(enemyPosition);
       if (!this.closestDistance || distance < this.closestDistance) {
-        this.closestDistance = distance;
-        this.target = this.botEnemyList[i];
+        if ( this.checkBaseDistance(enemyPosition) ) {
+          this.closestDistance = distance;
+          this.target = this.botEnemyList[i];
+        }
       }
     }
+  },
+
+  checkBaseDistance: function(enemyPosition) {
+    var distanceToBase = this.game.moonBaseTall.root.position.distanceTo(enemyPosition);
+    if (this.botType === 1 && distanceToBase > 6000) {
+      return false;
+    }
+    return true;
   },
 
   target2d: function () {
@@ -129,6 +155,7 @@ s.Bot = new Class( {
     
     var vTarget2D = this.target2d();
 
+    if (!vTarget2D) { return [pitch, yaw, roll, vTarget2D]; }
     if (vTarget2D.z < 1) {
         //go left; else if go right
         if (vTarget2D.x < -0.15) {
@@ -166,17 +193,21 @@ s.Bot = new Class( {
     var brakes = 0;
 
     var  maxDistance = this.maxDistance, minDistance = this.minDistance;
-
-    if (this.closestDistance > maxDistance) {
-      thrust = 1;
-    }
-    else if (this.closestDistance < minDistance) {
-      brakes = 1;
+    if (this.botType === 2) { minDistance = 3500; }
+    if (this.closestDistance) {
+      if (this.closestDistance > maxDistance) {
+        thrust = 1;
+      }
+      else if (this.closestDistance < minDistance) {
+        brakes = 1;
+      } else {
+        var ratio = (this.closestDistance - minDistance) / (maxDistance - minDistance);
+        var optimumSpeed = s.config.ship.maxSpeed * ratio;
+        if (optimumSpeed < this.botOptions.thrustImpulse) { brakes = 1; }
+        if (optimumSpeed > this.botOptions.thrustImpulse) { thrust = 1; }
+      }
     } else {
-      var ratio = (this.closestDistance - minDistance) / (maxDistance - minDistance);
-      var optimumSpeed = s.config.ship.maxSpeed * ratio;
-      if (optimumSpeed < this.botOptions.thrustImpulse) { brakes = 1; }
-      if (optimumSpeed > this.botOptions.thrustImpulse) { thrust = 1; }
+      brakes = 1;
     }
 
     if (thrust && this.botOptions.thrustImpulse < s.config.ship.maxSpeed){
@@ -188,7 +219,7 @@ s.Bot = new Class( {
     }
   },
 
-  motionAndPhysics: function(pitch, yaw, roll, vTarget2D) {
+  motionAndPhysics: function(pitch, yaw, roll) {
     var linearVelocity = this.root.getLinearVelocity().clone();
     var angularVelocity = this.root.getAngularVelocity().clone();
     var rotationMatrix = new THREE.Matrix4();
@@ -229,8 +260,8 @@ s.Bot = new Class( {
     if (this.evasiveManeuvers) {
       direction = this.dodgeBullet(now); ///DODGE BULLET LOGIC ///
     } else {
-      this.thrustAndBreaks(now); //// THRUST/BREAK LOGIC ////
       direction = this.determineDirection(); // LEFT/RIGHT/UP/DOWN LOGIC //
+      this.thrustAndBreaks(now); //// THRUST/BREAK LOGIC ////
 
       //flip yaw and pitch direction for evading bullets
       this.evade.yawSign = this.evade.yawSign * -1;
@@ -240,11 +271,12 @@ s.Bot = new Class( {
     var pitch = direction[0], yaw = direction[1], roll = direction[2], vTarget2D = direction[3];
 
     // MOTION AND PHYSICS LOGIC //
-    this.motionAndPhysics(pitch, yaw, roll, vTarget2D);
+    this.motionAndPhysics(pitch, yaw, roll);
 
     this.lastTime = now;
 
     ///////  FIRING LOGIC ////////
+    if (!vTarget2D) { return; }
     if (this.game.gameFire && Math.abs(vTarget2D.x) <= 0.15 && Math.abs(vTarget2D.y) <= 0.15 && vTarget2D.z < 1 && this.closestDistance < this.maxDistance) {
       this.fire('turret');
     }
