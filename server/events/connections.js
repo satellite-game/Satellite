@@ -47,9 +47,9 @@ module.exports = function (map, host, Sync, io) {
       //   socket.disconnect(true);
       //   return console.log("Something is undefined on line 50, aborting.");
       // }
-      console.log('socket:=================', socket, '\n=================');
-      console.log('host.sockets:=================', host.sockets, '\n=================');
-      console.log('host:=================', host, '\n=================');
+      // console.log('socket:=================', socket, '\n=================');
+      // console.log('host.sockets:=================', host.sockets, '\n=================');
+      // console.log('host:=================', host, '\n=================');
       var room = host.sockets[socket.id].room;
       var name = host.sockets[socket.id].name;
       var target = host.rooms[room].bot; 

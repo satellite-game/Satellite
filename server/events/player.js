@@ -62,6 +62,7 @@ module.exports = function (host, sync, io) {
     },
 
     botUpdate: function ( socket, packet) {
+      // console.log('botupdate running on server');
       var room = host.sockets[socket.id];
       if( host.sockets[socket.id] === undefined) {
         socket.disconnect(true);
@@ -72,7 +73,16 @@ module.exports = function (host, sync, io) {
     },
 
     baseFire: function (socket, packet) {
+      var room = host.sockets[socket.id];
+      if( host.sockets[socket.id] === undefined) {
+        socket.disconnect(true);
+        return console.log("Room doesn't exist");
+      }
+      
+      // socket.broadcast.to(room.room).emit('baseHit', packet);
+      socket.broadcast.to(room.room).emit('baseHit', packet);
       socket.emit('baseHit', packet);
+
     }
 
   };
