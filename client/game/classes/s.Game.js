@@ -19,7 +19,6 @@ s.Game = new Class({
     this.doRender = false;
     this.lastRender = 0;
     this.room = null;
-    this.humansOnly = false;
 
     // Store functions that should be called before render
     this.hookedFuncs = [];

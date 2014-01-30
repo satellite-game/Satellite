@@ -171,41 +171,43 @@ s.Controls = new Class({
     // GAMEPAD CONTROLS  //
     ///////////////////////
 
-    if (hasGamepad && !this.menu.displayed) {
-      var gamepadThrust, gamepadState = this.gamepad.gamepads[0].state;
+    if (hasGamepad) {
+      if (!this.menu.displayed) {
+        var gamepadThrust, gamepadState = this.gamepad.gamepads[0].state;
 
-      // Flight stick controls.
-      if (!gamepadState.RIGHT_STICK_Y) {
+        // Flight stick controls.
+        if (!gamepadState.RIGHT_STICK_Y) {
 
-        // TODO: Handle inverted option
-        pitch = gamepadState.LEFT_STICK_Y;
-        roll = gamepadState.LEFT_STICK_X*-1 * this.options.rotationSpeed;
-        yaw = 0;
+          // TODO: Handle inverted option
+          pitch = gamepadState.LEFT_STICK_Y;
+          roll = gamepadState.LEFT_STICK_X*-1 * this.options.rotationSpeed;
+          yaw = 0;
 
-        if (gamepadState.RB || gamepadState.X || gamepadState.FACE_1)
-          this.firing = true;
-        else
-          this.firing = false;
+          if (gamepadState.RB || gamepadState.X || gamepadState.FACE_1)
+            this.firing = true;
+          else
+            this.firing = false;
 
-        gamepadThrust = (gamepadState.RIGHT_STICK_X*-1 + 1)/2;
+          gamepadThrust = (gamepadState.RIGHT_STICK_X*-1 + 1)/2;
 
-        this.options.thrustImpulse = gamepadThrust * s.config.ship.maxSpeed;
+          this.options.thrustImpulse = gamepadThrust * s.config.ship.maxSpeed;
 
-      } else {
-        // Gamepad controls
-
-        if (gamepadState.RIGHT_BOTTOM_SHOULDER) {
-          this.firing = true;
         } else {
-          this.firing = false;
+          // Gamepad controls
+
+          if (gamepadState.RIGHT_BOTTOM_SHOULDER) {
+            this.firing = true;
+          } else {
+            this.firing = false;
+          }
+
+          pitch = gamepadState.LEFT_STICK_Y/2;
+          roll = (gamepadState.LEFT_STICK_X*-1 * this.options.rotationSpeed)/2;
+          yaw = gamepadState.RIGHT_STICK_X * -1;
+
+          thrust = gamepadState.RIGHT_STICK_Y*-1 > 0.04 ? gamepadState.RIGHT_STICK_Y*-1: 0;
+          brakes = gamepadState.RIGHT_STICK_Y > 0.04 ? gamepadState.RIGHT_STICK_Y: 0;
         }
-
-        pitch = gamepadState.LEFT_STICK_Y/2;
-        roll = (gamepadState.LEFT_STICK_X*-1 * this.options.rotationSpeed)/2;
-        yaw = gamepadState.RIGHT_STICK_X * -1;
-
-        thrust = gamepadState.RIGHT_STICK_Y*-1 > 0.04 ? gamepadState.RIGHT_STICK_Y*-1: 0;
-        brakes = gamepadState.RIGHT_STICK_Y > 0.04 ? gamepadState.RIGHT_STICK_Y: 0;
       }
     }
 
