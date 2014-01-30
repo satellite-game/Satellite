@@ -217,7 +217,7 @@ s.Menu = new Class({
         this.menuBox.position.setX((150*Math.sin(viewingAngleY))/Math.sin(Math.PI/4));
         // console.log(this.selectorRay.intersectObjects(this.menuBox.children));
 
-        this.menuBox.rotation.z = this.camera.rotation.z*-1;
+        this.menuBox.rotation.z = this.camera.rotation.z*-0.5;
       } else {
         // todo: skip over items with no action property
         if (direction === 'up' && this.cursorPosition < this.menuItems.length-1) {
@@ -359,7 +359,7 @@ s.Menu = new Class({
   showCredits: function () {
     this.menuScreen = 'creds';
     this.addMenuItems([
-      {text: 'SATELLITE', size: 6, bold: true},
+      {text: 'SATELLITE', size: 7, bold: true},
       {text: '%b', size: 5},
       {text: 'Team Lead, Client-Server Architecture, Build Automation, Website Design', small: true},
       {text: 'PHILIP ALEXANDER', size: 4},
@@ -429,7 +429,7 @@ s.Menu = new Class({
     ];
 
     if (baseDestroyed) {
-      items.splice(0, 2, {text: message, size: 6}, {text: baseDestroyed + ' destroyed'});
+      items.splice(0, 2, {text: message.toUpperCase(), size: 6}, {text: baseDestroyed.toUpperCase() + ' DESTROYED'});
     }
     this.addMenuItems(items);
   }
