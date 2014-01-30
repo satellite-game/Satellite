@@ -283,6 +283,7 @@ s.Menu = new Class({
       this.game.teamMode = false;
     }
     // room = 'asdf';
+
     this.game.room = room;
     this.game.comm.connectSockets();
     this.close();
