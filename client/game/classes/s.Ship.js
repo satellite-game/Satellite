@@ -7,6 +7,7 @@ s.Ship = new Class({
         missileOffset: new THREE.Vector3(0, 0, -120),
         turretFireTime: 150,
         botTurretFireTime: 1500,
+        botDefenderFireTime: 900,
         missileFireTime: 1000
     },
 
@@ -52,7 +53,11 @@ s.Ship = new Class({
 
         var turretFireTime;
         if (this.isBot) {
-            turretFireTime = this.options.botTurretFireTime;
+            if (this.botType === 1) {
+                turretFireTime = this.options.botDefenderFireTime;
+            } else {
+                turretFireTime = this.options.botTurretFireTime;
+            }
         } else {
             turretFireTime = this.options.turretFireTime;
             bullet.HUD = this.HUD;
