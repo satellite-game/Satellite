@@ -67,12 +67,20 @@ module.exports = function (host, sync, io) {
         socket.disconnect(true);
         return console.log("Room doesn't exist");
       }
-      
+
       socket.broadcast.to(room.room).emit('bot positions', packet);
     },
 
     baseFire: function (socket, packet) {
-      socket.emit('baseHit', packet);
+      var room = host.sockets[socket.id];
+      if( host.sockets[socket.id] === undefined) {
+        socket.disconnect(true);
+        return console.log("Room doesn't exist");
+      }
+      
+      socket.broadcast.to(room.room).emit('baseHit', packet); //go to everyone but client
+      socket.emit('baseHit', packet); //go to client
+
     }
 
   };
