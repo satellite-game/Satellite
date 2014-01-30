@@ -35,7 +35,7 @@ s.SatelliteGame = new Class( {
          ******************/
         this.enemies = {
             _list: [ ],
-            _numberOfHumans: 0,
+            _numberOfHumans: 1, //initialize to 1 for yourself
             _numberOfBots: 0,
             _map: {}, // new WeakMap()
             get: function ( nameOrId ) {
