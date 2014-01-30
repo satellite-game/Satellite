@@ -24,7 +24,7 @@ s.Controls = new Class({
     this.menu = options.menu;
 
     // Create interpreters for controllers
-    this.keyboard = new s.Keyboard( );
+    this.keyboard = new s.Keyboard();
 
     // Gamepad interface
     this.gamepad = new Gamepad();
@@ -172,27 +172,41 @@ s.Controls = new Class({
     ///////////////////////
 
     if (hasGamepad && !this.menu.displayed) {
-      var gamepadState = this.gamepad.gamepads[0].state;
+      var gamepadThrust, gamepadState = this.gamepad.gamepads[0].state;
 
-      // TODO: Handle inverted option
-      pitch = gamepadState.LEFT_STICK_Y;
+      // Flight stick controls.
+      if (!gamepadState.RIGHT_STICK_Y) {
 
-      if (gamepadYaw) {
-        yaw = gamepadState.LEFT_STICK_X*-1;
-      }
-      else {
+        // TODO: Handle inverted option
+        pitch = gamepadState.LEFT_STICK_Y;
         roll = gamepadState.LEFT_STICK_X*-1 * this.options.rotationSpeed;
+        yaw = 0;
+
+        if (gamepadState.RB || gamepadState.X || gamepadState.FACE_1)
+          this.firing = true;
+        else
+          this.firing = false;
+
+        gamepadThrust = (gamepadState.RIGHT_STICK_X*-1 + 1)/2;
+
+        this.options.thrustImpulse = gamepadThrust * s.config.ship.maxSpeed;
+
+      } else {
+        // Gamepad controls
+
+        if (gamepadState.RIGHT_BOTTOM_SHOULDER) {
+          this.firing = true;
+        } else {
+          this.firing = false;
+        }
+
+        pitch = gamepadState.LEFT_STICK_Y/2;
+        roll = (gamepadState.LEFT_STICK_X*-1 * this.options.rotationSpeed)/2;
+        yaw = gamepadState.RIGHT_STICK_X * -1;
+
+        thrust = gamepadState.RIGHT_STICK_Y*-1 > 0.04 ? gamepadState.RIGHT_STICK_Y*-1: 0;
+        brakes = gamepadState.RIGHT_STICK_Y > 0.04 ? gamepadState.RIGHT_STICK_Y: 0;
       }
-
-      if (gamepadState.RB || gamepadState.X || gamepadState.FACE_1)
-        this.firing = true;
-      else
-        this.firing = false;
-
-      var gamepadThrust = (gamepadState.RIGHT_STICK_X*-1 + 1)/2;
-
-      // Set thrust
-      this.options.thrustImpulse = gamepadThrust * s.config.ship.maxSpeed;
     }
 
     ///////////////////////
