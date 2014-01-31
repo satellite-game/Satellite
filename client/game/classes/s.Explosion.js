@@ -2,12 +2,13 @@ s.Explosion = new Class({
 	extend: s.GameObject,
 
 	construct: function(options){
+		var size = options.size || 20;
 		var pGeometry = new THREE.Geometry();
 			for(var i = 0; i < 10; i++){
 				var vertex = new THREE.Vector3();
-				vertex.x = Math.random() * 20 - 10;
-				vertex.y = Math.random() * 20 - 10;
-				vertex.z = Math.random() * 20 - 10;
+				vertex.x = Math.random() * size - 10;
+				vertex.y = Math.random() * size - 10;
+				vertex.z = Math.random() * size - 10;
 				pGeometry.vertices.push(vertex);
 			}
 

@@ -21,7 +21,6 @@ module.exports = function ( host, io ) {
       db.incKillCount(room, deathNotification.killer);
       db.incDeathCount(room, deathNotification.killed);
 
- 
       if (socket.id === target.hostPlayer) {
         for (var key in target.clients) {
           if (key !== target.hostPlayer) { target.hostPlayer = key; }
