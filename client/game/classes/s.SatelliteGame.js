@@ -213,8 +213,6 @@ s.SatelliteGame = new Class( {
             camera: this.camera
         } );
 
-        if (this.teamMode) { this.player.enemyBase = 'moonBaseTall'; }
-
         // Targeting square around targeted enemy.
 
         // var targetingGeo = new THREE.PlaneGeometry(100, 100);
@@ -455,7 +453,10 @@ s.SatelliteGame = new Class( {
     handlePlayerList: function(message) {
         for (var otherPlayerName in message) {
             // don't add self
-            if (otherPlayerName == this.player.name) continue;
+            if (otherPlayerName == this.player.name) {
+                s.game.setTeam(message[otherPlayerName]);
+                continue;
+            }
 
             var otherPlayer = message[otherPlayerName];
             s.game.enemies.add(otherPlayer);
@@ -775,16 +776,17 @@ s.SatelliteGame = new Class( {
     },
 
     setTeam: function(message) {
-        this.game.player.alliance = message.alliance;
+        if (!message.teamMode) { return; }
+        this.player.alliance = message.alliance;
         var position;
         if (message.alliance === 'rebel') {
-            this.game.startingPosition = [-6879, 210, 406]; //start at moon
-            this.game.player.enemyBase = 'moonBaseTall';
+            this.startingPosition = [-6879, 210, 406]; //start at moon
+            this.player.enemyBase = 'spaceStation';
         } else {
-            this.game.startingPosition = [19232, 19946, 20311]; //start at spacestation
-            this.game.player.enemyBase = 'spaceStation';
+            this.startingPosition = [19232, 19946, 20311]; //start at spacestation
+            this.player.enemyBase = 'moonBaseTall';
         }
-        this.game.player.setPosition(this.game.startingPosition,[0,0,0],[0,0,0],[0,0,0]);
+        this.player.setPosition(this.startingPosition,[0,0,0],[0,0,0],[0,0,0]);
     }
 
 } );

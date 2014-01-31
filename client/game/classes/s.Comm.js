@@ -142,7 +142,8 @@ s.Comm = new Class({
             // not sure if we need to send this to the
             // server except for testing purposes.
             aAccel: shipPosition.aAccel,
-            lAccel: shipPosition.lAccel
+            lAccel: shipPosition.lAccel,
+            alliance: s.game.player.alliance
           };
           s.game.comm.socket.emit( 'combat','move', packet );
           s.game.comm.lastMessageTime = time;
