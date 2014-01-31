@@ -67,7 +67,8 @@ s.Comm = new Class({
     this.socket.on('bot retrieval', this.makeTrigger('bot retrieval'));
     this.socket.on('bot positions', this.makeTrigger('bot positions'));
     this.socket.on('baseHit', this.makeTrigger( 'baseHit' ));
-    this.socket.on('setTeam', this.makeTrigger( 'setTeam' ));
+    this.socket.on('baseInfo', this.makeTrigger( 'baseInfo' ));
+    this.socket.on('baseShields', this.makeTrigger( 'baseShields' ));
 
     this.game.hook( this.position );
 
@@ -214,6 +215,13 @@ s.Comm = new Class({
         baseName: baseName,
         pilotName: pilotName
     });
+  },
+
+  //baseInfo is used for both bots vs. humans and humans vs. humans.
+  //But since the method uses a hostPlayer, so method on the
+  //server gets lumped into the 'bot' cagegory
+  baseInfo: function(message) {
+    this.socket.emit('bot', 'baseInfo', message);
   }
 
 });

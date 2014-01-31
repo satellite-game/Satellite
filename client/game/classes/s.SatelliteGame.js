@@ -296,7 +296,8 @@ s.SatelliteGame = new Class( {
         this.comm.on( 'bot retrieval', that.handleBotInfo );
         this.comm.on( 'bot positions', that.handleBotPositions );
         this.comm.on( 'baseHit', that.baseHit );
-        this.comm.on( 'setTeam', that.setTeam );
+        this.comm.on( 'baseInfo', that.handleBaseInfo );
+        this.comm.on( 'baseShields', that.handleBaseShields );
 
         this.HUD.controls = this.controls;
 
@@ -787,6 +788,18 @@ s.SatelliteGame = new Class( {
             this.player.enemyBase = 'moonBaseTall';
         }
         this.player.setPosition(this.startingPosition,[0,0,0],[0,0,0],[0,0,0]);
+    },
+
+    handleBaseInfo: function() {
+        s.game.comm.baseInfo({
+            moonBaseTallShields: s.game.moonBaseTall.shields,
+            spaceStationShields: s.game.spaceStation.shields
+        });
+    },
+
+    handleBaseShields: function(message) {
+        s.game.moonBaseTall.shields = message.moonBaseTallShields;
+        s.game.spaceStation.shields = message.spaceStationShields;
     }
 
 } );
