@@ -1,17 +1,13 @@
 
-var Room = function( sync_settings ) {
+var Room = function() {
 	this.rooms = {};
 	this.sockets = {};
-	sync = sync_settings;
 };
 
 Room.prototype = Object.create({});
 
 Room.prototype.init = function( socket, room, playerData ) {
-  // make a room with a playerlist and the
-  // 'gamestate' of all player positions:
   var roomProperties = {
-    gamestate: {},
     playerList: {},
     teamMode: playerData.teamMode,
     humansOnly: playerData.humansOnly,
@@ -60,5 +56,3 @@ Room.prototype.add = function( socket, room, playerData) {
 
 
 module.exports = Room;
-//write a test for init.
-//write a test for sync;
