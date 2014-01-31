@@ -82,6 +82,16 @@ module.exports = function (host, sync, io) {
       socket.broadcast.to(room.room).emit('baseHit', packet); //go to everyone but client
       socket.emit('baseHit', packet); //go to client
 
+    },
+
+    baseInfo: function (socket, packet) {
+      var room = host.sockets[socket.id].room;
+      var target = host.rooms[room].bot;
+      if(target === undefined || room === undefined) {
+        socket.disconnect(true);
+        return console.log("Target or Room is undefined at botInfo, this is bot ", target , "and this is room", room);
+      }
+      io.sockets.socket(target.lastClient).emit('baseShields', packet);
     }
 
   };

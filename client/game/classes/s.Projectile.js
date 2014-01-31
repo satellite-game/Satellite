@@ -44,13 +44,13 @@ s.Projectile = new Class({
                 }
                 this.comm.hit(mesh.name,this.game.pilot.name);
             }
-            if (mesh.name === this.game.player.enemyBase) {
+            if (mesh.name === this.game.player.enemyBase && this.game.teamMode) {
                 this.comm.baseFire(mesh.name, this.pilot);
             }
         } else if (this.isBot) {
             if (mesh.name === this.game.pilot.name) {
                 this.comm.botHit(mesh.name, this.pilot);
-            } else if (mesh.name === 'spaceStation' && this.game.hostPlayer) {
+            } else if (mesh.name === 'spaceStation' && this.game.teamMode && this.game.hostPlayer) {
                 this.comm.baseFire(mesh.name, this.pilot);
             }
         } 
