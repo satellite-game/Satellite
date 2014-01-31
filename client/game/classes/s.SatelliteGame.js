@@ -733,9 +733,12 @@ s.SatelliteGame = new Class( {
         var explode = function() {
             var baseRoot = s.game[base].root;
             var points = baseRoot._physijs.points;
+            var size;
+            if (base === 'moonBaseTall') { size = 100; } //only make bigger flames for moon base
             for (var i = 0; i < points.length - 10; i += 10) {
                 new s.Explosion({
                     game: s.game,
+                    size: size,
                     position: {x: baseRoot.position.x + points[i].x, y: baseRoot.position.y + points[i].y, z: baseRoot.position.z + points[i].z}
                 });
             }
