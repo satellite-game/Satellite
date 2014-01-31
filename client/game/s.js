@@ -11,7 +11,7 @@ var s = {
             maxSpeed: 1500
         },
         base: {
-            shields: 400
+            shields: 40
         },
         sound: {
             enabled: true,
