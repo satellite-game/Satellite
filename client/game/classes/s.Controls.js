@@ -224,7 +224,7 @@ s.Controls = new Class({
             this.slowControllerScroll = false;
           }
         }
-        if (gamepadState.LEFT_STICK_Y < 0.4 && gamepadState.RIGHT_STICK_Y < 0.4 && gamepadState.LEFT_STICK_Y > -0.4 && gamepadState.RIGHT_STICK_Y > -0.4 && !gamepadState.FACE_1 && !gamepadState.RIGHT_BOTTOM_SHOULDER) {
+        if (gamepadState.LEFT_STICK_Y < 0.4 && gamepadState.RIGHT_STICK_Y < 0.4 && gamepadState.LEFT_STICK_Y > -0.4 && gamepadState.RIGHT_STICK_Y > -0.4 && !gamepadState.FACE_1 && !gamepadState.FACE_2 && !gamepadState.FACE_3 && !gamepadState.FACE_4 && !gamepadState.RIGHT_BOTTOM_SHOULDER && !gamepadState.LEFT_BOTTOM_SHOULDER) {
           this.slowControllerScroll = true;
         }
       }
