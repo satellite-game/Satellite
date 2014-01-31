@@ -458,13 +458,13 @@ s.SatelliteGame = new Class( {
                 s.game.setTeam(message[otherPlayerName]);
                 continue;
             }
+            //set up game settings on client
+            s.game.humansOnly = message[otherPlayerName].humansOnly;
+            s.game.teamMode = message[otherPlayerName].teamMode;
 
             var otherPlayer = message[otherPlayerName];
             s.game.enemies.add(otherPlayer);
 
-            //set up game settings on client
-            s.game.humansOnly = message[otherPlayerName].humansOnly;
-            s.game.teamMode = message[otherPlayerName].teamMode;
         }
         s.game.addBotOnBotDeathOrJoin();
     },
