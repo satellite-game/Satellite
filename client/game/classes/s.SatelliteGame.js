@@ -453,18 +453,18 @@ s.SatelliteGame = new Class( {
 
     handlePlayerList: function(message) {
         for (var otherPlayerName in message) {
+            //set up game settings on client
+            s.game.humansOnly = message[otherPlayerName].humansOnly;
+            s.game.teamMode = message[otherPlayerName].teamMode;
+            
             // don't add self
             if (otherPlayerName == this.player.name) {
                 s.game.setTeam(message[otherPlayerName]);
                 continue;
             }
-            //set up game settings on client
-            s.game.humansOnly = message[otherPlayerName].humansOnly;
-            s.game.teamMode = message[otherPlayerName].teamMode;
 
             var otherPlayer = message[otherPlayerName];
             s.game.enemies.add(otherPlayer);
-
         }
         s.game.addBotOnBotDeathOrJoin();
     },
