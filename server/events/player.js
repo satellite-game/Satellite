@@ -23,8 +23,10 @@ module.exports = function ( host, io ) {
 
       if (socket.id === target.hostPlayer) {
         for (var key in target.clients) {
-          if (key !== target.hostPlayer) { target.hostPlayer = key; }
-          break;
+          if (key !== target.hostPlayer) {
+            target.hostPlayer = key;
+            break;
+          }
         }
       }
 
