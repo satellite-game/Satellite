@@ -1,6 +1,6 @@
 var db = require('../db/queries');
 
-module.exports = function (host, sync, io) {
+module.exports = function (host, io) {
   return {
 
     killed: function (socket, packet) {
@@ -79,8 +79,8 @@ module.exports = function (host, sync, io) {
         return console.log("Room doesn't exist");
       }
       
-      socket.broadcast.to(room.room).emit('baseHit', packet); //go to everyone but client
-      socket.emit('baseHit', packet); //go to client
+      socket.broadcast.to(room.room).emit('baseHit', packet);
+      socket.emit('baseHit', packet);
 
     }
 
