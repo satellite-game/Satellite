@@ -144,7 +144,7 @@ s.SatelliteGame = new Class( {
 
         //teamMode - invasion;, Not teamMode - free-for-all; 
         this.teamMode = true;
-        this.startingPosition = [19232, 19946, 20311];
+        this.startingPosition = [this.getRandomCoordinate(), this.getRandomCoordinate(), this.getRandomCoordinate()];
         this.humansOnly = false;
 
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
@@ -453,6 +453,10 @@ s.SatelliteGame = new Class( {
 
     handlePlayerList: function(message) {
         for (var otherPlayerName in message) {
+            //set up game settings on client
+            s.game.humansOnly = message[otherPlayerName].humansOnly;
+            s.game.teamMode = message[otherPlayerName].teamMode;
+            
             // don't add self
             if (otherPlayerName == this.player.name) {
                 s.game.setTeam(message[otherPlayerName]);
@@ -461,10 +465,6 @@ s.SatelliteGame = new Class( {
 
             var otherPlayer = message[otherPlayerName];
             s.game.enemies.add(otherPlayer);
-
-            //set up game settings on client
-            s.game.humansOnly = message[otherPlayerName].humansOnly;
-            s.game.teamMode = message[otherPlayerName].teamMode;
         }
         s.game.addBotOnBotDeathOrJoin();
     },
