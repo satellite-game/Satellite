@@ -1,28 +1,14 @@
 
-var Room = function( sync_settings ) {
+var Room = function() {
 	this.rooms = {};
 	this.sockets = {};
-	sync = sync_settings;
 };
 
 Room.prototype = Object.create({});
 
 Room.prototype.init = function( socket, room, playerData ) {
   // make a room with a playerlist and the
-  var roomProperties = {
-    playerList: {},
-    teamMode: playerData.teamMode,
-    humansOnly: playerData.humansOnly,
-  };
-
-  if (roomProperties.teamMode){
-    // make the first player alliance
-    playerData.alliance = 'alliance';
-    // extend the rooms so that they
-    // account for teams balance
-    roomProperties.allianceCount = 1;
-    roomProperties.rebelCount = 0;
-  }
+  var roomProperties = this.teamMode(playerData);
 
   roomProperties.playerList[playerData.name] = playerData;
 
@@ -54,6 +40,19 @@ Room.prototype.add = function( socket, room, playerData) {
     ship: playerData.ship,
     room: room
   };
+};
+
+Room.prototype.teamMode = function( playerData ) {
+  var results = {};
+  results.teamMode = playerData.teamMode;
+  results.humansOnly = playerData.humansOnly;
+  
+  if (roomProperties.teamMode){
+    playerData.alliance = 'alliance';
+    roomProperties.allianceCount = 1;
+    roomProperties.rebelCount = 0;
+  }
+  return results;
 };
 
 

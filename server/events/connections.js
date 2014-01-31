@@ -25,7 +25,6 @@ module.exports = function (map, host, io) {
       db.joinRoom(data.room, data.name);  // add to game in the db
 
       socket.emit('player list', target.playerList);
-      socket.emit('map', map.mapItems);
       socket.join(data.room);
       socket.broadcast.to(data.room).emit('join', data);
       

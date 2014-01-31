@@ -35,11 +35,7 @@ app.get('/rooms/:id', function (req, res) {
     });
 });
 
-var mapItems = [
-    { type: 'Alien Space Station', pos: [0, 1000], rot: 0, hp: 100 },
-    { type: 'Human Space Station',  pos: [0, -1000], rot: Math.PI*2, hp: 100 }
-];
 
-var socketManager = require('./io/manager.js')(mapItems, io);
+var socketManager = require('./io/manager.js')(io);
 io.sockets.on('connection', socketManager);
 
