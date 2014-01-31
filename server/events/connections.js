@@ -4,6 +4,17 @@ var globals = require('./globals');
 module.exports = function (map, host, io) {
   return {
     join: function( socket, data ) {
+      // database stuff:
+      var savedSocketData = host.sockets[socket.id];
+      if (savedSocketData) {
+        // switching rooms:
+        db.leaveRoom(savedSocketData.room, savedSocketData.name);
+        db.joinRoom(data.room, savedSocketData.name);
+      } else {
+        // joining a room for the first time:
+        db.joinRoom(data.room, data.name);
+      }
+
       var target;
       if(host.rooms[data.room] === undefined) {
         host.init(socket, data.room, data);
@@ -20,8 +31,6 @@ module.exports = function (map, host, io) {
         target.bot.lastClient = socket.id;
         target.bot.clients[socket.id] = true;
       }
-
-      db.joinRoom(data.room, data.name);  // add to game in the db
 
       socket.emit('player list', target.playerList);
       socket.emit('map', map.mapItems);
