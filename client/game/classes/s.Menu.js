@@ -340,16 +340,6 @@ s.Menu = new Class({
     });
   },
 
-  showTestMenu: function () {
-    this.menuScreen = 'test';
-    this.addMenuItems([
-      {text: 'SAMPLE TEXT 1', size: 5},
-      {text: 'SAMPLE TEXT 2', size: 2},
-      {text: 'SAMPLE TEXT 3', size: 4},
-      {text: 'SAMPLE TEXT 4', size: 3}
-    ]);
-  },
-
   showCredits: function () {
     this.menuScreen = 'creds';
     this.addMenuItems([
@@ -382,8 +372,9 @@ s.Menu = new Class({
       {text: 'HUD, Flight Controls, Game Logic, Multiplayer Support, Audio Design', small: true},
       {text: 'FELIX TRIPIER', size: 4},
       {text: '%b', size: 5},
-      {text: 'and Special Thanks to', small: true},
+      {text: 'Special Thanks to', small: true},
       {text: 'LARRY DAVIS', size: 3},
+      {text: 'HACK REACTOR', size: 3},
       {text: '%b', size: 18},
       {text: 'Thanks for playing!', size: 6}
     ]);

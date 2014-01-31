@@ -11,6 +11,7 @@ s.Oculus = new Class({
       vr.pollState(this.state);
       if (this.state.hmd.present) {
         this.detected = true;
+        $('.HMDoverlay').show();
         this.game.hook(this.update);
       }
     }, this);
