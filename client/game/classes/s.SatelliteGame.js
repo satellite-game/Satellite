@@ -459,6 +459,10 @@ s.SatelliteGame = new Class( {
 
             var otherPlayer = message[otherPlayerName];
             s.game.enemies.add(otherPlayer);
+
+            //set up game settings on client
+            s.game.humansOnly = message[otherPlayerName].humansOnly;
+            s.game.teamMode = message[otherPlayerName].teamMode;
         }
         s.game.addBotOnBotDeathOrJoin();
     },
@@ -472,10 +476,12 @@ s.SatelliteGame = new Class( {
         });
         s.game.enemies.delete(message.killed);
         if (message.killer == s.game.pilot.name) {
-            console.warn('You killed %s!', message.killed);
+            // console.warn('You killed %s!', message.killed);
+            s.game.HUD.pushKillList(message.killed, 'You');
         }
         else {
-            console.log('%s was killed by %s', message.killed, message.killer);
+            // console.log('%s was killed by %s', message.killed, message.killer);
+            s.game.HUD.pushKillList(message.killed, message.killer);
         }
     },
 
@@ -568,9 +574,10 @@ s.SatelliteGame = new Class( {
     },
 
     addBotOnBotDeathOrJoin: function() {
+        if (this.humansOnly) { return; }
+
         var humans = this.enemies._numberOfHumans;
         var bots = this.enemies._numberOfBots;
-
         if ( this.teamMode) {
         //there should be roughly 50% more bots than humans in team mode
             while (bots < humans + Math.ceil(humans / 2) ) {
@@ -756,9 +763,9 @@ s.SatelliteGame = new Class( {
             s.game.spaceStation.shields = s.config.base.shields;
 
             if (base === 'spaceStation') {
-                message = 'rebels wins';
+                message = 'rebels win';
             } else {
-                message = "alliance win";
+                message = "alliance wins";
             }
             s.game.gameOverBoolean = true;
             s.game.menu.gameOver('temp', s.game.baseNameMap[base], message);
