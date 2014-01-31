@@ -367,7 +367,7 @@ s.HUD = new Class({
         //BASE SHIELDS AND TEAM INFO  ///
         /////////////////////////////////
 
-        if (this.game.teamMode) {
+        if (this.game.teamMode && this.oculus.detected) {
             var teamColor;
             if (this.game.player.alliance === 'alliance') {
                 teamColor = 'blue';
