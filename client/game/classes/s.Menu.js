@@ -401,6 +401,7 @@ s.Menu = new Class({
   disconnect: function () {
     // leave the game. possibly just by redirecting to home page?
     console.log('Disconnecting...');
+    window.location.href = "http://satellite-game.com";
   },
 
   gameOver: function (killer, baseDestroyed, message) {
