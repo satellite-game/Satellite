@@ -47,6 +47,7 @@ module.exports = function (map, host, Sync, io) {
         }
         break;
       }
+      io.sockets.socket(target.bot.hostPlayer).emit('baseInfo');
       io.sockets.socket(target.bot.hostPlayer).emit("bot retrieval");
     },
 
