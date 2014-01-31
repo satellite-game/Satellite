@@ -293,13 +293,16 @@ s.Radar = new Class({
             for (var j = 0, lenj = enemies.length; j < lenj; j++){
                 if (!radar.getChildByName('enemy'+j)){
                     var enemyGeo = new THREE.TetrahedronGeometry(5);
+                    var color;
                     if (enemies[j].alliance === 'rebel') {
-                        
+                        color = 0xff0000;
+                    } else {
+                        color = 0x33CCFF;
                     }
                     // marker for player position
                     var enemyMarker = new THREE.Mesh(
                         enemyGeo,
-                        new THREE.MeshBasicMaterial( { color: 0xff0000, shading: THREE.FlatShading } ) );
+                        new THREE.MeshBasicMaterial( { color: color, shading: THREE.FlatShading } ) );
 
                     enemyMarker.name = "enemy"+j;
                     radar.add( enemyMarker );
