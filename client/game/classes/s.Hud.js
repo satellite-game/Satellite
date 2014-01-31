@@ -326,7 +326,7 @@ s.HUD = new Class({
                         c2D.y = -(-height + c2D.y*height )/2;
                     }
 
-                    this.writeName(enemies[j].name, c2D);
+                    this.writeName(enemies[j].name, c2D, enemies[j].alliance);
                 }
             }
 
@@ -363,6 +363,30 @@ s.HUD = new Class({
             // this.ctx.fillRect(0,0,width,height);
         }
 
+        /////////////////////////////////
+        //BASE SHIELDS AND TEAM INFO  ///
+        /////////////////////////////////
+
+        if (this.game.teamMode) {
+            var teamColor;
+            if (this.game.player.alliance === 'alliance') {
+                teamColor = 'blue';
+            } else {
+                teamColor = 'yellow';
+            }
+            this.ctx.fillStyle = teamColor;
+            this.ctx.fill();
+            this.ctx.fillText("Your are on the " + this.game.player.alliance + ' team (' + teamColor + ')', 0, height - 150 );
+            this.ctx.fillStyle = 'blue';
+            this.ctx.fill();
+            this.ctx.fillText("Space Station Health: " + this.game.spaceStation.shields, 0, height - 100 );
+            this.ctx.fillStyle = 'yellow';
+            this.ctx.fill();
+            this.ctx.fillText("Moon Base Health: " + this.game.moonBaseTall.shields, 0, height - 50 );
+        }
+
+
+
         ///////////////////////
         ///   CROSSHAIRS    ///
         ///////////////////////
@@ -383,8 +407,14 @@ s.HUD = new Class({
         this.oculusCtx.drawImage(this.canvas, this.oculusCanvas.width/2-50*1.07, -50, window.innerWidth/2, window.innerHeight/2);
     },
 
-    writeName: function (name, clone) {
-        this.ctx.fillStyle = this.menu.color;
+    writeName: function (name, clone, alliance) {
+        if (alliance === 'rebel') {
+            this.ctx.fillStyle = 'yellow';
+        } else if (alliance === 'alliance') {
+            this.ctx.fillStyle = 'blue';
+        } else {
+            this.ctx.fillStyle = this.menu.color;
+        }
         this.ctx.fillText( name, clone.x-20, clone.y+30);
         this.ctx.fill();
     },

@@ -205,7 +205,6 @@ s.Comm = new Class({
   },
 
   botUpdate: function(enemies) {
-    console.log('bot update running');
     this.socket.emit('bot', 'botUpdate', enemies);
   },
 
