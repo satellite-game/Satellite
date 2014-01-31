@@ -772,7 +772,7 @@ s.SatelliteGame = new Class( {
             s.game.gameOverBoolean = true;
             s.game.menu.gameOver('temp', s.game.baseNameMap[base], message);
             s.game.restartGame('base death');
-        }, 3000);
+        }, 2500);
 
     },
 
