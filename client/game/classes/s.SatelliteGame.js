@@ -664,7 +664,7 @@ s.SatelliteGame = new Class( {
             //this the first time this function has been called with this client
             this.game.botPositionInterval = setInterval(function() {
                 that.game.updatePlayersWithBots('botUpdate');
-            }, 2500);
+            }, 1000);
         }
         this.game.hostPlayer = true;
         if (this.game.botCount === 0) {
@@ -729,6 +729,26 @@ s.SatelliteGame = new Class( {
     },
 
     handleBaseDeath: function(base) {
+
+        var explode = function() {
+            var baseRoot = s.game[base].root;
+            var points = baseRoot._physijs.points;
+            var size;
+            if (base === 'moonBaseTall') { size = 100; } //only make bigger flames for moon base
+            for (var i = 0; i < points.length - 10; i += 10) {
+                new s.Explosion({
+                    game: s.game,
+                    size: size,
+                    position: {x: baseRoot.position.x + points[i].x, y: baseRoot.position.y + points[i].y, z: baseRoot.position.z + points[i].z}
+                });
+            }
+        };
+
+        explode();
+        setTimeout(explode, 500);
+        setTimeout(explode, 1000);
+
+
         setTimeout(function() {
             var message;
 
