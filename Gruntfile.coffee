@@ -165,4 +165,5 @@ module.exports = (grunt) ->
   grunt.registerTask 'server', ['jshint:server']
   grunt.registerTask 'client', ['jshint:client', 'copy:client', 'concat', 'stylus']
   grunt.registerTask 'client-prod', ['client', 'uglify']
+  grunt.registerTask 'heroku:production', ['client'];
   grunt.registerTask 'default', ['server', 'client', 'concurrent']
