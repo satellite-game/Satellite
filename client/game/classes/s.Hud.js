@@ -375,12 +375,6 @@ s.HUD = new Class({
         //BASE SHIELDS AND TEAM INFO  ///
         /////////////////////////////////
 
-        if (!this.game.teamMode && !this.oculus.detected) {
-            this.ctx.fillStyle = 'green';
-            this.ctx.fill();
-            this.ctx.fillText("Your are " + this.game.player.name, 0, height - 150 );
-        }
-
         if (this.game.teamMode && !this.oculus.detected) {
             var teamColor;
             if (this.game.player.alliance === 'alliance') {
