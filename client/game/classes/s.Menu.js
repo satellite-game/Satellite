@@ -202,8 +202,9 @@ s.Menu = new Class({
     if (!this.game.gameOverBoolean && this.hoveredItem && this.hoveredItem.menuItemSelectCallback) {
       this.scrollable = true;
       this.clearMenu();
+      var oldScreen = this.menuScreen;
       this[this.hoveredItem.menuItemSelectCallback]();
-      this.cursorPosition = this.menuItems.length-1;
+      this.cursorPosition = this.menuScreen === oldScreen ? this.cursorPosition : this.menuItems.length-1;
       this.hoverItem(this.menuItems[this.cursorPosition]);
       this.menuBox.position.setY((this.cursorPosition)*(this.menuHeight/this.menuItems.length*-1)+this.menuHeight/2-this.menuHeight/this.menuItems.length/2);
     }
@@ -228,15 +229,41 @@ s.Menu = new Class({
       } else if (this.scrollable) {
         if (direction === 'up' && this.cursorPosition < this.menuItems.length-1) {
           this.cursorPosition++;
+          while (this.menuItems[this.cursorPosition] === '%b') {
+            this.cursorPosition++;
+          }
         } else if (direction === 'down' && this.cursorPosition > 0) {
           this.cursorPosition--;
+          while (this.menuItems[this.cursorPosition] === '%b') {
+            this.cursorPosition--;
+          }
         }
+
+        // todo: skip over unselectable items.
+        // var currentCursor = this.cursorPosition;
+        // if (direction === 'up' && this.cursorPosition < this.menuItems.length-1) {
+        //   while (currentCursor < this.menuItems.length-1) {
+        //     currentCursor++;
+        //     if (!!this.menuItems[currentCursor].menuItemSelectCallback) {
+        //       this.cursorPosition = currentCursor;
+        //       return;
+        //     }
+        //   }
+        // } else if (direction === 'down' && this.cursorPosition > 0) {
+        //   while (currentCursor > 0) {
+        //     currentCursor--;
+        //     if (!!this.menuItems[currentCursor].menuItemSelectCallback) {
+        //       this.cursorPosition = currentCursor;
+        //       return;
+        //     }
+        //   }
+        // }
 
         this.scrollPosition = (this.cursorPosition)*(this.menuHeight/this.menuItems.length*-1)+this.menuHeight/2-this.menuHeight/this.menuItems.length/2;
 
         var that = this;
         var easeOut = function () {
-          if (Math.abs(that.menuBox.position.y - that.scrollPosition) > 0.1) {
+          if (Math.abs(that.menuBox.position.y - that.scrollPosition) > 0.05) {
             that.menuBox.position.y += (that.scrollPosition - that.menuBox.position.y)/4;
           } else {
             that.menuBox.position.setY(that.scrollPosition);
