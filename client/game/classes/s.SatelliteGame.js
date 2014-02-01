@@ -192,9 +192,6 @@ s.SatelliteGame = new Class( {
             game: this
         } );
 
-        // Gamepad interface
-        this.gamepad = new Gamepad();
-
         if (this.oculus.detected) {
             console.log('Activating oculus HUD');
             this.HUD.canvas.style.display = 'none';
@@ -205,6 +202,11 @@ s.SatelliteGame = new Class( {
         this.menu = new s.Menu({
             game: this
         });
+
+        // Add a hud
+        this.HUD = new s.HUD( {
+            game: this
+        } );
 
         this.menu.showStartMenu();
 
