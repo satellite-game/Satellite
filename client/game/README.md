@@ -1,7 +1,7 @@
 #Client File Structure
 
 ![Initialization Structure #1](/docs/p1.JPG)
-![Initialization Structure #2](/game/docs/p2.JPG)
+![Initialization Structure #2](/p2.JPG)
 ![Initialization Structure #3](/docs/p3.JPG)
 
 
