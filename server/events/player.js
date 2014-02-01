@@ -79,9 +79,7 @@ module.exports = function (host, io) {
         return console.log("Room doesn't exist");
       }
       
-      socket.broadcast.to(room.room).emit('baseHit', packet);
-      socket.emit('baseHit', packet);
-
+      io.sockets.in(room.room).emit('baseHit', packet);
     },
 
     baseInfo: function (socket, packet) {
