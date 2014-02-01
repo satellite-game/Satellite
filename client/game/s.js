@@ -3,7 +3,7 @@ Satellite
 Copyright (C) 2013 Larry Davis
 */
 
-var s = {
+window.s = {
     config: {
         ship: {
             hull: 120,

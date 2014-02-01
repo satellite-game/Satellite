@@ -54,8 +54,7 @@
     "socket.io": "~0.9.16",
     "express": "~3.3.5",
     "async": "~0.2.10",
-    "redis": "~0.10.0",
-    "nodemon": "~1.0.14"
+    "redis": "~0.10.0"
   },
   "scripts": {
     "start": "node server/app.js",
