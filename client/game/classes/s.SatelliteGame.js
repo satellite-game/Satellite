@@ -519,13 +519,13 @@ s.SatelliteGame = new Class( {
                     color: s.game.HUD.shieldsDamaged,
                     frames: 30
                 });
-                s.game.player.shields -= 20;
+                s.game.player.shields -= 30;
             } else {
                 s.game.HUD.menu.animate({
                     color: s.game.HUD.hull,
                     frames: 30
                 });
-                s.game.player.hull -= 20;
+                s.game.player.hull -= 30;
             }
             console.log('You were hit with a laser by %s! Your HP: %d', killer, s.game.player.hull);
 
@@ -540,13 +540,13 @@ s.SatelliteGame = new Class( {
                 }, 2000);
             }
             if (zappedEnemy.shields > 0){
-                zappedEnemy.shields -= 20;
+                zappedEnemy.shields -= 30;
                 console.log(zapped, ' shield is now: ', zappedEnemy.shields);
                 setTimeout(function() {
                     s.game.replenishEnemyShield(zappedEnemy);
                 }, 7000);
             } else {
-                zappedEnemy.hull -= 20;
+                zappedEnemy.hull -= 30;
                 console.log(zapped, ' hull is now: ', zappedEnemy.hull);
             }
             if (zappedEnemy.hull <= 0 && zappedEnemy.isBot) {
