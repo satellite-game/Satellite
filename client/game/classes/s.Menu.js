@@ -260,6 +260,26 @@ s.Menu = new Class({
         //   }
         // }
 
+        // todo: skip over unselectable items.
+        // var currentCursor = this.cursorPosition;
+        // if (direction === 'up' && this.cursorPosition < this.menuItems.length-1) {
+        //   while (currentCursor < this.menuItems.length-1) {
+        //     currentCursor++;
+        //     if (!!this.menuItems[currentCursor].menuItemSelectCallback) {
+        //       this.cursorPosition = currentCursor;
+        //       return;
+        //     }
+        //   }
+        // } else if (direction === 'down' && this.cursorPosition > 0) {
+        //   while (currentCursor > 0) {
+        //     currentCursor--;
+        //     if (!!this.menuItems[currentCursor].menuItemSelectCallback) {
+        //       this.cursorPosition = currentCursor;
+        //       return;
+        //     }
+        //   }
+        // }
+
         this.scrollPosition = (this.cursorPosition)*(this.menuHeight/this.menuItems.length*-1)+this.menuHeight/2-this.menuHeight/this.menuItems.length/2;
 
         var that = this;
