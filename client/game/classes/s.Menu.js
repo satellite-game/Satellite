@@ -203,8 +203,9 @@ s.Menu = new Class({
       this.scrollable = true;
       this.clearMenu();
       this[this.hoveredItem.menuItemSelectCallback]();
-      this.cursorPosition = 0;
+      this.cursorPosition = this.menuItems.length-1;
       this.hoverItem(this.menuItems[this.cursorPosition]);
+      this.menuBox.position.setY((this.cursorPosition)*(this.menuHeight/this.menuItems.length*-1)+this.menuHeight/2-this.menuHeight/this.menuItems.length/2);
     }
   },
 
@@ -230,6 +231,16 @@ s.Menu = new Class({
         } else if (direction === 'down' && this.cursorPosition > 0) {
           this.cursorPosition--;
         }
+
+        this.menuBox.position.setY((this.cursorPosition)*(this.menuHeight/this.menuItems.length*-1)+this.menuHeight/2-this.menuHeight/this.menuItems.length/2);
+
+        var that = this;
+        var easeInOut = function () {
+          while (that.menuBox.height) {
+
+          }
+        };
+
         this.hoverItem(this.menuItems[this.cursorPosition]);
       }
     }
@@ -306,6 +317,7 @@ s.Menu = new Class({
     this.menuScreen = 'default';
 
     this.addMenuItems([
+      {text: 'RESUME', size: 5, action: 'close'},
       {text: 'JOIN ROOM', size: 5, action: 'showRoomList'},
       {text: 'LEADERBOARD', size: 5, action: 'showScoreboard'},
       {text: 'QUIT', size: 5, action: 'disconnect'}
