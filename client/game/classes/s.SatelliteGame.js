@@ -147,7 +147,7 @@ s.SatelliteGame = new Class( {
         this.startingPosition = this.getStartPosition();
         this.humansOnly = false;
 
-        this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
+        this.rechargeShields = s.util.debounce(s.game.shieldBoost,11000);
         // No gravity
         this.scene.setGravity(new THREE.Vector3(0, 0, 0));
 
@@ -544,7 +544,7 @@ s.SatelliteGame = new Class( {
                 console.log(zapped, ' shield is now: ', zappedEnemy.shields);
                 setTimeout(function() {
                     s.game.replenishEnemyShield(zappedEnemy);
-                }, 7000);
+                }, 11000);
             } else {
                 zappedEnemy.hull -= 30;
                 console.log(zapped, ' hull is now: ', zappedEnemy.hull);
@@ -619,7 +619,7 @@ s.SatelliteGame = new Class( {
     },
 
     shieldBoost: function(){
-        s.game.IDs.push(setInterval(s.game.shieldAnimate,20));
+        s.game.IDs.push(setInterval(s.game.shieldAnimate,60));
     },
     shieldAnimate: function(){
         if (s.game.player.shields < s.config.ship.shields){
