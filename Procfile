@@ -1,1 +1,1 @@
-web: nodemon server/app.js
+web: npm install --dev; grunt client-prod; server/app.js
