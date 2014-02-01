@@ -203,11 +203,6 @@ s.SatelliteGame = new Class( {
             game: this
         });
 
-        // Add a hud
-        this.HUD = new s.HUD( {
-            game: this
-        } );
-
         this.menu.showStartMenu();
 
         this.player = new s.Player( {
