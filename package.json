@@ -54,10 +54,13 @@
     "socket.io": "~0.9.16",
     "express": "~3.3.5",
     "async": "~0.2.10",
-    "redis": "~0.10.0"
+    "redis": "~0.10.0",
+    "grunt": "~0.4.2",
+    "grunt-cli": "~0.1.13"
   },
   "scripts": {
     "start": "node server/app.js",
     "test": "grunt travisCI --force"
-  }
+  },
+  "postinstall": "./node_modules/.bin/grunt client"
 }
