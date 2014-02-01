@@ -144,7 +144,7 @@ s.SatelliteGame = new Class( {
 
         //teamMode - invasion;, Not teamMode - free-for-all; 
         this.teamMode = true;
-        this.startingPosition = [19232, 19946, 20311];
+        this.startingPosition = [this.getRandomCoordinate(), this.getRandomCoordinate(), this.getRandomCoordinate()];
         this.humansOnly = false;
 
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
@@ -215,8 +215,6 @@ s.SatelliteGame = new Class( {
             alliance: 'alliance',
             camera: this.camera
         } );
-
-        if (this.teamMode) { this.player.enemyBase = 'moonBaseTall'; }
 
         // Targeting square around targeted enemy.
 
@@ -301,7 +299,8 @@ s.SatelliteGame = new Class( {
         this.comm.on( 'bot retrieval', that.handleBotInfo );
         this.comm.on( 'bot positions', that.handleBotPositions );
         this.comm.on( 'baseHit', that.baseHit );
-        this.comm.on( 'setTeam', that.setTeam );
+        this.comm.on( 'baseInfo', that.handleBaseInfo );
+        this.comm.on( 'baseShields', that.handleBaseShields );
 
         this.HUD.controls = this.controls;
 
@@ -457,8 +456,15 @@ s.SatelliteGame = new Class( {
 
     handlePlayerList: function(message) {
         for (var otherPlayerName in message) {
+            //set up game settings on client
+            s.game.humansOnly = message[otherPlayerName].humansOnly;
+            s.game.teamMode = message[otherPlayerName].teamMode;
+            
             // don't add self
-            if (otherPlayerName == this.player.name) continue;
+            if (otherPlayerName == this.player.name) {
+                s.game.setTeam(message[otherPlayerName]);
+                continue;
+            }
 
             var otherPlayer = message[otherPlayerName];
             s.game.enemies.add(otherPlayer);
@@ -475,10 +481,12 @@ s.SatelliteGame = new Class( {
         });
         s.game.enemies.delete(message.killed);
         if (message.killer == s.game.pilot.name) {
-            console.warn('You killed %s!', message.killed);
+            // console.warn('You killed %s!', message.killed);
+            s.game.HUD.pushKillList(message.killed, 'You');
         }
         else {
-            console.log('%s was killed by %s', message.killed, message.killer);
+            // console.log('%s was killed by %s', message.killed, message.killer);
+            s.game.HUD.pushKillList(message.killed, message.killer);
         }
     },
 
@@ -571,9 +579,10 @@ s.SatelliteGame = new Class( {
     },
 
     addBotOnBotDeathOrJoin: function() {
+        if (this.humansOnly) { return; }
+
         var humans = this.enemies._numberOfHumans;
         var bots = this.enemies._numberOfBots;
-
         if ( this.teamMode) {
         //there should be roughly 50% more bots than humans in team mode
             while (bots < humans + Math.ceil(humans / 2) ) {
@@ -759,28 +768,41 @@ s.SatelliteGame = new Class( {
             s.game.spaceStation.shields = s.config.base.shields;
 
             if (base === 'spaceStation') {
-                message = 'rebels wins';
+                message = 'rebels win';
             } else {
-                message = "alliance win";
+                message = "alliance wins";
             }
             s.game.gameOverBoolean = true;
             s.game.menu.gameOver('temp', s.game.baseNameMap[base], message);
             s.game.restartGame('base death');
-        }, 3000);
+        }, 2500);
 
     },
 
     setTeam: function(message) {
-        this.game.player.alliance = message.alliance;
+        if (!message.teamMode) { return; }
+        this.player.alliance = message.alliance;
         var position;
         if (message.alliance === 'rebel') {
-            this.game.startingPosition = [-6879, 210, 406]; //start at moon
-            this.game.player.enemyBase = 'moonBaseTall';
+            this.startingPosition = [-6879, 210, 406]; //start at moon
+            this.player.enemyBase = 'spaceStation';
         } else {
-            this.game.startingPosition = [19232, 19946, 20311]; //start at spacestation
-            this.game.player.enemyBase = 'spaceStation';
+            this.startingPosition = [19232, 19946, 20311]; //start at spacestation
+            this.player.enemyBase = 'moonBaseTall';
         }
-        this.game.player.setPosition(this.game.startingPosition,[0,0,0],[0,0,0],[0,0,0]);
+        this.player.setPosition(this.startingPosition,[0,0,0],[0,0,0],[0,0,0]);
+    },
+
+    handleBaseInfo: function() {
+        s.game.comm.baseInfo({
+            moonBaseTallShields: s.game.moonBaseTall.shields,
+            spaceStationShields: s.game.spaceStation.shields
+        });
+    },
+
+    handleBaseShields: function(message) {
+        s.game.moonBaseTall.shields = message.moonBaseTallShields;
+        s.game.spaceStation.shields = message.spaceStationShields;
     }
 
 } );

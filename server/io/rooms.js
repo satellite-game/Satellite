@@ -43,7 +43,8 @@ Room.prototype.add = function( socket, room, playerData) {
     playerData.alliance = 'alliance';
     roomData.allianceCount++;
   }
-
+  playerData.humansOnly = roomData.humansOnly;
+  playerData.teamMode = roomData.teamMode;
   roomData.playerList[playerData.name] = playerData;
   this.sockets[socket.id] = {
     name: playerData.name,

@@ -39,6 +39,14 @@ s.HUD = new Class({
 		// this.gameOver = new Image();
         // this.gameOver.src = 'game/textures/Game-Over-1.png';
 
+        this.killList = [];
+        this.killVerbs = ['assassinated', 'executed', 'murdered', 'massacred', 'slaughtered',
+                          'annihilated', 'destroyed', 'slayed', 'eradicated', 'obliterated', 'exterminated',
+                          'guillotined', 'wasted', 'embarrased'];
+        this.killAdjectives = ['utterly', 'thoroughly', 'scrupulously', 'comprehensively', 'efficiently',
+                               'meticulously', 'completely', 'absolutely', 'unconditionally', 'exhaustively',
+                               'extensively', 'powerfully', 'energetically', 'vigorously'];
+
 		this.targetX = 0;
 		this.targetY = 0;
 
@@ -367,7 +375,7 @@ s.HUD = new Class({
         // BASE SHIELDS AND TEAM INFO  //
         /////////////////////////////////
 
-        if (this.game.teamMode && this.oculus.detected) {
+        if (this.game.teamMode && !this.oculus.detected) {
             var teamColor;
             if (this.game.player.alliance === 'alliance') {
                 teamColor = 'blue';
@@ -384,8 +392,6 @@ s.HUD = new Class({
             this.ctx.fill();
             this.ctx.fillText("Moon Base Health: " + this.game.moonBaseTall.shields, 0, height - 50 );
         }
-
-
 
         ///////////////////////
         ///   CROSSHAIRS    ///
@@ -405,6 +411,37 @@ s.HUD = new Class({
 
         this.oculusCtx.drawImage(this.canvas, 50*1.07, -50, window.innerWidth/2, window.innerHeight/2);
         this.oculusCtx.drawImage(this.canvas, this.oculusCanvas.width/2-50*1.07, -50, window.innerWidth/2, window.innerHeight/2);
+    
+        //DISPLAY KILL LIST IF NECESSARY//
+        if (this.killList.length > 0) { this.showKillList(); }
+
+    },
+
+    pushKillList: function(killed, killer) {
+        this.killList.push([killed, killer]);
+    },
+
+    shiftKillList: function() {
+        this.killList.shift();
+        this.killListTimeOut = false;
+        this.killAdj = null;
+        this.killVrb = null;
+    },
+
+    showKillList: function() {
+        if (!this.killListTimeOut) {
+            this.killListTimeOut = true;
+            var that = this;
+            setTimeout(that.shiftKillList.bind(that), 3000);
+        }
+        if (!this.killAdj || !this.killVrb) {
+            this.killAdj = this.killAdjectives[Math.floor(Math.random() * this.killAdjectives.length)];
+            this.killVrb = this.killVerbs[Math.floor(Math.random() * this.killVerbs.length)];
+        }
+        var message = this.killList[0][1] + ' ' + this.killAdj + ' ' + this.killVrb + ' ' + this.killList[0][0];
+        this.ctx.fillStyle = 'red';
+        this.ctx.fill();
+        this.ctx.fillText(message, width - 400, height - 100 );
     },
 
     writeName: function (name, clone, alliance) {

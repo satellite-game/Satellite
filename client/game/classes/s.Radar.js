@@ -93,12 +93,11 @@ s.Radar = new Class({
         ///////////////////////
         //  PLAYER LOCATION  //
         ///////////////////////
-
         var selfGeo = new THREE.TetrahedronGeometry(5);
-        selfGeo.faces[0].color.setHex(0x00248F);
-        selfGeo.faces[1].color.setHex(0x00248F);
-        selfGeo.faces[2].color.setHex(0x00248F);
-        selfGeo.faces[3].color.setHex(0x00248F);
+        selfGeo.faces[0].color.setHex(0x28B019);
+        selfGeo.faces[1].color.setHex(0x28B019);
+        selfGeo.faces[2].color.setHex(0x28B019);
+        selfGeo.faces[3].color.setHex(0x28B019);
         //selfGeo.colorsNeedUpdate = true;
 
         // marker for player position
@@ -299,10 +298,10 @@ s.Radar = new Class({
                 if (!radar.getChildByName('enemy'+j)){
                     var enemyGeo = new THREE.TetrahedronGeometry(5);
                     var playerColor;
-                    if (enemies[j].alliance === 'rebel') {
-                        playerColor = 0xff0000;
-                    } else {
+                    if (enemies[j].alliance === 'alliance') {
                         playerColor = 0x33CCFF;
+                    } else {
+                        playerColor = 0xE8F007;
                     }
                     // marker for player position
                     var enemyMarker = new THREE.Mesh(
