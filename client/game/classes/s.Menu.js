@@ -49,7 +49,7 @@ s.Menu = new Class({
     }
 
     // todo: more kind of space themed things for this
-    this.roomNamePrefix = ['Space', 'Wolf', 'Jupiter', 'Planet', 'Purple', 'Nova', 'M', 'Rad', 'Moon', 'Vector', 'Orion', 'Terra', 'Danger', 'Solar', 'Starlight', 'Spice', 'Lumpy', 'Outer', 'Deep-Space', 'Medusa', 'Hydra', 'Extrasolar', 'Rebel', 'Alliance'];
+    this.roomNamePrefix = ['Space', 'Wolf', 'Jupiter', 'PlFanet', 'Purple', 'Nova', 'M', 'Rad', 'Moon', 'Vector', 'Orion', 'Terra', 'Danger', 'Solar', 'Starlight', 'Spice', 'Lumpy', 'Outer', 'Deep-Space', 'Medusa', 'Hydra', 'Extrasolar', 'Rebel', 'Alliance'];
     this.roomNameSuffix = ['Base', '359', 'Station', 'X', 'Y', 'Z', 'Dimension', 'Zone', 'Quadrant', 'Alpha', '83', 'Sector', 'Prime', 'Dome', 'Prospect', 'Expanse', 'Imperium', 'Outpost', '1999', '64', 'Rift', 'Cloud', 'Nebula', 'Colony', 'Blockade', 'Fleet', 'System', 'Omega', 'Beta', 'Abyss'];
   },
 
@@ -238,7 +238,7 @@ s.Menu = new Class({
             this.cursorPosition--;
           }
         }
-
+        
         // todo: skip over unselectable items.
         
         // var currentCursor = this.cursorPosition;
@@ -273,7 +273,6 @@ s.Menu = new Class({
         };
 
         this.game.hook(easeOut);
-
         this.hoverItem(this.menuItems[this.cursorPosition]);
       }
     }
