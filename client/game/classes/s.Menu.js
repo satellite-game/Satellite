@@ -29,12 +29,12 @@ s.Menu = new Class({
     // Format for adding menu item object:
     // {
     //   text:   'displayed text string'(required, '%b' for linebreak object),
-    //   action: 'callbackNameString' (called in context of 'this')(default null),
+    //   action: 'callbackNameString' (called in context of 'this' when selected)(default null),
     //   font:   'font name string'(default "helvetiker"),
     //   bold:   true/false (default false),
     //   size:   number(1-5ish)(defualt 3),
     //   flat:   true/false(changes shader, depth and bevel)(default false),
-    //   small:  true/false(overides flat, bold, and size to make a standardized readable small font)(default false)
+    //   small:  true/false(overides flat, bold, and size to make a standard readable small font)(default false)
     // };
     
     this.menuBox.position.setZ(-150);
@@ -50,7 +50,7 @@ s.Menu = new Class({
 
     // todo: more kind of space themed things for this
     this.roomNamePrefix = ['Space', 'Wolf', 'Jupiter', 'Planet', 'Purple', 'Nova', 'M', 'Rad', 'Moon', 'Vector', 'Orion', 'Terra', 'Danger', 'Solar', 'Starlight', 'Spice', 'Lumpy', 'Outer', 'Deep-Space', 'Medusa', 'Hydra', 'Extrasolar', 'Rebel', 'Alliance'];
-    this.roomNameSuffix = ['Base', '359', 'Station', 'X', 'Y', 'Z', 'Dimension', 'Zone', 'Quadrant', 'Alpha', '83', 'Sector', 'Prime', 'Dome', 'Prospect', 'Expanse', 'Imperium', 'Outpost', '1999', '64', 'Rift', 'Cloud', 'Belt', 'Nebula', 'Colony', 'Blockade', 'Fleet', 'System', 'Omega', 'Gamma', 'Beta', 'Abyss'];
+    this.roomNameSuffix = ['Base', '359', 'Station', 'X', 'Y', 'Z', 'Dimension', 'Zone', 'Quadrant', 'Alpha', '83', 'Sector', 'Prime', 'Dome', 'Prospect', 'Expanse', 'Imperium', 'Outpost', '1999', '64', 'Rift', 'Cloud', 'Nebula', 'Colony', 'Blockade', 'Fleet', 'System', 'Omega', 'Beta', 'Abyss'];
   },
 
   addMenuItems: function ( items ) {
@@ -236,7 +236,8 @@ s.Menu = new Class({
 
     // todo: an addMenuScreen method that will create a
     // complete menu screen callable from an item's
-    // 'action' property.
+    // 'action' property. For creating entries in the
+    // method section below.
 
     // todo: add a proper back button action
   },
@@ -451,7 +452,7 @@ s.Menu = new Class({
     var that = this;
     this.game.hook(function () {
       if (that.menuBox.position.y < that.menuHeight/2) {
-        that.menuBox.position.y += speed/16;
+        that.menuBox.position.y += speed/20;
       }
     });
   },
@@ -462,13 +463,13 @@ s.Menu = new Class({
   },
 
   gameOver: function (killer, baseDestroyed, message) {
+    this.menuScreen = 'dead';
+
     this.clearMenu();
     this.displayed = true;
     this.menuBox.visible = true;
     this.HUD.canvas.style.display = 'none';
     this.HUD.oculusCanvas.style.display = 'none';
-
-    this.menuScreen = 'dead';
 
     var items = [
       {text: 'YOU DIED', size: 6},
