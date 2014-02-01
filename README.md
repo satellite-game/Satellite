@@ -22,5 +22,5 @@ Pushes to Azure with every merge to dev branch. [Link can be found here](http://
 
 
 # README Directory
-[Server concerns](../server)
+[Server concerns](/server)
 [Client concerns](../client)
