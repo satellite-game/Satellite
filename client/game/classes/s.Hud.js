@@ -400,10 +400,15 @@ s.HUD = new Class({
         // This is still pretty much a disaster.
         // Help.
 
-        var viewingAngleX = Math.PI/4 * (this.oculus.quat.x);
-        var viewingAngleY = Math.PI/4 * (this.oculus.quat.y);
-        this.crosshairs.position.setY(-60*Math.tan(viewingAngleX)*1.5);
-        this.crosshairs.position.setX(60*Math.tan(viewingAngleY)*1.5);
+        if (!this.game.menu.displayed) {
+            var viewingAngleX = Math.PI/4 * (this.oculus.quat.x);
+            var viewingAngleY = Math.PI/4 * (this.oculus.quat.y);
+            this.crosshairs.position.setY(-60*Math.tan(viewingAngleX)*1.5);
+            this.crosshairs.position.setX(60*Math.tan(viewingAngleY)*1.5);
+        } else {
+            this.crosshairs.position.setY(0);
+            this.crosshairs.position.setX(0);
+        }
 
         // Rendering to oculus scenes
 
