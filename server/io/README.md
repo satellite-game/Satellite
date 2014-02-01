@@ -10,7 +10,15 @@
 
 `Room.prototype.add` is called when a room already exists and a player wishes to join and assigns the player to a faction, Rebel or Alliance, depending on the state of `teamMode` and `humansOnly`. 
 
+`Room.prototype.teamMode` is a function that scaffolds a room for initialization purposes. It sets the state of the room to either being team and/or humans only. 
+
 
 #events.js
 
+`var Events` contains all the custom events for the server. If you wish to add your own custom events first delcare it up top before `var Events` is declared and in `var Events` put `this.yourEventHere = yourevent(host, io)`.
 
+The event system requires a host and an io, the io is provided by socket.io and the host is an alias for rooms.js which is declared and used in `manager.js`. 
+
+#Order of Events
+
+`manager -> initializes room.js and eventss.js -> routes requests to eventss' 

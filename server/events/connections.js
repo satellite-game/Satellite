@@ -1,7 +1,7 @@
 var db = require('../db/queries');
 var globals = require('./globals'); 
 
-module.exports = function (map, host, io) {
+module.exports = function ( host, io) {
   return {
     join: function( socket, data ) {
       var target;
