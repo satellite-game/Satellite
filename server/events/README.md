@@ -50,24 +50,24 @@ Change function allows the user to change rooms from the current one. It calls u
 This is simply used for the in game menu by emitting back `socket.emit('roomQuery')` to the current socket a  list of game rooms available. 
 
 #player.js
-Requires the database modules, refer to [Redis implementation](../server/db).
+Requires the database modules, refer to [Redis implementation](../db).
 
-###'killed'
-Handles the event in which a player is reduced to zero health. `db.incKillCount and db.incDeathCount` are database handlers, refer to [Redis implementation](../server/db) for more information. 
+###`killed:`
+Handles the event in which a player is reduced to zero health. `db.incKillCount and db.incDeathCount` are database handlers, refer to [Redis implementation](../db) for more information. 
 
 Once a player has been killed the server migrates the AI host to a new player and notifies the player that has been killed that he or she has been destroyed -- yes, the game does not actually kill you when you reach zero health, it only acknowledges that you have been destroyed when the event 'killed' has been emitted back. 
 
-###`botInfo`
+###`botInfo:`
 Uses the `socket` and extracts its id to find the key-value pair of the room the player is in and the bot info in regards to that room when a player joins. It should never be called at any other time. It may need refactoring. 
 
 ###`botHit`
 When a bot hits a client, the client emits `botHit` and then the server broadcasts to the room and to the current player that the client has been hit to properly decrease shielding. `socket.broadcast.to` is part of the infrastructure that would allow other clients to see another player's health as it decreases, however in the current implementation it isn't necessary and therefore could be commented out. 
 
-###`botUpdate`
+###`botUpdate:`
 The event is called by the AI host and is captured in this event. The function updates the positions of the bots in sync with the AI host. This should be moved to the server at some point. 
 
-###`baseFire`
+###`baseFire:`
 When a bot hits a base the AI host emits an event that the server captures and then broadcasts to all the clients to properly lower the base health. 
 
-###`baseInfo`
+###`baseInfo:`
 Uses a similar format to the other functions by grabbing the `socket` .id property to find the correct room the player is in. `baseInfo` is critical for team games; when a player joins they receive information by means of `packet` and `baseShields` which tells the client to set the current health of the base. However, for free-for-all, this is largely useless and should be culled out somehow. 
