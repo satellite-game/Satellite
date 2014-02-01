@@ -22,5 +22,5 @@ Pushes to Azure with every merge to dev branch. [Link can be found here](http://
 
 
 # README Directory
-[Server concerns](https://github.com/satellite-game/Satellite/tree/dev/server)
-[Client concerns](https://github.com/satellite-game/Satellite/tree/dev/client)
+[Server concerns](../server)
+[Client concerns](../client)

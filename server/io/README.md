@@ -4,7 +4,7 @@
 
 #rooms.js
 
-`var Room` is a class that holds a list of all the rooms on the server, each room represents a unique instance of the game, and it also holds all the sockets. 
+`var Room` is a class that holds a list of all the rooms on the server, each room represents a unique instance of the game, and it also holds all the sockets. As a note most functions will be using the `socket.id` and find the value at `sockets` in order to obtain the room the current client is in then use `room[name]` to 
 
 `Room.prototype.init` accepts a socket to derive the id from, the room to initialize and for the player to join, and playerData as its arguments. The room initialization is a two step process: `roomProperties` calls `teamMode` to give it a scaffold and then that data is linked to the room which the player has designated. 
 
