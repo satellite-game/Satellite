@@ -232,14 +232,19 @@ s.Menu = new Class({
           this.cursorPosition--;
         }
 
-        this.menuBox.position.setY((this.cursorPosition)*(this.menuHeight/this.menuItems.length*-1)+this.menuHeight/2-this.menuHeight/this.menuItems.length/2);
+        this.scrollPosition = (this.cursorPosition)*(this.menuHeight/this.menuItems.length*-1)+this.menuHeight/2-this.menuHeight/this.menuItems.length/2;
 
         var that = this;
-        var easeInOut = function () {
-          while (that.menuBox.height) {
-
+        var easeOut = function () {
+          if (Math.abs(that.menuBox.position.y - that.scrollPosition) > 0.1) {
+            that.menuBox.position.y += (that.scrollPosition - that.menuBox.position.y)/4;
+          } else {
+            that.menuBox.position.setY(that.scrollPosition);
+            that.game.unhook(easeOut);
           }
         };
+
+        this.game.hook(easeOut);
 
         this.hoverItem(this.menuItems[this.cursorPosition]);
       }
