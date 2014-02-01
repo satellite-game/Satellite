@@ -23,4 +23,4 @@ Pushes to Azure with every merge to dev branch. [Link can be found here](http://
 
 # README Directory
 [Server concerns](/server)
-[Client concerns](/client/game)
+[Client concerns](/client/game/README.md)
