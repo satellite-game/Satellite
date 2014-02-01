@@ -8,10 +8,12 @@ s.Menu = new Class({
     this.camera = options.game.camera;
     this.HUD = options.game.HUD;
     this.oculus = options.game.oculus;
+    this.gamepad = options.game.gamepad;
 
     this.menuItems = [];
     this.menuScreen = 'none';
     this.cursorPosition = 0;
+    this.scrollable = true;
     this.hoveredItem = null;
     this.menuHeight = 0;
 
@@ -46,8 +48,9 @@ s.Menu = new Class({
       this.menuBox.position.setZ(-50);
     }
 
-    this.roomNamePrefix = ['Space', 'Wolf', 'Jupiter', 'Planet', 'Purple', 'Nova', 'M', 'Rad', 'Moon', 'Vector', 'Orion', 'Terra', 'Danger', 'Solar', 'Starlight', 'Spice', 'Lumpy'];
-    this.roomNameSuffix = ['Base', '359', 'Station', 'X', 'Dimension', 'Zone', 'Alpha', '83', 'Sector', 'Prime', 'Dome', 'Prospect', 'Expanse', 'Imperium', 'Outpost'];
+    // todo: more kind of space themed things for this
+    this.roomNamePrefix = ['Space', 'Wolf', 'Jupiter', 'Planet', 'Purple', 'Nova', 'M', 'Rad', 'Moon', 'Vector', 'Orion', 'Terra', 'Danger', 'Solar', 'Starlight', 'Spice', 'Lumpy', 'Outer', 'Deep-Space', 'Medusa', 'Hydra', 'Extrasolar', 'Rebel', 'Alliance'];
+    this.roomNameSuffix = ['Base', '359', 'Station', 'X', 'Y', 'Z', 'Dimension', 'Zone', 'Quadrant', 'Alpha', '83', 'Sector', 'Prime', 'Dome', 'Prospect', 'Expanse', 'Imperium', 'Outpost', '1999', '64', 'Rift', 'Cloud', 'Belt', 'Nebula', 'Colony', 'Blockade', 'Fleet', 'System', 'Omega', 'Gamma', 'Beta', 'Abyss'];
   },
 
   addMenuItems: function ( items ) {
@@ -113,6 +116,8 @@ s.Menu = new Class({
 
         this.menuBox.add( menuItem );
         this.menuItems.push( menuItem );
+      } else {
+        this.menuItems.push('%b');
       }
       currentHeight += size*2;
     }
@@ -142,6 +147,8 @@ s.Menu = new Class({
     }
     this.HUD.canvas.style.display = 'none';
     this.HUD.oculusCanvas.style.display = 'none';
+
+    this.hoverItem(this.menuItems[this.cursorPosition]);
   },
 
   close: function () {
@@ -180,7 +187,7 @@ s.Menu = new Class({
   },
 
   unhoverItem: function ( item ) {
-    if (this.hoveredItem) {
+    if (this.hoveredItem && this.hoveredItem !== '%b') {
       item.material.color.setHex(0x00CC00);
       if (item.material.ambient) {
         item.material.ambient.setHex(0x00FF00);
@@ -193,9 +200,11 @@ s.Menu = new Class({
     // todo: cache menu screens during game load
     // currently recreating text mesh on every screen switch.
     if (!this.game.gameOverBoolean && this.hoveredItem && this.hoveredItem.menuItemSelectCallback) {
+      this.scrollable = true;
       this.clearMenu();
       this[this.hoveredItem.menuItemSelectCallback]();
       this.cursorPosition = 0;
+      this.hoverItem(this.menuItems[this.cursorPosition]);
     }
   },
 
@@ -211,15 +220,11 @@ s.Menu = new Class({
         var viewingAngleY = Math.PI/4 * (this.oculus.quat.y);
         var tilt = ~~((this.menuItems.length/2 * this.oculus.quat.x) * 6 + ~~(this.menuItems.length/2));
         var hover = this.menuItems[tilt];
-        this.hoverItem(hover);
+        if (this.scrollable) this.hoverItem(hover);
 
         if (this.menuScreen !== 'creds') this.menuBox.position.setY((-150*Math.sin(viewingAngleX))/Math.sin(Math.PI/4));
         this.menuBox.position.setX((150*Math.sin(viewingAngleY))/Math.sin(Math.PI/4));
-        // console.log(this.selectorRay.intersectObjects(this.menuBox.children));
-
-        this.menuBox.rotation.z = this.camera.rotation.z*-0.5;
-      } else {
-        // todo: skip over items with no action property
+      } else if (this.scrollable) {
         if (direction === 'up' && this.cursorPosition < this.menuItems.length-1) {
           this.cursorPosition++;
         } else if (direction === 'down' && this.cursorPosition > 0) {
@@ -228,11 +233,58 @@ s.Menu = new Class({
         this.hoverItem(this.menuItems[this.cursorPosition]);
       }
     }
+
+    // todo: an addMenuScreen method that will create a
+    // complete menu screen callable from an item's
+    // 'action' property.
+
+    // todo: add a proper back button action
   },
 
   // -- GAME SPECIFIC FUNCTIONS AND MENU SCREENS
   // methods referenced in a menuItem's 'action'
   // property need to be defined here.
+
+  showStartMenu: function () {
+    this.menuScreen = 'start';
+    this.displayed = true;
+    this.menuBox.visible = true;
+    this.scrollable = false;
+
+    this.HUD.canvas.style.display = 'none';
+    this.HUD.oculusCanvas.style.display = 'none';
+
+    var startMenuText = [
+      {text: 'SATELLITE', size: 7},
+      {text: '%b'},
+      {text: 'START', action: 'showInitialMenu'},
+      {text: '%b', size: 2}
+    ];
+
+    if (!this.oculus.detected) {
+      startMenuText.push({text: 'No Oculus Rift active. Install vr.js and restart your browser.', small: true});
+    } else {
+      startMenuText.push({text: 'OCULUS RIFT DETECTED', flat: true, size: 3});
+    }
+
+    if (!this.gamepad.gamepads.length) {
+      startMenuText.push(
+        {text: 'No gamepad active. Press any face button to activate.', small: true},
+        {text: 'No flightstick active. Pull trigger to activate.', small: true}
+      );
+    } else {
+      startMenuText.push(
+        {text: 'GAMEPAD/FLIGHTSTICK DETECTED', flat: true, size: 3},
+        {text: 'Press FIRE to start.', small: true}
+      );
+    }
+
+    this.addMenuItems(startMenuText);
+    console.log(this.menuItems);
+
+    this.cursorPosition = this.menuItems.length-3;
+    this.hoverItem(this.menuItems[this.cursorPosition]);
+  },
 
   showInitialMenu: function () {
     this.menuScreen = 'init';
@@ -274,7 +326,7 @@ s.Menu = new Class({
   },
 
   back: function () {
-    if (this.game.room) {
+    if (this.game.roomEntered) {
       this.showDefaultMenu();
     } else {
       this.showInitialMenu();
@@ -301,8 +353,10 @@ s.Menu = new Class({
       {text: 'NAME: '+this.game.room.toUpperCase(), size: 5},
       {text: 'CHANGE NAME', size: 4, action: 'shuffleRoom'},
       {text: 'BOTS: '+bots, size: 4, action: 'toggleBots'},
+      {text: '%b', size: 2},
       {text: 'INVASION MODE', size: 5, action: 'createRoom'},
-      {text: 'FREE-FOR-ALL', size: 5, action: 'createRoom'}
+      {text: 'FREE-FOR-ALL', size: 5, action: 'createRoom'},
+      {text: 'BACK', size: 3, action: 'back'}
     ]);
   },
 
@@ -357,7 +411,7 @@ s.Menu = new Class({
       {text: 'NPC Artificial Intelligence, Gameplay Mode Design, Multiplayer', small: true},
       {text: 'BRANDON COOPER', size: 4},
       {text: '%b', size: 2},
-      {text: 'Oulus Rift Integration, Flight Controls, In-Game UI, Aditional Graphics, Lighting', small: true},
+      {text: 'Oulus Rift Integration, Flight Controls, In-Game UI, Aditional Graphics', small: true},
       {text: 'ERIC HANNUM', size: 4},
       {text: '%b', size: 2},
       {text: 'Server-Side Predictive Player Movement, Socket.io Integration', small: true},
@@ -369,7 +423,7 @@ s.Menu = new Class({
       {text: 'Camera System, Environment Design, 3D Radar, Tactical Navigation Systems', small: true},
       {text: 'ANDREW SPADE', size: 4},
       {text: '%b', size: 2},
-      {text: 'NPC Controller, Artificial Intelligence, Unit Testing, Website Design', small: true},
+      {text: 'NPC Controller, Artificial Intelligence, Unit Testing, Website Development', small: true},
       {text: 'JOAO STEIN', size: 4},
       {text: '%b', size: 2},
       {text: 'Project Manager, Unit Testing, Network Optimization, Server-Side Predictive Physics', small: true},
@@ -384,6 +438,10 @@ s.Menu = new Class({
       {text: '%b', size: 18},
       {text: 'Thanks for playing!', size: 6, action: 'back'}
     ]);
+
+    this.scrollable = false;
+    this.cursorPosition = 0;
+    this.hoverItem(this.menuItems[this.cursorPosition]);
     this.autoScrollMenu(2);
   },
 
@@ -399,8 +457,7 @@ s.Menu = new Class({
   },
 
   disconnect: function () {
-    // leave the game. possibly just by redirecting to home page?
-    console.log('Disconnecting...');
+    console.log('Disconnecting.');
     window.location.href = "http://satellite-game.com";
   },
 
@@ -417,6 +474,7 @@ s.Menu = new Class({
       {text: 'YOU DIED', size: 6},
       {text: 'YOU WERE KILLED BY '+killer.toUpperCase()},
       {text: 'RESPAWNING IN 6 SEC...'},
+      {text: '%b', size: 2},
       {text: 'DISCONNECT', size: 5, action: 'disconnect'}
     ];
 

@@ -22,13 +22,11 @@ s.Controls = new Class({
     this.player = options.player;
     this.camera = options.camera;
     this.menu = options.menu;
+    this.gamepad = options.game.gamepad;
     this.slowControllerScroll = true;
 
     // Create interpreters for controllers
     this.keyboard = new s.Keyboard();
-
-    // Gamepad interface
-    this.gamepad = new Gamepad();
 
     // Oculus Rift interface
     this.oculus = this.game.oculus;

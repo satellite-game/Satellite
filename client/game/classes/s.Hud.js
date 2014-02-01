@@ -364,7 +364,7 @@ s.HUD = new Class({
         }
 
         /////////////////////////////////
-        //BASE SHIELDS AND TEAM INFO  ///
+        // BASE SHIELDS AND TEAM INFO  //
         /////////////////////////////////
 
         if (this.game.teamMode && this.oculus.detected) {
