@@ -13,6 +13,12 @@ s.Oculus = new Class({
         this.detected = true;
         $('.HMDoverlay').show();
         this.game.hook(this.update);
+
+        if (this.game.HUD) {
+            console.log('Activating oculus HUD');
+            this.game.HUD.canvas.style.display = 'none';
+            this.game.HUD.oculusCanvas.style.display = 'block';
+        }
       }
     }, this);
   },

@@ -240,6 +240,7 @@ s.Menu = new Class({
         }
 
         // todo: skip over unselectable items.
+        
         // var currentCursor = this.cursorPosition;
         // if (direction === 'up' && this.cursorPosition < this.menuItems.length-1) {
         //   while (currentCursor < this.menuItems.length-1) {

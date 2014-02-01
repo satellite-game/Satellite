@@ -35,10 +35,6 @@ s.HUD = new Class({
         this.oculusCtx = this.oculusCanvas.getContext('2d');
         // end Oculus canvases
 
-
-		// this.gameOver = new Image();
-        // this.gameOver.src = 'game/textures/Game-Over-1.png';
-
         this.killList = [];
         this.killVerbs = ['assassinated', 'executed', 'murdered', 'massacred', 'slaughtered',
                           'annihilated', 'destroyed', 'slayed', 'eradicated', 'obliterated', 'exterminated',
@@ -290,8 +286,10 @@ s.HUD = new Class({
         var enemies = s.game.enemies.list();
         var enemiesLen = enemies.length;
 
-        this.ctx.fillText("Survivors: " + (enemiesLen + 1), width-128-36, 256+30 );
-        this.ctx.fill();
+        if (this.oculus.detected) {
+            this.ctx.fillText("Survivors: " + (enemiesLen + 1), width-128-36, 256+30 );
+            this.ctx.fill();
+        }
 
         //////////////////////////////////////////
         // ENEMY TARGETING AND CALLSIGN DISPLAY //
