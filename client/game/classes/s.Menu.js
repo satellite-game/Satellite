@@ -50,7 +50,7 @@ s.Menu = new Class({
 
     // todo: more kind of space themed things for this
     this.roomNamePrefix = ['Space', 'Wolf', 'Jupiter', 'Planet', 'Purple', 'Nova', 'M', 'Rad', 'Moon', 'Vector', 'Orion', 'Terra', 'Danger', 'Solar', 'Starlight', 'Spice', 'Lumpy', 'Outer', 'Deep-Space', 'Medusa', 'Hydra', 'Extrasolar', 'Rebel', 'Alliance'];
-    this.roomNameSuffix = ['Base', '359', 'Station', 'X', 'Y', 'Z', 'Dimension', 'Zone', 'Quadrant', 'Alpha', '83', 'Sector', 'Prime', 'Dome', 'Prospect', 'Expanse', 'Imperium', 'Outpost', '1999', '64', 'Rift', 'Cloud', 'Nebula', 'Colony', 'Blockade', 'Fleet', 'System', 'Omega', 'Beta', 'Abyss'];
+    this.roomNameSuffix = ['Base', '359', 'Station', 'X', 'Y', 'Z', 'Dimension', 'Zone', 'Quadrant', 'Alpha', '83', 'Sector', 'Prime', 'Dome', 'Prospect', 'Expanse', 'Imperium', 'Outpost', '1999', '64', 'Rift', 'Cloud', 'Belt', 'Nebula', 'Colony', 'Blockade', 'Fleet', 'System', 'Omega', 'Gamma', 'Beta', 'Abyss'];
   },
 
   addMenuItems: function ( items ) {
