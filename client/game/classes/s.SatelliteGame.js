@@ -144,7 +144,7 @@ s.SatelliteGame = new Class( {
 
         //teamMode - invasion;, Not teamMode - free-for-all; 
         this.teamMode = true;
-        this.startingPosition = [this.getRandomCoordinate(), this.getRandomCoordinate(), this.getRandomCoordinate()];
+        this.startingPosition = this.getStartPosition();
         this.humansOnly = false;
 
         this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
@@ -600,7 +600,7 @@ s.SatelliteGame = new Class( {
         setTimeout(function() {
             that.player.shields = s.config.ship.shields;
             that.player.hull = s.config.ship.hull;
-            that.player.setPosition(that.startingPosition,[0,0,0],[0,0,0],[0,0,0]);
+            that.player.setPosition(that.getStartPosition(),[0,0,0],[0,0,0],[0,0,0]);
             if (type === 'base death') {
                 that.setBotsOnRestart();
             }
@@ -673,7 +673,7 @@ s.SatelliteGame = new Class( {
             //this the first time this function has been called with this client
             this.game.botPositionInterval = setInterval(function() {
                 that.game.updatePlayersWithBots('botUpdate');
-            }, 1000);
+            }, 250);
         }
         this.game.hostPlayer = true;
         if (this.game.botCount === 0) {
@@ -800,6 +800,10 @@ s.SatelliteGame = new Class( {
     handleBaseShields: function(message) {
         s.game.moonBaseTall.shields = message.moonBaseTallShields;
         s.game.spaceStation.shields = message.spaceStationShields;
+    },
+
+    getStartPosition: function() {
+        return [this.getRandomCoordinate(), this.getRandomCoordinate(), this.getRandomCoordinate()];
     }
 
 } );
