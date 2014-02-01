@@ -7,6 +7,6 @@ App.js is a standard Express-Node.js with Socket.io integration with the excepti
 
 `app.get('/rooms'...)` The pair of functions deals with Redis, please refer to [Redis implementation](server/db)
 
-`var socketManager and io.sockets.on` is an abstraction of `socket.on('connection', function{ socket.on(event, function(socket) {...} ) })`, please refer to [io manager documentation](/server/io) and [server events](server/events).
+`var socketManager and io.sockets.on` is an abstraction of `socket.on('connection', function{ socket.on(event, function(socket) {...} ) })`, please refer to [io manager documentation](/server/io) and [server events](/server/events).
 
 [Return to Master Directory](../README.md)
