@@ -11,7 +11,7 @@ window.s = {
             maxSpeed: 1500
         },
         base: {
-            shields: 40
+            shields: 400
         },
         sound: {
             enabled: true,

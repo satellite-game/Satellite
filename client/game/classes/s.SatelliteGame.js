@@ -144,10 +144,10 @@ s.SatelliteGame = new Class( {
 
         //teamMode - invasion;, Not teamMode - free-for-all; 
         this.teamMode = true;
-        this.startingPosition = [19232, 19946, 20311];
+        this.startingPosition = this.getStartPosition();
         this.humansOnly = false;
 
-        this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
+        this.rechargeShields = s.util.debounce(s.game.shieldBoost,11000);
         // No gravity
         this.scene.setGravity(new THREE.Vector3(0, 0, 0));
 
@@ -453,6 +453,10 @@ s.SatelliteGame = new Class( {
 
     handlePlayerList: function(message) {
         for (var otherPlayerName in message) {
+            //set up game settings on client
+            s.game.humansOnly = message[otherPlayerName].humansOnly;
+            s.game.teamMode = message[otherPlayerName].teamMode;
+            
             // don't add self
             if (otherPlayerName == this.player.name) {
                 s.game.setTeam(message[otherPlayerName]);
@@ -461,10 +465,6 @@ s.SatelliteGame = new Class( {
 
             var otherPlayer = message[otherPlayerName];
             s.game.enemies.add(otherPlayer);
-
-            //set up game settings on client
-            s.game.humansOnly = message[otherPlayerName].humansOnly;
-            s.game.teamMode = message[otherPlayerName].teamMode;
         }
         s.game.addBotOnBotDeathOrJoin();
     },
@@ -519,13 +519,13 @@ s.SatelliteGame = new Class( {
                     color: s.game.HUD.shieldsDamaged,
                     frames: 30
                 });
-                s.game.player.shields -= 20;
+                s.game.player.shields -= 30;
             } else {
                 s.game.HUD.menu.animate({
                     color: s.game.HUD.hull,
                     frames: 30
                 });
-                s.game.player.hull -= 20;
+                s.game.player.hull -= 30;
             }
             console.log('You were hit with a laser by %s! Your HP: %d', killer, s.game.player.hull);
 
@@ -540,13 +540,13 @@ s.SatelliteGame = new Class( {
                 }, 2000);
             }
             if (zappedEnemy.shields > 0){
-                zappedEnemy.shields -= 20;
+                zappedEnemy.shields -= 30;
                 console.log(zapped, ' shield is now: ', zappedEnemy.shields);
                 setTimeout(function() {
                     s.game.replenishEnemyShield(zappedEnemy);
-                }, 7000);
+                }, 11000);
             } else {
-                zappedEnemy.hull -= 20;
+                zappedEnemy.hull -= 30;
                 console.log(zapped, ' hull is now: ', zappedEnemy.hull);
             }
             if (zappedEnemy.hull <= 0 && zappedEnemy.isBot) {
@@ -600,7 +600,7 @@ s.SatelliteGame = new Class( {
         setTimeout(function() {
             that.player.shields = s.config.ship.shields;
             that.player.hull = s.config.ship.hull;
-            that.player.setPosition(that.startingPosition,[0,0,0],[0,0,0],[0,0,0]);
+            that.player.setPosition(that.getStartPosition(),[0,0,0],[0,0,0],[0,0,0]);
             if (type === 'base death') {
                 that.setBotsOnRestart();
             }
@@ -619,7 +619,7 @@ s.SatelliteGame = new Class( {
     },
 
     shieldBoost: function(){
-        s.game.IDs.push(setInterval(s.game.shieldAnimate,20));
+        s.game.IDs.push(setInterval(s.game.shieldAnimate,60));
     },
     shieldAnimate: function(){
         if (s.game.player.shields < s.config.ship.shields){
@@ -673,7 +673,7 @@ s.SatelliteGame = new Class( {
             //this the first time this function has been called with this client
             this.game.botPositionInterval = setInterval(function() {
                 that.game.updatePlayersWithBots('botUpdate');
-            }, 1000);
+            }, 250);
         }
         this.game.hostPlayer = true;
         if (this.game.botCount === 0) {
@@ -800,6 +800,10 @@ s.SatelliteGame = new Class( {
     handleBaseShields: function(message) {
         s.game.moonBaseTall.shields = message.moonBaseTallShields;
         s.game.spaceStation.shields = message.spaceStationShields;
+    },
+
+    getStartPosition: function() {
+        return [this.getRandomCoordinate(), this.getRandomCoordinate(), this.getRandomCoordinate()];
     }
 
 } );
