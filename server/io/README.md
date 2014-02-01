@@ -23,5 +23,5 @@ The event system requires a host and an io, the io is provided by socket.io and 
 
 `manager -> initializes room.js and eventss.js -> routes requests to eventss' 
 
-[Return to Server Directory](../server)
-[Return to Master Directory](../README.md)
+[Return to Server Directory](/server)
+[Return to Master Directory](/README.md)

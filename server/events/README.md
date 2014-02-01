@@ -72,5 +72,5 @@ When a bot hits a base the AI host emits an event that the server captures and t
 ###`baseInfo:`
 Uses a similar format to the other functions by grabbing the `socket` .id property to find the correct room the player is in. `baseInfo` is critical for team games; when a player joins they receive information by means of `packet` and `baseShields` which tells the client to set the current health of the base. However, for free-for-all, this is largely useless and should be culled out somehow. 
 
-[Return to Server Directory](../server)
-[Return to Master Directory](../README.md)
+[Return to Server Directory](/server)
+[Return to Master Directory](/README.md)
