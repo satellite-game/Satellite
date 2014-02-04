@@ -177,10 +177,10 @@ s.Menu = new Class({
       this.unhoverItem(this.hoveredItem);
       this.hoveredItem = item;
       if (this.hoveredItem.menuItemSelectCallback) {
-        item.material.color.setHex(0xCC0000);
+        item.material.color.setHex(0x00CCCC);
         if (item.material.ambient) {
-          item.material.ambient.setHex(0xFF0000);
-          item.material.specular.setHex(0xFF3333);
+          item.material.ambient.setHex(0x00FFFF);
+          item.material.specular.setHex(0x33FFFF);
         }
       }
     }
