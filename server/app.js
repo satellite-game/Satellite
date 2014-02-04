@@ -1,3 +1,5 @@
+// start monitoring with new relic
+require('newrelic');
 // creating global parameters and start
 // listening to 'process.env.PORT', we are creating an express
 // server and then we are binding it with socket.io
