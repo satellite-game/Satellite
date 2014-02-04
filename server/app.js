@@ -50,12 +50,28 @@ app.get('/rooms/:id', function (req, res) {
     });
 });
 
-
+// Holds players
+var players = {};
 
 var mapItems = [
     { type: 'Alien Space Station', pos: [0, 1000], rot: 0, hp: 100 },
     { type: 'Human Space Station',  pos: [0, -1000], rot: Math.PI*2, hp: 100 }
 ];
+
+var mapSize = 1600;
+var maxSpeed = 200; // units per second
+
+function getRandomCoord() {
+    return Math.random()*mapSize - mapSize/2;
+}
+
+function getRandomPosition() {
+    return [getRandomCoord(), 140, getRandomCoord()];
+}
+
+function getTime() {
+    return (new Date()).getTime();
+}
 
 var socketManager = require('./io/manager.js')(mapItems, io);
 io.sockets.on('connection', socketManager);

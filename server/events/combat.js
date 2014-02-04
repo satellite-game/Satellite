@@ -1,4 +1,4 @@
-module.exports = function (host) {
+module.exports = function (host, sync) {
 
   return {
     move: function( socket, packet ) {
@@ -8,8 +8,16 @@ module.exports = function (host) {
       }
 
       var room = host.sockets[socket.id].room;
+      var shipName = host.sockets[socket.id].name;
+      var playerState = host.rooms[room].gamestate[shipName];
+      // copy over the packet data into the canonical state
+
+
+      for(var i in packet) {
+        playerState[i] = packet[i];
+      }
       // emit the canonical state to everyone else
-      socket.broadcast.to(room).emit('move', packet);
+      socket.broadcast.to(room).emit('move', playerState);
     },
 
     fire: function( socket, packet ) {
@@ -42,3 +50,30 @@ module.exports = function (host) {
   };
 };
 
+  // socket.on('move', function(message) {
+  //     socket.get('name', function (err, name) {
+  //         if (players[name]) {
+  //             var player = players[name];
+
+  //             // Update position
+  //             player.pos = message.pos;
+  //             player.rot = message.rot;
+  //             player.aVeloc = message.aVeloc;
+  //             player.lVeloc = message.lVeloc;
+  //             player.lastMove = message.time;
+
+  //             // Notify players
+  //             socket.broadcast.emit('move', {
+  //                 name: name,
+  //                 pos: message.pos,
+  //                 rot: message.rot,
+  //                 aVeloc: message.aVeloc,
+  //                 lVeloc: message.lVeloc,
+  //                 interp: true
+  //             });
+  //         }
+  //         else {
+  //             socket.emit('failed');
+  //         }
+  //     });
+  // });

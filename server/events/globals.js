@@ -1,3 +1,5 @@
+// ************************************************************************ //
+// bot stuff
 module.exports = function() {
   return { 
     lastClient: undefined,
@@ -5,3 +7,4 @@ module.exports = function() {
     hostPlayer: undefined
   };
 };
+// ************************************************************************ //

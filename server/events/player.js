@@ -1,9 +1,9 @@
 var db = require('../db/queries');
 
-module.exports = function ( host, io ) {
+module.exports = function (host, sync, io) {
   return {
 
-    killed: function ( socket, packet ) {
+    killed: function (socket, packet) {
       var room = host.sockets[socket.id].room;
       var target = host.rooms[room].bot;
 
@@ -34,7 +34,8 @@ module.exports = function ( host, io ) {
       socket.broadcast.to(room).emit('killed', deathNotification);
     },
 
-    botInfo: function ( socket, packet ) {
+    botInfo: function ( socket, packet) {
+      console.log(host.sockets[socket.id]);
       var room = host.sockets[socket.id].room;
       var target = host.rooms[room].bot;
       if(target === undefined || room === undefined) {
@@ -45,7 +46,7 @@ module.exports = function ( host, io ) {
       io.sockets.socket(target.lastClient).emit('bot positions', packet);
     },
 
-    botHit: function ( socket, packet ) {
+    botHit: function ( socket, packet) {
       var room = host.sockets[socket.id];
 
       if( room === undefined) {
@@ -61,7 +62,7 @@ module.exports = function ( host, io ) {
       socket.emit('hit', response);
     },
 
-    botUpdate: function ( socket, packet ) {
+    botUpdate: function ( socket, packet) {
       var room = host.sockets[socket.id];
       if( host.sockets[socket.id] === undefined) {
         socket.disconnect(true);
@@ -80,6 +81,7 @@ module.exports = function ( host, io ) {
       
       socket.broadcast.to(room.room).emit('baseHit', packet); //go to everyone but client
       socket.emit('baseHit', packet); //go to client
+
     },
 
     baseInfo: function (socket, packet) {
