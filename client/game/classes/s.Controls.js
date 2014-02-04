@@ -10,7 +10,8 @@ s.Controls = new Class({
     thrustImpulse: 0,
     brakePower: 0.85,
     velocityFadeFactor: 16,
-    rotationFadeFactor: 4
+    rotationFadeFactor: 4,
+    boundaryPushback: 0
 
   },
 
@@ -22,13 +23,11 @@ s.Controls = new Class({
     this.player = options.player;
     this.camera = options.camera;
     this.menu = options.menu;
+    this.gamepad = options.game.gamepad;
     this.slowControllerScroll = true;
 
     // Create interpreters for controllers
     this.keyboard = new s.Keyboard();
-
-    // Gamepad interface
-    this.gamepad = new Gamepad();
 
     // Oculus Rift interface
     this.oculus = this.game.oculus;
@@ -241,11 +240,11 @@ s.Controls = new Class({
         if (hasGamepad) {
           pitch += this.oculus.quat.x/2;
           yaw += this.oculus.quat.y/2;
-          roll += this.oculus.quat.z/1.5;
+          roll += this.oculus.quat.z;
         } else {
           pitch += this.oculus.quat.x;
           yaw += this.oculus.quat.y;
-          roll += this.oculus.quat.z;
+          roll += this.oculus.quat.z*1.5;
         }
       } else {
         this.menu.updateHovered();
@@ -268,6 +267,23 @@ s.Controls = new Class({
     angularVelocity = angularVelocity.clone().divideScalar(this.options.rotationFadeFactor);
     root.setAngularVelocity(angularVelocity);
 
+    // If ship position is greater then x apply thrust in opposite direction
+    // If ship position is not greater then x allow to apply thrust
+    var playerPosition = this.player.root.position;
+    var boundryLimit = 30000;
+
+    // If the ship is beyound the boundary limit steer it back into the map
+
+    if(s.util.largerThan(playerPosition, boundryLimit)){
+      var boundryPush = new THREE.Vector3(-2*this.options.boundaryPushback*this.options.thrustImpulse, 0, 2*this.options.boundaryPushback*this.options.thrustImpulse ).applyMatrix4(rotationMatrix);
+      yaw = this.options.boundaryPushback;
+      if (this.options.boundaryPushback < 2) this.options.boundaryPushback += 0.01;
+      root.applyCentralImpulse(boundryPush);
+      console.log('--Outside Boundry Limit--');
+    } else if (this.options.boundaryPushback > 0) {
+      this.options.boundaryPushback -= 0.005;
+    }
+
     // Add to the existing angular velocity,
     var newAngularVelocity = new THREE.Vector3(pitch, yaw, roll).applyMatrix4(rotationMatrix).add(angularVelocity);
     root.setAngularVelocity(newAngularVelocity);
@@ -276,20 +292,6 @@ s.Controls = new Class({
     // Invert existing linear velocity
     // Fractionally apply the opposite impulse
     // Then apply forward impulse
-
-    // If ship position is greater then x apply thrust in opposite direction
-    // If ship position is not greater then x allow to apply thrust
-    var playerPosition = this.player.root.position;
-    var boundryLimit = 30000;
-
-    // If the ship is beyound the boundary limit push it back into the map
-    /*
-    if(s.util.largerThan(playerPosition, boundryLimit)){
-      var boundryPush = new THREE.Vector3(0, 0, 200*this.options.thrustImpulse).applyMatrix4(rotationMatrix);
-      root.applyCentralImpulse(boundryPush);
-      console.log('--Outside Boundry Limit--');
-    }
-    */
 
     if (thrust && this.options.thrustImpulse < s.config.ship.maxSpeed){
       this.options.thrustImpulse += (difference > s.config.ship.maxSpeed) ?

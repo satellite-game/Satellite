@@ -135,13 +135,10 @@ s.Comm = new Class({
           Math.abs(shipPosition.lAccel[1]) > 0.005 ||
           Math.abs(shipPosition.lAccel[2]) > 0.005 ) {
           var packet = {
-            time: time, // is this nessecary?
             pos: shipPosition.pos,
             rot: shipPosition.rot,
             aVeloc: shipPosition.aVeloc,
             lVeloc: shipPosition.lVeloc,
-            // not sure if we need to send this to the
-            // server except for testing purposes.
             aAccel: shipPosition.aAccel,
             lAccel: shipPosition.lAccel,
             alliance: s.game.player.alliance
