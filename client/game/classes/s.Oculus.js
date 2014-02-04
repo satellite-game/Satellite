@@ -11,7 +11,14 @@ s.Oculus = new Class({
       vr.pollState(this.state);
       if (this.state.hmd.present) {
         this.detected = true;
+        $('.HMDoverlay').show();
         this.game.hook(this.update);
+
+        if (this.game.HUD) {
+            console.log('Activating oculus HUD');
+            this.game.HUD.canvas.style.display = 'none';
+            this.game.HUD.oculusCanvas.style.display = 'block';
+        }
       }
     }, this);
   },

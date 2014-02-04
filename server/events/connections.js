@@ -4,17 +4,6 @@ var globals = require('./globals');
 module.exports = function (map, host, Sync, io) {
   return {
     join: function( socket, data ) {
-      // database stuff:
-      var savedSocketData = host.sockets[socket.id];
-      if (savedSocketData) {
-        // switching rooms:
-        db.leaveRoom(savedSocketData.room, savedSocketData.name);
-        db.joinRoom(data.room, savedSocketData.name);
-      } else {
-        // joining a room for the first time:
-        db.joinRoom(data.room, data.name);
-      }
-
       var target;
       if(host.rooms[data.room] === undefined) {
         host.init(socket, data.room, data);
@@ -36,6 +25,8 @@ module.exports = function (map, host, Sync, io) {
         target.bot.clients[socket.id] = true;
       }
 
+      db.joinRoom(data.room, data.name);  // add to game in the db
+
       socket.emit('player list', target.playerList);
       socket.emit('map', map.mapItems);
       socket.join(data.room);
@@ -52,10 +43,11 @@ module.exports = function (map, host, Sync, io) {
     },
 
     disconnect: function( socket ) {
-      if(host.sockets[socket.id] === undefined) {
-        socket.disconnect(true);
-        return console.log("Something is undefined on line 50, aborting.");
-      }
+      // if(host.sockets[socket.id] === undefined || host.sockets[socket.id].room === undefined ||
+      //    host.sockets[socket.id].name === undefined || host.rooms[host.sockets[socket.id].room].bot === undefined) {
+      //   socket.disconnect(true);
+      //   return console.log("Something is undefined on line 50, aborting.");
+      // }
       // console.log('socket:=================', socket, '\n=================');
       // console.log('host.sockets:=================', host.sockets, '\n=================');
       // console.log('host:=================', host, '\n=================');
