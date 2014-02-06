@@ -177,6 +177,7 @@ s.Menu = new Class({
       this.unhoverItem(this.hoveredItem);
       this.hoveredItem = item;
       if (this.hoveredItem.menuItemSelectCallback) {
+        this.hoveredItem.position.setZ(25);
         item.material.color.setHex(0x00CCCC);
         if (item.material.ambient) {
           item.material.ambient.setHex(0x00FFFF);
@@ -188,6 +189,7 @@ s.Menu = new Class({
 
   unhoverItem: function ( item ) {
     if (this.hoveredItem && this.hoveredItem !== '%b') {
+    this.hoveredItem.position.setZ(1);
       item.material.color.setHex(0x00CC00);
       if (item.material.ambient) {
         item.material.ambient.setHex(0x00FF00);
