@@ -66,12 +66,6 @@ s.Game = new Class({
     // for testing
     // this.oculus.detected = true;
 
-    // TODO: abstract key listening
-    $(document).on('keyup', function(evt) {
-      if (evt.which === 13)
-        self.toggleFullScreen();
-    });
-
     // Handle window resizes
     $(window).on('resize', this.fitWindow.bind(this));
     this.fitWindow();

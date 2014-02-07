@@ -73,13 +73,13 @@ s.Controls = new Class({
         }
       } else {
         if (that.menu.displayed) {
-          if (e.which === 32) {
+          if (e.which === 32 || e.which === 13) {
             that.menu.selectItem();
           }
-          if (e.which === 38) {
+          if (e.which === 38 || e.which === 87) {
             that.menu.updateHovered('up');
           }
-          if (e.which === 40) {
+          if (e.which === 40 || e.which === 83) {
             that.menu.updateHovered('down');
           }
         }
