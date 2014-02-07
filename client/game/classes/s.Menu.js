@@ -137,6 +137,7 @@ s.Menu = new Class({
   },
 
   open: function () {
+    debugger;
     if (this.menuScreen !== 'default') {
       this.showDefaultMenu();
     }
@@ -382,6 +383,7 @@ s.Menu = new Class({
   showRoomList: function () {
     this.menuScreen = 'rooms';
     var that = this;
+    this.addMenuItems([{text: 'JOIN GAME', size: 5},{text:'loading . . .', size: 3, flat: true}, {text: 'BACK', size: 3, action: 'back'}]);
 
     $.get('/rooms', function (data) {
       var roomList = [{text: 'JOIN GAME', size: 5},{text:'name    players', size: 3, flat: true}];
@@ -389,6 +391,7 @@ s.Menu = new Class({
         roomList.push({text: room + ' . . . ' + data[room], small: true, action: 'joinRoom', room: room});
       }
       roomList.push({text: 'BACK', size: 3, action: 'back'});
+      that.clearMenu();
       that.addMenuItems(roomList);
     });
   },
@@ -457,6 +460,7 @@ s.Menu = new Class({
   showScoreboard: function () {
     this.menuScreen = 'scoreboard';
     var that = this;
+      that.addMenuItems([{text: 'LEADERBOARD', size: 5}, {text: 'loading . . .', size: 3}]);
 
     $.get('/rooms/'+this.game.room, function (data) {
       var players = [{text: 'LEADERBOARD', size: 5, score: Infinity}];
@@ -464,6 +468,7 @@ s.Menu = new Class({
         players.push({text: name+' . . . '+data[name], small: true, score: data[name]});
       }
       players.sort(function (a, b) { return a.score > b.score; });
+      that.clearMenu();
       that.addMenuItems(players);
     });
   },
