@@ -12,7 +12,7 @@ s.Menu = new Class({
 
     this.menuItems = [];
     this.menuScreen = 'none';
-    this.cursorPosition = 0;
+    this.cursorPosition = 1;
     this.scrollable = true;
     this.hoveredItem = null;
     this.menuHeight = 0;
@@ -157,7 +157,7 @@ s.Menu = new Class({
 
     this.displayed = false;
     this.menuBox.visible = false;
-    this.cursorPosition = 0;
+    this.cursorPosition = 1;
     for (var i = 0; i < this.menuBox.children.length; i++) {
       this.menuBox.children[i].visible = false;
     }
