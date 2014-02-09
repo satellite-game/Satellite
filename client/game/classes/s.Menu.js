@@ -178,7 +178,11 @@ s.Menu = new Class({
       this.unhoverItem(this.hoveredItem);
       this.hoveredItem = item;
       if (this.hoveredItem.menuItemSelectCallback) {
-        this.hoveredItem.position.setZ(25);
+        if (this.oculus.detected) {
+          this.hoveredItem.position.setZ(12);
+        } else {
+          this.hoveredItem.position.setZ(25);
+        }
         item.material.color.setHex(0x0099CC);
         if (item.material.ambient) {
           item.material.ambient.setHex(0x00CCFF);
