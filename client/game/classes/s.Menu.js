@@ -179,7 +179,7 @@ s.Menu = new Class({
       this.hoveredItem = item;
       if (this.hoveredItem.menuItemSelectCallback) {
         if (this.oculus.detected) {
-          this.hoveredItem.position.setZ(12);
+          this.hoveredItem.position.setZ(10);
         } else {
           this.hoveredItem.position.setZ(25);
         }
@@ -535,7 +535,7 @@ s.Menu = new Class({
 
   disconnect: function () {
     console.log('Disconnecting.');
-    window.location.href = "http://satellite-game.com";
+    window.location.href = "http://satellite.io";
   },
 
   gameOver: function (killer, baseDestroyed, message) {
