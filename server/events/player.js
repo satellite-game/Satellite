@@ -1,6 +1,6 @@
 var db = require('../db/queries');
 
-module.exports = function (host, sync, io) {
+module.exports = function (host, io) {
   return {
 
     killed: function (socket, packet) {
@@ -79,9 +79,17 @@ module.exports = function (host, sync, io) {
         return console.log("Room doesn't exist");
       }
       
-      socket.broadcast.to(room.room).emit('baseHit', packet); //go to everyone but client
-      socket.emit('baseHit', packet); //go to client
+      io.sockets.in(room.room).emit('baseHit', packet);
+    },
 
+    baseInfo: function (socket, packet) {
+      var room = host.sockets[socket.id].room;
+      var target = host.rooms[room].bot;
+      if(target === undefined || room === undefined) {
+        socket.disconnect(true);
+        return console.log("Target or Room is undefined at botInfo, this is bot ", target , "and this is room", room);
+      }
+      io.sockets.socket(target.lastClient).emit('baseShields', packet);
     }
 
   };

@@ -144,10 +144,10 @@ s.SatelliteGame = new Class( {
 
         //teamMode - invasion;, Not teamMode - free-for-all; 
         this.teamMode = true;
-        this.startingPosition = [19232, 19946, 20311];
+        this.startingPosition = this.getStartPosition();
         this.humansOnly = false;
 
-        this.rechargeShields = s.util.debounce(s.game.shieldBoost,7000);
+        this.rechargeShields = s.util.debounce(s.game.shieldBoost,11000);
         // No gravity
         this.scene.setGravity(new THREE.Vector3(0, 0, 0));
 
@@ -212,8 +212,6 @@ s.SatelliteGame = new Class( {
             alliance: 'alliance',
             camera: this.camera
         } );
-
-        if (this.teamMode) { this.player.enemyBase = 'moonBaseTall'; }
 
         // Targeting square around targeted enemy.
 
@@ -298,7 +296,8 @@ s.SatelliteGame = new Class( {
         this.comm.on( 'bot retrieval', that.handleBotInfo );
         this.comm.on( 'bot positions', that.handleBotPositions );
         this.comm.on( 'baseHit', that.baseHit );
-        this.comm.on( 'setTeam', that.setTeam );
+        this.comm.on( 'baseInfo', that.handleBaseInfo );
+        this.comm.on( 'baseShields', that.handleBaseShields );
 
         this.HUD.controls = this.controls;
 
@@ -454,8 +453,15 @@ s.SatelliteGame = new Class( {
 
     handlePlayerList: function(message) {
         for (var otherPlayerName in message) {
+            //set up game settings on client
+            s.game.humansOnly = message[otherPlayerName].humansOnly;
+            s.game.teamMode = message[otherPlayerName].teamMode;
+            
             // don't add self
-            if (otherPlayerName == this.player.name) continue;
+            if (otherPlayerName == this.player.name) {
+                s.game.setTeam(message[otherPlayerName]);
+                continue;
+            }
 
             var otherPlayer = message[otherPlayerName];
             s.game.enemies.add(otherPlayer);
@@ -472,10 +478,12 @@ s.SatelliteGame = new Class( {
         });
         s.game.enemies.delete(message.killed);
         if (message.killer == s.game.pilot.name) {
-            console.warn('You killed %s!', message.killed);
+            // console.warn('You killed %s!', message.killed);
+            s.game.HUD.pushKillList(message.killed, 'You');
         }
         else {
-            console.log('%s was killed by %s', message.killed, message.killer);
+            // console.log('%s was killed by %s', message.killed, message.killer);
+            s.game.HUD.pushKillList(message.killed, message.killer);
         }
     },
 
@@ -511,13 +519,13 @@ s.SatelliteGame = new Class( {
                     color: s.game.HUD.shieldsDamaged,
                     frames: 30
                 });
-                s.game.player.shields -= 20;
+                s.game.player.shields -= 30;
             } else {
                 s.game.HUD.menu.animate({
                     color: s.game.HUD.hull,
                     frames: 30
                 });
-                s.game.player.hull -= 20;
+                s.game.player.hull -= 30;
             }
             console.log('You were hit with a laser by %s! Your HP: %d', killer, s.game.player.hull);
 
@@ -532,13 +540,13 @@ s.SatelliteGame = new Class( {
                 }, 2000);
             }
             if (zappedEnemy.shields > 0){
-                zappedEnemy.shields -= 20;
+                zappedEnemy.shields -= 30;
                 console.log(zapped, ' shield is now: ', zappedEnemy.shields);
                 setTimeout(function() {
                     s.game.replenishEnemyShield(zappedEnemy);
-                }, 7000);
+                }, 11000);
             } else {
-                zappedEnemy.hull -= 20;
+                zappedEnemy.hull -= 30;
                 console.log(zapped, ' hull is now: ', zappedEnemy.hull);
             }
             if (zappedEnemy.hull <= 0 && zappedEnemy.isBot) {
@@ -568,9 +576,10 @@ s.SatelliteGame = new Class( {
     },
 
     addBotOnBotDeathOrJoin: function() {
+        if (this.humansOnly) { return; }
+
         var humans = this.enemies._numberOfHumans;
         var bots = this.enemies._numberOfBots;
-
         if ( this.teamMode) {
         //there should be roughly 50% more bots than humans in team mode
             while (bots < humans + Math.ceil(humans / 2) ) {
@@ -591,7 +600,7 @@ s.SatelliteGame = new Class( {
         setTimeout(function() {
             that.player.shields = s.config.ship.shields;
             that.player.hull = s.config.ship.hull;
-            that.player.setPosition(that.startingPosition,[0,0,0],[0,0,0],[0,0,0]);
+            that.player.setPosition(that.getStartPosition(),[0,0,0],[0,0,0],[0,0,0]);
             if (type === 'base death') {
                 that.setBotsOnRestart();
             }
@@ -610,7 +619,7 @@ s.SatelliteGame = new Class( {
     },
 
     shieldBoost: function(){
-        s.game.IDs.push(setInterval(s.game.shieldAnimate,20));
+        s.game.IDs.push(setInterval(s.game.shieldAnimate,60));
     },
     shieldAnimate: function(){
         if (s.game.player.shields < s.config.ship.shields){
@@ -664,7 +673,7 @@ s.SatelliteGame = new Class( {
             //this the first time this function has been called with this client
             this.game.botPositionInterval = setInterval(function() {
                 that.game.updatePlayersWithBots('botUpdate');
-            }, 1000);
+            }, 250);
         }
         this.game.hostPlayer = true;
         if (this.game.botCount === 0) {
@@ -756,28 +765,45 @@ s.SatelliteGame = new Class( {
             s.game.spaceStation.shields = s.config.base.shields;
 
             if (base === 'spaceStation') {
-                message = 'rebels wins';
+                message = 'rebels win';
             } else {
-                message = "alliance win";
+                message = "alliance wins";
             }
             s.game.gameOverBoolean = true;
             s.game.menu.gameOver('temp', s.game.baseNameMap[base], message);
             s.game.restartGame('base death');
-        }, 3000);
+        }, 2500);
 
     },
 
     setTeam: function(message) {
-        this.game.player.alliance = message.alliance;
+        if (!message.teamMode) { return; }
+        this.player.alliance = message.alliance;
         var position;
         if (message.alliance === 'rebel') {
-            this.game.startingPosition = [-6879, 210, 406]; //start at moon
-            this.game.player.enemyBase = 'moonBaseTall';
+            this.startingPosition = [-6879, 210, 406]; //start at moon
+            this.player.enemyBase = 'spaceStation';
         } else {
-            this.game.startingPosition = [19232, 19946, 20311]; //start at spacestation
-            this.game.player.enemyBase = 'spaceStation';
+            this.startingPosition = [19232, 19946, 20311]; //start at spacestation
+            this.player.enemyBase = 'moonBaseTall';
         }
-        this.game.player.setPosition(this.game.startingPosition,[0,0,0],[0,0,0],[0,0,0]);
+        this.player.setPosition(this.startingPosition,[0,0,0],[0,0,0],[0,0,0]);
+    },
+
+    handleBaseInfo: function() {
+        s.game.comm.baseInfo({
+            moonBaseTallShields: s.game.moonBaseTall.shields,
+            spaceStationShields: s.game.spaceStation.shields
+        });
+    },
+
+    handleBaseShields: function(message) {
+        s.game.moonBaseTall.shields = message.moonBaseTallShields;
+        s.game.spaceStation.shields = message.spaceStationShields;
+    },
+
+    getStartPosition: function() {
+        return [this.getRandomCoordinate(), this.getRandomCoordinate(), this.getRandomCoordinate()];
     }
 
 } );
