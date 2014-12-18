@@ -531,7 +531,7 @@ s.Menu = new Class({
 
   disconnect: function () {
     console.log('Disconnecting.');
-    window.location.href = "http://satellite-game.com";
+    window.location.href = "http://satellite.io";
   },
 
   gameOver: function (killer, baseDestroyed, message) {

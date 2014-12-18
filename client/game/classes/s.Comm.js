@@ -186,7 +186,7 @@ s.Comm = new Class({
     this.time += 1;
 
     // if ( this.time >= 60 ){
-    //     window.location.href = "http://satellite-game.com";
+    //     window.location.href = "http://satellite.io";
     // }
   },
 
