@@ -12,7 +12,7 @@ s.Menu = new Class({
 
     this.menuItems = [];
     this.menuScreen = 'none';
-    this.cursorPosition = 0;
+    this.cursorPosition = 1;
     this.scrollable = true;
     this.hoveredItem = null;
     this.menuHeight = 0;
@@ -157,7 +157,7 @@ s.Menu = new Class({
 
     this.displayed = false;
     this.menuBox.visible = false;
-    this.cursorPosition = 0;
+    this.cursorPosition = 1;
     for (var i = 0; i < this.menuBox.children.length; i++) {
       this.menuBox.children[i].visible = false;
     }
@@ -178,11 +178,15 @@ s.Menu = new Class({
       this.unhoverItem(this.hoveredItem);
       this.hoveredItem = item;
       if (this.hoveredItem.menuItemSelectCallback) {
-        this.hoveredItem.position.setZ(25);
-        item.material.color.setHex(0x00CCCC);
+        if (this.oculus.detected) {
+          this.hoveredItem.position.setZ(10);
+        } else {
+          this.hoveredItem.position.setZ(25);
+        }
+        item.material.color.setHex(0x0099CC);
         if (item.material.ambient) {
-          item.material.ambient.setHex(0x00FFFF);
-          item.material.specular.setHex(0x33FFFF);
+          item.material.ambient.setHex(0x00CCFF);
+          item.material.specular.setHex(0x3399FF);
         }
       }
     }
